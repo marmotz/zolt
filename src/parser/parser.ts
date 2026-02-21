@@ -74,22 +74,17 @@ export class Parser {
 
   private parseHeading(): HeadingNode {
     const token = this.expect(TokenType.HEADING);
-    const level = this.countHeadingLevel(token.value);
+    const level = token.level || 1;
 
     return {
       type: 'Heading',
       level,
-      content: token.value.replace(/^#+/, '').trim(),
+      content: token.value,
     };
   }
 
-  private countHeadingLevel(value: string): number {
-    let level = 0;
-    for (const char of value) {
-      if (char === '#') level++;
-      else break;
-    }
-    return Math.min(level, 6);
+  private countHeadingLevel(_value: string): number {
+    return 1;
   }
 
   private parseParagraph(): ParagraphNode {
@@ -173,20 +168,12 @@ export class Parser {
 
   private parseListItem(kind: string): ListItemNode {
     const checked = this.parseTaskMarker();
+    let content = '';
 
     if (this.match(TokenType.BULLET_LIST) || this.match(TokenType.ORDERED_LIST) || this.match(TokenType.TASK_LIST)) {
+      const token = this.currentToken;
+      content = token.value;
       this.advance();
-    }
-
-    let content = '';
-    while (
-      !this.match(TokenType.EOF) &&
-      !this.match(TokenType.NEWLINE) &&
-      !this.match(TokenType.BULLET_LIST) &&
-      !this.match(TokenType.ORDERED_LIST) &&
-      !this.match(TokenType.TASK_LIST)
-    ) {
-      content += this.advance().value;
     }
 
     return {

@@ -39,6 +39,55 @@ describe('API', () => {
       expect(html).toContain('<ul>');
       expect(html).toContain('<li>');
     });
+
+    test('should build list with content', async () => {
+      const html = await buildString('- item 1\n- item 2');
+
+      expect(html).toContain('item 1');
+      expect(html).toContain('item 2');
+    });
+
+    test('should build heading with different levels', async () => {
+      const html = await buildString('# H1\n## H2\n### H3');
+
+      expect(html).toContain('<h1>H1</h1>');
+      expect(html).toContain('<h2>H2</h2>');
+      expect(html).toContain('<h3>H3</h3>');
+    });
+
+    test('should build link in paragraph', async () => {
+      const html = await buildString('[example.zlt](example.zlt)');
+
+      expect(html).toContain('<a href="example.zlt">example.zlt</a>');
+    });
+
+    test('should build link in list item', async () => {
+      const html = await buildString('- [file.zlt](file.zlt) — description');
+
+      expect(html).toContain('<a href="file.zlt">file.zlt</a>');
+      expect(html).toContain('— description');
+    });
+
+    test('should build complex document with all features', async () => {
+      const html = await buildString(`# Title
+
+Paragraph with [link](url).
+
+## Section
+
+- [item 1](item1.zlt)
+- [item 2](item2.zlt)
+
+1. First
+2. Second`);
+
+      expect(html).toContain('<h1>Title</h1>');
+      expect(html).toContain('<h2>Section</h2>');
+      expect(html).toContain('<a href="url">link</a>');
+      expect(html).toContain('<a href="item1.zlt">item 1</a>');
+      expect(html).toContain('<ol>');
+      expect(html).toContain('First');
+    });
   });
 
   describe('lint', () => {

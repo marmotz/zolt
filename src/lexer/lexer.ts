@@ -84,6 +84,7 @@ export class Lexer {
       line,
       column,
       length: this.pos - start,
+      level,
     };
   }
 
@@ -276,11 +277,21 @@ export class Lexer {
     ) {
       this.advanceChar();
     }
+
+    if (type === TokenType.ORDERED_LIST && this.peekChar() === '.') {
+      this.advanceChar();
+    }
+
     this.skipWhitespace();
+
+    let content = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      content += this.advanceChar();
+    }
 
     return {
       type,
-      value: '',
+      value: content,
       line,
       column,
       length: this.pos - start,

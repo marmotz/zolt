@@ -85,4 +85,41 @@ describe('Lexer', () => {
     expect(tokens[0].line).toBe(1);
     expect(tokens[1].line).toBe(2);
   });
+
+  test('should tokenize heading with correct level', () => {
+    const lexer = new Lexer('## Section');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HEADING);
+    expect(tokens[0].value).toBe('Section');
+    expect(tokens[0].level).toBe(2);
+  });
+
+  test('should tokenize heading level 6', () => {
+    const lexer = new Lexer('###### H6');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HEADING);
+    expect(tokens[0].level).toBe(6);
+  });
+
+  test('should tokenize list with content', () => {
+    const lexer = new Lexer('- item 1\n- item 2');
+    const tokens = lexer.tokenize();
+
+    const bulletTokens = tokens.filter((t) => t.type === TokenType.BULLET_LIST);
+    expect(bulletTokens.length).toBe(2);
+    expect(bulletTokens[0].value).toBe('item 1');
+    expect(bulletTokens[1].value).toBe('item 2');
+  });
+
+  test('should tokenize numbered list with content', () => {
+    const lexer = new Lexer('1. First\n2. Second');
+    const tokens = lexer.tokenize();
+
+    const orderedTokens = tokens.filter((t) => t.type === TokenType.ORDERED_LIST);
+    expect(orderedTokens.length).toBe(2);
+    expect(orderedTokens[0].value).toBe('First');
+    expect(orderedTokens[1].value).toBe('Second');
+  });
 });

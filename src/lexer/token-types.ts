@@ -66,4 +66,5 @@ export interface Token {
   line: number;
   column: number;
   length: number;
+  level?: number;
 }

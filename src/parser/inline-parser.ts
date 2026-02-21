@@ -5,6 +5,7 @@ import {
   HighlightNode,
   InlineStyleNode,
   ItalicNode,
+  LinkNode,
   StrikethroughNode,
   SubscriptNode,
   SuperscriptNode,
@@ -33,8 +34,9 @@ export class InlineParser {
   }
 
   private parseInlineElement(text: string): { node: ASTNode; remaining: string } | null {
-    if (this.matchPattern(text, /^\^\{([^}]+)\}/)) return this.parseSuperscript(text);
-    if (this.matchPattern(text, /^_\{([^}]+)\}/)) return this.parseSubscript(text);
+    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/)) return this.parseLink(text);
+    if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
+    if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
     if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) return this.parseInlineStyle(text);
     if (this.matchPattern(text, /^\*\*([^*]+)\*\*/)) return this.parseBold(text);
     if (this.matchPattern(text, /^\/\/([^/]+)\/\//)) return this.parseItalic(text);
@@ -50,6 +52,20 @@ export class InlineParser {
 
   private matchPattern(text: string, pattern: RegExp): RegExpMatchArray | null {
     return text.match(pattern);
+  }
+
+  private parseLink(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/);
+    if (!match) return null;
+
+    return {
+      node: {
+        type: 'Link',
+        content: match[1],
+        href: match[2],
+      } as LinkNode,
+      remaining: text.slice(match[0].length),
+    };
   }
 
   private parseBold(text: string): { node: ASTNode; remaining: string } | null {

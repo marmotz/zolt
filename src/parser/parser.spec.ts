@@ -12,7 +12,7 @@ describe('Parser', () => {
     expect(ast.type).toBe('Document');
     expect(ast.children[0].type).toBe('Heading');
     expect((ast.children[0] as any).content).toBe('Hello World');
-    expect((ast.children[0] as any).level).toBe(0);
+    expect((ast.children[0] as any).level).toBe(1);
   });
 
   test('should parse paragraph', () => {
@@ -102,5 +102,40 @@ describe('Parser', () => {
     const ast = parser.parse();
 
     expect(ast.sourceFile).toBe('test.zlt');
+  });
+
+  test('should parse heading level 2', () => {
+    const lexer = new Lexer('## Section Title');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Heading');
+    expect((ast.children[0] as any).level).toBe(2);
+    expect((ast.children[0] as any).content).toBe('Section Title');
+  });
+
+  test('should parse list with content', () => {
+    const lexer = new Lexer('- item 1\n- item 2');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('List');
+    expect((ast.children[0] as any).children.length).toBe(2);
+    expect((ast.children[0] as any).children[0].content).toBe('item 1');
+    expect((ast.children[0] as any).children[1].content).toBe('item 2');
+  });
+
+  test('should parse numbered list with content', () => {
+    const lexer = new Lexer('1. First\n2. Second');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('List');
+    expect((ast.children[0] as any).kind).toBe('numbered');
+    expect((ast.children[0] as any).children[0].content).toBe('First');
+    expect((ast.children[0] as any).children[1].content).toBe('Second');
   });
 });

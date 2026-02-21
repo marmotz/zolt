@@ -1,5 +1,5 @@
 /dist
 /examples/*.html
-/html/
-/node_modules/
-/tmp-output/
+/html
+/node_modules
+/tmp-output

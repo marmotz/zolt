@@ -33,8 +33,67 @@ import {
   VideoNode,
 } from '../../parser/types';
 import { Builder } from '../builder';
+import { InlineParser } from '../../parser/inline-parser';
+
+const DEFAULT_CSS = `
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #333;
+    background: #fafafa;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #111;
+  }
+  h1 { font-size: 2rem; border-bottom: 2px solid #e0e0e0; padding-bottom: 0.3em; }
+  h2 { font-size: 1.5rem; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.2em; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1rem; }
+  p { margin: 1em 0; }
+  ul, ol { padding-left: 2rem; margin: 1em 0; }
+  li { margin: 0.25em 0; }
+  a { color: #0066cc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  blockquote {
+    margin: 1em 0;
+    padding: 0.5em 1rem;
+    border-left: 4px solid #e0e0e0;
+    background: #f5f5f5;
+    color: #555;
+  }
+  code {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 0.9em;
+    background: #f0f0f0;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  hr { border: none; border-top: 2px solid #e0e0e0; margin: 2rem 0; }
+  input[type="checkbox"] { margin-right: 0.5em; }
+`.trim();
 
 export class HTMLBuilder implements Builder {
+  private inlineParser = new InlineParser();
+
   build(node: ASTNode): string {
     switch (node.type) {
       case 'Document':
@@ -70,7 +129,11 @@ export class HTMLBuilder implements Builder {
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+${DEFAULT_CSS}
+  </style>
 </head>
 <body>
 ${childrenHtml}
@@ -90,7 +153,8 @@ ${childrenHtml}
 
   visitParagraph(node: ParagraphNode): string {
     const attrs = this.buildAttributes(node.attributes);
-    return `<p${attrs}>${node.content}</p>`;
+    const content = this.processInlineContent(node.content);
+    return `<p${attrs}>${content}</p>`;
   }
 
   visitBlockquote(node: BlockquoteNode): string {
@@ -112,9 +176,10 @@ ${childrenHtml}
     const checkbox =
       node.checked !== undefined ? `<input type="checkbox" ${node.checked ? 'checked' : ''} disabled>` : '';
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const content = childrenHtml || this.processInlineContent(node.content);
 
     const attrs = this.buildAttributes(node.attributes);
-    return `<li${attrs}>${checkbox}${childrenHtml}</li>`;
+    return `<li${attrs}>${checkbox}${content}</li>`;
   }
 
   visitCodeBlock(node: CodeBlockNode): string {
@@ -141,7 +206,42 @@ ${childrenHtml}
   }
 
   processInline(text: string): string {
-    return text;
+    const nodes = this.inlineParser.parse(text);
+    return nodes.map((node) => this.buildInlineNode(node)).join('');
+  }
+
+  processInlineContent(text: string): string {
+    if (!text) return '';
+    return this.processInline(text);
+  }
+
+  private buildInlineNode(node: ASTNode): string {
+    switch (node.type) {
+      case 'Text':
+        return (node as any).content;
+      case 'Bold':
+        return this.visitBold(node as BoldNode);
+      case 'Italic':
+        return this.visitItalic(node as ItalicNode);
+      case 'Underline':
+        return this.visitUnderline(node as UnderlineNode);
+      case 'Strikethrough':
+        return this.visitStrikethrough(node as StrikethroughNode);
+      case 'Code':
+        return this.visitCode(node as CodeNode);
+      case 'Superscript':
+        return this.visitSuperscript(node as SuperscriptNode);
+      case 'Subscript':
+        return this.visitSubscript(node as SubscriptNode);
+      case 'Highlight':
+        return this.visitHighlight(node as HighlightNode);
+      case 'InlineStyle':
+        return this.visitInlineStyle(node as InlineStyleNode);
+      case 'Link':
+        return this.visitLink(node as LinkNode);
+      default:
+        return (node as any).content || '';
+    }
   }
 
   visitBold(node: BoldNode): string {
