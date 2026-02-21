@@ -118,9 +118,9 @@
 
 ### Blockquote Features
 
-- [ ] Simple blockquotes `> text`
+- [x] Simple blockquotes `> text`
 - [ ] Blockquotes with attributes
-- [ ] Nested blockquotes `>>` and `>>>`
+- [x] Nested blockquotes `>>` and `>>>`
 
 ## 7. Technical Indentation
 

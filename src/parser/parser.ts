@@ -14,6 +14,7 @@ import {
   FrontmatterNode,
   HeadingNode,
   HorizontalRuleNode,
+  IndentationNode,
   ListItemNode,
   ListNode,
   ParagraphNode,
@@ -234,45 +235,108 @@ export class Parser {
 
   private parseBlockquote(): BlockquoteNode {
     const startToken = this.expect(TokenType.BLOCKQUOTE);
-    const level = startToken.value.split('>').length - 1;
-    let quoteValue = startToken.value;
+    const baseLevel = startToken.level || 1;
 
     const children: ASTNode[] = [];
-    this.skipNewlines();
 
-    while (!this.match(TokenType.EOF) && !this.match(TokenType.BLOCKQUOTE) && !this.isNewBlockStart()) {
-      const content = this.parseBlockquoteContent();
-      if (content) {
-        children.push(content);
-      }
-      this.skipNewlines();
+    const firstLineContent = this.parseBlockquoteLineContent();
+    if (firstLineContent) {
+      children.push(firstLineContent);
     }
 
-    // Extract attributes from the first line if present
-    let attributes: Attributes | undefined;
-    const attrMatch = quoteValue.match(/\{([^}]+)}$/);
-    if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
+    while (!this.isEof()) {
+      if (this.match(TokenType.BLOCKQUOTE)) {
+        const nextLevel = this.currentToken.level || 1;
+
+        if (nextLevel < baseLevel) {
+          break;
+        }
+
+        if (nextLevel > baseLevel) {
+          const nested = this.parseBlockquote();
+          children.push(nested);
+          continue;
+        }
+
+        this.advance();
+        const lineContent = this.parseBlockquoteLineContent();
+        if (lineContent) {
+          children.push(lineContent);
+        }
+        continue;
+      }
+
+      if (!this.match(TokenType.NEWLINE)) {
+        break;
+      }
+      this.advance();
+
+      if (this.match(TokenType.NEWLINE)) {
+        break;
+      }
     }
 
     return {
       type: 'Blockquote',
+      level: baseLevel,
       children,
-      level,
-      attributes,
     };
   }
 
-  private parseBlockquoteContent(): ASTNode | null {
-    if (this.peekNext()?.type === TokenType.BLOCKQUOTE) {
-      return this.parseBlockquote();
+  private parseBlockquoteLineContent(): ASTNode | null {
+    if (this.match(TokenType.BLOCKQUOTE, TokenType.NEWLINE, TokenType.EOF)) {
+      return null;
     }
 
     if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
-      return this.parseList();
+      return this.parseBlockquoteList();
     }
 
     return this.parseParagraph();
+  }
+
+  private parseBlockquoteList(): ListNode {
+    const kind = this.getListKind(this.currentToken.type);
+    const children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[] = [];
+
+    while (!this.isEof()) {
+      if (!this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+        break;
+      }
+
+      if (this.getListKind(this.currentToken.type) !== kind) {
+        break;
+      }
+
+      const item = this.parseListItem(kind, '');
+      children.push(item);
+      this.skipNewlines();
+
+      if (this.match(TokenType.BLOCKQUOTE)) {
+        const nextLevel = this.currentToken.level || 1;
+        if (nextLevel !== 1) {
+          break;
+        }
+        const peekedNext = this.peek(1);
+        if (
+          peekedNext.type !== TokenType.BULLET_LIST &&
+          peekedNext.type !== TokenType.ORDERED_LIST &&
+          peekedNext.type !== TokenType.TASK_LIST
+        ) {
+          break;
+        }
+        if (this.getListKind(peekedNext.type) !== kind) {
+          break;
+        }
+        this.advance();
+      }
+    }
+
+    return {
+      type: 'List',
+      kind,
+      children,
+    };
   }
 
   private parseList(indent: string = ''): ListNode {

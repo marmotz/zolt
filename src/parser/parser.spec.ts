@@ -56,6 +56,49 @@ describe('Parser', () => {
     expect((ast.children[0] as any).level).toBe(1);
   });
 
+  test('should parse blockquote with multiple lines', () => {
+    const lexer = new Lexer('> Line 1\n> Line 2');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Blockquote');
+    expect((ast.children[0] as any).level).toBe(1);
+    expect((ast.children[0] as any).children.length).toBe(2);
+  });
+
+  test('should parse nested blockquote', () => {
+    const lexer = new Lexer('> Level 1\n> > Level 2');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Blockquote');
+    expect((ast.children[0] as any).level).toBe(1);
+    expect((ast.children[0] as any).children.length).toBe(2);
+    expect((ast.children[0] as any).children[1].type).toBe('Blockquote');
+    expect(((ast.children[0] as any).children[1] as any).level).toBe(2);
+  });
+
+  test('should parse three-level nested blockquote', () => {
+    const lexer = new Lexer('> Level 1\n> > Level 2\n> > > Level 3');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    const level1 = ast.children[0] as any;
+    expect(level1.type).toBe('Blockquote');
+    expect(level1.level).toBe(1);
+
+    const level2 = level1.children.find((c: any) => c.type === 'Blockquote') as any;
+    expect(level2).toBeDefined();
+    expect(level2.level).toBe(2);
+
+    const level3 = level2.children.find((c: any) => c.type === 'Blockquote') as any;
+    expect(level3).toBeDefined();
+    expect(level3.level).toBe(3);
+  });
+
   test('should parse horizontal rule', () => {
     const lexer = new Lexer('---');
     const tokens = lexer.tokenize();
@@ -185,7 +228,7 @@ describe('Parser', () => {
   test('should not hang on unexpected TRIPLE_COLON_END', () => {
     const lexer = new Lexer(':::foreach\n:::\n:::');
     const parser = new Parser(lexer.tokenize());
-    
+
     // This should not hang
     const ast = parser.parse();
     expect(ast).toBeDefined();
@@ -195,7 +238,7 @@ describe('Parser', () => {
   test('should handle multiple unexpected TRIPLE_COLON_END tokens', () => {
     const lexer = new Lexer(':::\n:::\n:::');
     const parser = new Parser(lexer.tokenize());
-    
+
     // This should not hang
     const ast = parser.parse();
     expect(ast).toBeDefined();

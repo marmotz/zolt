@@ -42,6 +42,30 @@ describe('Lexer', () => {
     expect(tokens[0].type).toBe(TokenType.BLOCKQUOTE);
   });
 
+  test('should tokenize blockquote with level', () => {
+    const lexer = new Lexer('> Quote text');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.BLOCKQUOTE);
+    expect(tokens[0].level).toBe(1);
+  });
+
+  test('should tokenize nested blockquote level 2', () => {
+    const lexer = new Lexer('> > Level 2 quote');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.BLOCKQUOTE);
+    expect(tokens[0].level).toBe(2);
+  });
+
+  test('should tokenize nested blockquote level 3', () => {
+    const lexer = new Lexer('> > > Level 3 quote');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.BLOCKQUOTE);
+    expect(tokens[0].level).toBe(3);
+  });
+
   test('should tokenize horizontal rule', () => {
     const lexer = new Lexer('---');
     const tokens = lexer.tokenize();
@@ -55,10 +79,10 @@ describe('Lexer', () => {
 
     expect(tokens[0].type).toBe(TokenType.CODE_BLOCK_START);
     expect(tokens[0].value).toBe('js');
-    
+
     expect(tokens[1].type).toBe(TokenType.CODE_BLOCK);
     expect(tokens[1].value).toBe('const x = 1');
-    
+
     expect(tokens[2].type).toBe(TokenType.CODE_BLOCK_END);
   });
 
@@ -79,15 +103,15 @@ describe('Lexer', () => {
   test('should tokenize triple colon blocks', () => {
     const lexer = new Lexer(':::columns\ncontent\n:::');
     const tokens = lexer.tokenize();
-    
+
     expect(tokens[0].type).toBe(TokenType.TRIPLE_COLON_START);
     expect(tokens[0].value).toBe('columns');
-    
+
     // tokens[1] is NEWLINE
     // tokens[2] is TEXT
     // tokens[3] is NEWLINE
-    
-    const endToken = tokens.find(t => t.type === TokenType.TRIPLE_COLON_END);
+
+    const endToken = tokens.find((t) => t.type === TokenType.TRIPLE_COLON_END);
     expect(endToken).toBeDefined();
     expect(endToken?.value).toBe('');
   });
