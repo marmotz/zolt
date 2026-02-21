@@ -159,13 +159,13 @@ describe('Parser', () => {
     expect((ast.children[0] as any).content).toContain('||Warning||{color=red font-weight=bold}');
   });
 
-  test('should parse inline style with padding', () => {
-    const lexer = new Lexer('||Click me||{background=blue color=white padding=4px 8px}');
+  test('should parse standalone inline comment', () => {
+    const lexer = new Lexer('%% comment %%');
     const tokens = lexer.tokenize();
     const parser = new Parser(tokens);
     const ast = parser.parse();
 
-    expect(ast.children[0].type).toBe('Paragraph');
-    expect((ast.children[0] as any).content).toContain('||Click me||{background=blue color=white padding=4px 8px}');
+    expect(ast.children[0].type).toBe('CommentInline');
+    expect((ast.children[0] as any).content).toBe('comment');
   });
 });

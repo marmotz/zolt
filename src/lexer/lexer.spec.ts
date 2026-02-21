@@ -122,4 +122,15 @@ describe('Lexer', () => {
     expect(orderedTokens[0].value).toBe('First');
     expect(orderedTokens[1].value).toBe('Second');
   });
+
+  test('should tokenize standalone inline comments', () => {
+    const lexer = new Lexer('%% comment 1 %%\n%% comment 2 %%');
+    const tokens = lexer.tokenize();
+
+    const commentTokens = tokens.filter((t) => t.type === TokenType.COMMENT_INLINE);
+
+    expect(commentTokens.length).toBe(2);
+    expect(commentTokens[0].value).toBe('comment 1');
+    expect(commentTokens[1].value).toBe('comment 2');
+  });
 });

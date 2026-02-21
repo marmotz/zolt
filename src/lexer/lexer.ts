@@ -53,6 +53,7 @@ export class Lexer {
     if (this.matchFrontmatter()) return this.readFrontmatter();
     if (this.matchGlobalAbbreviationDef()) return this.readGlobalAbbreviationDef();
     if (this.matchAbbreviationDef()) return this.readAbbreviationDef();
+    if (this.matchInlineComment()) return this.readInlineComment();
 
     return this.readText();
   }
@@ -484,6 +485,47 @@ export class Lexer {
     }
     this.pos++;
     return char;
+  }
+
+  private matchInlineComment(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^%%/.test(remaining);
+  }
+
+  private readInlineComment(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar(); // %
+    this.advanceChar(); // %
+
+    const commentStart = this.pos;
+
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      if (this.peekChar() === '%' && this.source[this.pos + 1] === '%') {
+        const content = this.source.slice(commentStart, this.pos);
+        this.advanceChar(); // %
+        this.advanceChar(); // %
+        return {
+          type: TokenType.COMMENT_INLINE,
+          value: content.trim(),
+          line,
+          column,
+          length: this.pos - start,
+        };
+      }
+      this.advanceChar();
+    }
+
+    const content = this.source.slice(commentStart, this.pos);
+    return {
+      type: TokenType.COMMENT_INLINE,
+      value: content.trim(),
+      line,
+      column,
+      length: this.pos - start,
+    };
   }
 
   private isEof(): boolean {

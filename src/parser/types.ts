@@ -147,6 +147,11 @@ export interface AbbreviationDefinitionNode {
   isGlobal: boolean;
 }
 
+export interface CommentInlineNode {
+  type: 'CommentInline';
+  content: string;
+}
+
 export interface AnchorNode {
   type: 'Anchor';
   id: string;
@@ -256,6 +261,7 @@ export type ASTNode =
   | FootnoteDefinitionNode
   | AbbreviationNode
   | AbbreviationDefinitionNode
+  | CommentInlineNode
   | AnchorNode
   | ParagraphNode
   | HeadingNode

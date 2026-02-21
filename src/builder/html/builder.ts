@@ -148,6 +148,8 @@ export class HTMLBuilder implements Builder {
         return this.visitIndentation(node as IndentationNode);
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+      case 'CommentInline':
+        return '';
       default:
         return '';
     }
@@ -156,11 +158,8 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.abbreviationDefinitions.clear();
 
-    for (const child of node.children) {
-      if (child.type === 'AbbreviationDefinition') {
-        this.visitAbbreviationDefinition(child as AbbreviationDefinitionNode);
-      }
-    }
+    // Collect all abbreviations from the document
+    this.collectAbbreviations(node);
 
     const allAbbreviations = new Map<string, string>([
       ...HTMLBuilder.globalAbbreviations.entries(),
@@ -186,6 +185,31 @@ ${childrenHtml}
 </html>`;
   }
 
+  private collectAbbreviations(node: ASTNode): void {
+    if (node.type === 'AbbreviationDefinition') {
+      this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+    } else if (node.type === 'Paragraph' || node.type === 'Heading' || node.type === 'ListItem') {
+      const content = (node as any).content;
+      if (typeof content === 'string') {
+        const regex = /([A-Za-z0-9μ]+)\{abbr="([^"]+)"[^}]*\}/g;
+        let match;
+        while ((match = regex.exec(content)) !== null) {
+          const abbreviation = match[1];
+          const definition = match[2];
+          if (!this.abbreviationDefinitions.has(abbreviation)) {
+            this.abbreviationDefinitions.set(abbreviation, definition);
+          }
+        }
+      }
+    }
+
+    if ('children' in node && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        this.collectAbbreviations(child);
+      }
+    }
+  }
+
   visitDocument(node: DocumentNode): string {
     return node.children.map((child) => this.build(child)).join('\n');
   }
@@ -193,13 +217,16 @@ ${childrenHtml}
   visitHeading(node: HeadingNode): string {
     const level = Math.min(Math.max(node.level, 1), 6);
     const attrs = this.buildAttributes(node.attributes);
-    return `<h${level}${attrs}>${node.content}</h${level}>`;
+    const content = this.processInlineContent(node.content);
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+    return `<h${level}${attrs}>${trimmed}</h${level}>`;
   }
 
   visitParagraph(node: ParagraphNode): string {
     const attrs = this.buildAttributes(node.attributes);
     const content = this.processInlineContent(node.content);
-    return `<p${attrs}>${content}</p>`;
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+    return `<p${attrs}>${trimmed}</p>`;
   }
 
   visitBlockquote(node: BlockquoteNode): string {
@@ -222,9 +249,10 @@ ${childrenHtml}
       node.checked !== undefined ? `<input type="checkbox" ${node.checked ? 'checked' : ''} disabled>` : '';
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
     const content = childrenHtml || this.processInlineContent(node.content);
+    const trimmed = content.replace(/\s+/g, ' ').trim();
 
     const attrs = this.buildAttributes(node.attributes);
-    return `<li${attrs}>${checkbox}${content}</li>`;
+    return `<li${attrs}>${checkbox}${trimmed}</li>`;
   }
 
   visitCodeBlock(node: CodeBlockNode): string {
@@ -286,6 +314,8 @@ ${childrenHtml}
         return this.visitLink(node as LinkNode);
       case 'Abbreviation':
         return this.visitAbbreviation(node as AbbreviationNode);
+      case 'CommentInline':
+        return this.visitCommentInline(node as any);
       default:
         return (node as any).content || '';
     }
@@ -457,6 +487,10 @@ ${childrenHtml}
     } else {
       this.abbreviationDefinitions.set(node.abbreviation, node.definition);
     }
+    return '';
+  }
+
+  visitCommentInline(node: any): string {
     return '';
   }
 

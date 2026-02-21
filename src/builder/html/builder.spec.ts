@@ -320,4 +320,17 @@ describe('HTMLBuilder', () => {
     const html = builder.visitAbbreviation(node);
     expect(html).toBe('<abbr title="microsecond">μs</abbr>');
   });
+
+  test('should return empty string for CommentInline', () => {
+    const node = { type: 'CommentInline', content: 'comment' };
+    const html = builder.visitCommentInline(node as any);
+    expect(html).toBe('');
+  });
+
+  test('should remove inline comment during inline processing', () => {
+    const html = builder.processInline('Text %% comment %% more text');
+    expect(html).toContain('Text');
+    expect(html).toContain('more text');
+    expect(html).not.toContain('comment');
+  });
 });

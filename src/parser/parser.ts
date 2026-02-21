@@ -1,10 +1,12 @@
 import { Token, TokenType } from '../lexer/token-types';
 import { ParseError } from './errors/parse-error';
+import { InlineParser } from './inline-parser';
 import {
   ASTNode,
   AbbreviationDefinitionNode,
   BlockquoteNode,
   CodeBlockNode,
+  CommentInlineNode,
   DocumentNode,
   FrontmatterNode,
   HeadingNode,
@@ -73,6 +75,7 @@ export class Parser {
     if (this.match(TokenType.INDENTATION)) return this.parseIndentation();
     if (this.match(TokenType.ABBREVIATION_DEF)) return this.parseAbbreviationDef();
     if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
+    if (this.match(TokenType.COMMENT_INLINE)) return this.parseCommentInline();
 
     return this.parseParagraph();
   }
@@ -84,6 +87,14 @@ export class Parser {
     return {
       type: 'Heading',
       level,
+      content: token.value.trim(),
+    };
+  }
+
+  private parseCommentInline(): CommentInlineNode {
+    const token = this.expect(TokenType.COMMENT_INLINE);
+    return {
+      type: 'CommentInline',
       content: token.value,
     };
   }
