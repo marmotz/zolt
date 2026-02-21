@@ -47,6 +47,15 @@ describe('API: Build', () => {
       expect(html).toContain('item 2');
     });
 
+    test('should build nested lists', async () => {
+      const html = await buildString('- parent\n  - child');
+
+      expect(html).toContain('<ul>');
+      expect(html).toContain('<li>parent');
+      expect(html).toContain('<ul>');
+      expect(html).toContain('<li>child</li>');
+    });
+
     test('should build heading with different levels', async () => {
       const html = await buildString('# H1\n## H2\n### H3');
 

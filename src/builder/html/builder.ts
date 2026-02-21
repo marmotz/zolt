@@ -67,6 +67,7 @@ const DEFAULT_CSS = `
   h4 { font-size: 1rem; }
   p { margin: 1em 0; }
   ul, ol { padding-left: 2rem; margin: 1em 0; }
+  ul ul {  margin: 0; }
   li { margin: 0.25em 0; }
   a { color: #0066cc; text-decoration: none; }
   a:hover { text-decoration: underline; }
@@ -322,8 +323,9 @@ ${childrenHtml}
   visitListItem(node: ListItemNode): string {
     const checkbox =
       node.checked !== undefined ? `<input type="checkbox" ${node.checked ? 'checked' : ''} disabled>` : '';
+    const inlineContent = this.processInlineContent(node.content);
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-    const content = childrenHtml || this.processInlineContent(node.content);
+    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
     const trimmed = content.replace(/\s+/g, ' ').trim();
 
     const attrs = this.buildAttributes(node.attributes);

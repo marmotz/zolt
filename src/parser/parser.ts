@@ -71,6 +71,18 @@ export class Parser {
     if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
     if (this.match(TokenType.DOUBLE_BRACKET_START)) return this.parseDoubleBracketBlock();
     if (this.match(TokenType.HORIZONTAL_RULE)) return this.parseHorizontalRule();
+
+    if (this.match(TokenType.INDENTATION)) {
+      const next = this.peek(1);
+      if (
+        next.type === TokenType.BULLET_LIST ||
+        next.type === TokenType.ORDERED_LIST ||
+        next.type === TokenType.TASK_LIST
+      ) {
+        return this.parseList(this.currentToken.value);
+      }
+    }
+
     if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
       return this.parseList();
     }
@@ -88,7 +100,8 @@ export class Parser {
   private isTableStart(): boolean {
     const token = this.currentToken;
     if (token.type !== TokenType.TEXT) return false;
-    return token.value.trim().startsWith('|');
+    const value = token.value.trim();
+    return value.startsWith('|') && !value.startsWith('||');
   }
 
   private parseTable(): TableNode {
@@ -213,13 +226,31 @@ export class Parser {
     return this.parseParagraph();
   }
 
-  private parseList(): ListNode {
-    const listToken = this.currentToken;
-    const kind = this.getListKind(listToken.type);
+  private parseList(indent: string = ''): ListNode {
+    const firstToken = indent !== '' ? this.peek(1) : this.currentToken;
+    const kind = this.getListKind(firstToken.type);
     const children: ListItemNode[] = [];
 
-    while (this.match(listToken.type)) {
-      const item = this.parseListItem(kind);
+    while (!this.isEof()) {
+      if (indent !== '') {
+        if (!this.match(TokenType.INDENTATION) || this.currentToken.value !== indent) {
+          break;
+        }
+        const next = this.peek(1);
+        if (this.getListKind(next.type) !== kind) {
+          break;
+        }
+        this.advance(); // consume indentation
+      } else {
+        if (!this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+          break;
+        }
+        if (this.getListKind(this.currentToken.type) !== kind) {
+          break;
+        }
+      }
+
+      const item = this.parseListItem(kind, indent);
       children.push(item);
       this.skipNewlines();
     }
@@ -244,31 +275,49 @@ export class Parser {
     }
   }
 
-  private parseListItem(kind: string): ListItemNode {
-    const checked = this.parseTaskMarker();
+  private parseListItem(kind: string, currentIndent: string): ListItemNode {
+    let checked: boolean | undefined;
     let content = '';
 
-    if (this.match(TokenType.BULLET_LIST) || this.match(TokenType.ORDERED_LIST) || this.match(TokenType.TASK_LIST)) {
-      const token = this.currentToken;
-      content = token.value;
-      this.advance();
+    if (this.match(TokenType.TASK_LIST)) {
+      const token = this.advance();
+      checked = /\[x\]/i.test(token.value);
+      content = token.value.replace(/^([-*]\s+)?\[[ x]]\s+/i, '');
+    } else if (this.match(TokenType.BULLET_LIST)) {
+      const token = this.advance();
+      content = token.value.replace(/^[-*]\s+/, '');
+    } else if (this.match(TokenType.ORDERED_LIST)) {
+      const token = this.advance();
+      content = token.value.replace(/^\d+\.\s+/, '');
+    }
+
+    this.skipNewlines();
+
+    const children: ASTNode[] = [];
+
+    // Check for nested blocks (indented more than currentIndent)
+    while (
+      !this.isEof() &&
+      this.match(TokenType.INDENTATION) &&
+      this.currentToken.value.length > currentIndent.length
+    ) {
+      const block = this.parseBlock();
+      if (block) {
+        children.push(block);
+      }
+      this.skipNewlines();
     }
 
     return {
       type: 'ListItem',
       content: content.trim(),
       checked,
-      children: [],
+      children,
     };
   }
 
   private parseTaskMarker(): boolean | undefined {
-    if (this.match(TokenType.TASK_LIST)) {
-      const token = this.currentToken;
-      this.advance();
-      return token.value.includes('x');
-    }
-    return undefined;
+    return undefined; // Not used anymore as parseListItem handles it
   }
 
   private parseCodeBlock(): CodeBlockNode {
@@ -313,7 +362,12 @@ export class Parser {
   }
 
   private parseIndentation(): ASTNode {
-    return { type: 'Indentation', level: 0, children: [] } as ASTNode;
+    const token = this.expect(TokenType.INDENTATION);
+    return {
+      type: 'Indentation',
+      level: token.value.length / 2, // assuming 2 spaces per level
+      children: [],
+    } as any;
   }
 
   private parseFrontmatter(): FrontmatterNode {

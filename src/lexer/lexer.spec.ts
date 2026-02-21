@@ -109,8 +109,8 @@ describe('Lexer', () => {
 
     const bulletTokens = tokens.filter((t) => t.type === TokenType.BULLET_LIST);
     expect(bulletTokens.length).toBe(2);
-    expect(bulletTokens[0].value).toBe('item 1');
-    expect(bulletTokens[1].value).toBe('item 2');
+    expect(bulletTokens[0].value).toBe('- item 1');
+    expect(bulletTokens[1].value).toBe('- item 2');
   });
 
   test('should tokenize numbered list with content', () => {
@@ -119,8 +119,8 @@ describe('Lexer', () => {
 
     const orderedTokens = tokens.filter((t) => t.type === TokenType.ORDERED_LIST);
     expect(orderedTokens.length).toBe(2);
-    expect(orderedTokens[0].value).toBe('First');
-    expect(orderedTokens[1].value).toBe('Second');
+    expect(orderedTokens[0].value).toBe('1. First');
+    expect(orderedTokens[1].value).toBe('2. Second');
   });
 
   test('should tokenize standalone inline comments', () => {

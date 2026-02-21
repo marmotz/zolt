@@ -265,6 +265,31 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('— description');
   });
 
+  test('should build nested list', () => {
+    const node: ListNode = {
+      type: 'List',
+      kind: 'bullet',
+      children: [
+        {
+          type: 'ListItem',
+          content: 'Parent',
+          children: [
+            {
+              type: 'List',
+              kind: 'bullet',
+              children: [{ type: 'ListItem', content: 'Child', children: [] }],
+            },
+          ],
+        },
+      ],
+    };
+
+    const html = builder.visitList(node);
+    expect(html).toContain('<li>Parent');
+    expect(html).toContain('<ul>');
+    expect(html).toContain('<li>Child</li>');
+  });
+
   test('should build abbreviation', () => {
     const node: AbbreviationNode = {
       type: 'Abbreviation',

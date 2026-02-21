@@ -26,6 +26,13 @@ export class Lexer {
         continue;
       }
 
+      if (this.column === 1) {
+        const indentation = this.readIndentation();
+        if (indentation) {
+          this.tokens.push(indentation);
+        }
+      }
+
       this.skipWhitespace();
       if (this.isEof()) break;
 
@@ -36,6 +43,29 @@ export class Lexer {
     }
     this.tokens.push({ type: TokenType.EOF, value: '', line: this.line, column: this.column, length: 0 });
     return this.tokens;
+  }
+
+  private readIndentation(): Token | null {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+    let value = '';
+
+    while (!this.isEof() && (this.peekChar() === ' ' || this.peekChar() === '\t')) {
+      value += this.advanceChar();
+    }
+
+    if (value.length > 0) {
+      return {
+        type: TokenType.INDENTATION,
+        value,
+        line,
+        column,
+        length: this.pos - start,
+      };
+    }
+
+    return null;
   }
 
   private nextToken(): Token | null {
@@ -256,7 +286,12 @@ export class Lexer {
 
   private matchList(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^[-*]\s/.test(remaining) || /^\d+\.\s/.test(remaining) || /^\[[ x]]\s/.test(remaining);
+    return (
+      /^[-*]\s+\[[ x]]\s/.test(remaining) ||
+      /^[-*]\s/.test(remaining) ||
+      /^\d+\.\s/.test(remaining) ||
+      /^\[[ x]]\s/.test(remaining)
+    );
   }
 
   private readList(): Token {
@@ -266,35 +301,26 @@ export class Lexer {
     const remaining = this.source.slice(this.pos);
 
     let type: TokenType;
-    if (/^[-*]\s/.test(remaining)) {
+    if (/^[-*]\s+\[[ x]]\s/.test(remaining)) {
+      type = TokenType.TASK_LIST;
+    } else if (/^[-*]\s/.test(remaining)) {
       type = TokenType.BULLET_LIST;
     } else if (/^\d+\.\s/.test(remaining)) {
       type = TokenType.ORDERED_LIST;
-    } else {
+    } else if (/^\[[ x]]\s/.test(remaining)) {
       type = TokenType.TASK_LIST;
+    } else {
+      type = TokenType.BULLET_LIST;
     }
 
-    while (
-      !this.isEof() &&
-      (this.peekChar() === '-' || this.peekChar() === '*' || /\d/.test(this.peekChar()) || this.peekChar() === '[')
-    ) {
-      this.advanceChar();
-    }
-
-    if (type === TokenType.ORDERED_LIST && this.peekChar() === '.') {
-      this.advanceChar();
-    }
-
-    this.skipWhitespace();
-
-    let content = '';
+    let value = '';
     while (!this.isEof() && this.peekChar() !== '\n') {
-      content += this.advanceChar();
+      value += this.advanceChar();
     }
 
     return {
       type,
-      value: content,
+      value: value.trim(),
       line,
       column,
       length: this.pos - start,
