@@ -1,21 +1,10 @@
 #!/usr/bin/env bun
 
+import { stat } from 'fs/promises';
+import { basename, dirname, join } from 'path';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getLinkedFiles, lint } from '../api';
-import { stat } from 'fs/promises';
-import { join, basename, dirname } from 'path';
-
-interface BuildOptions {
-  type: 'html' | 'pdf';
-  output?: string;
-  watch?: boolean;
-}
-
-interface LintOptions {
-  format: 'json' | 'text';
-  fix?: boolean;
-}
 
 async function buildFileWithDeps(
   inputFile: string,
@@ -24,7 +13,7 @@ async function buildFileWithDeps(
   visited: Set<string>
 ): Promise<void> {
   const normalizedInput = inputFile.replace(/^\.\//, '');
-  
+
   if (visited.has(normalizedInput)) {
     return;
   }
@@ -41,7 +30,7 @@ async function buildFileWithDeps(
 
   for (const linkedFile of linkedFiles) {
     let linkedPath = linkedFile;
-    
+
     if (!linkedPath.endsWith('.zlt')) {
       linkedPath = linkedPath + '.zlt';
     }

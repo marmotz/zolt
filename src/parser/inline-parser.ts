@@ -44,8 +44,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^~~([^~]+)~~/)) return this.parseStrikethrough(text);
     if (this.matchPattern(text, /^==([^=]+)==/)) return this.parseHighlight(text);
     if (this.matchPattern(text, /^`([^`]+)`/)) return this.parseCode(text);
-    if (this.matchPattern(text, /^\{([^}]+)\}/)) return this.parseAttributeShortcut(text);
-    if (this.matchPattern(text, /^\[\[include\s+([^\]]+)\]\]/i)) return this.parseInclude(text);
+    if (this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i)) return this.parseInclude(text);
 
     return null;
   }
@@ -129,7 +128,7 @@ export class InlineParser {
   }
 
   private parseSuperscript(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\^\{([^}]+)\}/);
+    const match = this.matchPattern(text, /^\^\{([^}]+)}/);
     if (!match) return null;
 
     return {
@@ -139,7 +138,7 @@ export class InlineParser {
   }
 
   private parseSubscript(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^_\{([^}]+)\}/);
+    const match = this.matchPattern(text, /^_\{([^}]+)}/);
     if (!match) return null;
 
     return {
@@ -158,12 +157,8 @@ export class InlineParser {
     };
   }
 
-  private parseAttributeShortcut(text: string): { node: ASTNode; remaining: string } | null {
-    return null;
-  }
-
   private parseInclude(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\[\[include\s+([^\]]+)\]\]/i);
+    const match = this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i);
     if (!match) return null;
 
     return {

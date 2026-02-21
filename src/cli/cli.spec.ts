@@ -1,6 +1,6 @@
-import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { spawn } from 'child_process';
-import { writeFile, unlink, mkdir, rm } from 'fs/promises';
+import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { version } from '../../package.json';
 
@@ -23,7 +23,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['version'], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data.trim()));
         proc.on('error', reject);
       });
@@ -34,7 +34,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['-v'], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data.trim()));
         proc.on('error', reject);
       });
@@ -45,7 +45,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['--version'], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data.trim()));
         proc.on('error', reject);
       });
@@ -58,7 +58,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['--help'], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });
@@ -70,7 +70,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['-h'], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });
@@ -86,7 +86,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['lint', testFile], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });
@@ -104,7 +104,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['build', testFile, '-o', outputFile], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });
@@ -121,7 +121,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['build', testFile, '-o', outputDir], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });
@@ -138,7 +138,7 @@ describe('CLI', () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['build', testFile, '-o', outputFile], { shell: true });
         let data = '';
-        proc.stdout.on('data', (chunk) => data += chunk);
+        proc.stdout.on('data', (chunk) => (data += chunk));
         proc.on('close', () => resolve(data));
         proc.on('error', reject);
       });

@@ -66,7 +66,7 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
 }
 
 export function extractZltLinks(content: string): string[] {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+\.zlt)\)/g;
+  const linkRegex = /\[([^\]]+)]\(([^)]+\.zlt)\)/g;
   const links: string[] = [];
   let match;
 
@@ -85,7 +85,7 @@ export async function getLinkedFiles(inputPath: string): Promise<string[]> {
   return extractZltLinks(content);
 }
 
-export async function lint(filePath: string, options?: LintOptions): Promise<LintResult> {
+export async function lint(filePath: string): Promise<LintResult> {
   const errors: LintError[] = [];
   const warnings: LintWarning[] = [];
 

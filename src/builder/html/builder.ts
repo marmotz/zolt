@@ -1,3 +1,4 @@
+import { InlineParser } from '../../parser/inline-parser';
 import {
   ASTNode,
   Attributes,
@@ -33,7 +34,6 @@ import {
   VideoNode,
 } from '../../parser/types';
 import { Builder } from '../builder';
-import { InlineParser } from '../../parser/inline-parser';
 
 const DEFAULT_CSS = `
   * {
@@ -126,7 +126,7 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
     return `<!DOCTYPE html>
-<html>
+<html lang="">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

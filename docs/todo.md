@@ -377,6 +377,12 @@
 - [ ] Cache parsed results
 - [ ] Lazy loading for large documents
 
+## 21. Maintenance & Infrastructure
+
+- [x] Split E2E tests into themed files (`*.e2e.spec.ts`)
+- [x] Update `AGENTS.md` with new test patterns
+- [x] Clean up unused interfaces in CLI (`BuildOptions`, `LintOptions`)
+
 ---
 
 ## Legend

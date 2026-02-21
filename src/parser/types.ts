@@ -121,6 +121,7 @@ export interface HighlightNode extends ASTNode {
 export interface InlineStyleNode extends ASTNode {
   type: 'InlineStyle';
   content: string;
+  attributes?: Record<string, string>;
 }
 
 export interface LinkNode extends ASTNode {

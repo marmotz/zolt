@@ -164,14 +164,14 @@ vibe build examples/abbreviations.zlt --watch
 
 ### Specification
 
-The complete Zolt v0.2 specification is available in [spec.md](spec.md).
+The complete Zolt v0.2 specification is available in [spec.md](docs/spec.md).
 
 ### Examples
 
-Check the [`examples/`](examples/) directory for comprehensive examples:
+Check the [`examples/`](examples) directory for comprehensive examples:
 
 | File                                            | Description                                           |
-| ----------------------------------------------- | ----------------------------------------------------- |
+|-------------------------------------------------|-------------------------------------------------------|
 | [lists.zlt](examples/lists.zlt)                 | All list types (bullets, numbers, tasks, definitions) |
 | [links.zlt](examples/links.zlt)                 | Links, references, and attributes                     |
 | [quotes.zlt](examples/quotes.zlt)               | Blockquotes and citations                             |
@@ -307,7 +307,7 @@ Your existing `.md` files will work correctly in Zolt.
 ### Key Syntax Changes
 
 | Markdown        | Zolt                             |
-| --------------- | -------------------------------- |
+|-----------------|----------------------------------|
 | `*italic*`      | `//italic//`                     |
 | `<u>text</u>`   | `__text__`                       |
 | `> [!NOTE]`     | `:::note`                        |
@@ -345,8 +345,8 @@ MIT License - see LICENSE file for details
 
 ## 📞 Support
 
-- **Documentation:** [spec.md](spec.md)
-- **Examples:** [`examples/`](examples/)
+- **Documentation:** [spec.md](docs/spec.md)
+- **Examples:** [`examples/`](examples)
 - **Issues:** [GitHub Issues](https://github.com/marmotz/vibe/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/marmotz/vibe/discussions)
 
@@ -354,4 +354,4 @@ MIT License - see LICENSE file for details
 
 **Zolt** • _Markdown with a better vibe._
 
-For detailed specifications, see [spec.md](spec.md).
+For detailed specifications, see [spec.md](docs/spec.md).

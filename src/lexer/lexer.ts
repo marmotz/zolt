@@ -253,7 +253,7 @@ export class Lexer {
 
   private matchList(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^[-*]\s/.test(remaining) || /^\d+\.\s/.test(remaining) || /^\[[ x]\]\s/.test(remaining);
+    return /^[-*]\s/.test(remaining) || /^\d+\.\s/.test(remaining) || /^\[[ x]]\s/.test(remaining);
   }
 
   private readList(): Token {
