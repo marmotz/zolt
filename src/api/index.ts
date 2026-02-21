@@ -66,7 +66,7 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
 }
 
 export function extractZltLinks(content: string): string[] {
-  const linkRegex = /\[([^\]]+)]\(([^)]+\.zlt)\)/g;
+  const linkRegex = /\[([^\]]+)\]\(([^\s)]+?\.zlt)\)/g;
   const links: string[] = [];
   let match;
 

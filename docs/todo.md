@@ -264,9 +264,9 @@
 
 ### Advanced Code Blocks
 
-- [ ] Basic code blocks with triple backticks
-- [ ] Language-specific code blocks - PARTIAL (parsed but not highlighted)
-- [ ] Code block attributes: `{title=value}`, `{highlight=N-M}`, `{start=N}`
+- [x] Basic code blocks with triple backticks
+- [x] Language-specific code blocks - PARTIAL (parsed but not highlighted)
+- [x] Code block attributes: `{title=value}`, `{highlight=N-M}`, `{start=N}`
 
 ### Mathematics (LaTeX)
 

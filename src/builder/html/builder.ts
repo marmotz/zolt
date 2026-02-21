@@ -433,8 +433,14 @@ ${childrenHtml}
     visitCodeBlock(node: CodeBlockNode): string {
       const lang = node.language ? ` class="language-${node.language}"` : '';
       const attrs = this.renderAllAttributes(node.attributes);
-      // lang and attrs should probably be merged if attrs has a class
-      return `<pre${attrs}><code${lang}>${node.content}</code></pre>`;
+      const escapedContent = node.content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      
+      return `<pre${attrs}><code${lang}>${escapedContent}</code></pre>`;
     }
   
     visitTripleColonBlock(node: TripleColonBlockNode): string {

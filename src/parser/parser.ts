@@ -54,6 +54,7 @@ export class Parser {
     }
 
     while (!this.match(TokenType.EOF)) {
+      const startPos = this.pos;
       this.skipNewlines();
 
       if (this.isEof()) break;
@@ -62,6 +63,10 @@ export class Parser {
       if (block) {
         children.push(block);
       }
+
+      if (this.pos === startPos) {
+        this.error(`Parser stuck at token ${this.currentToken.type}`, 'PARSER_STUCK');
+      }
     }
 
     return children;
@@ -69,7 +74,7 @@ export class Parser {
 
   private parseBlock(): ASTNode | null {
     if (this.match(TokenType.HEADING)) return this.parseHeading();
-    if (this.match(TokenType.CODE_BLOCK)) return this.parseCodeBlock();
+    if (this.match(TokenType.CODE_BLOCK_START)) return this.parseCodeBlock();
     if (this.match(TokenType.BLOCKQUOTE)) return this.parseBlockquote();
     if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
     if (this.match(TokenType.TRIPLE_COLON_END)) {
@@ -101,6 +106,14 @@ export class Parser {
     if (this.match(TokenType.ABBREVIATION_DEF)) return this.parseAbbreviationDef();
     if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
     if (this.match(TokenType.COMMENT_INLINE)) return this.parseCommentInline();
+
+    if (this.match(TokenType.CODE_BLOCK, TokenType.CODE_BLOCK_END)) {
+      const token = this.advance();
+      return {
+        type: 'Paragraph',
+        content: token.value,
+      };
+    }
 
     if (this.isTableStart()) return this.parseTable();
 
@@ -390,12 +403,44 @@ export class Parser {
   }
 
   private parseCodeBlock(): CodeBlockNode {
-    const token = this.expect(TokenType.CODE_BLOCK);
+    const startToken = this.expect(TokenType.CODE_BLOCK_START);
+    let value = startToken.value;
+
+    // Extract attributes
+    let attributes: Attributes | undefined;
+    const attrMatch = value.match(/\s+\{([^}]+)}$/);
+    let language = value;
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+      language = value.replace(/\s+\{([^}]+)}$/, '').trim();
+    }
+
+    let content = '';
+    while (!this.isEof() && !this.match(TokenType.CODE_BLOCK_END)) {
+      const token = this.advance();
+      if (token.type === TokenType.CODE_BLOCK) {
+        content += token.value + '\n';
+      } else if (token.type === TokenType.NEWLINE) {
+        // Handled by lexer producing CODE_BLOCK tokens for each line including newline
+        // Wait, readCodeBlockContent advances \n but doesn't include it in value.
+        // So I should add \n.
+      }
+    }
+
+    if (this.match(TokenType.CODE_BLOCK_END)) {
+      this.advance();
+    }
+
+    // Remove last newline if present
+    if (content.endsWith('\n')) {
+      content = content.slice(0, -1);
+    }
 
     return {
       type: 'CodeBlock',
-      language: token.value || undefined,
-      content: '',
+      language: language || undefined,
+      content,
+      attributes,
     };
   }
 
@@ -425,11 +470,16 @@ export class Parser {
     this.skipNewlines();
 
     while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      const startPos = this.pos;
       const block = this.parseBlock();
       if (block) {
         children.push(block);
       }
       this.skipNewlines();
+
+      if (this.pos === startPos) {
+        this.error(`Parser stuck in TripleColonBlock at token ${this.currentToken.type}`, 'PARSER_STUCK');
+      }
     }
 
     if (this.match(TokenType.TRIPLE_COLON_END)) {
@@ -486,13 +536,20 @@ export class Parser {
     return (
       type === TokenType.HEADING ||
       type === TokenType.CODE_BLOCK ||
+      type === TokenType.CODE_BLOCK_START ||
       type === TokenType.BLOCKQUOTE ||
       type === TokenType.BULLET_LIST ||
       type === TokenType.ORDERED_LIST ||
       type === TokenType.TASK_LIST ||
+      type === TokenType.DEFINITION ||
       type === TokenType.HORIZONTAL_RULE ||
       type === TokenType.TRIPLE_COLON_START ||
-      type === TokenType.TRIPLE_COLON_END
+      type === TokenType.TRIPLE_COLON_END ||
+      type === TokenType.DOUBLE_BRACKET_START ||
+      type === TokenType.ABBREVIATION_DEF ||
+      type === TokenType.ABBREVIATION_DEF_GLOBAL ||
+      type === TokenType.COMMENT_INLINE ||
+      type === TokenType.FRONTMATTER
     );
   }
 

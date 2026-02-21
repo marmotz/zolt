@@ -73,6 +73,7 @@ describe('Parser', () => {
 
     expect(ast.children[0].type).toBe('CodeBlock');
     expect((ast.children[0] as any).language).toBe('js');
+    expect((ast.children[0] as any).content).toBe('code');
   });
 
   test('should parse multiple blocks', () => {

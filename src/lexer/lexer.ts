@@ -26,14 +26,16 @@ export class Lexer {
         continue;
       }
 
-      if (this.column === 1) {
-        const indentation = this.readIndentation();
-        if (indentation) {
-          this.tokens.push(indentation);
+      if (this.state.mode !== 'CODE') {
+        if (this.column === 1) {
+          const indentation = this.readIndentation();
+          if (indentation) {
+            this.tokens.push(indentation);
+          }
         }
-      }
 
-      this.skipWhitespace();
+        this.skipWhitespace();
+      }
       if (this.isEof()) break;
 
       const token = this.nextToken();
@@ -141,8 +143,12 @@ export class Lexer {
 
     this.state.enterCodeBlock(language.trim());
 
+    if (this.peekChar() === '\n') {
+      this.advanceChar();
+    }
+
     return {
-      type: TokenType.CODE_BLOCK,
+      type: TokenType.CODE_BLOCK_START,
       value: language.trim(),
       line,
       column,
@@ -191,7 +197,7 @@ export class Lexer {
     }
 
     return {
-      type: TokenType.CODE_BLOCK,
+      type: TokenType.CODE_BLOCK_END,
       value: '',
       line,
       column,
@@ -361,7 +367,7 @@ export class Lexer {
   }
 
   private matchFrontmatter(): boolean {
-    return this.source.slice(this.pos).startsWith('---') && (this.pos === 0 || this.source[this.pos - 1] === '\n');
+    return this.pos === 0 && this.source.slice(this.pos).startsWith('---');
   }
 
   private readFrontmatter(): Token {

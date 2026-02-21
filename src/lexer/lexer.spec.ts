@@ -53,7 +53,13 @@ describe('Lexer', () => {
     const lexer = new Lexer('```js\nconst x = 1\n```');
     const tokens = lexer.tokenize();
 
-    expect(tokens[0].type).toBe(TokenType.CODE_BLOCK);
+    expect(tokens[0].type).toBe(TokenType.CODE_BLOCK_START);
+    expect(tokens[0].value).toBe('js');
+    
+    expect(tokens[1].type).toBe(TokenType.CODE_BLOCK);
+    expect(tokens[1].value).toBe('const x = 1');
+    
+    expect(tokens[2].type).toBe(TokenType.CODE_BLOCK_END);
   });
 
   test('should tokenize newlines', () => {

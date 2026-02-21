@@ -52,6 +52,12 @@ describe('API: Links', () => {
 
       expect(links).toEqual(['item1.zlt', 'item2.zlt']);
     });
+
+    test('should not be greedy with spaces and text between links', () => {
+      const content = '- [link1](file1.zlt) — some description\n- [link2](file2.zlt)';
+      const links = extractZltLinks(content);
+      expect(links).toEqual(['file1.zlt', 'file2.zlt']);
+    });
   });
 
   describe('getLinkedFiles', () => {
