@@ -12,7 +12,7 @@
 
 - [ ] Parse YAML frontmatter at start of file
 - [ ] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
-  `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
+      `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 
 ### Phase 1: Variables
 
@@ -119,7 +119,7 @@
 ### Blockquote Features
 
 - [x] Simple blockquotes `> text`
-- [ ] Blockquotes with attributes
+- [x] Blockquotes with attributes (on paragraph lines)
 - [x] Nested blockquotes `>>` and `>>>`
 
 ## 7. Technical Indentation
@@ -247,7 +247,7 @@
 
 - [ ] `:::foreach {$array as $item}`
 - [ ] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
-  `{$foreach.odd}`
+      `{$foreach.odd}`
 - [ ] Nested loops
 - [ ] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles

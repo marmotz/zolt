@@ -25,6 +25,33 @@ describe('Blockquotes E2E', () => {
     expect(html).toContain('id="quote1"');
   });
 
+  test('should build blockquote paragraph with ID without space before attribute', async () => {
+    const html = await buildString('> This quote has an ID{#quote1}');
+    expect(html).toContain('<p id="quote1"');
+    expect(html).toContain('This quote has an ID');
+  });
+
+  test('should build blockquote paragraph with style without space before attribute', async () => {
+    const html = await buildString('> This quote is red{color=red}');
+    expect(html).toContain('<p style="color: red"');
+    expect(html).toContain('This quote is red');
+  });
+
+  test('should build blockquote paragraph with ID and style without space', async () => {
+    const html = await buildString('> This quote is highlighted{#quote3 background=yellow}');
+    expect(html).toContain('id="quote3"');
+    expect(html).toContain('style="background: yellow"');
+    expect(html).toContain('This quote is highlighted');
+  });
+
+  test('should build multiple blockquote lines with different attributes', async () => {
+    const html = await buildString('> First line{#first}\n> Second line{color=blue}');
+    expect(html).toContain('<p id="first"');
+    expect(html).toContain('First line');
+    expect(html).toContain('<p style="color: blue"');
+    expect(html).toContain('Second line');
+  });
+
   test('should build nested blockquote', async () => {
     const html = await buildString('> Level 1\n> > Level 2');
     expect(html).toContain('<blockquote>');

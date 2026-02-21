@@ -209,7 +209,7 @@ export class Parser {
     };
   }
 
-  private parseParagraph(): ParagraphNode {
+  private parseParagraph(requireSpaceBeforeAttrs: boolean = true): ParagraphNode {
     let content = '';
 
     while (!this.match(TokenType.EOF) && !this.match(TokenType.NEWLINE) && !this.isNewBlockStart()) {
@@ -219,8 +219,11 @@ export class Parser {
     content = content.trim();
 
     // Extract attributes at the end of content
+    // In blockquotes, allow attributes without preceding space
+    // In regular paragraphs, require space to avoid stealing attributes from inline elements
     let attributes: Attributes | undefined;
-    const attrMatch = content.match(/\s+\{([^}]+)}$/);
+    const pattern = requireSpaceBeforeAttrs ? /\s+\{([^}]+)}$/ : /\s*\{([^}]+)}$/;
+    const attrMatch = content.match(pattern);
     if (attrMatch) {
       attributes = InlineParser.parseAttributes(attrMatch[1]);
       content = content.slice(0, -attrMatch[0].length).trim();
@@ -292,7 +295,7 @@ export class Parser {
       return this.parseBlockquoteList();
     }
 
-    return this.parseParagraph();
+    return this.parseParagraph(false);
   }
 
   private parseBlockquoteList(): ListNode {
