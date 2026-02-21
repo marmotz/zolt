@@ -277,8 +277,70 @@ ${childrenHtml}
   }
 
   visitInlineStyle(node: InlineStyleNode): string {
-    const attrs = this.buildAttributes(node.attributes);
-    return `<span${attrs}>${node.content}</span>`;
+    const htmlAttrs = this.filterCssProperties(node.attributes || {});
+    const styleStr = this.buildStyleAttribute(node.attributes);
+    const attrs = this.buildAttributes(htmlAttrs);
+    return `<span${styleStr}${attrs}>${node.content}</span>`;
+  }
+
+  private buildStyleAttribute(attrs?: Attributes): string {
+    if (!attrs) return '';
+
+    const cssProps: string[] = [];
+    const cssPropertyMap: Record<string, string> = {
+      'font-weight': 'font-weight',
+      'font-size': 'font-size',
+      'font-style': 'font-style',
+      'font-family': 'font-family',
+      'text-decoration': 'text-decoration',
+      'text-align': 'text-align',
+      color: 'color',
+      background: 'background',
+      'background-color': 'background-color',
+      border: 'border',
+      'border-radius': 'border-radius',
+      padding: 'padding',
+      margin: 'margin',
+      display: 'display',
+      opacity: 'opacity',
+      transform: 'transform',
+    };
+
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value !== undefined && cssPropertyMap[key]) {
+        cssProps.push(`${cssPropertyMap[key]}: ${value}`);
+      }
+    }
+
+    return cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
+  }
+
+  private filterCssProperties(attrs: Attributes): Attributes {
+    const cssProps = new Set([
+      'font-weight',
+      'font-size',
+      'font-style',
+      'font-family',
+      'text-decoration',
+      'text-align',
+      'color',
+      'background',
+      'background-color',
+      'border',
+      'border-radius',
+      'padding',
+      'margin',
+      'display',
+      'opacity',
+      'transform',
+    ]);
+    const filtered: Attributes = {};
+    for (const [key, value] of Object.entries(attrs)) {
+      if (!cssProps.has(key)) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
   }
 
   private transformHref(href: string): string {

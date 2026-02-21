@@ -132,7 +132,7 @@ This is ||bold and colored||{color=blue} ||within more styled text||{color=red f
 
 ### Product Feature
 
-||Feature:||{font-weight=bold color=blue} ||Dark Mode||{color=purple font-weight=background=#F3E8FF padding=2px 6px}
+||Feature:||{font-weight=bold color=blue} ||Dark Mode||{color=purple background=#F3E8FF padding=2px 6px}
 
 ||Supports automatic theme switching||{color=gray font-size=0.9em}
 

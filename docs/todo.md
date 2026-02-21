@@ -12,7 +12,7 @@
 
 - [ ] Parse YAML frontmatter at start of file
 - [ ] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
-  `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
+      `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 
 ### Phase 1: Variables
 
@@ -74,7 +74,7 @@
 
 ### Styled Inline Groups
 
-- [ ] `||text||{attributes}` - Apply styles to groups of words
+- [x] `||text||{attributes}` - Apply styles to groups of words
 
 ### Character Escaping
 
@@ -247,7 +247,7 @@
 
 - [ ] `:::foreach {$array as $item}`
 - [ ] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
-  `{$foreach.odd}`
+      `{$foreach.odd}`
 - [ ] Nested loops
 - [ ] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles
@@ -336,7 +336,7 @@
 
 - [x] Generate valid HTML5
 - [x] Apply CSS classes from attributes
-- [x] Apply inline styles from attributes - PARTIAL
+- [x] Apply inline styles from attributes
 - [x] Generate semantic HTML for blocks
 
 ## 18. Testing & Validation

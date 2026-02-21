@@ -171,7 +171,7 @@ The complete Zolt v0.2 specification is available in [spec.md](docs/spec.md).
 Check the [`examples/`](examples) directory for comprehensive examples:
 
 | File                                            | Description                                           |
-|-------------------------------------------------|-------------------------------------------------------|
+| ----------------------------------------------- | ----------------------------------------------------- |
 | [lists.zlt](examples/lists.zlt)                 | All list types (bullets, numbers, tasks, definitions) |
 | [links.zlt](examples/links.zlt)                 | Links, references, and attributes                     |
 | [quotes.zlt](examples/quotes.zlt)               | Blockquotes and citations                             |
@@ -307,7 +307,7 @@ Your existing `.md` files will work correctly in Zolt.
 ### Key Syntax Changes
 
 | Markdown        | Zolt                             |
-|-----------------|----------------------------------|
+| --------------- | -------------------------------- |
 | `*italic*`      | `//italic//`                     |
 | `<u>text</u>`   | `__text__`                       |
 | `> [!NOTE]`     | `:::note`                        |

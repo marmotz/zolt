@@ -37,7 +37,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/)) return this.parseLink(text);
     if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
     if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
-    if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) return this.parseInlineStyle(text);
+    if (this.matchPattern(text, /^\|\|([^|]+)\|\|(\{[^}]+\})?/)) return this.parseInlineStyle(text);
     if (this.matchPattern(text, /^\*\*([^*]+)\*\*/)) return this.parseBold(text);
     if (this.matchPattern(text, /^\/\/([^/]+)\/\//)) return this.parseItalic(text);
     if (this.matchPattern(text, /^__([^_]+)__/)) return this.parseUnderline(text);
@@ -148,13 +148,75 @@ export class InlineParser {
   }
 
   private parseInlineStyle(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\|\|([^|]+)\|\|/);
+    const match = this.matchPattern(text, /^\|\|([^|]+)\|\|(\{[^}]+\})?/);
     if (!match) return null;
 
+    const content = match[1];
+    const attributesStr = match[2];
+    const attributes = this.parseAttributes(attributesStr);
+
     return {
-      node: { type: 'InlineStyle', content: match[1] } as InlineStyleNode,
+      node: { type: 'InlineStyle', content, attributes } as InlineStyleNode,
       remaining: text.slice(match[0].length),
     };
+  }
+
+  private parseAttributes(attrStr?: string): Attributes | undefined {
+    if (!attrStr) return undefined;
+
+    const attrs: Attributes = {};
+    const content = attrStr.slice(1, -1);
+    let remaining = content;
+
+    while (remaining.length > 0) {
+      remaining = remaining.trimStart();
+
+      const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
+      const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
+
+      if (quotedMatch) {
+        const key = quotedMatch[1];
+        const value = quotedMatch[2];
+        this.setAttribute(attrs, key, value);
+        remaining = remaining.slice(quotedMatch[0].length);
+      } else if (quotedMatch2) {
+        const key = quotedMatch2[1];
+        const value = quotedMatch2[2];
+        this.setAttribute(attrs, key, value);
+        remaining = remaining.slice(quotedMatch2[0].length);
+      } else {
+        const keyValueMatch = remaining.match(/^([a-zA-Z-]+)=/);
+        if (keyValueMatch) {
+          const key = keyValueMatch[1];
+          const afterKey = remaining.slice(keyValueMatch[0].length);
+          let value = '';
+
+          const nextKeyMatch = afterKey.match(/ [a-zA-Z-]+=/);
+          if (nextKeyMatch) {
+            value = afterKey.slice(0, nextKeyMatch.index);
+          } else {
+            value = afterKey;
+          }
+
+          this.setAttribute(attrs, key, value.trim());
+          remaining = remaining.slice(key.length + 1 + value.length);
+        } else {
+          remaining = remaining.slice(1);
+        }
+      }
+    }
+
+    return Object.keys(attrs).length > 0 ? attrs : undefined;
+  }
+
+  private setAttribute(attrs: Attributes, key: string, value: string): void {
+    if (key === 'visually-hidden' || key === 'sr-only') {
+      attrs['aria-hidden'] = 'true';
+      attrs['class'] =
+        (attrs['class'] ? attrs['class'] + ' ' : '') + (key === 'sr-only' ? 'sr-only' : 'visually-hidden');
+    } else {
+      attrs[key] = value;
+    }
   }
 
   private parseInclude(text: string): { node: ASTNode; remaining: string } | null {

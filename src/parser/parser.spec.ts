@@ -138,4 +138,34 @@ describe('Parser', () => {
     expect((ast.children[0] as any).children[0].content).toBe('First');
     expect((ast.children[0] as any).children[1].content).toBe('Second');
   });
+
+  test('should parse inline style with single attribute', () => {
+    const lexer = new Lexer('This is ||important||{color=red} text');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Paragraph');
+    expect((ast.children[0] as any).content).toContain('||important||{color=red}');
+  });
+
+  test('should parse inline style with multiple attributes', () => {
+    const lexer = new Lexer('||Warning||{color=red font-weight=bold}');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Paragraph');
+    expect((ast.children[0] as any).content).toContain('||Warning||{color=red font-weight=bold}');
+  });
+
+  test('should parse inline style with padding', () => {
+    const lexer = new Lexer('||Click me||{background=blue color=white padding=4px 8px}');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Paragraph');
+    expect((ast.children[0] as any).content).toContain('||Click me||{background=blue color=white padding=4px 8px}');
+  });
 });

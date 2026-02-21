@@ -88,6 +88,72 @@ Paragraph with [link](url).
       expect(html).toContain('<ol>');
       expect(html).toContain('First');
     });
+
+    test('should build inline style with color attribute', async () => {
+      const html = await buildString('This is ||important||{color=red} text');
+
+      expect(html).toContain('<span style="color: red">important</span>');
+    });
+
+    test('should build inline style with multiple attributes', async () => {
+      const html = await buildString('||Warning||{color=red font-weight=bold}');
+
+      expect(html).toContain('<span style="color: red; font-weight: bold">Warning</span>');
+    });
+
+    test('should build inline style with background', async () => {
+      const html = await buildString('||Highlighted||{background=yellow}');
+
+      expect(html).toContain('<span style="background: yellow">Highlighted</span>');
+    });
+
+    test('should build inline style with padding', async () => {
+      const html = await buildString('||Button||{background=blue color=white padding=4px 8px}');
+
+      expect(html).toContain('<span style="background: blue; color: white; padding: 4px 8px">Button</span>');
+    });
+
+    test('should build inline style with border', async () => {
+      const html = await buildString('||Bordered||{border=1px solid black}');
+
+      expect(html).toContain('<span style="border: 1px solid black">Bordered</span>');
+    });
+
+    test('should build inline style without attributes', async () => {
+      const html = await buildString('||Just text||');
+
+      expect(html).toContain('<span>Just text</span>');
+    });
+
+    test('should build inline style with font-size', async () => {
+      const html = await buildString('||Small||{font-size=0.8em}');
+
+      expect(html).toContain('<span style="font-size: 0.8em">Small</span>');
+    });
+
+    test('should build inline style with text-decoration', async () => {
+      const html = await buildString('||Strikethrough||{text-decoration=line-through}');
+
+      expect(html).toContain('<span style="text-decoration: line-through">Strikethrough</span>');
+    });
+
+    test('should build inline style with border-radius', async () => {
+      const html = await buildString('||Rounded||{border=1px solid red border-radius=4px}');
+
+      expect(html).toContain('<span style="border: 1px solid red; border-radius: 4px">Rounded</span>');
+    });
+
+    test('should build inline style with display block', async () => {
+      const html = await buildString('||Centered||{text-align=center display=block}');
+
+      expect(html).toContain('<span style="text-align: center; display: block">Centered</span>');
+    });
+
+    test('should build inline style with hex color', async () => {
+      const html = await buildString('||Purple||{color=#8B5CF6}');
+
+      expect(html).toContain('<span style="color: #8B5CF6">Purple</span>');
+    });
   });
 
   describe('buildFile', () => {
