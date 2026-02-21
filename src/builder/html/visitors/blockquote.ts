@@ -1,10 +1,8 @@
-import { BlockquoteNode, Attributes } from '../../../parser/types';
+import { Attributes, BlockquoteNode } from '../../../parser/types';
 import { HTMLBuilder } from '../builder';
 
 export function visitBlockquote(node: BlockquoteNode, builder: HTMLBuilder): string {
-  const childrenHtml = node.children
-    .map(child => builder.build(child))
-    .join('');
+  const childrenHtml = node.children.map((child) => builder.build(child)).join('');
 
   const attrs = buildAttributes(node.attributes);
   return `<blockquote${attrs}>${childrenHtml}</blockquote>`;

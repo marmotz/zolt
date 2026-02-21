@@ -1,5 +1,5 @@
-import { Token, TokenType } from './token-types';
 import { LexerState } from './state/lexer-state';
+import { Token, TokenType } from './token-types';
 
 export class Lexer {
   private source: string;
@@ -20,6 +20,12 @@ export class Lexer {
 
   tokenize(): Token[] {
     while (!this.isEof()) {
+      if (this.peekChar() === '\n') {
+        this.advanceChar();
+        this.tokens.push({ type: TokenType.NEWLINE, value: '\n', line: this.line, column: this.column, length: 1 });
+        continue;
+      }
+
       this.skipWhitespace();
       if (this.isEof()) break;
 
@@ -77,7 +83,7 @@ export class Lexer {
       value: content.trim(),
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -106,7 +112,7 @@ export class Lexer {
       value: language.trim(),
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -133,7 +139,7 @@ export class Lexer {
       value: content,
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -155,7 +161,7 @@ export class Lexer {
       value: '',
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -182,7 +188,7 @@ export class Lexer {
       value: blockType.trim(),
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -213,7 +219,7 @@ export class Lexer {
       value: content.trim(),
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -240,7 +246,7 @@ export class Lexer {
       value,
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -264,7 +270,10 @@ export class Lexer {
       type = TokenType.TASK_LIST;
     }
 
-    while (!this.isEof() && (this.peekChar() === '-' || this.peekChar() === '*' || /\d/.test(this.peekChar()) || this.peekChar() === '[')) {
+    while (
+      !this.isEof() &&
+      (this.peekChar() === '-' || this.peekChar() === '*' || /\d/.test(this.peekChar()) || this.peekChar() === '[')
+    ) {
       this.advanceChar();
     }
     this.skipWhitespace();
@@ -274,7 +283,7 @@ export class Lexer {
       value: '',
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -288,7 +297,11 @@ export class Lexer {
     const line = this.line;
     const column = this.column;
 
-    while (!this.isEof() && this.peekChar() !== '\n' && (this.peekChar() === '-' || this.peekChar() === '*' || this.peekChar() === '_')) {
+    while (
+      !this.isEof() &&
+      this.peekChar() !== '\n' &&
+      (this.peekChar() === '-' || this.peekChar() === '*' || this.peekChar() === '_')
+    ) {
       this.advanceChar();
     }
 
@@ -297,7 +310,7 @@ export class Lexer {
       value: '',
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -330,7 +343,7 @@ export class Lexer {
       value: content,
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 
@@ -349,7 +362,7 @@ export class Lexer {
       value,
       line,
       column,
-      length: this.pos - start
+      length: this.pos - start,
     };
   }
 

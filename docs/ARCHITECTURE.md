@@ -149,10 +149,10 @@ const html = await buildString('# Hello World\n\nThis is **bold**', { type: 'htm
 
 ```typescript
 interface BuildOptions {
-  type: 'html' | 'pdf' | string;         // Output format
-  variables?: Record<string, any>;       // Global variables
-  frontmatter?: boolean;                 // Parse YAML frontmatter
-  [key: string]: any;                    // Future options
+  type: 'html' | 'pdf' | string; // Output format
+  variables?: Record<string, any>; // Global variables
+  frontmatter?: boolean; // Parse YAML frontmatter
+  [key: string]: any; // Future options
 }
 ```
 
@@ -205,6 +205,7 @@ src/lexer/
 #### `src/lexer/token-types.ts`
 
 This file defines all token types used by the lexer and provides the Token interface. The TokenType enum contains:
+
 - **Structural tokens**: NEWLINE, INDENT, DEDENT, EOF
 - **Heading tokens**: HEADING, HEADING_MARKER
 - **List tokens**: BULLET_LIST, ORDERED_LIST, TASK_LIST, DEFINITION
@@ -221,6 +222,7 @@ The Token interface includes: type, value, line, column, and length.
 #### `src/lexer/lexer.ts`
 
 This is the core Lexer class that transforms input strings into tokens. Key responsibilities:
+
 - Maintains source string, current position, line and column counters
 - Implements tokenization loop that processes the entire input
 - Contains pattern matching methods (matchHeading, matchCodeBlock, etc.) for recognizing different syntax elements
@@ -231,6 +233,7 @@ This is the core Lexer class that transforms input strings into tokens. Key resp
 #### `src/lexer/state/lexer-state.ts`
 
 This file defines the LexerState class that manages lexer context during tokenization:
+
 - **mode**: Current parsing mode (BLOCK, INLINE, CODE, FRONTMATTER, TABLE, TRIPLE_COLON)
 - **indentStack**: Tracks indentation levels for Python-like block detection
 - **codeLanguage**: Stores the language identifier from code blocks
@@ -269,6 +272,7 @@ src/parser/
 #### `src/parser/types.ts`
 
 This file defines all AST node type interfaces. Key interfaces include:
+
 - **DocumentNode**: Root node containing children and optional frontmatter
 - **Block nodes**: HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode, TripleColonBlockNode, DoubleBracketBlockNode, HorizontalRuleNode, IndentationNode
 - **Inline nodes**: BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode, HighlightNode, InlineStyleNode
@@ -280,6 +284,7 @@ All nodes share a base ASTNode interface with type and optional attributes.
 #### `src/parser/parser.ts`
 
 The main Parser class implementing recursive descent parsing:
+
 - Consumes tokens from the lexer
 - Parses document structure by delegating to specialized methods
 - **parseDocument()**: Entry point handling optional frontmatter and block parsing
@@ -295,14 +300,16 @@ Uses helper methods: advance(), peek(), expect(), match(), skipNewlines(), error
 #### `src/parser/inline-parser.ts`
 
 Handles inline element parsing within text content:
+
 - **parse()**: Main method that processes text and returns array of inline nodes
 - **parseInlineElement()**: Tries each inline pattern in order (longest/most specific first)
 - Pattern methods: parseBold, parseItalic, parseUnderline, parseStrikethrough, parseHighlight, parseCode, parseSuperscript, parseSubscript, parseInlineStyle
-- Uses regex patterns to match inline syntax (**, //, __, ~~, ==, `, ^, _, ||)
+- Uses regex patterns to match inline syntax (\*\*, //, \__, ~~, ==, `, ^, _, ||)
 
 #### `src/parser/errors/parse-error.ts`
 
 Custom error class for parse errors:
+
 - Extends Error with location information
 - Properties: message, line, column, filePath, code
 - Used by Parser to throw descriptive errors with exact location
@@ -334,12 +341,14 @@ src/builder/
 #### `src/builder/builder.ts`
 
 The Builder interface that all builders must implement:
+
 - **build(node: ASTNode)**: Transform a single AST node to output string
 - **buildDocument(node: DocumentNode)**: Build complete document with wrapper (DOCTYPE, html, head, body)
 
 #### `src/builder/html/builder.ts`
 
 The HTMLBuilder class that transforms AST to HTML:
+
 - **visitDocument()**: Wraps children in HTML document structure
 - **visitHeading()**: Generates h1-h6 elements
 - **visitParagraph()**: Generates p elements
@@ -357,6 +366,7 @@ The HTMLBuilder class that transforms AST to HTML:
 #### `src/builder/html/visitors/blockquote.ts`
 
 Example of the Visitor pattern implementation:
+
 - **visitBlockquote()**: Function that transforms BlockquoteNode to HTML
 - Recursively builds child content using the builder
 - Uses buildAttributes helper for attribute handling
@@ -369,7 +379,7 @@ Example of the Visitor pattern implementation:
 ### 6.1 Separation of Concerns
 
 | Layer   | Responsibility               | Location       |
-|---------|------------------------------|----------------|
+| ------- | ---------------------------- | -------------- |
 | CLI     | User interface, file I/O     | `src/cli/`     |
 | API     | Public functions, validation | `src/api/`     |
 | Lexer   | String → Tokens              | `src/lexer/`   |
@@ -427,4 +437,4 @@ Example of the Visitor pattern implementation:
 
 ---
 
-*This document defines the target architecture. Everything is built from scratch using custom Lexer and Recursive Descent Parser in TypeScript.*
+_This document defines the target architecture. Everything is built from scratch using custom Lexer and Recursive Descent Parser in TypeScript._

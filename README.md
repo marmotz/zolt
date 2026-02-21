@@ -1,6 +1,6 @@
 # 📘 Zolt
 
-*Zolt : The high-voltage successor to Markdown*
+_Zolt : The high-voltage successor to Markdown_
 
 ![Zolt Version](https://img.shields.io/badge/version-0.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -171,7 +171,7 @@ The complete Zolt v0.2 specification is available in [spec.md](spec.md).
 Check the [`examples/`](examples/) directory for comprehensive examples:
 
 | File                                            | Description                                           |
-|-------------------------------------------------|-------------------------------------------------------|
+| ----------------------------------------------- | ----------------------------------------------------- |
 | [lists.zlt](examples/lists.zlt)                 | All list types (bullets, numbers, tasks, definitions) |
 | [links.zlt](examples/links.zlt)                 | Links, references, and attributes                     |
 | [quotes.zlt](examples/quotes.zlt)               | Blockquotes and citations                             |
@@ -286,6 +286,7 @@ vibe/
 Zolt follows **standard Markdown conventions** for paragraph formatting:
 
 - **Single line breaks**: Lines separated by a single newline are joined into one paragraph
+
   ```
   Line 1
   Line 2
@@ -293,6 +294,7 @@ Zolt follows **standard Markdown conventions** for paragraph formatting:
   ```
 
 - **Multiple line breaks**: Blank lines separate paragraphs
+
   ```
   Paragraph 1
 
@@ -305,7 +307,7 @@ Your existing `.md` files will work correctly in Zolt.
 ### Key Syntax Changes
 
 | Markdown        | Zolt                             |
-|-----------------|----------------------------------|
+| --------------- | -------------------------------- |
 | `*italic*`      | `//italic//`                     |
 | `<u>text</u>`   | `__text__`                       |
 | `> [!NOTE]`     | `:::note`                        |
@@ -350,6 +352,6 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Zolt** • *Markdown with a better vibe.*
+**Zolt** • _Markdown with a better vibe._
 
 For detailed specifications, see [spec.md](spec.md).

@@ -12,7 +12,7 @@
 
 - [ ] Parse YAML frontmatter at start of file
 - [ ] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
-  `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
+      `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 
 ### Phase 1: Variables
 
@@ -110,7 +110,7 @@
 ### Link Attributes
 
 - [ ] `{target=_blank}` - Open in new tab
-- [ ] `{rel=noopener}` - Security for target=_blank
+- [ ] `{rel=noopener}` - Security for target=\_blank
 - [ ] `{download}` - Force download
 - [ ] `{title=value}` - Tooltip
 
@@ -247,7 +247,7 @@
 
 - [ ] `:::foreach {$array as $item}`
 - [ ] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
-  `{$foreach.odd}`
+      `{$foreach.odd}`
 - [ ] Nested loops
 - [ ] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles
@@ -381,7 +381,7 @@
 
 ## Summary
 
-### Implemented Features: ~55/180 (30%)
+### Implemented Features: ~60/180 (33%)
 
 ### Major Completed Categories:
 
@@ -396,6 +396,8 @@
 - ✅ Custom blocks (details, tabs, columns)
 - ✅ Dark mode CSS
 - ✅ HTML generation
+- ✅ CLI (lint and build commands)
+- ✅ Unit tests (bun test)
 
 ### Major Missing Categories:
 
@@ -432,4 +434,4 @@
 - Some checkboxes contain multiple sub-features
 - Features are organized by logical categories
 - Reference spec.md for detailed syntax and behavior requirements
-- Last updated: 2026-02-20
+- Last updated: 2026-02-21

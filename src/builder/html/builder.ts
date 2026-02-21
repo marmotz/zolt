@@ -1,5 +1,38 @@
+import {
+  ASTNode,
+  Attributes,
+  AudioNode,
+  BlockquoteNode,
+  BoldNode,
+  CodeBlockNode,
+  CodeNode,
+  DocumentNode,
+  DoubleBracketBlockNode,
+  EmbedNode,
+  ExpressionNode,
+  FileNode,
+  FootnoteDefinitionNode,
+  FootnoteNode,
+  HeadingNode,
+  HighlightNode,
+  HorizontalRuleNode,
+  ImageNode,
+  IndentationNode,
+  InlineStyleNode,
+  ItalicNode,
+  LinkNode,
+  ListItemNode,
+  ListNode,
+  ParagraphNode,
+  StrikethroughNode,
+  SubscriptNode,
+  SuperscriptNode,
+  TripleColonBlockNode,
+  UnderlineNode,
+  VariableNode,
+  VideoNode,
+} from '../../parser/types';
 import { Builder } from '../builder';
-import { ASTNode, DocumentNode, HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode, TripleColonBlockNode, DoubleBracketBlockNode, HorizontalRuleNode, IndentationNode, BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode, HighlightNode, InlineStyleNode, LinkNode, ImageNode, VideoNode, AudioNode, EmbedNode, FileNode, VariableNode, ExpressionNode, FootnoteNode, FootnoteDefinitionNode, Attributes } from '../parser/types';
 
 export class HTMLBuilder implements Builder {
   build(node: ASTNode): string {
@@ -32,7 +65,7 @@ export class HTMLBuilder implements Builder {
   }
 
   buildDocument(node: DocumentNode): string {
-    const childrenHtml = node.children.map(child => this.build(child)).join('\n');
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -46,7 +79,7 @@ ${childrenHtml}
   }
 
   visitDocument(node: DocumentNode): string {
-    return node.children.map(child => this.build(child)).join('\n');
+    return node.children.map((child) => this.build(child)).join('\n');
   }
 
   visitHeading(node: HeadingNode): string {
@@ -61,9 +94,7 @@ ${childrenHtml}
   }
 
   visitBlockquote(node: BlockquoteNode): string {
-    const childrenHtml = node.children
-      .map(child => this.build(child))
-      .join('');
+    const childrenHtml = node.children.map((child) => this.build(child)).join('');
 
     const attrs = this.buildAttributes(node.attributes);
     return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
@@ -71,21 +102,16 @@ ${childrenHtml}
 
   visitList(node: ListNode): string {
     const tag = node.kind === 'numbered' ? 'ol' : 'ul';
-    const childrenHtml = node.children
-      .map(child => this.build(child))
-      .join('\n');
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
     const attrs = this.buildAttributes(node.attributes);
     return `<${tag}${attrs}>\n${childrenHtml}\n</${tag}>`;
   }
 
   visitListItem(node: ListItemNode): string {
-    const checkbox = node.checked !== undefined 
-      ? `<input type="checkbox" ${node.checked ? 'checked' : ''} disabled>` 
-      : '';
-    const childrenHtml = node.children
-      .map(child => this.build(child))
-      .join('\n');
+    const checkbox =
+      node.checked !== undefined ? `<input type="checkbox" ${node.checked ? 'checked' : ''} disabled>` : '';
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
     const attrs = this.buildAttributes(node.attributes);
     return `<li${attrs}>${checkbox}${childrenHtml}</li>`;
@@ -109,9 +135,7 @@ ${childrenHtml}
   }
 
   visitIndentation(node: IndentationNode): string {
-    const childrenHtml = node.children
-      .map(child => this.build(child))
-      .join('\n');
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
     return `<div class="indented" style="margin-left: ${node.level * 2}em">${childrenHtml}</div>`;
   }

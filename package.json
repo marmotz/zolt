@@ -1,0 +1,38 @@
+{
+  "name": "zolt",
+  "version": "0.3.0",
+  "author": "Zolt Team",
+  "main": "./dist/index.js",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.8.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "typescript": "^5.3.3"
+  },
+  "bin": {
+    "zolt": "./dist/cli/index.js"
+  },
+  "description": "Zolt - The high-voltage successor to Markdown",
+  "keywords": [
+    "markdown",
+    "markup",
+    "html",
+    "parser",
+    "cli"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "bun run build:linux && bun run build:macos-x64 && bun run build:macos-arm64 && bun run build:windows",
+    "build:linux": "bun build src/cli.ts --outfile dist/zolt-linux-x64 --target bun-x64-linux --compile",
+    "build:macos-x64": "bun build src/cli.ts --outfile dist/zolt-macos-x64 --target bun-x64-macos --compile",
+    "build:macos-arm64": "bun build src/cli.ts --outfile dist/zolt-macos-arm64 --target bun-aarch64-macos --compile",
+    "build:windows": "bun build src/cli.ts --outfile dist/zolt-windows-x64.exe --target bun-x64-windows --compile",
+    "dev": "bun run src/cli/index.ts",
+    "test": "bun test",
+    "prepublish": "bun run build",
+    "format": "bun x prettier --write .",
+    "lint": "bun x prettier --check ."
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts"
+}

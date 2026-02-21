@@ -1,4 +1,16 @@
-import { ASTNode, TextNode, BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode, HighlightNode, InlineStyleNode, LinkNode } from './types';
+import {
+  ASTNode,
+  BoldNode,
+  CodeNode,
+  HighlightNode,
+  InlineStyleNode,
+  ItalicNode,
+  StrikethroughNode,
+  SubscriptNode,
+  SuperscriptNode,
+  TextNode,
+  UnderlineNode,
+} from './types';
 
 export class InlineParser {
   parse(text: string): ASTNode[] {
@@ -46,7 +58,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Bold', content: match[1] } as BoldNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -56,7 +68,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Italic', content: match[1] } as ItalicNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -66,7 +78,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Underline', content: match[1] } as UnderlineNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -76,7 +88,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Strikethrough', content: match[1] } as StrikethroughNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -86,7 +98,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Highlight', content: match[1] } as HighlightNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -96,7 +108,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Code', content: match[1] } as CodeNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -106,7 +118,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Superscript', content: match[1] } as SuperscriptNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -116,7 +128,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Subscript', content: match[1] } as SubscriptNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -126,7 +138,7 @@ export class InlineParser {
 
     return {
       node: { type: 'InlineStyle', content: match[1] } as InlineStyleNode,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 
@@ -140,7 +152,7 @@ export class InlineParser {
 
     return {
       node: { type: 'Include', path: match[1] } as any,
-      remaining: text.slice(match[0].length)
+      remaining: text.slice(match[0].length),
     };
   }
 

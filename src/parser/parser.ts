@@ -1,6 +1,17 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { ASTNode, DocumentNode, HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode, HorizontalRuleNode, FrontmatterNode } from './types';
+import { Token, TokenType } from '../lexer/token-types';
 import { ParseError } from './errors/parse-error';
+import {
+  ASTNode,
+  BlockquoteNode,
+  CodeBlockNode,
+  DocumentNode,
+  FrontmatterNode,
+  HeadingNode,
+  HorizontalRuleNode,
+  ListItemNode,
+  ListNode,
+  ParagraphNode,
+} from './types';
 
 export class Parser {
   private tokens: Token[];
@@ -20,7 +31,7 @@ export class Parser {
     return {
       type: 'Document',
       children,
-      sourceFile: this.filePath
+      sourceFile: this.filePath,
     };
   }
 
@@ -45,7 +56,7 @@ export class Parser {
     return children;
   }
 
-(): ASTNode |  private parseBlock null {
+  private parseBlock(): ASTNode | null {
     if (this.match(TokenType.HEADING)) return this.parseHeading();
     if (this.match(TokenType.CODE_BLOCK)) return this.parseCodeBlock();
     if (this.match(TokenType.BLOCKQUOTE)) return this.parseBlockquote();
@@ -64,11 +75,11 @@ export class Parser {
   private parseHeading(): HeadingNode {
     const token = this.expect(TokenType.HEADING);
     const level = this.countHeadingLevel(token.value);
-    
+
     return {
       type: 'Heading',
       level,
-      content: token.value.replace(/^#+/, '').trim()
+      content: token.value.replace(/^#+/, '').trim(),
     };
   }
 
@@ -91,7 +102,7 @@ export class Parser {
 
     return {
       type: 'Paragraph',
-      content: content.trim()
+      content: content.trim(),
     };
   }
 
@@ -102,9 +113,7 @@ export class Parser {
     const children: ASTNode[] = [];
     this.skipNewlines();
 
-    while (!this.match(TokenType.EOF) &&
-           !this.match(TokenType.BLOCKQUOTE) &&
-           !this.isNewBlockStart()) {
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.BLOCKQUOTE) && !this.isNewBlockStart()) {
       const content = this.parseBlockquoteContent();
       if (content) {
         children.push(content);
@@ -115,7 +124,7 @@ export class Parser {
     return {
       type: 'Blockquote',
       children,
-      level
+      level,
     };
   }
 
@@ -145,7 +154,7 @@ export class Parser {
     return {
       type: 'List',
       kind,
-      children
+      children,
     };
   }
 
@@ -165,19 +174,26 @@ export class Parser {
   private parseListItem(kind: string): ListItemNode {
     const checked = this.parseTaskMarker();
 
-    const children: ASTNode[] = [];
-    while (this.hasIndentedContent()) {
-      const content = this.parseBlock();
-      if (content) {
-        children.push(content);
-      }
+    if (this.match(TokenType.BULLET_LIST) || this.match(TokenType.ORDERED_LIST) || this.match(TokenType.TASK_LIST)) {
+      this.advance();
+    }
+
+    let content = '';
+    while (
+      !this.match(TokenType.EOF) &&
+      !this.match(TokenType.NEWLINE) &&
+      !this.match(TokenType.BULLET_LIST) &&
+      !this.match(TokenType.ORDERED_LIST) &&
+      !this.match(TokenType.TASK_LIST)
+    ) {
+      content += this.advance().value;
     }
 
     return {
       type: 'ListItem',
-      content: '',
+      content: content.trim(),
       checked,
-      children
+      children: [],
     };
   }
 
@@ -192,11 +208,11 @@ export class Parser {
 
   private parseCodeBlock(): CodeBlockNode {
     const token = this.expect(TokenType.CODE_BLOCK);
-    
+
     return {
       type: 'CodeBlock',
       language: token.value || undefined,
-      content: ''
+      content: '',
     };
   }
 
@@ -205,8 +221,8 @@ export class Parser {
     return {
       type: 'TripleColonBlock',
       blockType: '',
-      content: ''
-    };
+      content: '',
+    } as ASTNode;
   }
 
   private parseDoubleBracketBlock(): ASTNode {
@@ -214,33 +230,33 @@ export class Parser {
     return {
       type: 'DoubleBracketBlock',
       blockType: 'toc',
-      content: ''
-    };
+      content: '',
+    } as ASTNode;
   }
 
   private parseHorizontalRule(): HorizontalRuleNode {
-    const token = this.expect(TokenType.HORIZONTAL_RULE);
-    
+    this.expect(TokenType.HORIZONTAL_RULE);
+
     return {
       type: 'HorizontalRule',
-      style: 'solid'
+      style: 'solid',
     };
   }
 
   private parseDefinitionList(): ASTNode {
-    return { type: 'Paragraph', content: '' };
+    return { type: 'Paragraph', content: '' } as ASTNode;
   }
 
   private parseIndentation(): ASTNode {
-    return { type: 'Indentation', level: 0, children: [] };
+    return { type: 'Indentation', level: 0, children: [] } as ASTNode;
   }
 
   private parseFrontmatter(): FrontmatterNode {
-    const token = this.expect(TokenType.FRONTMATTER);
-    
+    this.expect(TokenType.FRONTMATTER);
+
     return {
       type: 'Frontmatter',
-      data: {}
+      data: {},
     };
   }
 
@@ -250,13 +266,15 @@ export class Parser {
 
   private isNewBlockStart(): boolean {
     const type = this.currentToken.type;
-    return type === TokenType.HEADING ||
-           type === TokenType.CODE_BLOCK ||
-           type === TokenType.BLOCKQUOTE ||
-           type === TokenType.BULLET_LIST ||
-           type === TokenType.ORDERED_LIST ||
-           type === TokenType.TASK_LIST ||
-           type === TokenType.HORIZONTAL_RULE;
+    return (
+      type === TokenType.HEADING ||
+      type === TokenType.CODE_BLOCK ||
+      type === TokenType.BLOCKQUOTE ||
+      type === TokenType.BULLET_LIST ||
+      type === TokenType.ORDERED_LIST ||
+      type === TokenType.TASK_LIST ||
+      type === TokenType.HORIZONTAL_RULE
+    );
   }
 
   private advance(): Token {
@@ -295,13 +313,11 @@ export class Parser {
   }
 
   private error(message: string, code: string): never {
-    throw new ParseError(
-      message,
-      this.currentToken.line,
-      this.currentToken.column,
-      this.filePath,
-      code
-    );
+    throw new ParseError(message, this.currentToken.line, this.currentToken.column, this.filePath, code);
+  }
+
+  private isEof(): boolean {
+    return this.currentToken.type === TokenType.EOF;
   }
 
   private warn(message: string): void {
