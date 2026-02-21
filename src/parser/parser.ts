@@ -14,6 +14,9 @@ import {
   ListItemNode,
   ListNode,
   ParagraphNode,
+  TableCellNode,
+  TableNode,
+  TableRowNode,
 } from './types';
 
 export class Parser {
@@ -77,7 +80,66 @@ export class Parser {
     if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
     if (this.match(TokenType.COMMENT_INLINE)) return this.parseCommentInline();
 
+    if (this.isTableStart()) return this.parseTable();
+
     return this.parseParagraph();
+  }
+
+  private isTableStart(): boolean {
+    const token = this.currentToken;
+    if (token.type !== TokenType.TEXT) return false;
+    return token.value.trim().startsWith('|');
+  }
+
+  private parseTable(): TableNode {
+    const rows: TableRowNode[] = [];
+    let header: TableRowNode | undefined;
+
+    while (this.isTableStart()) {
+      const row = this.parseTableRow();
+      
+      // Check if this is a separator row (e.g., |---|---|)
+      if (this.isSeparatorRow(row)) {
+        if (rows.length > 0 && !header) {
+          header = rows.pop();
+          // We don't add the separator row to rows
+        }
+      } else {
+        rows.push(row);
+      }
+      
+      this.skipNewlines();
+      if (this.isEof()) break;
+    }
+
+    return {
+      type: 'Table',
+      header,
+      rows,
+    };
+  }
+
+  private parseTableRow(): TableRowNode {
+    const token = this.expect(TokenType.TEXT);
+    const line = token.value.trim();
+    
+    // Remove leading and trailing pipes
+    const content = line.replace(/^\|/, '').replace(/\|$/, '');
+    const cellContents = content.split('|');
+    
+    const cells: TableCellNode[] = cellContents.map(cell => ({
+      type: 'TableCell',
+      content: cell.trim(),
+    }));
+
+    return {
+      type: 'TableRow',
+      cells,
+    };
+  }
+
+  private isSeparatorRow(row: TableRowNode): boolean {
+    return row.cells.every(cell => /^[ \t]*:?-+:?[ \t]*$/.test(cell.content));
   }
 
   private parseHeading(): HeadingNode {

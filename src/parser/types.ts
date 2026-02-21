@@ -217,6 +217,24 @@ export interface TripleColonBlockNode {
   attributes?: Attributes;
 }
 
+export interface TableNode {
+  type: 'Table';
+  header?: TableRowNode;
+  rows: TableRowNode[];
+  attributes?: Attributes;
+}
+
+export interface TableRowNode {
+  type: 'TableRow';
+  cells: TableCellNode[];
+}
+
+export interface TableCellNode {
+  type: 'TableCell';
+  content: string;
+  isHeader?: boolean;
+}
+
 export interface DoubleBracketBlockNode {
   type: 'DoubleBracketBlock';
   blockType: string;
@@ -272,6 +290,7 @@ export type ASTNode =
   | HorizontalRuleNode
   | FrontmatterNode
   | TripleColonBlockNode
+  | TableNode
   | DoubleBracketBlockNode
   | IndentationNode
   | DocumentNode;

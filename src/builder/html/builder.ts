@@ -30,6 +30,9 @@ import {
   StrikethroughNode,
   SubscriptNode,
   SuperscriptNode,
+  TableCellNode,
+  TableNode,
+  TableRowNode,
   TripleColonBlockNode,
   UnderlineNode,
   VariableNode,
@@ -91,9 +94,23 @@ const DEFAULT_CSS = `
   pre code { background: none; padding: 0; color: inherit; }
   hr { border: none; border-top: 2px solid #e0e0e0; margin: 2rem 0; }
   input[type="checkbox"] { margin-right: 0.5em; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  th {
+    background: #f8f8f8;
+    font-weight: 600;
+  }
   abbr {
     color: #7c3aed;
-    text-decoration: underline;
+    text-decoration: underline dotted;
     text-decoration-color: #c4b5fd;
     text-underline-offset: 2px;
     cursor: help;
@@ -148,11 +165,49 @@ export class HTMLBuilder implements Builder {
         return this.visitIndentation(node as IndentationNode);
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+      case 'Table':
+        return this.visitTable(node as TableNode);
       case 'CommentInline':
         return '';
       default:
         return '';
     }
+  }
+
+  visitTable(node: TableNode): string {
+    let html = '<table>\n';
+
+    if (node.header) {
+      html += '  <thead>\n';
+      html += '    ' + this.visitTableRow(node.header, true) + '\n';
+      html += '  </thead>\n';
+    }
+
+    if (node.rows.length > 0) {
+      html += '  <tbody>\n';
+      for (const row of node.rows) {
+        html += '    ' + this.visitTableRow(row, false) + '\n';
+      }
+      html += '  </tbody>\n';
+    }
+
+    html += '</table>';
+    return html;
+  }
+
+  visitTableRow(node: TableRowNode, isHeader: boolean): string {
+    let html = '<tr>';
+    for (const cell of node.cells) {
+      html += this.visitTableCell(cell, isHeader);
+    }
+    html += '</tr>';
+    return html;
+  }
+
+  visitTableCell(node: TableCellNode, isHeader: boolean): string {
+    const tag = isHeader ? 'th' : 'td';
+    const content = this.processInlineContent(node.content);
+    return `<${tag}>${content}</${tag}>`;
   }
 
   buildDocument(node: DocumentNode): string {
@@ -188,7 +243,12 @@ ${childrenHtml}
   private collectAbbreviations(node: ASTNode): void {
     if (node.type === 'AbbreviationDefinition') {
       this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
-    } else if (node.type === 'Paragraph' || node.type === 'Heading' || node.type === 'ListItem') {
+    } else if (
+      node.type === 'Paragraph' ||
+      node.type === 'Heading' ||
+      node.type === 'ListItem' ||
+      node.type === 'TableCell'
+    ) {
       const content = (node as any).content;
       if (typeof content === 'string') {
         const regex = /([A-Za-z0-9μ]+)\{abbr="([^"]+)"[^}]*\}/g;
@@ -206,6 +266,21 @@ ${childrenHtml}
     if ('children' in node && Array.isArray(node.children)) {
       for (const child of node.children) {
         this.collectAbbreviations(child);
+      }
+    }
+
+    if (node.type === 'Table') {
+      const table = node as TableNode;
+      if (table.header) {
+        this.collectAbbreviations(table.header);
+      }
+      for (const row of table.rows) {
+        this.collectAbbreviations(row);
+      }
+    } else if (node.type === 'TableRow') {
+      const row = node as TableRowNode;
+      for (const cell of row.cells) {
+        this.collectAbbreviations(cell);
       }
     }
   }

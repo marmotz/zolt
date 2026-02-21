@@ -282,6 +282,15 @@ Use the same abbreviation multiple times:
 | JSON{abbr="JavaScript Object Notation"} | Data format     |
 | XML{abbr="eXtensible Markup Language"}  | Markup language |
 | YAML{abbr="YAML Ain't Markup Language"} | Configuration   |
+| API                                     | Interface       |
+
+### Complex Table with Global Abbreviations
+
+| Stack | Components |
+|-------|------------|
+| Web   | HTML, CSS, and JS |
+| Backend | API and SQL{abbr="Structured Query Language"} |
+| Mobile | SDK{abbr="Software Development Kit"} |
 
 ## Best Practices
 
