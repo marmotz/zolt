@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  AbbreviationNode,
   BlockquoteNode,
   CodeBlockNode,
   DocumentNode,
@@ -262,5 +263,61 @@ describe('HTMLBuilder', () => {
     const html = builder.visitListItem(node);
     expect(html).toContain('<a href="file.html">file.zlt</a>');
     expect(html).toContain('— description');
+  });
+
+  test('should build abbreviation', () => {
+    const node: AbbreviationNode = {
+      type: 'Abbreviation',
+      abbreviation: 'HTML',
+      definition: 'HyperText Markup Language',
+    };
+
+    const html = builder.visitAbbreviation(node);
+    expect(html).toBe('<abbr title="HyperText Markup Language">HTML</abbr>');
+  });
+
+  test('should build abbreviation with class attribute', () => {
+    const node: AbbreviationNode = {
+      type: 'Abbreviation',
+      abbreviation: 'HTML',
+      definition: 'HyperText Markup Language',
+      attributes: { class: 'org-link' },
+    };
+
+    const html = builder.visitAbbreviation(node);
+    expect(html).toContain('<abbr');
+    expect(html).toContain('title="HyperText Markup Language"');
+    expect(html).toContain('class="org-link"');
+    expect(html).toContain('>HTML</abbr>');
+  });
+
+  test('should build abbreviation with id attribute', () => {
+    const node: AbbreviationNode = {
+      type: 'Abbreviation',
+      abbreviation: 'HTML5',
+      definition: 'HTML version 5',
+      attributes: { id: 'html5-def' },
+    };
+
+    const html = builder.visitAbbreviation(node);
+    expect(html).toContain('id="html5-def"');
+    expect(html).toContain('>HTML5</abbr>');
+  });
+
+  test('should process inline abbreviation in text', () => {
+    const html = builder.processInline('HTML{abbr="HyperText Markup Language"} is the standard');
+    expect(html).toContain('<abbr title="HyperText Markup Language">HTML</abbr>');
+    expect(html).toContain('is the standard');
+  });
+
+  test('should build abbreviation with Greek letter mu', () => {
+    const node: AbbreviationNode = {
+      type: 'Abbreviation',
+      abbreviation: 'μs',
+      definition: 'microsecond',
+    };
+
+    const html = builder.visitAbbreviation(node);
+    expect(html).toBe('<abbr title="microsecond">μs</abbr>');
   });
 });

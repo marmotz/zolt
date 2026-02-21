@@ -234,9 +234,9 @@
 
 ### Abbreviations
 
-- [ ] Inline abbreviations `Text{abbr="definition"}`
-- [ ] Global abbreviation definitions `*[ABBR]: Definition`
-- [ ] Abbreviations with additional attributes
+- [x] Inline abbreviations `Text{abbr="definition"}`
+- [x] Global abbreviation definitions `*[ABBR]: Definition`
+- [x] Abbreviations with additional attributes
 
 ### Table of Contents
 

@@ -1313,7 +1313,7 @@ Dernière mise à jour : {$modified}.
 
 Les abbréviations permettent de définir des explications pour des termes techniques.
 
-#### Syntaxe
+#### Syntaxe Inline
 
 ```
 HTML{abbr="HyperText Markup Language"} est le langage de base du web.
@@ -1326,17 +1326,48 @@ CSS{abbr="Cascading Style Sheets"} gère la présentation.
 <abbr title="HyperText Markup Language">HTML</abbr> est le langage de base du web.
 ```
 
-#### Définitions Globales
+#### Définitions Locales
 
-Pour éviter les répétitions, les abbréviations peuvent être définies une seule fois :
+Les abbréviations locales (document courant uniquement) utilisent `*[ABBR]` :
 
 ```
 *[HTML]: HyperText Markup Language
 *[CSS]: Cascading Style Sheets
-*[API]: Application Programming Interface
+*[JS]: JavaScript
 
 HTML et CSS sont essentiels. L'API est puissante.
 ```
+
+Les définitions locales ne sont appliquées qu'au document courant et ne sont pas partagées avec les autres documents liés ou inclus.
+
+#### Définitions Globales
+
+Les abbréviations globales (partagées entre tous les documents) utilisent `**[ABBR]` :
+
+```
+**[HTML]: HyperText Markup Language
+**[CSS]: Cascading Style Sheets
+**[JS]: JavaScript
+```
+
+Les définitions globales sont disponibles dans :
+
+- Tous les documents du projet lors du build
+- Les fichiers inclus via `{{include}}`
+- Les fichiers liés par des références croisées
+
+C'est similaire au système des variables :
+
+- `*[ABBR]` équivaut à `$var` (local au document)
+- `**[ABBR]` équivaut à `$$var` (global au projet)
+
+#### Portée des Abréviations
+
+| Syntaxe      | Portée            | Usage                                 |
+| ------------ | ----------------- | ------------------------------------- |
+| `*[ABBR]`    | Document courant  | Définitions spécifiques au fichier    |
+| `**[ABBR]`   | Globale au projet | Définitions communes à tout le projet |
+| `ABBR{abbr}` | Inline (une fois) | Définition à usage unique             |
 
 #### Avec Attributs Supplémentaires
 

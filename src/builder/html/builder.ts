@@ -1,6 +1,8 @@
 import { InlineParser } from '../../parser/inline-parser';
 import {
   ASTNode,
+  AbbreviationDefinitionNode,
+  AbbreviationNode,
   Attributes,
   AudioNode,
   BlockquoteNode,
@@ -89,10 +91,36 @@ const DEFAULT_CSS = `
   pre code { background: none; padding: 0; color: inherit; }
   hr { border: none; border-top: 2px solid #e0e0e0; margin: 2rem 0; }
   input[type="checkbox"] { margin-right: 0.5em; }
+  abbr {
+    color: #7c3aed;
+    text-decoration: underline;
+    text-decoration-color: #c4b5fd;
+    text-underline-offset: 2px;
+    cursor: help;
+    font-weight: 500;
+  }
+  abbr:hover {
+    color: #6d28d9;
+    text-decoration-color: #a78bfa;
+  }
 `.trim();
 
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
+  private abbreviationDefinitions: Map<string, string> = new Map();
+  private static globalAbbreviations: Map<string, string> = new Map();
+
+  static setGlobalAbbreviation(abbreviation: string, definition: string): void {
+    this.globalAbbreviations.set(abbreviation, definition);
+  }
+
+  static clearGlobalAbbreviations(): void {
+    this.globalAbbreviations.clear();
+  }
+
+  static getGlobalAbbreviations(): Map<string, string> {
+    return this.globalAbbreviations;
+  }
 
   build(node: ASTNode): string {
     switch (node.type) {
@@ -118,12 +146,29 @@ export class HTMLBuilder implements Builder {
         return this.visitHorizontalRule(node as HorizontalRuleNode);
       case 'Indentation':
         return this.visitIndentation(node as IndentationNode);
+      case 'AbbreviationDefinition':
+        return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
       default:
         return '';
     }
   }
 
   buildDocument(node: DocumentNode): string {
+    this.abbreviationDefinitions.clear();
+
+    for (const child of node.children) {
+      if (child.type === 'AbbreviationDefinition') {
+        this.visitAbbreviationDefinition(child as AbbreviationDefinitionNode);
+      }
+    }
+
+    const allAbbreviations = new Map<string, string>([
+      ...HTMLBuilder.globalAbbreviations.entries(),
+      ...this.abbreviationDefinitions.entries(),
+    ]);
+
+    this.inlineParser.setGlobalAbbreviations(allAbbreviations);
+
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
     return `<!DOCTYPE html>
 <html lang="">
@@ -239,6 +284,8 @@ ${childrenHtml}
         return this.visitInlineStyle(node as InlineStyleNode);
       case 'Link':
         return this.visitLink(node as LinkNode);
+      case 'Abbreviation':
+        return this.visitAbbreviation(node as AbbreviationNode);
       default:
         return (node as any).content || '';
     }
@@ -397,6 +444,20 @@ ${childrenHtml}
 
   visitFootnoteDefinition(node: FootnoteDefinitionNode): string {
     return `<div id="fn-${node.id}"><sup>${node.id}</sup>${node.content}</div>`;
+  }
+
+  visitAbbreviation(node: AbbreviationNode): string {
+    const attrs = this.buildAttributes(node.attributes);
+    return `<abbr title="${node.definition}"${attrs}>${node.abbreviation}</abbr>`;
+  }
+
+  visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {
+    if (node.isGlobal) {
+      HTMLBuilder.globalAbbreviations.set(node.abbreviation, node.definition);
+    } else {
+      this.abbreviationDefinitions.set(node.abbreviation, node.definition);
+    }
+    return '';
   }
 
   private buildAttributes(attrs?: Attributes): string {

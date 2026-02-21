@@ -51,6 +51,8 @@ export class Lexer {
     if (this.matchList()) return this.readList();
     if (this.matchHorizontalRule()) return this.readHorizontalRule();
     if (this.matchFrontmatter()) return this.readFrontmatter();
+    if (this.matchGlobalAbbreviationDef()) return this.readGlobalAbbreviationDef();
+    if (this.matchAbbreviationDef()) return this.readAbbreviationDef();
 
     return this.readText();
   }
@@ -352,6 +354,91 @@ export class Lexer {
     return {
       type: TokenType.FRONTMATTER,
       value: content,
+      line,
+      column,
+      length: this.pos - start,
+    };
+  }
+
+  private matchAbbreviationDef(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^\*\[([A-Z0-9μ]+)\]:\s+/.test(remaining);
+  }
+
+  private matchGlobalAbbreviationDef(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^\*\*\[([A-Z0-9μ]+)\]:\s+/.test(remaining);
+  }
+
+  private readGlobalAbbreviationDef(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar();
+    this.advanceChar();
+    this.advanceChar();
+
+    let abbreviation = '';
+    while (!this.isEof() && this.peekChar() !== ']') {
+      abbreviation += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar();
+    }
+
+    if (!this.isEof() && this.peekChar() === ':') {
+      this.advanceChar();
+    }
+
+    this.skipWhitespace();
+
+    let definition = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      definition += this.advanceChar();
+    }
+
+    return {
+      type: TokenType.ABBREVIATION_DEF_GLOBAL,
+      value: `${abbreviation}:${definition.trim()}`,
+      line,
+      column,
+      length: this.pos - start,
+    };
+  }
+
+  private readAbbreviationDef(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar();
+    this.advanceChar();
+
+    let abbreviation = '';
+    while (!this.isEof() && this.peekChar() !== ']') {
+      abbreviation += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar();
+    }
+
+    if (!this.isEof() && this.peekChar() === ':') {
+      this.advanceChar();
+    }
+
+    this.skipWhitespace();
+
+    let definition = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      definition += this.advanceChar();
+    }
+
+    return {
+      type: TokenType.ABBREVIATION_DEF,
+      value: `${abbreviation}:${definition.trim()}`,
       line,
       column,
       length: this.pos - start,

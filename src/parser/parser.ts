@@ -2,6 +2,7 @@ import { Token, TokenType } from '../lexer/token-types';
 import { ParseError } from './errors/parse-error';
 import {
   ASTNode,
+  AbbreviationDefinitionNode,
   BlockquoteNode,
   CodeBlockNode,
   DocumentNode,
@@ -18,12 +19,14 @@ export class Parser {
   private pos: number;
   private currentToken: Token;
   private filePath: string;
+  private abbreviationDefinitions: Map<string, string>;
 
   constructor(tokens: Token[], filePath?: string) {
     this.tokens = tokens;
     this.pos = 0;
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
+    this.abbreviationDefinitions = new Map();
   }
 
   parse(): DocumentNode {
@@ -68,6 +71,8 @@ export class Parser {
     }
     if (this.match(TokenType.DEFINITION)) return this.parseDefinitionList();
     if (this.match(TokenType.INDENTATION)) return this.parseIndentation();
+    if (this.match(TokenType.ABBREVIATION_DEF)) return this.parseAbbreviationDef();
+    if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
 
     return this.parseParagraph();
   }
@@ -271,6 +276,27 @@ export class Parser {
       this.currentToken = this.tokens[this.pos];
     }
     return token;
+  }
+
+  private parseAbbreviationDef(): AbbreviationDefinitionNode {
+    const token = this.expect(
+      this.match(TokenType.ABBREVIATION_DEF_GLOBAL) ? TokenType.ABBREVIATION_DEF_GLOBAL : TokenType.ABBREVIATION_DEF
+    );
+    const value = token.value;
+
+    const colonIndex = value.indexOf(':');
+    const abbreviation = value.substring(0, colonIndex);
+    const definition = value.substring(colonIndex + 1);
+
+    const isGlobal = token.type === TokenType.ABBREVIATION_DEF_GLOBAL;
+    this.abbreviationDefinitions.set(abbreviation, definition);
+
+    return {
+      type: 'AbbreviationDefinition',
+      abbreviation,
+      definition,
+      isGlobal,
+    };
   }
 
   private peek(offset: number = 0): Token {

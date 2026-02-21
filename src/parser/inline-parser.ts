@@ -1,5 +1,7 @@
 import {
   ASTNode,
+  AbbreviationNode,
+  Attributes,
   BoldNode,
   CodeNode,
   HighlightNode,
@@ -14,9 +16,27 @@ import {
 } from './types';
 
 export class InlineParser {
+  private globalAbbreviations: Map<string, string> = new Map();
+
+  setGlobalAbbreviations(abbreviations: Map<string, string>): void {
+    this.globalAbbreviations = abbreviations;
+  }
+
   parse(text: string): ASTNode[] {
+    let processedText = text;
+
+    for (const [abbreviation, definition] of this.globalAbbreviations) {
+      const abbrPattern = new RegExp(`${abbreviation}\\{abbr="[^"]+"\\}`, 'g');
+      const hasInlineAbbr = abbrPattern.test(processedText);
+
+      if (!hasInlineAbbr) {
+        const regex = new RegExp(`(?<![\\w])${abbreviation}(?![\\w\\{])`, 'g');
+        processedText = processedText.replace(regex, `${abbreviation}{abbr="${definition}"}`);
+      }
+    }
+
     const nodes: ASTNode[] = [];
-    let remaining = text;
+    let remaining = processedText;
 
     while (remaining.length > 0) {
       const result = this.parseInlineElement(remaining);
@@ -45,6 +65,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^==([^=]+)==/)) return this.parseHighlight(text);
     if (this.matchPattern(text, /^`([^`]+)`/)) return this.parseCode(text);
     if (this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i)) return this.parseInclude(text);
+    if (this.matchPattern(text, /^([A-Za-z0-9μ]+)\{abbr="([^"]+)"([^}]+)?}/)) return this.parseAbbreviation(text);
 
     return null;
   }
@@ -227,6 +248,66 @@ export class InlineParser {
       node: { type: 'Include', path: match[1] } as any,
       remaining: text.slice(match[0].length),
     };
+  }
+
+  private parseAbbreviation(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^([A-Za-z0-9μ]+)\{abbr="([^"]+)"([^}]+)?}/);
+    if (!match) return null;
+
+    const abbreviation = match[1];
+    const definition = match[2];
+    const attributesStr = match[3];
+    const attributes = attributesStr ? this.parseAbbreviationAttributes(attributesStr) : undefined;
+
+    return {
+      node: { type: 'Abbreviation', abbreviation, definition, attributes } as AbbreviationNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseAbbreviationAttributes(attrStr: string): Attributes | undefined {
+    const attrs: Attributes = {};
+    let remaining = attrStr.trim();
+
+    while (remaining.length > 0) {
+      remaining = remaining.trimStart();
+
+      const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
+      const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
+
+      if (quotedMatch) {
+        const key = quotedMatch[1];
+        const value = quotedMatch[2];
+        this.setAttribute(attrs, key, value);
+        remaining = remaining.slice(quotedMatch[0].length);
+      } else if (quotedMatch2) {
+        const key = quotedMatch2[1];
+        const value = quotedMatch2[2];
+        this.setAttribute(attrs, key, value);
+        remaining = remaining.slice(quotedMatch2[0].length);
+      } else {
+        const keyValueMatch = remaining.match(/^([a-zA-Z-]+)=/);
+        if (keyValueMatch) {
+          const key = keyValueMatch[1];
+          const afterKey = remaining.slice(keyValueMatch[0].length);
+          let value = '';
+
+          const nextKeyMatch = afterKey.match(/ [a-zA-Z-]+=/);
+          if (nextKeyMatch) {
+            value = afterKey.slice(0, nextKeyMatch.index);
+          } else {
+            value = afterKey;
+          }
+
+          this.setAttribute(attrs, key, value.trim());
+          remaining = remaining.slice(key.length + 1 + value.length);
+        } else {
+          remaining = remaining.slice(1);
+        }
+      }
+    }
+
+    return Object.keys(attrs).length > 0 ? attrs : undefined;
   }
 
   private createTextNode(content: string): TextNode {

@@ -17,6 +17,13 @@ Define abbreviations once, use throughout:
 - HTML, CSS, and JS work together to create web applications.
 - The API provides endpoints for data access.
 
+## Project-Wide Global Abbreviations
+
+These global abbreviations (using `**[ABBR]`) are defined in [index.zlt](index.zlt) and available across all documents:
+- The W3C sets web standards.
+- The ECMA standardizes languages like JavaScript.
+- The IEEE sets technical standards.
+
 ## Repeated Abbreviations
 
 Use the same abbreviation multiple times:

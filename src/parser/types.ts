@@ -137,6 +137,14 @@ export interface AbbreviationNode {
   type: 'Abbreviation';
   abbreviation: string;
   definition: string;
+  attributes?: Attributes;
+}
+
+export interface AbbreviationDefinitionNode {
+  type: 'AbbreviationDefinition';
+  abbreviation: string;
+  definition: string;
+  isGlobal: boolean;
 }
 
 export interface AnchorNode {
@@ -247,6 +255,7 @@ export type ASTNode =
   | FootnoteNode
   | FootnoteDefinitionNode
   | AbbreviationNode
+  | AbbreviationDefinitionNode
   | AnchorNode
   | ParagraphNode
   | HeadingNode
