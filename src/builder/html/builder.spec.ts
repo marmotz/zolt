@@ -91,6 +91,7 @@ describe('HTMLBuilder', () => {
     const html = builder.visitList(node);
     expect(html).toContain('<input type="checkbox"');
     expect(html).toContain('checked');
+    expect(html).toContain('onclick="return false;"');
   });
 
   test('should build blockquote', () => {

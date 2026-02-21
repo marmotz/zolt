@@ -2,7 +2,6 @@ import { Token, TokenType } from '../lexer/token-types';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
 import {
-  ASTNode,
   AbbreviationDefinitionNode,
   BlockquoteNode,
   CodeBlockNode,
@@ -110,7 +109,7 @@ export class Parser {
 
     while (this.isTableStart()) {
       const row = this.parseTableRow();
-      
+
       // Check if this is a separator row (e.g., |---|---|)
       if (this.isSeparatorRow(row)) {
         if (rows.length > 0 && !header) {
@@ -120,7 +119,7 @@ export class Parser {
       } else {
         rows.push(row);
       }
-      
+
       this.skipNewlines();
       if (this.isEof()) break;
     }
@@ -135,12 +134,12 @@ export class Parser {
   private parseTableRow(): TableRowNode {
     const token = this.expect(TokenType.TEXT);
     const line = token.value.trim();
-    
+
     // Remove leading and trailing pipes
     const content = line.replace(/^\|/, '').replace(/\|$/, '');
     const cellContents = content.split('|');
-    
-    const cells: TableCellNode[] = cellContents.map(cell => ({
+
+    const cells: TableCellNode[] = cellContents.map((cell) => ({
       type: 'TableCell',
       content: cell.trim(),
     }));
@@ -152,17 +151,27 @@ export class Parser {
   }
 
   private isSeparatorRow(row: TableRowNode): boolean {
-    return row.cells.every(cell => /^[ \t]*:?-+:?[ \t]*$/.test(cell.content));
+    return row.cells.every((cell) => /^[ \t]*:?-+:?[ \t]*$/.test(cell.content));
   }
 
   private parseHeading(): HeadingNode {
     const token = this.expect(TokenType.HEADING);
     const level = token.level || 1;
+    let content = token.value.trim();
+
+    // Extract attributes at the end of content
+    let attributes: Attributes | undefined;
+    const attrMatch = content.match(/\s+\{([^}]+)\}$/);
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+      content = content.slice(0, -attrMatch[0].length).trim();
+    }
 
     return {
       type: 'Heading',
       level,
-      content: token.value.trim(),
+      content,
+      attributes,
     };
   }
 
@@ -174,27 +183,34 @@ export class Parser {
     };
   }
 
-  private countHeadingLevel(_value: string): number {
-    return 1;
-  }
-
   private parseParagraph(): ParagraphNode {
-    const token = this.currentToken;
     let content = '';
 
     while (!this.match(TokenType.EOF) && !this.match(TokenType.NEWLINE) && !this.isNewBlockStart()) {
       content += this.advance().value;
     }
 
+    content = content.trim();
+
+    // Extract attributes at the end of content
+    let attributes: Attributes | undefined;
+    const attrMatch = content.match(/\s+\{([^}]+)\}$/);
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+      content = content.slice(0, -attrMatch[0].length).trim();
+    }
+
     return {
       type: 'Paragraph',
-      content: content.trim(),
+      content,
+      attributes,
     };
   }
 
   private parseBlockquote(): BlockquoteNode {
     const startToken = this.expect(TokenType.BLOCKQUOTE);
     const level = startToken.value.split('>').length - 1;
+    let quoteValue = startToken.value;
 
     const children: ASTNode[] = [];
     this.skipNewlines();
@@ -207,10 +223,18 @@ export class Parser {
       this.skipNewlines();
     }
 
+    // Extract attributes from the first line if present
+    let attributes: Attributes | undefined;
+    const attrMatch = quoteValue.match(/\{([^}]+)\}$/);
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+    }
+
     return {
       type: 'Blockquote',
       children,
       level,
+      attributes,
     };
   }
 
@@ -281,7 +305,7 @@ export class Parser {
 
     if (this.match(TokenType.TASK_LIST)) {
       const token = this.advance();
-      checked = /\[x\]/i.test(token.value);
+      checked = /\[x]/i.test(token.value);
       content = token.value.replace(/^([-*]\s+)?\[[ x]]\s+/i, '');
     } else if (this.match(TokenType.BULLET_LIST)) {
       const token = this.advance();
@@ -289,6 +313,14 @@ export class Parser {
     } else if (this.match(TokenType.ORDERED_LIST)) {
       const token = this.advance();
       content = token.value.replace(/^\d+\.\s+/, '');
+    }
+
+    // Extract attributes at the end of content
+    let attributes: Attributes | undefined;
+    const attrMatch = content.match(/\s+\{([^}]+)}$/);
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+      content = content.slice(0, -attrMatch[0].length).trim();
     }
 
     this.skipNewlines();
@@ -313,11 +345,8 @@ export class Parser {
       content: content.trim(),
       checked,
       children,
+      attributes,
     };
-  }
-
-  private parseTaskMarker(): boolean | undefined {
-    return undefined; // Not used anymore as parseListItem handles it
   }
 
   private parseCodeBlock(): CodeBlockNode {
@@ -377,10 +406,6 @@ export class Parser {
       type: 'Frontmatter',
       data: {},
     };
-  }
-
-  private hasIndentedContent(): boolean {
-    return false;
   }
 
   private isNewBlockStart(): boolean {
@@ -458,9 +483,5 @@ export class Parser {
 
   private isEof(): boolean {
     return this.currentToken.type === TokenType.EOF;
-  }
-
-  private warn(message: string): void {
-    console.warn(`Warning: ${message} at line ${this.currentToken.line}`);
   }
 }

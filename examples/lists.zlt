@@ -34,7 +34,7 @@ Task list with checkboxes:
 
 - [ ] Task to do
 - [x] Completed task
-- [ ] Important task{color=red}
+- [ ] Important task {color=red}
 - [x] Reviewed task
 
 ## Definition Lists
@@ -55,16 +55,16 @@ Definition list using `:` syntax:
 List items with attributes:
 
 - Normal item
-- Important item{color=red font-weight=bold}
-- Highlighted item{background=yellow}
-- Custom styled item{.my-custom-class}
+- Important item {color=red font-weight=bold}
+- Highlighted item {background=yellow}
+- Custom styled item {.my-custom-class}
 
 ## Shopping List
 
 - [ ] Fruits
   - [x] Apples
   - [ ] Bananas
-  - [ ] Oranges{color=orange}
+  - [ ] Oranges {color=orange}
 - [ ] Vegetables
   - [ ] Carrots
   - [x] Tomatoes
