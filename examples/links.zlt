@@ -1,0 +1,99 @@
+# Links Examples in Zolt
+
+## Basic Links
+
+Simple link syntax:
+[Zolt Documentation](https://zolt.example.com)
+[Example Website](https://example.com)
+
+## Links with Attributes
+
+Styled links:
+
+[External link](https://example.com){target=_blank rel=noopener}
+[Important link](page.html){color=blue font-weight=bold}
+[Download PDF](document.pdf){download=true}
+[Button link](action.html){btn=primary}
+
+## Link Attributes Reference
+
+| Attribute | Description |
+|-----------|-------------|
+| `target=_blank` | Opens in new tab |
+| `rel=noopener` | Security for target=_blank |
+| `download` | Force download |
+| `title=...` | Tooltip text |
+
+## Automatic References
+
+Reference-style links to avoid repeating URLs:
+
+Check out [Zolt][vibe] documentation and [GitHub][github] repository.
+
+[vibe]: https://zolt.example.com
+[github]: https://github.com/vibe/vibe
+
+## Internal Links (Cross-references)
+
+Links to document sections using `@` symbol:
+
+See the [Introduction](@intro) for more details.
+Go to [Advanced Features](@advanced).
+[Back to top](){#top}
+
+## Link Anchors
+
+Direct anchor links:
+
+Jump to [Lists section](#lists)
+[Return to summary](){#summary}
+
+## Links with Variables
+
+Using variables in links:
+
+$site_url = "https://example.com"
+$doc_url = "https://docs.example.com"
+
+Visit [our website]({$site_url}) for more information.
+Check the [documentation]({$doc_url}).
+
+## Combined Examples
+
+### Navigation Menu
+
+[Home](/){class=nav-link}
+[About](/about){class=nav-link active}
+[Services](/services){class=nav-link}
+[Contact](/contact){class=nav-link}
+
+### Resource Links
+
+**Official Resources:**
+
+- [Documentation][docs]
+- [API Reference][api]
+- [Community Forum][forum]
+
+[docs]: https://docs.zlt.example.com
+[api]: https://api.zlt.example.com
+[forum]: https://forum.zlt.example.com
+
+### Download Section
+
+**Downloads:**
+
+- [PDF Version](guide.pdf){download=true}
+- [ePub Version](guide.epub){download=true}
+- [Source Code][github]{target=_blank rel=noopener}
+
+[github]: https://github.com/vibe/vibe/archive/main.zip
+
+### Styling Example
+
+[Primary Button](#){btn=primary}
+[Secondary Button](#){btn=secondary}
+[Success Button](#){btn=success}
+[Danger Button](#){btn=danger color=red}
+
+[← Back to Examples Index](index.zlt)

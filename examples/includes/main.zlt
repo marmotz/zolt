@@ -1,0 +1,23 @@
+{{include header.zlt}}
+
+{{include navigation.zlt}}
+
+# Page d'Accueil
+
+Bienvenue sur notre site ! Cette page démontre la fonctionnalité d'inclusion de fichiers.
+
+## Introduction
+
+Cette page est composée de plusieurs fichiers inclus :
+- Un en-tête avec logo
+- Une barre de navigation
+- Ce contenu principal
+- Un pied de page
+
+## Avantages de l'Inclusion
+
+- **Modularité** : Réutilisez les mêmes composants sur plusieurs pages
+- **Maintenance** : Modifiez une seule fois, appliquez partout
+- **Lisibilité** : Gardez vos fichiers organisés et concis
+
+{{include footer.zlt}}

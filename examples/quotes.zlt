@@ -1,0 +1,108 @@
+# Blockquotes Examples in Zolt
+
+## Basic Blockquotes
+
+Simple quote using `>`:
+
+> This is a simple blockquote.
+> It can span multiple lines.
+
+## Blockquotes with Attributes
+
+Styled quotes:
+
+> This quote has an ID{#quote1}
+> This quote is red{color=red}
+> This quote is highlighted{#quote3 background=yellow}
+
+## Nested Blockquotes
+
+Quotes within quotes:
+
+> Level 1 quote
+>
+> > Level 2 quote
+> >
+> > > Level 3 quote
+> >
+> > Back to level 2
+>
+> Back to level 1
+
+## Blockquotes vs Inline Styling
+
+> This is an entire blockquote paragraph.
+> All lines are styled the same way.
+
+This is a paragraph with ||inline styled text||{color=blue} inside.
+
+## Complex Examples
+
+### Testimonial Section
+
+> "Zolt has completely transformed how I write documentation. It's intuitive, powerful, and a joy to use."
+>
+> — **Sarah Johnson**, Technical Writer at TechCorp{#testimonial-sarah}
+
+> "The combination of Markdown simplicity with advanced features makes Zolt the perfect choice for modern documentation."
+>
+> — **Michael Chen**, Software Engineer at StartupInc{#testimonial-michael}
+
+### Callout Quotes
+
+> **Tip:** Use blockquotes for important notes and tips.
+> They stand out from regular text and draw attention.
+
+> **Warning:** This feature is experimental.
+> Use at your own risk in production environments.{color=orange border=1px solid orange padding=0 10px}
+
+> **Note:** Remember to save your work before leaving.
+> Auto-save is enabled every 5 minutes.{background=light-blue}
+
+### Code Citations
+
+> The `print()` function outputs text to the console.
+> It's one of the most commonly used functions in programming.
+
+```python
+print("Hello, World!")
+```
+
+> Always escape user input before rendering.
+> This prevents security vulnerabilities like XSS.
+
+### Multiline Quotes with Formatting
+
+> **Key Principles:**
+>
+> 1. Keep it simple
+> 2. Make it clear
+> 3. Be consistent
+>
+> These three principles will guide your documentation writing process.
+
+### Stylized Quotes
+
+> **Pro Tip:** Use the `&` symbol for technical indentation instead of blockquotes when you need code-like formatting without semantic quoting.
+
+> **Important:** Blockquotes (`>`) are for semantic quotations and callouts.
+> Use `&` for technical code blocks or terminal output.
+
+### Quote with Lists
+
+> **Recommended workflow:**
+>
+> - Write your content first
+> - Review and edit
+> - Add formatting
+> - Test the output
+>
+> This ensures quality documentation.
+
+### Long Form Quote
+
+> "Documentation is a love letter you write to your future self. When you return to a project after six months, clear documentation will be your best friend. It transforms the daunting task of understanding old code into a pleasant journey of rediscovery. Invest time in good documentation, and your future self will thank you countless times over."
+>
+> — **Anonymous Senior Developer**
+
+[← Back to Examples Index](index.zlt)

@@ -1,0 +1,374 @@
+# Details/Accordion Examples in Zolt
+
+## Basic Details
+
+Simple collapsible section:
+
+:::details [Click to expand]
+This content is hidden by default.
+Click the header to reveal it.
+:::
+
+## Details Open by Default
+
+Details that start expanded:
+
+:::details [Always Visible Content] {open=true}
+This content is visible when the page loads.
+:::
+
+## Nested Details
+
+Details within details:
+
+:::details [Main Section]
+Content in the main section.
+
+:::details [Sub-section]
+Content in the nested section.
+:::
+
+More main content.
+:::
+
+## Multiple Details
+
+Several collapsible sections:
+
+:::details [Installation]
+1. Download the installer
+2. Run the setup wizard
+3. Follow the prompts
+:::
+
+:::details [Configuration]
+Edit the config file:
+- Set your preferences
+- Save changes
+- Restart the application
+:::
+
+:::details [Troubleshooting]
+Common issues and solutions:
+- Port already in use
+- Missing dependencies
+- Permission errors
+:::
+
+## Styled Details
+
+Details with custom styling:
+
+:::details [Important Information] {border=2px solid red}
+This section contains critical information.
+Please read carefully.
+:::
+
+:::details [Pro Tip] {background=#FEF3C7 border-left=4px solid #F59E0B}
+Use keyboard shortcuts to save time!
+Press Ctrl+S to save your work.
+:::
+
+## Practical Examples
+
+### FAQ Section
+
+:::details [What is Zolt?]
+Zolt is a modern markup language that combines the simplicity of Markdown with powerful features for technical documentation.
+:::
+
+:::details [How do I get started?]
+1. Read the documentation
+2. Try the examples
+3. Start writing your own documents
+:::
+
+:::details [Is Zolt free to use?]
+Yes, Zolt is open source and free to use for any purpose.
+:::
+
+### Code Examples
+
+:::details [Show Python Example]
+```python
+def hello():
+    print("Hello, World!")
+```
+:::
+
+:::details [Show JavaScript Example]
+```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+```
+:::
+
+### Documentation Sections
+
+:::details [Advanced Features]
+Zolt supports variables, loops, calculations, and much more. Explore the documentation to learn about all features.
+:::
+
+:::details [API Reference]
+Complete API documentation is available in the developer section.
+:::
+
+### User Guide
+
+:::details [Getting Started]
+Welcome to Zolt! This guide will help you get started with the basics.
+
+First, create a file with the .zlt extension. Then, start writing your content using Zolt syntax.
+:::
+
+:::details [Best Practices]
+- Keep your content organized
+- Use descriptive headings
+- Add examples and code snippets
+- Review and edit your work
+:::
+
+### Technical Specifications
+
+:::details [System Requirements]
+- Operating System: Windows, macOS, or Linux
+- RAM: 512 MB minimum
+- Disk Space: 100 MB
+- Internet: Optional for online features
+:::
+
+:::details [Supported Formats]
+Input: .zlt, .md
+Output: HTML, PDF, EPUB
+:::
+
+## Rich Content in Details
+
+### Formatted Text
+
+:::details [Styled Content]
+This content has **bold text**, //italics//, and ||highlighted||{background=yellow} portions.
+
+You can also include:
+- Lists
+- > Quotes
+- Code blocks
+:::
+
+### Tables in Details
+
+:::details [Data Table]
+
+| Feature | Status |
+|---------|--------|
+| Lists | ✅ Supported |
+| Tables | ✅ Supported |
+| Code | ✅ Supported |
+
+:::
+
+### Images in Details
+
+:::details [Screenshot]
+![Application Screenshot](screenshot.png){width=100%}
+
+This is the main interface of the application.
+:::
+
+## Interactive Examples
+
+### Tutorial Steps
+
+:::details [Step 1: Installation]
+Download and run the installer.
+
+System will guide you through:
+1. License agreement
+2. Installation path
+3. Additional components
+:::
+
+:::details [Step 2: First Run]
+Configure your settings:
+
+- User preferences
+- Default directories
+- Plugin selection
+
+:::
+
+:::details [Step 3: Create Your First Document]
+Start writing!
+
+Use any text editor to create a .zlt file and start experimenting with the syntax.
+:::
+
+### Troubleshooting Guide
+
+:::details [Issue: Application Won't Start]
+**Possible causes:**
+- Missing dependencies
+- Corrupted configuration
+- Insufficient permissions
+
+**Solutions:**
+1. Reinstall the application
+2. Reset configuration
+3. Run as administrator
+:::
+
+:::details [Issue: Export Failed]
+**Possible causes:**
+- Invalid output path
+- Insufficient disk space
+- File permission errors
+
+**Solutions:**
+1. Check output directory
+2. Free up disk space
+3. Verify write permissions
+:::
+
+## Use Cases
+
+### Documentation
+
+:::details [For Developers]
+Technical documentation including API references, code examples, and architecture diagrams.
+:::
+
+:::details [For Writers]
+Content creation tools, style guides, and publishing workflows.
+:::
+
+:::details [For Designers]
+Design system documentation, component libraries, and brand guidelines.
+:::
+
+### Educational Content
+
+:::details [Prerequisites]
+Before starting this course, you should have:
+- Basic computer skills
+- Understanding of file systems
+- Familiarity with text editors
+:::
+
+:::details [Learning Objectives]
+By the end of this course, you will:
+- Master Zolt syntax
+- Create professional documents
+- Export to multiple formats
+:::
+
+:::details [Assessment]
+Final exam covering:
+- Syntax knowledge
+- Practical applications
+- Best practices
+:::
+
+### Release Notes
+
+:::details [Version 2.0.0] {open=true}
+**New Features:**
+- Inline styling
+- Advanced calculations
+- Nested loops
+
+**Bug Fixes:**
+- Fixed table rendering
+- Improved PDF export
+
+**Breaking Changes:**
+- Updated syntax for lists
+:::
+
+:::details [Version 1.5.0]
+**New Features:**
+- Added support for tabs
+- Improved chart rendering
+
+**Bug Fixes:**
+- Fixed link handling
+:::
+
+## Complex Examples
+
+### Product Features
+
+:::details [Core Features] {border-left=4px solid blue}
+- Advanced text formatting
+- Rich media support
+- Export capabilities
+:::
+
+:::details [Premium Features] {border-left=4px solid gold background=#FEF3C7}
+- Cloud sync
+- Collaboration tools
+- Advanced analytics
+- Priority support
+:::
+
+### Legal Information
+
+:::details [Terms of Service]
+By using this software, you agree to the following terms...
+
+[Full legal text would go here]
+:::
+
+:::details [Privacy Policy]
+We collect and use data as follows...
+
+[Full privacy policy would go here]
+:::
+
+:::details [License Information]
+This software is licensed under the MIT License...
+
+[Full license text would go here]
+:::
+
+## Best Practices
+
+### When to Use Details
+
+Use collapsible sections for:
+- ✅ Supplementary information
+- ✅ Optional content
+- ✅ Code examples
+- ✅ FAQ items
+- ✅ Technical details
+
+Don't use for:
+- ❌ Critical content (might be missed)
+- ❌ Very short content (not worth collapsing)
+- ❌ Information needed for context
+
+### Accessibility
+
+:::details [Accessibility Note]
+Collapsible sections should:
+- Have clear, descriptive titles
+- Be keyboard navigable
+- Screen reader friendly
+- Remember user's expand/collapse state
+:::
+
+### Content Organization
+
+:::details [Quick Start]
+Get up and running in 5 minutes with the quick start guide.
+:::
+
+:::details [Full Documentation]
+Comprehensive documentation covering all features and use cases.
+:::
+
+:::details [API Reference]
+Complete API reference for developers building on top of Zolt.
+:::
+
+[← Back to Examples Index](index.zlt)

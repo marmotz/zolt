@@ -1,0 +1,501 @@
+# Charts Examples in Zolt
+
+## Basic Chart Container
+
+Simple chart with one graph:
+
+:::chart
+:::chart-line {title="Sales Over Time"}
+Jan: 100
+Feb: 120
+Mar: 150
+Apr: 180
+:::
+:::
+:::
+
+## Multiple Charts in Container
+
+Several graphs sharing the same space:
+
+:::chart
+:::chart-line {title="Revenue"}
+2020: 50000
+2021: 75000
+2022: 100000
+2023: 125000
+:::
+
+:::chart-bar {title="Expenses"}
+2020: 30000
+2021: 35000
+2022: 40000
+2023: 45000
+:::
+:::
+:::
+
+## Chart Types
+
+### Line Chart
+
+:::chart
+:::chart-line {title="Monthly Growth"}
+Jan: 20
+Feb: 35
+Mar: 50
+Apr: 75
+May: 100
+:::
+:::
+:::
+
+### Bar Chart
+
+:::chart
+:::chart-bar {title="Product Sales"}
+Widget A: 150
+Widget B: 200
+Widget C: 175
+Widget D: 220
+:::
+:::
+:::
+
+### Pie Chart
+
+:::chart
+:::chart-pie {title="Market Share"}
+Company A: 35%
+Company B: 25%
+Company C: 20%
+Company D: 15%
+Others: 5%
+:::
+:::
+:::
+
+### Area Chart
+
+:::chart
+:::chart-area {title="Traffic Over Time"}
+Morning: 120
+Afternoon: 200
+Evening: 180
+Night: 50
+:::
+:::
+:::
+
+## Styled Charts
+
+### Custom Color Schemes
+
+:::chart
+:::chart-line {color-scheme=cool title="Cool Colors"}
+Jan: 10
+Feb: 20
+Mar: 30
+:::
+
+:::chart-line {color-scheme=warm title="Warm Colors"}
+Jan: 10
+Feb: 20
+Mar: 30
+:::
+:::
+:::
+
+### Chart with Legend
+
+:::chart
+:::chart-bar {title="Sales by Region" legend=true}
+North: 450
+South: 320
+East: 280
+West: 390
+:::
+:::
+:::
+
+### Chart with Grid
+
+:::chart
+:::chart-line {title="Detailed View" grid=true}
+Jan: 100
+Feb: 150
+Mar: 200
+:::
+:::
+:::
+
+## Practical Examples
+
+### Financial Report
+
+```yaml
+---
+title: "Q4 Financial Report"
+date: 2026-02-18
+---
+```
+
+# Revenue Analysis
+
+:::chart {width=100%}
+:::chart-line {title="Revenue Trend" color-scheme=blue}
+October: $450,000
+November: $520,000
+December: $610,000
+:::
+
+:::chart-bar {title="By Product Line" color-scheme=warm}
+Electronics: $1,200,000
+Clothing: $800,000
+Home & Garden: $650,000
+:::
+:::
+:::
+
+### Website Analytics
+
+:::chart
+:::chart-line {title="Monthly Visitors" legend=true grid=true}
+Jan: 15000
+Feb: 18000
+Mar: 22000
+Apr: 25000
+May: 28000
+:::
+
+:::chart-pie {title="Traffic Sources" color-scheme=pastel}
+Organic: 45%
+Direct: 25%
+Social: 20%
+Referral: 10%
+:::
+:::
+:::
+
+### Survey Results
+
+:::chart
+:::chart-bar {title="Customer Satisfaction" horizontal=true}
+Very Satisfied: 45%
+Satisfied: 30%
+Neutral: 15%
+Dissatisfied: 8%
+Very Dissatisfied: 2%
+:::
+
+:::chart-pie {title="Response Distribution"}
+Positive: 75%
+Neutral: 15%
+Negative: 10%
+:::
+:::
+:::
+
+### Project Timeline
+
+:::chart
+:::chart-line {title="Project Progress" legend=true}
+Week 1: 10
+Week 2: 25
+Week 3: 45
+Week 4: 70
+Week 5: 90
+Week 6: 100
+:::
+
+:::chart-bar {title="Tasks by Status" color-scheme=cool}
+Completed: 45
+In Progress: 25
+Pending: 20
+Blocked: 10
+:::
+:::
+:::
+
+### Sales Dashboard
+
+:::chart
+:::chart-bar {title="Monthly Sales 2026" legend=true}
+Q1: 125000
+Q2: 145000
+Q3: 138000
+Q4: 168000
+:::
+
+:::chart-pie {title="Sales by Category"}
+Electronics: 35%
+Clothing: 25%
+Home: 20%
+Other: 20%
+:::
+:::
+:::
+
+### Performance Metrics
+
+:::chart
+:::chart-line {title="Server Performance" grid=true}
+00:00: 45%
+04:00: 52%
+08:00: 68%
+12:00: 75%
+16:00: 61%
+20:00: 48%
+:::
+
+:::chart-bar {title="Error Rates" color-scheme=warm}
+Critical: 2%
+High: 5%
+Medium: 12%
+Low: 25%
+Info: 56%
+:::
+:::
+:::
+
+### Comparison Charts
+
+:::chart
+:::chart-bar {title="Year Over Year" legend=true}
+2023: 100
+2024: 120
+:::
+:::
+:::
+
+## Advanced Chart Features
+
+### Multi-Dataset Line Chart
+
+:::chart
+:::chart-line {title="Product Comparison" legend=true}
+Product A: 100
+Product A: 150
+Product A: 200
+
+Product B: 80
+Product B: 140
+Product B: 190
+
+Product C: 120
+Product C: 130
+Product C: 180
+:::
+:::
+:::
+
+### Stacked Bar Chart
+
+:::chart
+:::chart-bar {title="Team Composition" stacked=true}
+Team A:
+Team B:
+Team C:
+:::
+:::
+:::
+
+### Time Series Data
+
+:::chart
+:::chart-line {title="Temperature Throughout Day" color-scheme=warm}
+6 AM: 18
+9 AM: 22
+12 PM: 28
+3 PM: 30
+6 PM: 25
+9 PM: 20
+:::
+:::
+:::
+
+### Target vs Actual
+
+:::chart
+:::chart-line {title="Target vs Actual" legend=true}
+Target: 100
+Target: 100
+Target: 100
+
+Actual: 85
+Actual: 95
+Actual: 110
+:::
+:::
+:::
+
+## Real-World Scenarios
+
+### Health Tracking
+
+:::chart
+:::chart-line {title="Weight Progress" grid=true}
+Week 1: 180
+Week 2: 178
+Week 3: 177
+Week 4: 175
+:::
+
+:::chart-bar {title="Workout Distribution"}
+Cardio: 45
+Strength: 30
+Flexibility: 15
+Rest: 10
+:::
+:::
+:::
+
+### Budget Breakdown
+
+:::chart
+:::chart-pie {title="Monthly Expenses"}
+Housing: 35%
+Food: 20%
+Transport: 15%
+Utilities: 10%
+Entertainment: 10%
+Savings: 10%
+:::
+:::
+:::
+
+### Social Media Stats
+
+:::chart
+:::chart-bar {title="Follower Growth" legend=true}
+Instagram: 5000
+Instagram: 7500
+Instagram: 10000
+
+Twitter: 2000
+Twitter: 3000
+Twitter: 4500
+:::
+:::
+:::
+
+### Learning Progress
+
+:::chart
+:::chart-area {title="Skills Development" color-scheme=cool}
+Week 1: 10
+Week 2: 25
+Week 3: 45
+Week 4: 70
+:::
+:::
+:::
+
+## Layout Examples
+
+### Side-by-Side Comparison
+
+:::columns
+:::column {width=50%}
+### 2025 Results
+
+:::chart
+:::chart-pie {title="2025 Distribution"}
+A: 40%
+B: 35%
+C: 25%
+:::
+:::
+:::
+
+:::column {width=50%}
+### 2026 Results
+
+:::chart
+:::chart-pie {title="2026 Distribution"}
+A: 45%
+B: 30%
+C: 25%
+:::
+:::
+:::
+:::
+:::
+
+### Dashboard Layout
+
+:::columns
+:::column {width=66%}
+### Main Metrics
+
+:::chart
+:::chart-line {title="Revenue Trend" legend=true grid=true}
+Q1: 100
+Q2: 150
+Q3: 200
+Q4: 250
+:::
+:::
+:::
+
+:::column {width=33%}
+### Breakdown
+
+:::chart
+:::chart-pie {title="By Region"}
+North: 35%
+South: 30%
+East: 20%
+West: 15%
+:::
+:::
+:::
+:::
+:::
+
+## Best Practices
+
+### Chart Titles
+
+Always provide descriptive titles:
+
+✅ **Good:** `title="Monthly Revenue 2026"`
+❌ **Bad:** `title="Chart"`
+
+### Color Schemes
+
+Use appropriate color schemes:
+
+- `cool` - Professional, calm data
+- `warm` - Energy, activity
+- `pastel` - Soft, approachable
+- `vibrant` - Bold, attention-grabbing
+
+### Legend Usage
+
+Use legends when data needs context:
+
+:::chart
+:::chart-line {title="User Growth" legend=true}
+Free Users: 1000
+Free Users: 1500
+Paid Users: 200
+Paid Users: 350
+:::
+:::
+:::
+
+### Grid Display
+
+Add grids for easier reading:
+
+:::chart
+:::chart-bar {title="Performance Metrics" grid=true}
+Metric A: 85
+Metric B: 92
+Metric C: 78
+:::
+:::
+:::
+
+[← Back to Examples Index](index.zlt)

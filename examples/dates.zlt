@@ -1,0 +1,479 @@
+# Automatic Dates Examples in Zolt
+
+## Basic Date Variables
+
+Using automatic date variables:
+
+This document was created on: {$created}
+Last modified: {$modified}
+
+## Date Formatting
+
+Configure global date format:
+
+```
+$date_format = "DD/MM/YYYY"
+$datetime_format = "DD/MM/YYYY HH:mm"
+```
+
+### Formatted Output
+
+**Date only:** {$created}
+**Date and time:** {$datetime_format}
+
+## Format Tokens
+
+Available format tokens:
+
+| Token | Description | Example |
+|-------|-------------|---------|
+| `DD` | Day (2 digits) | 18 |
+| `MM` | Month (2 digits) | 02 |
+| `YYYY` | Year (4 digits) | 2026 |
+| `YY` | Year (2 digits) | 26 |
+| `HH` | Hour (24h) | 14 |
+| `mm` | Minutes | 30 |
+| `ss` | Seconds | 45 |
+
+## Common Date Formats
+
+### ISO Format
+
+```yaml
+---
+$date_format = "YYYY-MM-DD"
+---
+
+Created: {$created}
+```
+
+### European Format
+
+```yaml
+---
+$date_format = "DD/MM/YYYY"
+---
+
+Created: {$created}
+```
+
+### US Format
+
+```yaml
+---
+$date_format = "MM/DD/YYYY"
+---
+
+Created: {$created}
+```
+
+### Custom Format
+
+```yaml
+---
+$date_format = "DD MMM, YYYY"
+---
+
+Created: {$created}
+```
+
+## Practical Examples
+
+### Document Header
+
+```yaml
+---
+$date_format = "DD MMMM YYYY"
+---
+```
+
+# My Document
+
+**Created:** {$created}
+**Last Updated:** {$modified}
+
+### Version History
+
+```yaml
+---
+$date_format = "YYYY-MM-DD HH:mm"
+---
+```
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | {$created} | Initial release |
+| 1.1.0 | {$modified} | Bug fixes and improvements |
+
+### Blog Post
+
+```yaml
+---
+$date_format = "MMMM DD, YYYY"
+---
+```
+
+# Post Title
+
+**Published:** {$created}
+
+### Technical Report
+
+```yaml
+---
+$date_format = "DD/MM/YYYY HH:mm"
+$timezone = "UTC"
+---
+```
+
+**Report Generated:** {$created} (UTC)
+
+## Time Zones
+
+### Setting Time Zone
+
+```yaml
+---
+$timezone = "America/New_York"
+$datetime_format = "DD/MM/YYYY HH:mm"
+---
+
+Created: {$created}
+```
+
+### Available Time Zones
+
+Common time zones:
+
+```yaml
+---
+# US Time Zones
+$timezone = "America/New_York"    # EST/EDT
+$timezone = "America/Chicago"      # CST/CDT
+$timezone = "America/Los_Angeles"  # PST/PDT
+
+# European Time Zones
+$timezone = "Europe/London"        # GMT/BST
+$timezone = "Europe/Paris"         # CET/CEST
+$timezone = "Europe/Berlin"        # CET/CEST
+
+# Asian Time Zones
+$timezone = "Asia/Tokyo"           # JST
+$timezone = "Asia/Shanghai"        # CST
+$timezone = "Asia/Dubai"           # GST
+
+# UTC
+$timezone = "UTC"                  # Coordinated Universal Time
+---
+```
+
+## Multiple Date Formats
+
+Using different formats in the same document:
+
+```yaml
+---
+$date_short = "DD/MM/YYYY"
+$date_long = "DD MMMM, YYYY"
+$datetime = "YYYY-MM-DD HH:mm:ss"
+---
+```
+
+**Short:** {$date_short}
+**Long:** {$date_long}
+**Full:** {$datetime}
+
+## Date Calculations
+
+### Relative Dates
+
+Document age: {{ Math.floor(({$modified} - {$created}) / 86400) }} days
+
+**Note:** This assumes date calculations are supported in your Zolt implementation.
+
+### Example Usage
+
+```yaml
+---
+$date_format = "DD MMMM YYYY"
+---
+```
+
+# Project Documentation
+
+**Created:** {$created}
+**Last Modified:** {$modified}
+
+:::if {$modified > {$created}}
+*This document has been updated since creation.*
+:::
+
+## Metadata Integration
+
+### Frontmatter with Dates
+
+```yaml
+---
+title: "My Document"
+created: {$created}
+modified: {$modified}
+date_format: "DD/MM/YYYY"
+---
+```
+
+### Publishing Workflow
+
+```yaml
+---
+title: "Blog Post"
+published_at: {$created}
+last_updated: {$modified}
+status: "published"
+---
+```
+
+## Date Display Patterns
+
+### Human-Readable Dates
+
+```yaml
+---
+$date_human = "MMMM DD, YYYY"
+---
+```
+
+Today is {$date_human}
+
+### Compact Dates
+
+```yaml
+---
+$date_compact = "YYYYMMDD"
+---
+```
+
+File: document_{$date_compact}.zlt
+
+### Verbose Dates
+
+```yaml
+---
+$date_verbose = "dddd, MMMM DD, YYYY 'at' HH:mm"
+---
+```
+
+Full timestamp: {$date_verbose}
+
+## Use Cases
+
+### Document Templates
+
+```yaml
+---
+title: "Meeting Minutes"
+$date_format = "DD MMMM YYYY"
+$meeting_date = {$created}
+---
+```
+
+# Meeting Minutes - {$meeting_date}
+
+**Date:** {$meeting_date}
+**Time:** {$datetime_format}
+
+### Version Control
+
+```yaml
+---
+title: "Changelog"
+$date_format = "YYYY-MM-DD"
+---
+```
+
+## Changelog
+
+### Version 1.0.0 ({$created})
+- Initial release
+- Core features implemented
+
+### Version 1.1.0 ({$modified})
+- Bug fixes
+- Performance improvements
+
+### Legal Documents
+
+```yaml
+---
+title: "Terms of Service"
+$date_format = "MMMM DD, YYYY"
+$effective_date = {$created}
+---
+```
+
+**Effective Date:** {$effective_date}
+
+**Last Updated:** {$modified}
+
+## Date Localization
+
+### Multi-Language Support
+
+```yaml
+---
+$lang = "fr"
+$date_format = "DD/MM/YYYY"
+---
+```
+
+**Date de création:** {$created}
+**Dernière modification:** {$modified}
+
+```yaml
+---
+$lang = "de"
+$date_format = "DD.MM.YYYY"
+---
+```
+
+**Erstellungsdatum:** {$created}
+**Letzte Änderung:** {$modified}
+
+## Dynamic Dates
+
+### Publication Schedule
+
+```yaml
+---
+$scheduled_date = "2026-03-01"
+$date_format = "DD MMMM YYYY"
+---
+```
+
+**Scheduled for:** {$scheduled_date}
+
+### Expiration Date
+
+```yaml
+---
+$expires = "2026-12-31"
+$date_format = "DD MMMM YYYY"
+---
+```
+
+**This document expires on:** {$expires}
+
+## Best Practices
+
+### Consistent Formatting
+
+Use consistent date formats throughout a project:
+
+```yaml
+---
+# Project-wide configuration
+$date_format = "YYYY-MM-DD"
+$datetime_format = "YYYY-MM-DD HH:mm"
+$timezone = "UTC"
+---
+```
+
+### Always Show Modified Date
+
+```yaml
+---
+$date_format = "DD MMMM YYYY 'at' HH:mm"
+---
+```
+
+**Created:** {$created}
+**Last modified:** {$modified}
+
+### Date Validation
+
+```yaml
+---
+# Ensure dates are in the correct format
+created: {$created}
+modified: {$modified}
+---
+```
+
+:::if {$modified < {$created}}
+:::warning [Invalid Date]
+Modified date is before creation date!
+:::
+:::
+
+## Examples
+
+### Software Release
+
+```yaml
+---
+title: "Release Notes v2.0"
+release_date: {$created}
+date_format: "DD MMMM YYYY"
+---
+```
+
+# Release Date: {$release_date}
+
+This version was released on {$release_date}.
+
+### Event Planning
+
+```yaml
+---
+title: "Conference Schedule"
+event_date: {$created}
+date_format: "dddd, MMMM DD, YYYY"
+---
+```
+
+**Event Date:** {$event_date}
+
+### Academic Paper
+
+```yaml
+---
+title: "Research Paper"
+submission_date: {$created}
+date_format: "YYYY-MM-DD"
+---
+```
+
+**Submitted:** {$submission_date}
+
+## Time-Sensitive Content
+
+### Deadlines
+
+```yaml
+---
+$deadline = "2026-03-31"
+$date_format = "DD MMMM YYYY"
+---
+```
+
+**Deadline:** {$deadline}
+
+:::if {$created > {$deadline}}
+:::error [Overdue]
+This document is past the deadline!
+:::
+:::
+
+### Maintenance Windows
+
+```yaml
+---
+$maintenance = "2026-02-20 02:00"
+$datetime_format = "YYYY-MM-DD HH:mm"
+---
+```
+
+**Next Maintenance:** {$maintenance}
+
+[← Back to Examples Index](index.zlt)

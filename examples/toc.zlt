@@ -1,0 +1,686 @@
+# Table of Contents (TOC) Examples in Zolt
+
+## Basic TOC
+
+Simple table of contents:
+
+[[toc]]
+
+## TOC with Depth
+
+Limit the depth of headings:
+
+[[toc {depth=2}]]
+
+## TOC with Numbering
+
+Include section numbers:
+
+[[toc {numbered=true}]]
+
+## TOC with Custom Range
+
+Specify start and end levels:
+
+[[toc {from=2 to=4}]]
+
+## TOC with Multiple Options
+
+Combine multiple attributes:
+
+[[toc {depth=3 numbered=true}]]
+
+## Practical Examples
+
+### Complete Document TOC
+
+```yaml
+---
+numbering: true
+numbering_style: decimal
+---
+```
+
+# Complete Guide
+
+[[toc {depth=2 numbered=true}]]
+
+## Chapter 1
+
+Introduction content...
+
+## Chapter 2
+
+Chapter content...
+
+### Section 2.1
+
+Subsection content...
+
+## Chapter 3
+
+Final chapter...
+
+### Partial TOC
+
+### Advanced Topics
+
+[[toc {from=2 to=3}]]
+
+#### Topic 1
+
+Content...
+
+#### Topic 2
+
+Content...
+
+#### Topic 3
+
+Content...
+
+### TOC in Sidebar
+
+:::columns
+:::column {width=70%}
+# Main Content
+
+## Section 1
+
+Content...
+
+## Section 2
+
+Content...
+
+## Section 3
+
+Content...
+:::
+
+:::column {width=30%}
+## Contents
+
+[[toc {depth=2}]]
+:::
+:::
+:::
+
+### Multi-Level TOC
+
+# Main Document
+
+[[toc {depth=3 numbered=true}]]
+
+## Level 1 Heading
+
+Content...
+
+### Level 2 Heading
+
+Details...
+
+#### Level 3 Heading
+
+More details...
+
+## Another Level 1
+
+Content...
+
+### Another Level 2
+
+Details...
+
+### Styled TOC
+
+### Blue TOC
+
+[[toc {class=toc-blue}]]
+
+### Compact TOC
+
+[[toc {depth=2 class=toc-compact}]]
+
+### Fancy TOC
+
+[[toc {numbered=true class=toc-fancy depth=3}]]
+
+### TOC by Section
+
+### Getting Started
+
+[[toc {from=2 to=3}]]
+
+#### Installation
+
+Install Zolt using your package manager...
+
+#### Configuration
+
+Configure your environment...
+
+#### First Document
+
+Create your first .zlt file...
+
+### Advanced Features
+
+[[toc {from=2}]]
+
+#### Variables
+
+Use variables to reuse content...
+
+#### Calculations
+
+Perform mathematical operations...
+
+#### Loops
+
+Iterate over data...
+
+### Conditional TOC
+
+:::if {$toc}
+## Table of Contents
+
+[[toc {numbered=true}]]
+:::
+
+### TOC with Custom Styling
+
+```yaml
+---
+toc_title: "Contents"
+toc_depth: 3
+toc_numbered: true
+toc_class: "custom-toc"
+---
+```
+
+## {$toc_title}
+
+[[toc {depth=$toc_depth numbered=$toc_numbered class=$toc_class}]]
+
+### Document Structure Example
+
+```yaml
+---
+title: "Comprehensive Guide"
+toc: true
+toc_depth: 2
+numbering: true
+---
+```
+
+# {$title}
+
+[[toc {depth=$toc_depth numbered=true}]}
+
+## Introduction
+
+Welcome to this comprehensive guide...
+
+## Getting Started
+
+### Prerequisites
+
+Before you begin...
+
+### Installation
+
+Install the software...
+
+## Core Concepts
+
+### Concept 1
+
+First concept...
+
+### Concept 2
+
+Second concept...
+
+## Advanced Topics
+
+### Topic A
+
+Advanced topic A...
+
+### Topic B
+
+Advanced topic B...
+
+## Best Practices
+
+Guidelines and tips...
+
+## Conclusion
+
+Summary and next steps...
+
+### Books and Long Documents
+
+```yaml
+---
+title: "Mastering Zolt"
+subtitle: "The Complete Guide"
+author: "Jane Doe"
+toc: true
+toc_depth: 3
+numbering: true
+part_numbering: roman
+---
+```
+
+# {$title}
+
+## {$subtitle}
+
+**Author:** {$author}
+
+[[toc {depth=3 numbered=true}]}
+
+### Part I: Fundamentals
+
+## Chapter 1: Introduction
+
+Introduction to Zolt...
+
+## Chapter 2: Basic Syntax
+
+Understanding the basics...
+
+## Chapter 3: Intermediate Features
+
+Moving beyond basics...
+
+### Part II: Advanced Concepts
+
+## Chapter 4: Advanced Formatting
+
+Complex formatting techniques...
+
+## Chapter 5: Dynamic Content
+
+Variables and calculations...
+
+## Chapter 6: Automation
+
+Loops and logic...
+
+### Part III: Reference
+
+## Appendix A: Quick Reference
+
+All syntax in one place...
+
+## Appendix B: Troubleshooting
+
+Common issues and solutions...
+
+## Glossary
+
+Key terms and definitions...
+
+## Index
+
+Alphabetical index...
+
+### Technical Documentation
+
+```yaml
+---
+title: "API Reference"
+version: "2.0.0"
+toc: true
+toc_depth: 4
+numbered: true
+---
+```
+
+# {$title} v{$version}
+
+[[toc {depth=3 numbered=true}]]
+
+## Overview
+
+Introduction to the API...
+
+## Authentication
+
+### API Keys
+
+How to obtain keys...
+
+### OAuth 2.0
+
+OAuth flow...
+
+## Endpoints
+
+### Users
+
+#### GET /users
+
+List all users...
+
+#### POST /users
+
+Create a user...
+
+#### GET /users/:id
+
+Get user by ID...
+
+### Posts
+
+#### GET /posts
+
+List all posts...
+
+#### POST /posts
+
+Create a post...
+
+## Error Handling
+
+### Error Codes
+
+List of error codes...
+
+### Best Practices
+
+How to handle errors...
+
+## Rate Limiting
+
+Rate limit information...
+
+## Changelog
+
+Version history...
+
+### Course Structure
+
+```yaml
+---
+title: "Zolt Tutorial Course"
+toc: true
+toc_depth: 2
+numbering: true
+---
+```
+
+# {$title}
+
+[[toc {depth=2 numbered=true}]]
+
+## Module 1: Introduction
+
+### Lesson 1: What is Zolt?
+
+Understanding Zolt...
+
+### Lesson 2: Your First Document
+
+Creating your first file...
+
+## Module 2: Basic Syntax
+
+### Lesson 3: Text Formatting
+
+Bold, italic, and more...
+
+### Lesson 4: Lists and Structure
+
+Organizing content...
+
+## Module 3: Intermediate Features
+
+### Lesson 5: Links and References
+
+Creating connections...
+
+### Lesson 6: Images and Media
+
+Enhancing with media...
+
+## Module 4: Advanced Features
+
+### Lesson 7: Variables and Logic
+
+Dynamic content...
+
+### Lesson 8: Custom Components
+
+Building blocks...
+
+## Module 5: Best Practices
+
+### Lesson 9: Documentation Style
+
+Writing better docs...
+
+### Lesson 10: Publishing and Exporting
+
+Sharing your work...
+
+### TOC in Multi-Language Documents
+
+```yaml
+---
+title: "Multi-Language Guide"
+languages: [en, fr, es]
+toc: true
+---
+```
+
+# English Version
+
+[[toc {depth=2}]]
+
+## Introduction
+
+Welcome...
+
+## Features
+
+Main features...
+
+# Version Française
+
+[[toc {depth=2}]]
+
+## Introduction
+
+Bienvenue...
+
+## Fonctionnalités
+
+Fonctionnalités principales...
+
+# Versión en Español
+
+[[toc {depth=2}]]
+
+## Introducción
+
+Bienvenido...
+
+## Características
+
+Características principales...
+
+### TOC with Exclusions
+
+# Main Document
+
+[[toc {from=2}]]
+
+## Included in TOC
+
+This section appears in the TOC...
+
+### Subsection
+
+This also appears...
+
+## Appendix
+
+Content here...
+
+### Internal Appendix
+
+Not in main TOC...
+
+[[toc {from=2 to=2}]]
+
+### Appendix Sections
+
+Just the main appendix headings...
+
+### Back Matter
+
+# References
+
+[[toc {from=2}]]
+
+## Bibliography
+
+Sources...
+
+## Further Reading
+
+Additional resources...
+
+## Index
+
+Alphabetical index...
+
+### Dynamic TOC Based on Metadata
+
+```yaml
+---
+toc_depth: 3
+numbered: true
+show_headings: true
+---
+```
+
+:::if {$toc}
+## Table of Contents
+
+[[toc {depth=$toc_depth numbered=$toc_numbering}]]
+:::
+
+### TOC Styling Examples
+
+### Minimal TOC
+
+[[toc {class=toc-minimal}]]
+
+### Detailed TOC
+
+[[toc {depth=4 numbered=true class=toc-detailed}]]
+
+### Hierarchical TOC
+
+[[toc {depth=3 numbered=true class=toc-hierarchical}]]
+
+### Interactive TOC
+
+## Navigation
+
+[[toc {numbered=true class=toc-interactive}]}
+
+### With breadcrumb support...
+
+### Best Practices
+
+### For Short Documents
+
+# Short Document
+
+[[toc {depth=2}]]
+
+## Quick Start
+
+Brief content...
+
+## Conclusion
+
+Wrap up...
+
+### For Long Documents
+
+```yaml
+---
+toc: true
+toc_depth: 3
+numbering: true
+---
+```
+
+# Book Title
+
+[[toc {depth=3 numbered=true}]}
+
+## Part I: Concepts
+
+Detailed content...
+
+## Part II: Implementation
+
+More details...
+
+## Part III: Case Studies
+
+Real-world examples...
+
+### For Technical Documentation
+
+# API Documentation
+
+[[toc {depth=4}]]
+
+## Overview
+
+High-level overview...
+
+## Authentication
+
+### OAuth 2.0
+
+Detailed OAuth flow...
+
+### API Keys
+
+Key management...
+
+## Endpoints
+
+### Users API
+
+#### List Users
+
+GET /users
+
+#### Create User
+
+POST /users
+
+#### Update User
+
+PUT /users/:id
+
+#### Delete User
+
+DELETE /users/:id
+
+### Posts API
+
+Similar structure...
+
+[← Back to Examples Index](index.zlt)

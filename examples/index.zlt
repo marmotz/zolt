@@ -1,0 +1,49 @@
+# Zolt Examples Index
+
+Welcome to the Zolt examples collection! This index provides an overview of all available example files to help you explore different Zolt features.
+
+## Text Formatting
+
+- [inline-style.zlt](inline-style.zlt) — Inline text styling with colors, fonts, sizes, borders, and CSS attributes
+- [abbreviations.zlt](abbreviations.zlt) — Abbreviation syntax with tooltips for acronyms and technical terms
+
+## Structure & Layout
+
+- [lists.zlt](lists.zlt) — Bullet lists, numbered lists, task lists, and definition lists
+- [columns.zlt](columns.zlt) — Multi-column layouts with custom widths and nested content
+- [quotes.zlt](quotes.zlt) — Blockquotes with nested levels and styling options
+- [separators.zlt](separators.zlt) — Horizontal rules with various styles and alignment options
+- [indentation.zlt](indentation.zlt) — Technical indentation for terminal output and code-style content
+
+## Interactive Components
+
+- [tabs.zlt](tabs.zlt) — Tabbed interfaces for organizing related content
+- [details.zlt](details.zlt) — Collapsible accordion sections for hiding/showing content
+
+## Dynamic Content
+
+- [calculations.zlt](calculations.zlt) — Mathematical operations, Math/List/String namespaces, and practical examples
+- [loops.zlt](loops.zlt) — Iteration with foreach, index tracking, conditions, and nested loops
+
+## Navigation
+
+- [links.zlt](links.zlt) — External links, internal references, and link attributes
+- [toc.zlt](toc.zlt) — Table of contents with depth control, numbering, and styling
+
+## Media & Data
+
+- [charts.zlt](charts.zlt) — Chart types including line, bar, pie, and area with styling options
+
+## Documentation Features
+
+- [frontmatter.zlt](frontmatter.zlt) — YAML metadata for document configuration and variables
+- [dates.zlt](dates.zlt) — Automatic date variables, formatting options, and timezone handling
+- [footnotes.zlt](footnotes.zlt) — Footnote references with academic and practical use cases
+
+## Syntax Reference
+
+- [escaping.zlt](escaping.zlt) — Character escaping for displaying literal markup syntax
+
+## Complete Example
+
+- [complete.zlt](complete.zlt) — Comprehensive example showcasing all Zolt features in one document

@@ -1,0 +1,313 @@
+# Horizontal Rules Examples in Zolt
+
+## Basic Separators
+
+Three types of horizontal rules:
+
+---
+Standard separator (three dashes)
+
+***
+Thick separator (three asterisks)
+
+___
+Thin separator (three underscores)
+
+## Styled Separators
+
+Separators with attributes:
+
+--- {color=red}
+Red separator
+
+*** {color=blue}
+Blue thick separator
+
+___ {color=green}
+Green thin separator
+
+## Dashed Separators
+
+Different styles:
+
+--- {style=dashed}
+Dashed separator
+
+--- {style=dotted}
+Dotted separator
+
+--- {style=solid}
+Solid separator (default)
+
+## Width Variations
+
+Different widths:
+
+--- {width=50%}
+50% width separator
+
+--- {width=200px}
+200 pixel width separator
+
+--- {width=30em}
+30 em width separator
+
+## Alignment
+
+Separator alignment:
+
+--- {align=left}
+Left aligned
+
+--- {align=center}
+Center aligned
+
+--- {align=right}
+Right aligned
+
+## Combined Styling
+
+Multiple attributes together:
+
+--- {color=blue style=dashed width=80%}
+Blue dashed 80% width
+
+*** {color=red style=solid width=300px align=center}
+Red solid 300px centered
+
+___ {color=purple style=dotted width=60% align=right}
+Purple dotted 60% right
+
+## Practical Examples
+
+### Document Sections
+
+# Chapter 1
+
+Introduction content here...
+
+---
+
+# Chapter 2
+
+More content here...
+
+***
+
+# Chapter 3
+
+Final chapter...
+
+### Scene Breaks in Stories
+
+The hero stood at the edge of the cliff, uncertain of what lay below.
+
+* * *
+
+He took a deep breath and made the leap.
+
+### Thematic Breaks
+
+## Introduction
+
+Welcome to our guide.
+
+---
+
+## Getting Started
+
+Let's begin with the basics.
+
+* * *
+
+## Advanced Topics
+
+Now for the complex stuff.
+
+### Section Dividers
+
+### Part 1: Basics
+
+Content about basics...
+
+___ {color=blue}
+
+### Part 2: Advanced
+
+Content about advanced topics...
+
+___ {color=blue}
+
+### Part 3: Expert
+
+Expert-level content...
+
+### Time Jumps in Narrative
+
+The year was 2020, and the world was changing rapidly.
+
+*** {color=gray}
+
+Five years later, everything had transformed.
+
+### Stylized Dividers
+
+## Section A
+
+Content...
+
+--- {color=orange style=dashed}
+
+## Section B
+
+Content...
+
+--- {color=teal style=dotted}
+
+## Section C
+
+Content...
+
+### Creative Uses
+
+### Emotional Pauses
+
+She hesitated, her hand hovering over the button.
+
+* * *
+
+With a deep breath, she pressed it.
+
+### Perspective Shifts
+
+From the engineer's perspective:
+
+--- {color=blue}
+
+The code was elegant and efficient.
+
+* * *
+
+From the user's perspective:
+
+It was confusing and frustrating.
+
+### Level Progression
+
+=== Level 1: Beginner ===
+
+Content for beginners...
+
+*** {color=green}
+
+=== Level 2: Intermediate ===
+
+Content for intermediate learners...
+
+*** {color=orange}
+
+=== Level 3: Advanced ===
+
+Content for advanced users...
+
+## Design Patterns
+
+### Classic Book Layout
+
+# Book Title
+
+Author Name
+
+---
+
+## Chapter 1
+
+Chapter content...
+
+* * *
+
+## Chapter 2
+
+More chapter content...
+
+### Modern Web Design
+
+# Hero Section
+
+Hero content...
+
+___ {width=80% color=accent}
+
+# Features Section
+
+Features content...
+
+___ {width=80% color=accent}
+
+# Testimonials
+
+Testimonials content...
+
+### Presentation Slides Structure
+
+# Title Slide
+
+Title and author...
+
+--- {color=primary}
+
+# Agenda
+
+List of topics...
+
+*** {color=secondary}
+
+# Main Content
+
+Presentation content...
+
+--- {color=primary}
+
+# Summary
+
+Key takeaways...
+
+## Complete Document Example
+
+# My Document
+
+## Introduction
+
+This is the introduction.
+
+---
+
+## Background
+
+Background information...
+
+---
+
+## Methodology
+
+Our approach...
+
+---
+
+## Results
+
+The findings...
+
+---
+
+## Conclusion
+
+Summary and conclusions...
+
+---
+
+## References
+
+Sources and citations...
+
+[← Back to Examples Index](index.zlt)

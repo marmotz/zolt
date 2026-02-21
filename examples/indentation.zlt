@@ -1,0 +1,214 @@
+# Technical Indentation Examples in Zolt
+
+## Basic Indentation
+
+Simple indentation using `&`:
+
+& This text is indented (level 1)
+& Another indented line
+
+## Multiple Indentation Levels
+
+Double and triple indentation:
+
+& Level 1 indentation
+&& Level 2 indentation
+&&& Level 3 indentation
+&& Back to level 2
+& Back to level 1
+
+## Indentation vs Blockquotes
+
+Technical indentation (&) vs Semantic quotes (>):
+
+& Technical content
+& Terminal output style
+& No semantic meaning
+
+> This is a quote
+> Semantic meaning
+> Like a citation
+
+## Code Output Examples
+
+### Terminal Output
+
+& $ python script.py
+& Hello, World!
+& Process completed.
+
+### Log Files
+
+& [INFO] Application started
+& [DEBUG] Loading configuration
+& [WARN] Configuration file not found, using defaults
+& [INFO] Ready to serve requests
+
+### File Contents
+
+& config.json:
+& {
+&   "port": 8080,
+&   "host": "localhost"
+& }
+
+## Practical Examples
+
+### Configuration File Display
+
+& server {
+&   listen 80;
+&   server_name example.com;
+&
+&   location / {
+&     root /var/www/html;
+&     index index.html;
+&   }
+& }
+
+### Code Explanation
+
+& To run the application:
+& 1. Install dependencies
+& 2. Configure environment
+& 3. Start the server
+&
+& The server will be available at http://localhost:3000
+
+### Data Format Example
+
+& User data format:
+& {
+&   "id": 123,
+&   "name": "John Doe",
+&   "email": "john@example.com",
+&   "roles": ["admin", "user"]
+& }
+
+### Command Line Usage
+
+& Usage: vibe [options] [input]
+&
+& Options:
+&   -o, --output    Output file
+&   -f, --format    Output format (html, pdf)
+&   -w, --watch     Watch for changes
+&   -h, --help      Show help message
+
+## Nested Indentation
+
+Complex nested structure:
+
+& Main topic
+&& Sub-topic 1
+&&& Detail 1.1
+&&& Detail 1.2
+&& Sub-topic 2
+&&& Detail 2.1
+&&& Detail 2.2
+&&& Detail 2.3
+& Back to main
+
+## Styled Indentation
+
+& Regular indented text
+& {color=blue}This is blue indented text
+& {background=yellow}This has a yellow background
+
+## Documentation Examples
+
+### API Response Format
+
+& Response structure:
+& {
+&   "status": "success",
+&   "data": {
+&     "id": 123,
+&     "name": "Product Name"
+&   },
+&   "meta": {
+&     "timestamp": "2026-02-18T10:30:00Z"
+&   }
+& }
+
+### Database Schema
+
+& Table: users
+&& Columns:
+&&& id (INTEGER, PRIMARY KEY)
+&&& username (VARCHAR(50), UNIQUE)
+&&& email (VARCHAR(100), UNIQUE)
+&&& created_at (TIMESTAMP)
+
+### Error Messages
+
+& Error: Connection failed
+& Details: Unable to connect to database server
+& Suggestion: Check your connection settings
+&& Host: localhost
+&& Port: 5432
+&& Database: mydb
+
+## Comparisons
+
+### File Structure
+
+& project/
+&& src/
+&&& main.py
+&&& utils.py
+&& tests/
+&&& test_main.py
+&&& test_utils.py
+&& README.md
+&& requirements.txt
+
+### JSON Configuration
+
+& Development environment:
+& development.json:
+&& {
+&&   "debug": true,
+&&   "logLevel": "verbose"
+&& }
+&
+& Production environment:
+& production.json:
+&& {
+&&   "debug": false,
+&&   "logLevel": "error"
+&& }
+
+## Literary Example
+
+& In the beginning there was only darkness.
+&& Then came the light.
+&&& And with it, hope emerged.
+&
+& The journey had just begun.
+
+## Technical Documentation
+
+### Installation Steps
+
+& Step 1: Download the installer
+& Step 2: Run the installer
+& Step 3: Follow the prompts
+&& Step 3.1: Choose installation directory
+&& Step 3.2: Select components
+&& Step 3.3: Configure settings
+& Step 4: Complete the installation
+
+### Troubleshooting Guide
+
+& Issue: Application won't start
+&& Possible causes:
+&&& Port already in use
+&&& Missing dependencies
+&&& Insufficient permissions
+&& Solutions:
+&&& Change port in configuration
+&&& Install missing dependencies
+&&& Run with appropriate permissions
+
+[← Back to Examples Index](index.zlt)
