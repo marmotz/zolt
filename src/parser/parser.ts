@@ -3,9 +3,13 @@ import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
 import {
   AbbreviationDefinitionNode,
+  ASTNode,
+  Attributes,
   BlockquoteNode,
   CodeBlockNode,
   CommentInlineNode,
+  DefinitionDescriptionNode,
+  DefinitionTermNode,
   DocumentNode,
   FrontmatterNode,
   HeadingNode,
@@ -76,16 +80,16 @@ export class Parser {
       if (
         next.type === TokenType.BULLET_LIST ||
         next.type === TokenType.ORDERED_LIST ||
-        next.type === TokenType.TASK_LIST
+        next.type === TokenType.TASK_LIST ||
+        next.type === TokenType.DEFINITION
       ) {
         return this.parseList(this.currentToken.value);
       }
     }
 
-    if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+    if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION)) {
       return this.parseList();
     }
-    if (this.match(TokenType.DEFINITION)) return this.parseDefinitionList();
     if (this.match(TokenType.INDENTATION)) return this.parseIndentation();
     if (this.match(TokenType.ABBREVIATION_DEF)) return this.parseAbbreviationDef();
     if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
@@ -161,7 +165,7 @@ export class Parser {
 
     // Extract attributes at the end of content
     let attributes: Attributes | undefined;
-    const attrMatch = content.match(/\s+\{([^}]+)\}$/);
+    const attrMatch = content.match(/\s+\{([^}]+)}$/);
     if (attrMatch) {
       attributes = InlineParser.parseAttributes(attrMatch[1]);
       content = content.slice(0, -attrMatch[0].length).trim();
@@ -194,7 +198,7 @@ export class Parser {
 
     // Extract attributes at the end of content
     let attributes: Attributes | undefined;
-    const attrMatch = content.match(/\s+\{([^}]+)\}$/);
+    const attrMatch = content.match(/\s+\{([^}]+)}$/);
     if (attrMatch) {
       attributes = InlineParser.parseAttributes(attrMatch[1]);
       content = content.slice(0, -attrMatch[0].length).trim();
@@ -225,7 +229,7 @@ export class Parser {
 
     // Extract attributes from the first line if present
     let attributes: Attributes | undefined;
-    const attrMatch = quoteValue.match(/\{([^}]+)\}$/);
+    const attrMatch = quoteValue.match(/\{([^}]+)}$/);
     if (attrMatch) {
       attributes = InlineParser.parseAttributes(attrMatch[1]);
     }
@@ -253,7 +257,7 @@ export class Parser {
   private parseList(indent: string = ''): ListNode {
     const firstToken = indent !== '' ? this.peek(1) : this.currentToken;
     const kind = this.getListKind(firstToken.type);
-    const children: ListItemNode[] = [];
+    const children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[] = [];
 
     while (!this.isEof()) {
       if (indent !== '') {
@@ -266,7 +270,7 @@ export class Parser {
         }
         this.advance(); // consume indentation
       } else {
-        if (!this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+        if (!this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION)) {
           break;
         }
         if (this.getListKind(this.currentToken.type) !== kind) {
@@ -294,14 +298,20 @@ export class Parser {
         return 'numbered';
       case TokenType.TASK_LIST:
         return 'task';
+      case TokenType.DEFINITION:
+        return 'definition';
       default:
         return 'bullet';
     }
   }
 
-  private parseListItem(kind: string, currentIndent: string): ListItemNode {
+  private parseListItem(
+    kind: string,
+    currentIndent: string
+  ): ListItemNode | DefinitionTermNode | DefinitionDescriptionNode {
     let checked: boolean | undefined;
     let content = '';
+    let isDescription = false;
 
     if (this.match(TokenType.TASK_LIST)) {
       const token = this.advance();
@@ -313,6 +323,11 @@ export class Parser {
     } else if (this.match(TokenType.ORDERED_LIST)) {
       const token = this.advance();
       content = token.value.replace(/^\d+\.\s+/, '');
+    } else if (this.match(TokenType.DEFINITION)) {
+      const token = this.advance();
+      const value = token.value.replace(/^:\s/, '');
+      isDescription = value.startsWith('  ');
+      content = value.trim();
     }
 
     // Extract attributes at the end of content
@@ -338,6 +353,24 @@ export class Parser {
         children.push(block);
       }
       this.skipNewlines();
+    }
+
+    if (kind === 'definition') {
+      if (isDescription) {
+        return {
+          type: 'DefinitionDescription',
+          content,
+          children,
+          attributes,
+        };
+      } else {
+        return {
+          type: 'DefinitionTerm',
+          content,
+          children,
+          attributes,
+        };
+      }
     }
 
     return {
@@ -384,10 +417,6 @@ export class Parser {
       type: 'HorizontalRule',
       style: 'solid',
     };
-  }
-
-  private parseDefinitionList(): ASTNode {
-    return { type: 'Paragraph', content: '' } as ASTNode;
   }
 
   private parseIndentation(): ASTNode {

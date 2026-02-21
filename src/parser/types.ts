@@ -177,10 +177,24 @@ export interface BlockquoteNode {
   attributes?: Attributes;
 }
 
+export interface DefinitionTermNode {
+  type: 'DefinitionTerm';
+  content: string;
+  children: ASTNode[];
+  attributes?: Attributes;
+}
+
+export interface DefinitionDescriptionNode {
+  type: 'DefinitionDescription';
+  content: string;
+  children: ASTNode[];
+  attributes?: Attributes;
+}
+
 export interface ListNode {
   type: 'List';
   kind: 'bullet' | 'numbered' | 'task' | 'definition';
-  children: ListItemNode[];
+  children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[];
   attributes?: Attributes;
 }
 
@@ -286,11 +300,15 @@ export type ASTNode =
   | BlockquoteNode
   | ListNode
   | ListItemNode
+  | DefinitionTermNode
+  | DefinitionDescriptionNode
   | CodeBlockNode
   | HorizontalRuleNode
   | FrontmatterNode
   | TripleColonBlockNode
   | TableNode
+  | TableRowNode
+  | TableCellNode
   | DoubleBracketBlockNode
   | IndentationNode
   | DocumentNode;

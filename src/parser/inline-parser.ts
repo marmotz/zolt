@@ -227,9 +227,7 @@ export class InlineParser {
     if (!attrStr) return undefined;
 
     const attrs: Attributes = {};
-    const content =
-      attrStr.startsWith('{') && attrStr.endsWith('}') ? attrStr.slice(1, -1) : attrStr;
-    let remaining = content;
+    let remaining = attrStr.startsWith('{') && attrStr.endsWith('}') ? attrStr.slice(1, -1) : attrStr;
 
     while (remaining.length > 0) {
       remaining = remaining.trimStart();

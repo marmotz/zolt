@@ -133,4 +133,14 @@ describe('Lexer', () => {
     expect(commentTokens[0].value).toBe('comment 1');
     expect(commentTokens[1].value).toBe('comment 2');
   });
+
+  test('should tokenize definition list', () => {
+    const lexer = new Lexer(': Term\n:   Definition');
+    const tokens = lexer.tokenize();
+
+    const defTokens = tokens.filter((t) => t.type === TokenType.DEFINITION);
+    expect(defTokens.length).toBe(2);
+    expect(defTokens[0].value).toBe(': Term');
+    expect(defTokens[1].value).toBe(':   Definition');
+  });
 });

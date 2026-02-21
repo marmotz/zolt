@@ -9,6 +9,8 @@ import {
   BoldNode,
   CodeBlockNode,
   CodeNode,
+  DefinitionDescriptionNode,
+  DefinitionTermNode,
   DocumentNode,
   DoubleBracketBlockNode,
   EmbedNode,
@@ -65,10 +67,11 @@ const DEFAULT_CSS = `
   h2 { font-size: 1.5rem; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.2em; }
   h3 { font-size: 1.25rem; }
   h4 { font-size: 1rem; }
-  p { margin: 1em 0; }
-  ul, ol { padding-left: 2rem; margin: 1em 0; }
-  ul ul {  margin: 0; }
-  li { margin: 0.25em 0; }
+  ul, ol, dl { padding-left: 2rem; margin: 1em 0; }
+  ul ul, ol ol, ul ol, ol ul {  margin: 0; }
+  li, dt, dd { margin: 0.25em 0; }
+  dt { font-weight: bold; margin-top: 1em; }
+  dd { margin-left: 1.5rem; }
   a { color: #0066cc; text-decoration: none; }
   a:hover { text-decoration: underline; }
   blockquote {
@@ -154,6 +157,10 @@ export class HTMLBuilder implements Builder {
         return this.visitList(node as ListNode);
       case 'ListItem':
         return this.visitListItem(node as ListItemNode);
+      case 'DefinitionTerm':
+        return this.visitDefinitionTerm(node as DefinitionTermNode);
+      case 'DefinitionDescription':
+        return this.visitDefinitionDescription(node as DefinitionDescriptionNode);
       case 'CodeBlock':
         return this.visitCodeBlock(node as CodeBlockNode);
       case 'TripleColonBlock':
@@ -248,6 +255,8 @@ ${childrenHtml}
       node.type === 'Paragraph' ||
       node.type === 'Heading' ||
       node.type === 'ListItem' ||
+      node.type === 'DefinitionTerm' ||
+      node.type === 'DefinitionDescription' ||
       node.type === 'TableCell'
     ) {
       const content = (node as any).content;
@@ -313,7 +322,13 @@ ${childrenHtml}
     }
   
     visitList(node: ListNode): string {
-      const tag = node.kind === 'numbered' ? 'ol' : 'ul';
+      let tag = 'ul';
+      if (node.kind === 'numbered') {
+        tag = 'ol';
+      } else if (node.kind === 'definition') {
+        tag = 'dl';
+      }
+      
       const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
   
       const attrs = this.renderAllAttributes(node.attributes);
@@ -330,6 +345,26 @@ ${childrenHtml}
   
       const attrs = this.renderAllAttributes(node.attributes);
       return `<li${attrs}>${checkbox}${trimmed}</li>`;
+    }
+
+    visitDefinitionTerm(node: DefinitionTermNode): string {
+      const inlineContent = this.processInlineContent(node.content);
+      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+      const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
+      const trimmed = content.replace(/\s+/g, ' ').trim();
+  
+      const attrs = this.renderAllAttributes(node.attributes);
+      return `<dt${attrs}>${trimmed}</dt>`;
+    }
+
+    visitDefinitionDescription(node: DefinitionDescriptionNode): string {
+      const inlineContent = this.processInlineContent(node.content);
+      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+      const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
+      const trimmed = content.replace(/\s+/g, ' ').trim();
+  
+      const attrs = this.renderAllAttributes(node.attributes);
+      return `<dd${attrs}>${trimmed}</dd>`;
     }
   
     visitCodeBlock(node: CodeBlockNode): string {

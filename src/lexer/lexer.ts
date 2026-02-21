@@ -290,7 +290,8 @@ export class Lexer {
       /^[-*]\s+\[[ x]]\s/.test(remaining) ||
       /^[-*]\s/.test(remaining) ||
       /^\d+\.\s/.test(remaining) ||
-      /^\[[ x]]\s/.test(remaining)
+      /^\[[ x]]\s/.test(remaining) ||
+      /^:\s/.test(remaining)
     );
   }
 
@@ -309,6 +310,8 @@ export class Lexer {
       type = TokenType.ORDERED_LIST;
     } else if (/^\[[ x]]\s/.test(remaining)) {
       type = TokenType.TASK_LIST;
+    } else if (/^:\s/.test(remaining)) {
+      type = TokenType.DEFINITION;
     } else {
       type = TokenType.BULLET_LIST;
     }

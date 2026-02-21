@@ -168,4 +168,18 @@ describe('Parser', () => {
     expect(ast.children[0].type).toBe('CommentInline');
     expect((ast.children[0] as any).content).toBe('comment');
   });
+
+  test('should parse definition list', () => {
+    const lexer = new Lexer(': Term\n:   Definition');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('List');
+    expect((ast.children[0] as any).kind).toBe('definition');
+    expect((ast.children[0] as any).children[0].type).toBe('DefinitionTerm');
+    expect((ast.children[0] as any).children[0].content).toBe('Term');
+    expect((ast.children[0] as any).children[1].type).toBe('DefinitionDescription');
+    expect((ast.children[0] as any).children[1].content).toBe('Definition');
+  });
 });

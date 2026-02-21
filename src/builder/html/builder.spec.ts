@@ -359,4 +359,21 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('more text');
     expect(html).not.toContain('comment');
   });
+
+  test('should build definition list', () => {
+    const node: ListNode = {
+      type: 'List',
+      kind: 'definition',
+      children: [
+        { type: 'DefinitionTerm', content: 'Term', children: [] },
+        { type: 'DefinitionDescription', content: 'Definition', children: [] },
+      ],
+    };
+
+    const html = builder.visitList(node);
+    expect(html).toContain('<dl>');
+    expect(html).toContain('<dt>Term</dt>');
+    expect(html).toContain('<dd>Definition</dd>');
+    expect(html).toContain('</dl>');
+  });
 });

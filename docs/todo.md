@@ -88,7 +88,7 @@
 - [ ] Bullet lists `- item`
 - [ ] Numbered lists `1. item`
 - [ ] Task lists `- [ ] task` and `- [ ] task`
-- [ ] Definition lists `: term` / `: definition`
+- [x] Definition lists `: term` / `: definition`
 
 ### List Features
 
