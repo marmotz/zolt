@@ -80,6 +80,7 @@ export class Lexer {
     if (this.matchTripleColon()) return this.readTripleColon();
     if (this.matchDoubleBracket()) return this.readDoubleBracket();
     if (this.matchBlockquote()) return this.readBlockquote();
+    if (this.matchTechnicalIndentation()) return this.readTechnicalIndentation();
     if (this.matchList()) return this.readList();
     if (this.matchHorizontalRule()) return this.readHorizontalRule();
     if (this.matchFrontmatter()) return this.readFrontmatter();
@@ -260,6 +261,33 @@ export class Lexer {
     return {
       type: TokenType.DOUBLE_BRACKET_START,
       value: content.trim(),
+      line,
+      column,
+      length: this.pos - start,
+    };
+  }
+
+  private matchTechnicalIndentation(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^&+\s?/.test(remaining);
+  }
+
+  private readTechnicalIndentation(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    let value = '';
+    while (this.peekChar() === '&') {
+      value += this.advanceChar();
+    }
+    if (this.peekChar() === ' ') {
+      value += this.advanceChar();
+    }
+
+    return {
+      type: TokenType.TECHNICAL_INDENT,
+      value,
       line,
       column,
       length: this.pos - start,

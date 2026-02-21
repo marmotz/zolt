@@ -126,9 +126,9 @@
 
 ### Indentation System
 
-- [ ] Simple indentation `& text`
-- [ ] Multiple indentation levels `&&`, `&&&`
-- [ ] Distinction from blockquotes (`>`)
+- [x] Simple indentation `& text`
+- [x] Multiple indentation levels `&&`, `&&&`
+- [x] Distinction from blockquotes (`>`)
 
 ## 8. Horizontal Rules
 

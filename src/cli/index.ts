@@ -168,7 +168,6 @@ async function handleLint(args: string[]) {
   }
 
   const format = values.format as 'json' | 'text';
-  const fix = values.fix as boolean;
   let hasErrors = false;
 
   for (const file of files) {

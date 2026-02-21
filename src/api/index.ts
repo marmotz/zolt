@@ -138,6 +138,10 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
   };
 }
 
+export function extractZltLinks(content: string): string[] {
+  return extractAllAssets(content).zltLinks;
+}
+
 export async function getLinkedFiles(inputPath: string): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { zltLinks } = extractAllAssets(content);

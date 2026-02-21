@@ -76,6 +76,7 @@ export class Parser {
     if (this.match(TokenType.HEADING)) return this.parseHeading();
     if (this.match(TokenType.CODE_BLOCK_START)) return this.parseCodeBlock();
     if (this.match(TokenType.BLOCKQUOTE)) return this.parseBlockquote();
+    if (this.match(TokenType.TECHNICAL_INDENT)) return this.parseTechnicalIndentation();
     if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
     if (this.match(TokenType.TRIPLE_COLON_END)) {
       this.advance();
@@ -522,6 +523,43 @@ export class Parser {
     } as any;
   }
 
+  private parseTechnicalIndentation(): IndentationNode {
+    const startToken = this.expect(TokenType.TECHNICAL_INDENT);
+    const level = startToken.value.trim().length;
+
+    const children: ASTNode[] = [];
+
+    // Parse content of the first line
+    const firstLineContent = this.parseParagraph();
+    if (firstLineContent) {
+      children.push(firstLineContent);
+    }
+    this.skipNewlines();
+
+    // Parse consecutive lines with the same indentation level
+    while (!this.isEof() && this.match(TokenType.TECHNICAL_INDENT)) {
+      const nextToken = this.peek();
+      const nextLevel = nextToken.value.trim().length;
+
+      if (nextLevel !== level) {
+        break;
+      }
+
+      this.advance(); // consume the technical indent marker
+      const lineContent = this.parseParagraph();
+      if (lineContent) {
+        children.push(lineContent);
+      }
+      this.skipNewlines();
+    }
+
+    return {
+      type: 'Indentation',
+      level,
+      children,
+    };
+  }
+
   private parseFrontmatter(): FrontmatterNode {
     this.expect(TokenType.FRONTMATTER);
 
@@ -538,6 +576,7 @@ export class Parser {
       type === TokenType.CODE_BLOCK ||
       type === TokenType.CODE_BLOCK_START ||
       type === TokenType.BLOCKQUOTE ||
+      type === TokenType.TECHNICAL_INDENT ||
       type === TokenType.BULLET_LIST ||
       type === TokenType.ORDERED_LIST ||
       type === TokenType.TASK_LIST ||
