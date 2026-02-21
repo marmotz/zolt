@@ -2,9 +2,9 @@
 
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
-import { buildFile, lint } from '../api';
+import { buildFile, getLinkedFiles, lint } from '../api';
 import { stat } from 'fs/promises';
-import { join, basename } from 'path';
+import { join, basename, dirname } from 'path';
 
 interface BuildOptions {
   type: 'html' | 'pdf';
@@ -15,6 +15,52 @@ interface BuildOptions {
 interface LintOptions {
   format: 'json' | 'text';
   fix?: boolean;
+}
+
+async function buildFileWithDeps(
+  inputFile: string,
+  outputDir: string,
+  type: 'html' | 'pdf',
+  visited: Set<string>
+): Promise<void> {
+  const normalizedInput = inputFile.replace(/^\.\//, '');
+  
+  if (visited.has(normalizedInput)) {
+    return;
+  }
+  visited.add(normalizedInput);
+
+  const baseName = basename(normalizedInput).replace(/\.zlt$/, '.html');
+  const outputFile = join(outputDir, baseName);
+
+  await buildFile(normalizedInput, outputFile, { type });
+  console.log(`Built: ${outputFile}`);
+
+  const linkedFiles = await getLinkedFiles(normalizedInput);
+  const inputDir = dirname(normalizedInput);
+
+  for (const linkedFile of linkedFiles) {
+    let linkedPath = linkedFile;
+    
+    if (!linkedPath.endsWith('.zlt')) {
+      linkedPath = linkedPath + '.zlt';
+    }
+
+    if (linkedPath.startsWith('./') || linkedPath.startsWith('../')) {
+      linkedPath = linkedPath.replace(/^\.+\//, '');
+    }
+
+    const fullLinkedPath = join(inputDir, linkedPath);
+
+    try {
+      const linkedStat = await stat(fullLinkedPath);
+      if (linkedStat.isFile()) {
+        await buildFileWithDeps(fullLinkedPath, outputDir, type, visited);
+      }
+    } catch {
+      console.warn(`Warning: Linked file not found: ${fullLinkedPath}`);
+    }
+  }
 }
 
 async function main() {
@@ -224,15 +270,21 @@ async function handleBuild(args: string[]) {
       if (output) {
         const outputStat = await stat(output).catch(() => null);
         if (outputStat?.isDirectory()) {
+          const visited = new Set<string>();
+          await buildFileWithDeps(inputFile, output, type, visited);
+        } else {
           const baseName = basename(inputFile).replace(/\.zlt$/, '.html');
           outputFile = join(output, baseName);
+
+          await buildFile(inputFile, outputFile, { type });
+          console.log(`Built: ${outputFile}`);
         }
       } else {
         outputFile = inputFile.replace(/\.zlt$/, '.html');
-      }
 
-      await buildFile(inputFile, outputFile, { type });
-      console.log(`Built: ${outputFile}`);
+        await buildFile(inputFile, outputFile, { type });
+        console.log(`Built: ${outputFile}`);
+      }
     } else {
       if (!output) {
         console.error('Error: Output directory required for multiple files');
@@ -245,12 +297,9 @@ async function handleBuild(args: string[]) {
         process.exit(1);
       }
 
+      const visited = new Set<string>();
       for (const inputFile of files) {
-        const baseName = basename(inputFile).replace(/\.zlt$/, '.html');
-        const outputFile = join(output, baseName);
-
-        await buildFile(inputFile, outputFile, { type });
-        console.log(`Built: ${outputFile}`);
+        await buildFileWithDeps(inputFile, output, type, visited);
       }
     }
   } catch (error) {

@@ -65,6 +65,26 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
   return buildString(content, options);
 }
 
+export function extractZltLinks(content: string): string[] {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+\.zlt)\)/g;
+  const links: string[] = [];
+  let match;
+
+  while ((match = linkRegex.exec(content)) !== null) {
+    const href = match[2];
+    if (!href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('#')) {
+      links.push(href);
+    }
+  }
+
+  return [...new Set(links)];
+}
+
+export async function getLinkedFiles(inputPath: string): Promise<string[]> {
+  const content = await readFile(inputPath, 'utf-8');
+  return extractZltLinks(content);
+}
+
 export async function lint(filePath: string, options?: LintOptions): Promise<LintResult> {
   const errors: LintError[] = [];
   const warnings: LintWarning[] = [];

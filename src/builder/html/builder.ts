@@ -281,10 +281,18 @@ ${childrenHtml}
     return `<span${attrs}>${node.content}</span>`;
   }
 
+  private transformHref(href: string): string {
+    if (href.endsWith('.zlt')) {
+      return href.replace(/\.zlt$/, '.html');
+    }
+    return href;
+  }
+
   visitLink(node: LinkNode): string {
     const attrs = this.buildAttributes(node.attributes);
     const title = node.title ? ` title="${node.title}"` : '';
-    return `<a href="${node.href}"${title}${attrs}>${node.content}</a>`;
+    const href = this.transformHref(node.href);
+    return `<a href="${href}"${title}${attrs}>${node.content}</a>`;
   }
 
   visitImage(node: ImageNode): string {
@@ -309,7 +317,8 @@ ${childrenHtml}
   }
 
   visitFile(node: FileNode): string {
-    return `<a href="${node.src}">${node.title || node.src}</a>`;
+    const src = this.transformHref(node.src);
+    return `<a href="${src}">${node.title || node.src}</a>`;
   }
 
   visitVariable(node: VariableNode): string {

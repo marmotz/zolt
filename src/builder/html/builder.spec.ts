@@ -3,8 +3,11 @@ import {
   BlockquoteNode,
   CodeBlockNode,
   DocumentNode,
+  FileNode,
   HeadingNode,
   HorizontalRuleNode,
+  LinkNode,
+  ListItemNode,
   ListNode,
   ParagraphNode,
 } from '../../parser/types';
@@ -190,12 +193,57 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitLink(node);
-    expect(html).toBe('<a href="file.zlt">file.zlt</a>');
+    expect(html).toBe('<a href="file.html">file.zlt</a>');
+  });
+
+  test('should transform .zlt link to .html', () => {
+    const node: LinkNode = {
+      type: 'Link',
+      href: 'example.zlt',
+      content: 'Example',
+    };
+
+    const html = builder.visitLink(node);
+    expect(html).toContain('href="example.html"');
+  });
+
+  test('should not transform non-.zlt links', () => {
+    const node: LinkNode = {
+      type: 'Link',
+      href: 'page.html',
+      content: 'Page',
+    };
+
+    const html = builder.visitLink(node);
+    expect(html).toBe('<a href="page.html">Page</a>');
+  });
+
+  test('should not transform external links', () => {
+    const node: LinkNode = {
+      type: 'Link',
+      href: 'https://example.com',
+      content: 'External',
+    };
+
+    const html = builder.visitLink(node);
+    expect(html).toContain('href="https://example.com"');
+  });
+
+  test('should transform file node .zlt to .html', () => {
+    const node: FileNode = {
+      type: 'File',
+      src: 'document.zlt',
+      title: 'Document',
+    };
+
+    const html = builder.visitFile(node);
+    expect(html).toContain('href="document.html"');
+    expect(html).toContain('>Document</a>');
   });
 
   test('should process inline link in paragraph', () => {
     const html = builder.processInline('[example.zlt](example.zlt)');
-    expect(html).toBe('<a href="example.zlt">example.zlt</a>');
+    expect(html).toBe('<a href="example.html">example.zlt</a>');
   });
 
   test('should process multiple inline elements', () => {
@@ -212,7 +260,7 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitListItem(node);
-    expect(html).toContain('<a href="file.zlt">file.zlt</a>');
+    expect(html).toContain('<a href="file.html">file.zlt</a>');
     expect(html).toContain('— description');
   });
 });
