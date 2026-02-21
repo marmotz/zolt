@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { stat } from 'fs/promises';
-import { basename, dirname, join } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getLinkedFiles, lint } from '../api';
@@ -12,34 +12,24 @@ async function buildFileWithDeps(
   type: 'html' | 'pdf',
   visited: Set<string>
 ): Promise<void> {
-  const normalizedInput = inputFile.replace(/^\.\//, '');
+  const absoluteInput = resolve(inputFile);
 
-  if (visited.has(normalizedInput)) {
+  if (visited.has(absoluteInput)) {
     return;
   }
-  visited.add(normalizedInput);
+  visited.add(absoluteInput);
 
-  const baseName = basename(normalizedInput).replace(/\.zlt$/, '.html');
+  const baseName = basename(absoluteInput).replace(/\.zlt$/, '.html');
   const outputFile = join(outputDir, baseName);
 
-  await buildFile(normalizedInput, outputFile, { type });
+  await buildFile(absoluteInput, outputFile, { type });
   console.log(`Built: ${outputFile}`);
 
-  const linkedFiles = await getLinkedFiles(normalizedInput);
-  const inputDir = dirname(normalizedInput);
+  const linkedFiles = await getLinkedFiles(absoluteInput);
+  const inputDir = dirname(absoluteInput);
 
   for (const linkedFile of linkedFiles) {
-    let linkedPath = linkedFile;
-
-    if (!linkedPath.endsWith('.zlt')) {
-      linkedPath = linkedPath + '.zlt';
-    }
-
-    if (linkedPath.startsWith('./') || linkedPath.startsWith('../')) {
-      linkedPath = linkedPath.replace(/^\.+\//, '');
-    }
-
-    const fullLinkedPath = join(inputDir, linkedPath);
+    const fullLinkedPath = resolve(inputDir, linkedFile);
 
     try {
       const linkedStat = await stat(fullLinkedPath);
@@ -261,19 +251,16 @@ async function handleBuild(args: string[]) {
         if (outputStat?.isDirectory()) {
           const visited = new Set<string>();
           await buildFileWithDeps(inputFile, output, type, visited);
+          return;
         } else {
-          const baseName = basename(inputFile).replace(/\.zlt$/, '.html');
-          outputFile = join(output, baseName);
-
-          await buildFile(inputFile, outputFile, { type });
-          console.log(`Built: ${outputFile}`);
+          outputFile = output;
         }
       } else {
         outputFile = inputFile.replace(/\.zlt$/, '.html');
-
-        await buildFile(inputFile, outputFile, { type });
-        console.log(`Built: ${outputFile}`);
       }
+
+      await buildFile(inputFile, outputFile, { type });
+      console.log(`Built: ${outputFile}`);
     } else {
       if (!output) {
         console.error('Error: Output directory required for multiple files');

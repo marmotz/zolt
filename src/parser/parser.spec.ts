@@ -181,6 +181,27 @@ describe('Parser', () => {
     expect(columnBlock.children[0].type).toBe('Heading');
   });
 
+  test('should not hang on unexpected TRIPLE_COLON_END', () => {
+    const lexer = new Lexer(':::foreach\n:::\n:::');
+    const parser = new Parser(lexer.tokenize());
+    
+    // This should not hang
+    const ast = parser.parse();
+    expect(ast).toBeDefined();
+    expect(ast.children.length).toBeGreaterThan(0);
+  });
+
+  test('should handle multiple unexpected TRIPLE_COLON_END tokens', () => {
+    const lexer = new Lexer(':::\n:::\n:::');
+    const parser = new Parser(lexer.tokenize());
+    
+    // This should not hang
+    const ast = parser.parse();
+    expect(ast).toBeDefined();
+    expect(ast.children.length).toBe(3);
+    expect(ast.children[0].type).toBe('Paragraph');
+  });
+
   test('should parse definition list', () => {
     const lexer = new Lexer(': Term\n:   Definition');
     const tokens = lexer.tokenize();

@@ -72,6 +72,13 @@ export class Parser {
     if (this.match(TokenType.CODE_BLOCK)) return this.parseCodeBlock();
     if (this.match(TokenType.BLOCKQUOTE)) return this.parseBlockquote();
     if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
+    if (this.match(TokenType.TRIPLE_COLON_END)) {
+      this.advance();
+      return {
+        type: 'Paragraph',
+        content: ':::',
+      };
+    }
     if (this.match(TokenType.DOUBLE_BRACKET_START)) return this.parseDoubleBracketBlock();
     if (this.match(TokenType.HORIZONTAL_RULE)) return this.parseHorizontalRule();
 
