@@ -545,6 +545,16 @@ ${childrenHtml}
           return this.visitInlineStyle(node as InlineStyleNode);
         case 'Link':
           return this.visitLink(node as LinkNode);
+        case 'Image':
+          return this.visitImage(node as ImageNode);
+        case 'Video':
+          return this.visitVideo(node as VideoNode);
+        case 'Audio':
+          return this.visitAudio(node as AudioNode);
+        case 'Embed':
+          return this.visitEmbed(node as EmbedNode);
+        case 'File':
+          return this.visitFile(node as FileNode);
         case 'Abbreviation':
           return this.visitAbbreviation(node as AbbreviationNode);
         case 'CommentInline':
@@ -683,36 +693,37 @@ ${childrenHtml}
   }
 
   visitLink(node: LinkNode): string {
-    const attrs = this.buildAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
     const title = node.title ? ` title="${node.title}"` : '';
     const href = this.transformHref(node.href);
     return `<a href="${href}"${title}${attrs}>${node.content}</a>`;
   }
 
   visitImage(node: ImageNode): string {
-    const attrs = this.buildAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
     return `<img src="${node.src}" alt="${node.alt}"${attrs}>`;
   }
 
   visitVideo(node: VideoNode): string {
-    const attrs = this.buildAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
     return `<video src="${node.src}"${attrs}>${node.alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
-    const attrs = this.buildAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
     return `<audio src="${node.src}"${attrs}>${node.alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {
-    const attrs = this.buildAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
     const title = node.title ? ` title="${node.title}"` : '';
     return `<iframe src="${node.src}"${title}${attrs}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
     const src = this.transformHref(node.src);
-    return `<a href="${src}">${node.title || node.src}</a>`;
+    return `<a href="${src}"${attrs}>${node.title || node.src}</a>`;
   }
 
   visitVariable(node: VariableNode): string {
@@ -758,7 +769,11 @@ ${childrenHtml}
 
     for (const [key, value] of Object.entries(attrs)) {
       if (key !== 'id' && key !== 'class' && value !== undefined) {
-        parts.push(`${key}="${value}"`);
+        if (value === '') {
+          parts.push(key);
+        } else {
+          parts.push(`${key}="${value}"`);
+        }
       }
     }
 

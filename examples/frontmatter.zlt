@@ -22,7 +22,7 @@ title: "Complete Guide to Zolt"
 author: "Marie Dupont"
 date: 2026-02-18
 version: 2.0
-tags: [documentation, tutorial, vibe]
+tags: [documentation, tutorial, zolt]
 description: "A comprehensive guide to the Zolt markup language"
 lang: en
 toc: true
@@ -70,7 +70,7 @@ date: {$created}
 category: "Tutorial"
 tags: [beginner, guide]
 featured: true
-image: /images/vibe-cover.jpg
+image: /images/zolt-cover.jpg
 ---
 ```
 
@@ -205,7 +205,7 @@ excerpt: "Brief description of the article..."
 ---
 title: "SEO-Optimized Title"
 description: "Compelling description for search engines"
-keywords: [vibe, markdown, documentation, technical-writing]
+keywords: [zolt, markdown, documentation, technical-writing]
 author: "Jane Doe"
 image: https://example.com/og-image.jpg
 url: https://example.com/article
@@ -236,7 +236,7 @@ Locale: {$locale}
 title: "Project Documentation"
 project_name: "Zolt"
 project_version: "2.0.0"
-repository: "https://github.com/vibe/vibe"
+repository: "https://github.com/marmotz/zolt"
 license: "MIT"
 contributors: 50
 ---

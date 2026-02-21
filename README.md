@@ -59,14 +59,14 @@ bun install
 bun run build
 
 # Run the CLI
-./dist/vibe
+./dist/zolt
 ```
 
 ### Your First Document
 
 Create `hello.zlt`:
 
-```vibe
+```zolt
 ---
 title: "My First Zolt Document"
 author: "Your Name"
@@ -94,25 +94,25 @@ Zolt combines Markdown simplicity with professional features!
 
 ```bash
 # Lint a .zlt file (analyze and report errors)
-vibe lint examples/abbreviations.zlt
+zolt lint examples/abbreviations.zlt
 
 # Watch a file for changes and re-lint
-vibe lint examples/abbreviations.zlt --watch
+zolt lint examples/abbreviations.zlt --watch
 
 # Build to HTML/PDF
-vibe build examples/abbreviations.zlt -o output.html
+zolt build examples/abbreviations.zlt -o output.html
 ```
 
 ---
 
 ## 🛠️ CLI Commands
 
-### `vibe lint <file>`
+### `zolt lint <file>`
 
 Analyze a `.zlt` file and report errors and warnings.
 
 ```bash
-vibe lint examples/abbreviations.zlt
+zolt lint examples/abbreviations.zlt
 ```
 
 **Options:**
@@ -122,15 +122,15 @@ vibe lint examples/abbreviations.zlt
 **Example:**
 
 ```bash
-vibe lint examples/abbreviations.zlt --watch
+zolt lint examples/abbreviations.zlt --watch
 ```
 
-### `vibe build <file>`
+### `zolt build <file>`
 
 Build a `.zlt` file to HTML (with embedded CSS) or PDF.
 
 ```bash
-vibe build examples/abbreviations.zlt
+zolt build examples/abbreviations.zlt
 ```
 
 **Options:**
@@ -142,10 +142,10 @@ vibe build examples/abbreviations.zlt
 
 ```bash
 # Build to HTML
-vibe build examples/abbreviations.zlt -o output.html
+zolt build examples/abbreviations.zlt -o output.html
 
 # Build with watch mode
-vibe build examples/abbreviations.zlt --watch
+zolt build examples/abbreviations.zlt --watch
 ```
 
 **Features:**
@@ -171,7 +171,7 @@ The complete Zolt v0.2 specification is available in [spec.md](docs/spec.md).
 Check the [`examples/`](examples) directory for comprehensive examples:
 
 | File                                            | Description                                           |
-| ----------------------------------------------- | ----------------------------------------------------- |
+|-------------------------------------------------|-------------------------------------------------------|
 | [lists.zlt](examples/lists.zlt)                 | All list types (bullets, numbers, tasks, definitions) |
 | [links.zlt](examples/links.zlt)                 | Links, references, and attributes                     |
 | [quotes.zlt](examples/quotes.zlt)               | Blockquotes and citations                             |
@@ -198,7 +198,7 @@ Check the [`examples/`](examples) directory for comprehensive examples:
 
 ### Text Formatting
 
-```vibe
+```zolt
 **Bold text** and //italics//
 __Underline__ and ~~strikethrough==
 ^{Superscript} and _{subscripts}
@@ -207,7 +207,7 @@ __Underline__ and ~~strikethrough==
 
 ### Universal Attributes
 
-```vibe
+```zolt
 # Title {#intro}
 Text{color=blue} with styles
 ![Image](img.jpg){width=100% align=center}
@@ -215,7 +215,7 @@ Text{color=blue} with styles
 
 ### Variables & Calculations
 
-```vibe
+```zolt
 $version = "2.0"
 $price = 99
 
@@ -226,7 +226,7 @@ Average: {{ Math.round(List.avg($scores)) }}
 
 ### Dynamic Content
 
-```vibe
+```zolt
 $products = [{name: "A", price: 10}, {name: "B", price: 20}]
 
 :::foreach {$products as $product}
@@ -236,7 +236,7 @@ $products = [{name: "A", price: 10}, {name: "B", price: 20}]
 
 ### Interactive Components
 
-```vibe
+```zolt
 :::details [Click to expand]
 Hidden content here...
 :::
@@ -256,7 +256,7 @@ print("Hello")
 ## 📂 Project Structure
 
 ```
-vibe/
+zolt/
 ├── spec.md              # Complete language specification
 ├── README.md            # This file
 ├── package.json         # Project dependencies and scripts
@@ -307,7 +307,7 @@ Your existing `.md` files will work correctly in Zolt.
 ### Key Syntax Changes
 
 | Markdown        | Zolt                             |
-| --------------- | -------------------------------- |
+|-----------------|----------------------------------|
 | `*italic*`      | `//italic//`                     |
 | `<u>text</u>`   | `__text__`                       |
 | `> [!NOTE]`     | `:::note`                        |
@@ -347,11 +347,11 @@ MIT License - see LICENSE file for details
 
 - **Documentation:** [spec.md](docs/spec.md)
 - **Examples:** [`examples/`](examples)
-- **Issues:** [GitHub Issues](https://github.com/marmotz/vibe/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/marmotz/vibe/discussions)
+- **Issues:** [GitHub Issues](https://github.com/marmotz/zolt/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/marmotz/zolt/discussions)
 
 ---
 
-**Zolt** • _Markdown with a better vibe._
+_Zolt : The high-voltage successor to Markdown_
 
 For detailed specifications, see [spec.md](docs/spec.md).

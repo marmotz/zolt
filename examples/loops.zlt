@@ -207,7 +207,7 @@ $faq_categories = [
   {
     category: "Technical",
     questions: [
-      {q: "How do I install?", a: "Run: npm install vibe-cli"},
+      {q: "How do I install?", a: "Run: npm install zolt-cli"},
       {q: "What formats?", a: "HTML, PDF, EPUB"}
     ]
   }
@@ -408,12 +408,12 @@ $hours = ["9:00 AM", "10:00 AM", "11:00 AM"]
 ### Always Use Descriptive Variable Names
 
 ✅ Good:
-```vibe
+```zolt
 :::foreach {$products as $product}
 ```
 
 ❌ Bad:
-```vibe
+```zolt
 :::foreach {$items as $i}
 ```
 

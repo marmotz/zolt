@@ -39,7 +39,7 @@ style ou de comportement entre accolades placées immédiatement après l'élém
 ### 1.2 Attributs sur le Texte Inline
 
 | Syntaxe                  | Description        | Exemple                             |
-| ------------------------ | ------------------ | ----------------------------------- |
+|--------------------------|--------------------|-------------------------------------|
 | `{color=blue}`           | Couleur du texte   | `Texte{color=blue}`                 |
 | `{size=2em}`             | Taille du texte    | `Gros texte{size=2em}`              |
 | `{#mon-ancre}`           | Identifiant unique | `Texte avec ancre{#mon-ancre}`      |
@@ -56,7 +56,7 @@ style ou de comportement entre accolades placées immédiatement après l'élém
 Génère automatiquement une ancre pour les références croisées.
 
 | Attribut           | Description               | Exemple                     |
-| ------------------ | ------------------------- | --------------------------- |
+|--------------------|---------------------------|-----------------------------|
 | `{#id}`            | Identifiant unique        | `## Titre{#intro}`          |
 | `{numbered}`       | Active la numérotation    | `## Chapitre{numbered}`     |
 | `{numbered=false}` | Désactive la numérotation | `## Annexe{numbered=false}` |
@@ -68,7 +68,7 @@ Génère automatiquement une ancre pour les références croisées.
 ```
 
 | Attribut                  | Description                      |
-| ------------------------- | -------------------------------- |
+|---------------------------|----------------------------------|
 | `w=300` ou `width=300px`  | Largeur                          |
 | `h=200` ou `height=200px` | Hauteur                          |
 | `align=center`            | Alignement (left, center, right) |
@@ -82,7 +82,7 @@ Génère automatiquement une ancre pour les références croisées.
 ```
 
 | Attribut   | Description            |
-| ---------- | ---------------------- |
+|------------|------------------------|
 | `autoplay` | Lecture automatique    |
 | `loop`     | Boucle                 |
 | `muted`    | Son désactivé          |
@@ -126,7 +126,7 @@ Pour désactiver la numérotation sur une section spécifique tout en la gardant
 #### Styles de Numérotation Disponibles
 
 | Style         | Description          | Exemple de rendu |
-| ------------- | -------------------- | ---------------- |
+|---------------|----------------------|------------------|
 | `decimal`     | Nombres décimaux     | 1, 1.1, 1.1.1    |
 | `roman-lower` | Chiffres romains min | i, ii, iii       |
 | `roman-upper` | Chiffres romains maj | I, II, III       |
@@ -152,13 +152,15 @@ $numbering_style = "decimal"
 
 Rendu :
 
-- 1. Mémoire de Fin d'Études
-  - 1.1 Introduction
-    - 1.1.1 Contexte
-    - 1.1.2 Problématique
-  - 1.2 Méthodologie
-    - 1.2.1 Collecte de données
-    - 1.2.2 Analyse
+-
+    1. Mémoire de Fin d'Études
+
+    - 1.1 Introduction
+        - 1.1.1 Contexte
+        - 1.1.2 Problématique
+    - 1.2 Méthodologie
+        - 1.2.1 Collecte de données
+        - 1.2.2 Analyse
 
 - Bibliographie
 
@@ -176,7 +178,7 @@ Le Zolt utilise des symboles distinctifs pour éviter les conflits avec les list
 ### 2.1 Tableau des Symboles de Formatage
 
 | Symbole     | Rendu HTML            | Description                                           |
-| ----------- | --------------------- | ----------------------------------------------------- |
+|-------------|-----------------------|-------------------------------------------------------|
 | `**texte**` | **Gras**              | Formatage classique                                   |
 | `//texte//` | _Italique_            | Remplace `*` pour éviter les conflits avec les listes |
 | `__texte__` | <u>Souligné</u>       | Natif en Zolt                                         |
@@ -233,7 +235,7 @@ Les caractères entre `%%` et `%%` sont ignorés par le moteur de rendu.
 #### Cas d'Usage
 
 | Usage                       | Syntaxe recommandée                    |
-| --------------------------- | -------------------------------------- |
+|-----------------------------|----------------------------------------|
 | Notes de rédaction longues  | `:::comment ... :::`                   |
 | TODO temporaires            | `%% TODO: action %%`                   |
 | Notes pour contributeurs    | `:::note ... :::` ou `%% Note: ... %%` |
@@ -343,7 +345,7 @@ Le Zolt propose une syntaxe riche pour les liens, avec attributs et références
 ```
 
 | Attribut        | Description                  |
-| --------------- | ---------------------------- |
+|-----------------|------------------------------|
 | `target=_blank` | Ouvre dans un nouvel onglet  |
 | `rel=noopener`  | Sécurité pour target=\_blank |
 | `download`      | Force le téléchargement      |
@@ -448,7 +450,7 @@ L'indentation permet de décaler du texte visuellement, distinctement des citati
 ```
 
 | Syntaxe | Usage                 | Style visuel                    |
-| ------- | --------------------- | ------------------------------- |
+|---------|-----------------------|---------------------------------|
 | `>`     | Citations, extraits   | Bordure gauche, fond gris clair |
 | `&`     | Indentation technique | Décalage sans bordure           |
 
@@ -481,7 +483,7 @@ ___ {width=50% align=center}
 ```
 
 | Attribut | Description                 |
-| -------- | --------------------------- |
+|----------|-----------------------------|
 | `color`  | Couleur du séparateur       |
 | `style`  | `solid`, `dashed`, `dotted` |
 | `width`  | Largeur (px, %, em)         |
@@ -585,7 +587,7 @@ Contenu du bloc
 #### Types Natifs
 
 | Type       | Usage                  |
-| ---------- | ---------------------- |
+|------------|------------------------|
 | `info`     | Informations générales |
 | `warning`  | Avertissements         |
 | `error`    | Erreurs critiques      |
@@ -627,7 +629,7 @@ simples.
 #### Marqueurs Spéciaux
 
 | Marqueur      | Description                         |
-| ------------- | ----------------------------------- |
+|---------------|-------------------------------------|
 | `[h]`         | Cellule d'en-tête (header)          |
 | `[colspan=N]` | Fusionne N cellules horizontalement |
 | `[rowspan=N]` | Fusionne N cellules verticalement   |
@@ -673,7 +675,7 @@ Ce contenu est visible par défaut.
 #### Attributs Disponibles
 
 | Attribut    | Description                 |
-| ----------- | --------------------------- |
+|-------------|-----------------------------|
 | `open=true` | Accordéon ouvert par défaut |
 
 #### Exemples
@@ -738,7 +740,7 @@ print("Hello")
 #### Attributs Disponibles
 
 | Élément   | Attribut      | Description                   |
-| --------- | ------------- | ----------------------------- |
+|-----------|---------------|-------------------------------|
 | `:::tabs` | `default=Nom` | Onglet actif par défaut       |
 | `:::tab`  | `active=true` | Marque cet onglet comme actif |
 
@@ -749,19 +751,19 @@ print("Hello")
 :::tabs
 :::tab [Installation]
 
-```
+\```
 
-npm install vibe-parser
+npm install zolt-parser
 
-```
+\```
 
 :::
 
 :::tab [Utilisation]
 
-```
+\```
 
-const vibe = require('vibe-parser');
+const zolt = require('zolt-parser');
 const html = zolt.parse('# Hello Zolt');
 
 ```
@@ -1201,7 +1203,7 @@ title: 'Titre du Document'
 author: 'Jean Dupont'
 date: 2026-02-18
 version: 1.0
-tags: [vibe, markdown, documentation]
+tags: [zolt, markdown, documentation]
 description: 'Description courte du document'
 ---
 ```
@@ -1221,7 +1223,7 @@ Version : v{$version}
 #### Métadonnées Supportées
 
 | Champ         | Type          | Description                     |
-| ------------- | ------------- | ------------------------------- |
+|---------------|---------------|---------------------------------|
 | `title`       | string        | Titre du document               |
 | `author`      | string        | Auteur                          |
 | `date`        | date          | Date de création                |
@@ -1240,7 +1242,7 @@ title: "Guide Zolt Complet"
 author: "Équipe Zolt"
 date: 2026-02-18
 version: 2.0
-tags: [ documentation, tutorial, vibe ]
+tags: [ documentation, tutorial, zolt ]
 toc: true
 theme: "professional"
 ---
@@ -1280,7 +1282,7 @@ Dernière modification : {$modified}
 #### Formats Disponibles
 
 | Token  | Description        | Exemple |
-| ------ | ------------------ | ------- |
+|--------|--------------------|---------|
 | `DD`   | Jour (2 chiffres)  | 18      |
 | `MM`   | Mois (2 chiffres)  | 02      |
 | `YYYY` | Année (4 chiffres) | 2026    |
@@ -1338,7 +1340,8 @@ Les abbréviations locales (document courant uniquement) utilisent `*[ABBR]` :
 HTML et CSS sont essentiels. L'API est puissante.
 ```
 
-Les définitions locales ne sont appliquées qu'au document courant et ne sont pas partagées avec les autres documents liés ou inclus.
+Les définitions locales ne sont appliquées qu'au document courant et ne sont pas partagées avec les autres documents
+liés ou inclus.
 
 #### Définitions Globales
 
@@ -1364,7 +1367,7 @@ C'est similaire au système des variables :
 #### Portée des Abréviations
 
 | Syntaxe      | Portée            | Usage                                 |
-| ------------ | ----------------- | ------------------------------------- |
+|--------------|-------------------|---------------------------------------|
 | `*[ABBR]`    | Document courant  | Définitions spécifiques au fichier    |
 | `**[ABBR]`   | Globale au projet | Définitions communes à tout le projet |
 | `ABBR{abbr}` | Inline (une fois) | Définition à usage unique             |
@@ -1396,7 +1399,7 @@ La table des matières peut être générée automatiquement et insérée n'impo
 #### Attributs Disponibles
 
 | Attribut        | Description               | Défaut |
-| --------------- | ------------------------- | ------ |
+|-----------------|---------------------------|--------|
 | `depth=N`       | Profondeur maximale (1-6) | 3      |
 | `from=N`        | Niveau de départ (1-6)    | 1      |
 | `to=N`          | Niveau de fin (1-6)       | 6      |
@@ -1448,7 +1451,7 @@ Contenu pour chaque élément : {$item.name}
 Des variables automatiques sont disponibles dans chaque itération :
 
 | Variable            | Description                 |
-| ------------------- | --------------------------- |
+|---------------------|-----------------------------|
 | `{$foreach.index}`  | Index actuel (commence à 0) |
 | `{$foreach.index1}` | Index actuel (commence à 1) |
 | `{$foreach.first}`  | `true` si premier élément   |
@@ -1598,7 +1601,7 @@ $site_name = "Mon Site"
 #### Cas d'Usage Recommandés
 
 | Usage                  | Exemple                     |
-| ---------------------- | --------------------------- |
+|------------------------|-----------------------------|
 | En-tête commun         | `{{include header.zlt}}`    |
 | Pied de page           | `{{include footer.zlt}}`    |
 | Navigation             | `{{include nav.zlt}}`       |
@@ -1629,7 +1632,7 @@ code ici
 #### Attributs Disponibles
 
 | Attribut        | Description                | Exemple           |
-| --------------- | -------------------------- | ----------------- |
+|-----------------|----------------------------|-------------------|
 | `title="..."`   | Titre du bloc              | `title="main.py"` |
 | `highlight=N-M` | Surlignage de lignes       | `highlight=2-4`   |
 | `start=N`       | Numérotation starting line | `start=10`        |
@@ -1696,7 +1699,7 @@ Produit C: 175
 #### Types de Graphiques Disponibles
 
 | Type            | Description          | Données requises        |
-| --------------- | -------------------- | ----------------------- |
+|-----------------|----------------------|-------------------------|
 | `:::chart-line` | Graphique linéaire   | Série temporelle        |
 | `:::chart-bar`  | Graphique à barres   | Catégories + valeurs    |
 | `:::chart-pie`  | Graphique circulaire | Parts + pourcentages    |
@@ -1714,7 +1717,7 @@ Feb: 120
 ```
 
 | Attribut | Description                                      |
-| -------- | ------------------------------------------------ |
+|----------|--------------------------------------------------|
 | `width`  | Largeur du conteneur                             |
 | `height` | Hauteur du conteneur                             |
 | `layout` | `horizontal` ou `vertical` pour multi-graphiques |
@@ -1726,7 +1729,7 @@ Feb: 120
 ```
 
 | Attribut       | Description         |
-| -------------- | ------------------- |
+|----------------|---------------------|
 | `title`        | Titre du graphique  |
 | `color-scheme` | Palette de couleurs |
 | `legend`       | Afficher la légende |
@@ -1783,7 +1786,8 @@ Distributeurs: 20%
 
 ## 7. Architecture Technique (Pour le Développeur)
 
-Zolt utilise une architecture en trois couches distinctes : **Lexer** (analyse lexicale), **Parser** (analyse syntaxique), et **Builder** (génération de sortie). Cette séparation garantit un code maintenable et extensible.
+Zolt utilise une architecture en trois couches distinctes : **Lexer** (analyse lexicale), **Parser** (analyse
+syntaxique), et **Builder** (génération de sortie). Cette séparation garantit un code maintenable et extensible.
 
 ### 7.1 Flux de Traitement
 
@@ -1793,7 +1797,8 @@ Fichier Zolt → Lexer → Tokens → Parser → AST → Builder → Sortie (HTM
 
 ### 7.2 Couche 1 : Lexer (Analyse Lexicale)
 
-Le Lexer transforme le texte brut en stream de Tokens. Il ne comprend pas la structure du langage, il ne fait que reconnaître les motifs syntaxiques.
+Le Lexer transforme le texte brut en stream de Tokens. Il ne comprend pas la structure du langage, il ne fait que
+reconnaître les motifs syntaxiques.
 
 **Responsabilités :**
 
@@ -1815,7 +1820,8 @@ Le Lexer transforme le texte brut en stream de Tokens. Il ne comprend pas la str
 
 ### 7.3 Couche 2 : Parser (Analyse Syntaxique)
 
-Le Parser consume le stream de Tokens et produit un AST (Abstract Syntax Tree). Il utilise une approche récursive descendante (Recursive Descent Parser).
+Le Parser consume le stream de Tokens et produit un AST (Abstract Syntax Tree). Il utilise une approche récursive
+descendante (Recursive Descent Parser).
 
 **Responsabilités :**
 
@@ -1826,10 +1832,13 @@ Le Parser consume le stream de Tokens et produit un AST (Abstract Syntax Tree). 
 **Types de Nœuds AST :**
 
 - Nœuds de document : DocumentNode (racine)
-- Nœuds de blocs : HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode, TripleColonBlockNode, DoubleBracketBlockNode, HorizontalRuleNode, IndentationNode
-- Nœuds inline : BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode, HighlightNode, InlineStyleNode
+- Nœuds de blocs : HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode,
+  TripleColonBlockNode, DoubleBracketBlockNode, HorizontalRuleNode, IndentationNode
+- Nœuds inline : BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode,
+  HighlightNode, InlineStyleNode
 - Nœuds médias : LinkNode, ImageNode, VideoNode, AudioNode, EmbedNode, FileNode
-- Nœuds spéciaux : VariableNode, ExpressionNode, IncludeNode, ForeachNode, IfNode, FootnoteNode, FootnoteDefinitionNode, AbbreviationNode, FrontmatterNode
+- Nœuds spéciaux : VariableNode, ExpressionNode, IncludeNode, ForeachNode, IfNode, FootnoteNode, FootnoteDefinitionNode,
+  AbbreviationNode, FrontmatterNode
 
 ### 7.4 Couche 3 : Builder (Génération de Sortie)
 
@@ -1843,7 +1852,8 @@ Le Builder transforme l'AST en format de sortie (HTML, PDF, etc.). Il utilise le
 
 ### 7.5 Règles Architecturales
 
-1. **Séparation des préoccupations** : Le Lexer ne connaît pas l'AST, le Parser ne connaît pas HTML/PDF, le Builder ne fait pas de parsing
+1. **Séparation des préoccupations** : Le Lexer ne connaît pas l'AST, le Parser ne connaît pas HTML/PDF, le Builder ne
+   fait pas de parsing
 2. **Erreurs résilientes** : En cas d'erreur syntaxique, le parseur doit continuer et émettre un avertissement
 3. **Informations de position** : Chaque Token et Nœud doit inclure ligne et colonne pour les messages d'erreur
 4. **Extensibilité** : Ajouter un nouveau format de sortie = ajouter un nouveau Builder
@@ -1877,7 +1887,7 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 
 ### 8.2 Tableau Comparatif des Fonctionnalités
 
-| Fonctionnalité           | Markdown Classique   | Zolt                                   |
+| Fonctionnalité | Markdown Classique | Zolt |
 | ------------------------ | -------------------- | -------------------------------------- | --- | ----- | --- | ------- |
 | **Couleur texte**        | `<span style="...">` | `Texte{color=red}`                     |
 | **Gras**                 | `**texte**`          | `**texte**` (identique)                |
@@ -1886,39 +1896,39 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 | **Exposant**             | `<sup>...</sup>`     | `^{texte}` (natif, imbrication)        |
 | **Indice**               | `<sub>...</sub>`     | `_{texte}` (natif, imbrication)        |
 | **Surligné**             | `<mark>...</mark>`   | `==texte==` (natif)                    |
-| **Taille image**         | Non supporté         | `![..](..){w=100}`                     |
-| **Alignement image**     | HTML requis          | `![..](..){align=right}`               |
+| **Taille image**         | Non supporté | `![..](..){w=100}`                     |
+| **Alignement image**     | HTML requis | `![..](..){align=right}`               |
 | **Alertes/Callouts**     | `> [!NOTE]` (hack)   | `:::note` (natif)                      |
-| **Ancre ID**             | HTML manuel          | `## Titre{#id}` (natif)                |
-| **Tableaux avancés**     | Limité               | `[[table]]` avec colspan/rowspan       |
-| **Vidéo**                | HTML requis          | `!![alt](url)` (natif)                 |
-| **Audio**                | HTML requis          | `??[alt](url)` (natif)                 |
-| **Embed**                | HTML requis          | `@@[alt](url)` (natif)                 |
-| **Variables**            | Non supporté         | `$var = "val"` + `{$var}`              |
-| **Calculs**              | Non supporté         | `{{ 10 + 5 }}`                         |
-| **Mathématiques**        | Extension requise    | `$...$` (natif)                        |
-| **Diagrammes**           | Extension requise    | `:::mermaid` (natif)                   |
-| **Graphiques**           | Non supporté         | `:::chart` (natif)                     |
-| **Numérotation titres**  | Non supporté         | `$numbering=true` + `{numbered}`       |
+| **Ancre ID**             | HTML manuel | `## Titre{#id}` (natif)                |
+| **Tableaux avancés**     | Limité | `[[table]]` avec colspan/rowspan |
+| **Vidéo**                | HTML requis | `!![alt](url)` (natif)                 |
+| **Audio**                | HTML requis | `??[alt](url)` (natif)                 |
+| **Embed**                | HTML requis | `@@[alt](url)` (natif)                 |
+| **Variables**            | Non supporté | `$var = "val"` + `{$var}`              |
+| **Calculs**              | Non supporté | `{{ 10 + 5 }}`                         |
+| **Mathématiques**        | Extension requise | `$...$` (natif)                        |
+| **Diagrammes**           | Extension requise | `:::mermaid` (natif)                   |
+| **Graphiques**           | Non supporté | `:::chart` (natif)                     |
+| **Numérotation titres**  | Non supporté | `$numbering=true` + `{numbered}`       |
 | **Commentaires**         | `<!-- -->`           | `:::comment` et `%% %%` (natif)        |
-| **Listes de définition** | Non supporté         | `: terme` / `: définition`             |
-| **Liens avancés**        | Basique              | `[text](url){target=_blank}`           |
-| **Références liens**     | Non supporté         | `[text][ref]` + `[ref]: url`           |
-| **Citations stylées**    | Basique              | `> texte{color=red}`                   |
-| **Indentation tech**     | Non supporté         | `& texte` (vs `>` citation)            |
-| **Séparateurs stylés**   | Limité               | `--- {color=red style=dashed}`         |
-| **Inline stylé**         | Non supporté         | `                                      |     | texte |     | {attr}` |
-| **Notes de bas de page** | Extension            | `[^1]` natif + définitions             |
-| **Frontmatter**          | Non supporté         | YAML natif avec variables auto         |
-| **Dates auto**           | Non supporté         | `{$created}`, `{$modified}`            |
-| **Abréviations**         | Non supporté         | `{abbr="..."}`                         |
-| **TOC dynamique**        | Extension            | `[[toc {from=2 to=4}]]`                |
-| **Calculs avancés**      | Non supporté         | `Math.*`, `List.*`, `String.*`         |
-| **Boucles**              | Non supporté         | `:::foreach` avec `$foreach.*`         |
-| **Accordéons**           | Non supporté         | `:::details [Titre]`                   |
-| **Onglets**              | Non supporté         | `:::tabs` / `:::tab`                   |
-| **Colonnes**             | Non supporté         | `:::columns` / `:::column`             |
-| **Échappement**          | Backslash limité     | `\` universel pour tous les opérateurs |
+| **Listes de définition** | Non supporté | `: terme` / `: définition`             |
+| **Liens avancés**        | Basique | `[text](url){target=_blank}`           |
+| **Références liens**     | Non supporté | `[text][ref]` + `[ref]: url`           |
+| **Citations stylées**    | Basique | `> texte{color=red}`                   |
+| **Indentation tech**     | Non supporté | `& texte` (vs `>` citation)            |
+| **Séparateurs stylés**   | Limité | `--- {color=red style=dashed}`         |
+| **Inline stylé**         | Non supporté | `                                      |     | texte |     | {attr}` |
+| **Notes de bas de page** | Extension | `[^1]` natif + définitions |
+| **Frontmatter**          | Non supporté | YAML natif avec variables auto |
+| **Dates auto**           | Non supporté | `{$created}`, `{$modified}`            |
+| **Abréviations**         | Non supporté | `{abbr="..."}`                         |
+| **TOC dynamique**        | Extension | `[[toc {from=2 to=4}]]`                |
+| **Calculs avancés**      | Non supporté | `Math.*`, `List.*`, `String.*`         |
+| **Boucles**              | Non supporté | `:::foreach` avec `$foreach.*`         |
+| **Accordéons**           | Non supporté | `:::details [Titre]`                   |
+| **Onglets**              | Non supporté | `:::tabs` / `:::tab`                   |
+| **Colonnes**             | Non supporté | `:::columns` / `:::column`             |
+| **Échappement**          | Backslash limité | `\` universel pour tous les opérateurs |
 
 ---
 
@@ -2128,7 +2138,7 @@ title: "Guide Complet Zolt"
 author: "Marie Dupont"
 date: { $created }
 version: 2.0
-tags: [ documentation, tutorial, vibe ]
+tags: [ documentation, tutorial, zolt ]
 toc: true
 numbering: true
 ---
@@ -2185,7 +2195,7 @@ numbering: true
 
 :::tabs
 :::tab [Documentation]
-```vibe
+```zolt
 $variable = "valeur"
 # Titre
 ````
@@ -2297,8 +2307,8 @@ Texte avec une note[^1] et une autre note[^note2].
 
 ## Footer
 
-**Liens utiles :** [Documentation](https://vibe.example.com){target=\_blank} | [GitHub](https://github.com/vibe/vibe)
-{target=\_blank} | [Guide complet](@intro)
+**Liens utiles :** [Documentation](@docs){target=\_blank} | [GitHub](https://github.com/marmotz/zolt)
+{target=\_blank} | [Guide complet](@docs)
 
 ---
 

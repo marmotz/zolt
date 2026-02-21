@@ -131,14 +131,14 @@ Tablet-optimized layout.
 
 :::tabs
 :::tab [Windows]
-1. Download `vibe-setup-win.exe`
+1. Download `zolt-setup-win.exe`
 2. Run the installer
 3. Follow the prompts
 4. Restart your computer
 :::
 
 :::tab [macOS]
-1. Download `vibe-setup-mac.dmg`
+1. Download `zolt-setup-mac.dmg`
 2. Open the disk image
 3. Drag Zolt to Applications
 4. Launch from Applications
@@ -147,13 +147,13 @@ Tablet-optimized layout.
 :::tab [Linux]
 ```bash
 # Ubuntu/Debian
-sudo apt install vibe
+sudo apt install zolt
 
 # Fedora
-sudo dnf install vibe
+sudo dnf install zolt
 
 # Arch Linux
-yay -S vibe
+yay -S zolt
 ```
 :::
 :::
@@ -191,9 +191,9 @@ export:
 Configure via environment:
 
 ```bash
-VIBE_THEME=dark
-VIBE_CONFIG_PATH=~/.zlt/config.yaml
-VIBE_EXPORT_PATH=~/exports
+ZOLT_THEME=dark
+ZOLT_CONFIG_PATH=~/.zlt/config.yaml
+ZOLT_EXPORT_PATH=~/exports
 ```
 :::
 :::

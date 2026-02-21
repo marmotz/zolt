@@ -6,7 +6,7 @@ title: "Zolt - The Complete Example"
 author: "Jane Doe"
 date: {$created}
 version: 1.0
-tags: [documentation, tutorial, vibe, complete]
+tags: [documentation, tutorial, zolt, complete]
 toc: true
 toc_depth: 2
 numbering: true
@@ -105,7 +105,7 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 ### Links
 
 - [Documentation](https://zolt.example.com){target=_blank}
-- [GitHub Repository](https://github.com/vibe/vibe)
+- [GitHub Repository](https://github.com/marmotz/zolt)
 - [Getting Started](@introduction)
 
 ### References
@@ -157,7 +157,7 @@ $$
 
 :::tab [Installation]
 ```bash
-npm install -g vibe-cli
+npm install -g zolt-cli
 ```
 :::
 
@@ -448,7 +448,7 @@ Common Zolt editor shortcuts:
 
 [docs]: https://zolt.example.com/docs
 [forum]: https://forum.zlt.example.com
-[github]: https://github.com/vibe/vibe/issues
+[github]: https://github.com/marmotz/zolt/issues
 
 ---
 

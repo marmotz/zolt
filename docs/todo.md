@@ -42,16 +42,16 @@
 
 ### Attributes on Images
 
-- [ ] `{w=width}` or `{width=value}` - Width
-- [ ] `{h=height}` or `{height=value}` - Height
-- [ ] `{align=value}` - Alignment (left, center, right)
+- [x] `{w=width}` or `{width=value}` - Width
+- [x] `{h=height}` or `{height=value}` - Height
+- [x] `{align=value}` - Alignment (left, center, right)
 - [ ] `{shadow=value}` - Shadow
-- [ ] `{float=value}` - Float
+- [x] `{float=value}` - Float
 
 ### Image Syntax
 
-- [ ] `![alt](src)` - Basic image
-- [ ] `![alt](src){width=value}` - Image with attributes
+- [x] `![alt](src)` - Basic image
+- [x] `![alt](src){width=value}` - Image with attributes
 
 ### Attributes on Videos
 
@@ -101,7 +101,7 @@
 ### Link Types
 
 - [x] External links `[text](url)`
-- [ ] Links with attributes `[text](url){attributes}`
+- [x] Links with attributes `[text](url){attributes}`
 - [ ] Automatic reference links `[text][ref]` with `[ref]: url`
 - [ ] Internal links/cross-references `[text](@id)`
 - [ ] Anchor links `[text](#anchor)`
@@ -177,11 +177,11 @@
 
 ### Media Prefixes
 
-- [ ] `![alt](url)` - Images (jpg, png, gif, svg) → `<img>`
-- [ ] `!![alt](url)` - Videos (mp4, webm, ogg) → `<video>`
-- [ ] `??[alt](url)` - Audio (mp3, wav, ogg) → `<audio>`
-- [ ] `@@[alt](url)` - Embeds (YouTube, Vimeo, Spotify) → `<iframe>`
-- [ ] `&&[alt](url)` - Downloadable files (pdf, doc, zip) → `<a>` with icon
+- [x] `![alt](url)` - Images (jpg, png, gif, svg) → `<img>`
+- [x] `!![alt](url)` - Videos (mp4, webm, ogg) → `<video>`
+- [x] `??[alt](url)` - Audio (mp3, wav, ogg) → `<audio>`
+- [x] `@@[alt](url)` - Embeds (YouTube, Vimeo, Spotify) → `<iframe>`
+- [x] `&&[alt](url)` - Downloadable files (pdf, doc, zip) → `<a>` with icon
 
 ## 11. Calculations & Logic
 

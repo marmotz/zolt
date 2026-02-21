@@ -2,10 +2,14 @@ import {
   AbbreviationNode,
   ASTNode,
   Attributes,
+  AudioNode,
   BoldNode,
   CodeNode,
   CommentInlineNode,
+  EmbedNode,
+  FileNode,
   HighlightNode,
+  ImageNode,
   InlineStyleNode,
   ItalicNode,
   LinkNode,
@@ -14,6 +18,7 @@ import {
   SuperscriptNode,
   TextNode,
   UnderlineNode,
+  VideoNode,
 } from './types';
 
 export class InlineParser {
@@ -95,7 +100,12 @@ export class InlineParser {
 
   private parseInlineElement(text: string): { node: ASTNode; remaining: string } | null {
     if (this.matchPattern(text, /^%%/)) return this.parseCommentInline(text);
-    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/)) return this.parseLink(text);
+    if (this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseVideo(text);
+    if (this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseAudio(text);
+    if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseEmbed(text);
+    if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseFile(text);
+    if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseImage(text);
+    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseLink(text);
     if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
     if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
     if (this.matchPattern(text, /^\|\|([^|]+)\|\|(\{[^}]+})?/)) return this.parseInlineStyle(text);
@@ -116,15 +126,121 @@ export class InlineParser {
   }
 
   private parseLink(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/);
+    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)(\{[^}]+})?/);
     if (!match) return null;
+
+    const content = match[1];
+    const href = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
 
     return {
       node: {
         type: 'Link',
-        content: match[1],
-        href: match[2],
+        content,
+        href,
+        attributes,
       } as LinkNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseImage(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    if (!match) return null;
+
+    const alt = match[1];
+    const src = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
+
+    return {
+      node: {
+        type: 'Image',
+        src,
+        alt,
+        attributes,
+      } as ImageNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseVideo(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    if (!match) return null;
+
+    const alt = match[1];
+    const src = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
+
+    return {
+      node: {
+        type: 'Video',
+        src,
+        alt,
+        attributes,
+      } as VideoNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseAudio(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    if (!match) return null;
+
+    const alt = match[1];
+    const src = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
+
+    return {
+      node: {
+        type: 'Audio',
+        src,
+        alt,
+        attributes,
+      } as AudioNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseEmbed(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    if (!match) return null;
+
+    const title = match[1];
+    const src = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
+
+    return {
+      node: {
+        type: 'Embed',
+        src,
+        title,
+        attributes,
+      } as EmbedNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseFile(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    if (!match) return null;
+
+    const title = match[1];
+    const src = match[2];
+    const attributesStr = match[3];
+    const attributes = this.parseAttributes(attributesStr);
+
+    return {
+      node: {
+        type: 'File',
+        src,
+        title,
+        attributes,
+      } as FileNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -252,7 +368,7 @@ export class InlineParser {
           const afterKey = remaining.slice(keyValueMatch[0].length);
           let value = '';
 
-          const nextKeyMatch = afterKey.match(/ [a-zA-Z-]+=/);
+          const nextKeyMatch = afterKey.match(/ ([a-zA-Z-]+=|#|\.)/);
           if (nextKeyMatch) {
             value = afterKey.slice(0, nextKeyMatch.index);
           } else {
@@ -262,8 +378,9 @@ export class InlineParser {
           this.setAttribute(attrs, key, value.trim());
           remaining = remaining.slice(key.length + 1 + value.length);
         } else {
-          // Handle shortcuts like .class or #id
+          // Handle shortcuts like .class or #id, or boolean attributes
           const shortcutMatch = remaining.match(/^([.#][a-zA-Z0-9_-]+)/);
+          const booleanMatch = remaining.match(/^([a-zA-Z-]+)/);
           if (shortcutMatch) {
             const val = shortcutMatch[1];
             if (val.startsWith('.')) {
@@ -273,6 +390,10 @@ export class InlineParser {
               attrs['id'] = val.slice(1);
             }
             remaining = remaining.slice(val.length);
+          } else if (booleanMatch) {
+            const key = booleanMatch[1];
+            this.setAttribute(attrs, key, '');
+            remaining = remaining.slice(key.length);
           } else {
             remaining = remaining.slice(1);
           }
@@ -353,7 +474,7 @@ export class InlineParser {
           const afterKey = remaining.slice(keyValueMatch[0].length);
           let value = '';
 
-          const nextKeyMatch = afterKey.match(/ [a-zA-Z-]+=/);
+          const nextKeyMatch = afterKey.match(/ ([a-zA-Z-]+=|#|\.)/);
           if (nextKeyMatch) {
             value = afterKey.slice(0, nextKeyMatch.index);
           } else {
@@ -363,7 +484,15 @@ export class InlineParser {
           this.setAttribute(attrs, key, value.trim());
           remaining = remaining.slice(key.length + 1 + value.length);
         } else {
-          remaining = remaining.slice(1);
+          // Handle boolean attributes
+          const booleanMatch = remaining.match(/^([a-zA-Z-]+)/);
+          if (booleanMatch) {
+            const key = booleanMatch[1];
+            this.setAttribute(attrs, key, '');
+            remaining = remaining.slice(key.length);
+          } else {
+            remaining = remaining.slice(1);
+          }
         }
       }
     }

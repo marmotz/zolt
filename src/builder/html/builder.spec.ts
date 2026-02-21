@@ -7,6 +7,7 @@ import {
   FileNode,
   HeadingNode,
   HorizontalRuleNode,
+  ImageNode,
   LinkNode,
   ListItemNode,
   ListNode,
@@ -229,6 +230,31 @@ describe('HTMLBuilder', () => {
 
     const html = builder.visitLink(node);
     expect(html).toContain('href="https://example.com"');
+  });
+
+  test('should build image', () => {
+    const node: ImageNode = {
+      type: 'Image',
+      src: 'img.jpg',
+      alt: 'Alt',
+    };
+
+    const html = builder.visitImage(node);
+    expect(html).toBe('<img src="img.jpg" alt="Alt">');
+  });
+
+  test('should build image with attributes', () => {
+    const node: ImageNode = {
+      type: 'Image',
+      src: 'img.jpg',
+      alt: 'Alt',
+      attributes: { width: '100px', class: 'img-fluid' },
+    };
+
+    const html = builder.visitImage(node);
+    expect(html).toContain('<img src="img.jpg" alt="Alt"');
+    expect(html).toContain('style="width: 100px"');
+    expect(html).toContain('class="img-fluid"');
   });
 
   test('should transform file node .zlt to .html', () => {

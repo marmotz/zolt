@@ -28,10 +28,10 @@ Styled links:
 
 Reference-style links to avoid repeating URLs:
 
-Check out [Zolt][vibe] documentation and [GitHub][github] repository.
+Check out [Zolt][zolt] documentation and [GitHub][github] repository.
 
-[vibe]: https://zolt.example.com
-[github]: https://github.com/vibe/vibe
+[zolt]: https://zolt.example.com
+[github]: https://github.com/marmotz/zolt
 
 ## Internal Links (Cross-references)
 
@@ -87,7 +87,7 @@ Check the [documentation]({$doc_url}).
 - [ePub Version](guide.epub){download=true}
 - [Source Code][github]{target=_blank rel=noopener}
 
-[github]: https://github.com/vibe/vibe/archive/main.zip
+[github]: https://github.com/marmotz/zolt/archive/main.zip
 
 ### Styling Example
 

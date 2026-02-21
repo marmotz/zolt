@@ -1,16 +1,17 @@
 #!/usr/bin/env bun
 
-import { stat } from 'fs/promises';
+import { copyFile, mkdir, stat } from 'fs/promises';
 import { basename, dirname, join, resolve } from 'path';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
-import { buildFile, getLinkedFiles, lint } from '../api';
+import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 
 async function buildFileWithDeps(
   inputFile: string,
   outputDir: string,
   type: 'html' | 'pdf',
-  visited: Set<string>
+  visited: Set<string>,
+  customOutputFile?: string
 ): Promise<void> {
   const absoluteInput = resolve(inputFile);
 
@@ -19,14 +20,39 @@ async function buildFileWithDeps(
   }
   visited.add(absoluteInput);
 
-  const baseName = basename(absoluteInput).replace(/\.zlt$/, '.html');
-  const outputFile = join(outputDir, baseName);
+  let outputFile: string;
+  if (customOutputFile) {
+    outputFile = customOutputFile;
+  } else {
+    const baseName = basename(absoluteInput).replace(/\.zlt$/, '.html');
+    outputFile = join(outputDir, baseName);
+  }
 
   await buildFile(absoluteInput, outputFile, { type });
   console.log(`Built: ${outputFile}`);
 
-  const linkedFiles = await getLinkedFiles(absoluteInput);
   const inputDir = dirname(absoluteInput);
+
+  // Handle other assets (images, etc.)
+  const assets = await getAssetFiles(absoluteInput);
+  for (const asset of assets) {
+    const fullAssetPath = resolve(inputDir, asset);
+    const destAssetPath = join(outputDir, asset);
+
+    try {
+      const assetStat = await stat(fullAssetPath);
+      if (assetStat.isFile()) {
+        await mkdir(dirname(destAssetPath), { recursive: true });
+        await copyFile(fullAssetPath, destAssetPath);
+        // console.log(`Copied asset: ${asset} -> ${destAssetPath}`);
+      }
+    } catch {
+      console.warn(`Warning: Asset file not found: ${fullAssetPath}`);
+    }
+  }
+
+  // Handle linked .zlt files recursively
+  const linkedFiles = await getLinkedFiles(absoluteInput);
 
   for (const linkedFile of linkedFiles) {
     const fullLinkedPath = resolve(inputDir, linkedFile);
@@ -147,7 +173,7 @@ async function handleLint(args: string[]) {
 
   for (const file of files) {
     try {
-      const result = await lint(file, { format, fix });
+      const result = await lint(file);
 
       if (format === 'json') {
         console.log(JSON.stringify(result, null, 2));
@@ -259,8 +285,9 @@ async function handleBuild(args: string[]) {
         outputFile = inputFile.replace(/\.zlt$/, '.html');
       }
 
-      await buildFile(inputFile, outputFile, { type });
-      console.log(`Built: ${outputFile}`);
+      const outputDir = dirname(resolve(outputFile));
+      const visited = new Set<string>();
+      await buildFileWithDeps(inputFile, outputDir, type, visited, outputFile);
     } else {
       if (!output) {
         console.error('Error: Output directory required for multiple files');

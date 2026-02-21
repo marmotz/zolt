@@ -104,6 +104,7 @@ export interface FileNode {
   type: 'File';
   src: string;
   title?: string;
+  attributes?: Attributes;
 }
 
 export interface VariableNode {

@@ -107,11 +107,11 @@ Details about topic 2[^topic2].
 
 Reuse footnote references:
 
-The concept of "vibe"[^vibe-def] appears multiple times in this text.
+The concept of "zolt"[^zolt-def] appears multiple times in this text.
 
-Understanding the[vibe-def] philosophy is essential for effective usage.
+Understanding the[zolt-def] philosophy is essential for effective usage.
 
-[vibe-def]: ||Zolt||{color=blue} represents a modern approach to documentation markup, combining simplicity with power.
+[zolt-def]: ||Zolt||{color=blue} represents a modern approach to documentation markup, combining simplicity with power.
 
 ## Footnotes in Different Contexts
 

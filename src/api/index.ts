@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { Builder } from '../builder/builder';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
+import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
 
 export interface BuildOptions {
@@ -65,24 +66,88 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
   return buildString(content, options);
 }
 
-export function extractZltLinks(content: string): string[] {
-  const linkRegex = /\[([^\]]+)\]\(([^\s)]+?\.zlt)\)/g;
-  const links: string[] = [];
-  let match;
+export function extractAllAssets(content: string): { zltLinks: string[]; otherAssets: string[] } {
+  const lexer = new Lexer(content);
+  const tokens = lexer.tokenize();
+  const parser = new Parser(tokens);
+  const ast = parser.parse();
 
-  while ((match = linkRegex.exec(content)) !== null) {
-    const href = match[2];
-    if (!href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('#')) {
-      links.push(href);
+  const zltLinks: string[] = [];
+  const otherAssets: string[] = [];
+  const inlineParser = new InlineParser();
+
+  const visit = (node: any) => {
+    if (!node) return;
+
+    const checkHref = (href: string) => {
+      if (!href) return;
+      if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#') || href.startsWith('mailto:')) {
+        return;
+      }
+
+      if (href.endsWith('.zlt')) {
+        zltLinks.push(href);
+      } else {
+        otherAssets.push(href);
+      }
+    };
+
+    switch (node.type) {
+      case 'Link':
+        checkHref(node.href);
+        break;
+      case 'Image':
+      case 'Video':
+      case 'Audio':
+      case 'Embed':
+      case 'File':
+        checkHref(node.src || node.href);
+        break;
+      case 'Paragraph':
+      case 'Heading':
+      case 'ListItem':
+      case 'DefinitionTerm':
+      case 'DefinitionDescription':
+      case 'TableCell':
+        if (node.content && typeof node.content === 'string') {
+          const inlineNodes = inlineParser.parse(node.content);
+          inlineNodes.forEach(visit);
+        }
+        break;
     }
-  }
 
-  return [...new Set(links)];
+    if (node.children && Array.isArray(node.children)) {
+      node.children.forEach(visit);
+    }
+    if (node.rows && Array.isArray(node.rows)) {
+      node.rows.forEach(visit);
+    }
+    if (node.cells && Array.isArray(node.cells)) {
+      node.cells.forEach(visit);
+    }
+    if (node.header) {
+      visit(node.header);
+    }
+  };
+
+  visit(ast);
+
+  return {
+    zltLinks: [...new Set(zltLinks)],
+    otherAssets: [...new Set(otherAssets)],
+  };
 }
 
 export async function getLinkedFiles(inputPath: string): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
-  return extractZltLinks(content);
+  const { zltLinks } = extractAllAssets(content);
+  return zltLinks;
+}
+
+export async function getAssetFiles(inputPath: string): Promise<string[]> {
+  const content = await readFile(inputPath, 'utf-8');
+  const { otherAssets } = extractAllAssets(content);
+  return otherAssets;
 }
 
 export async function lint(filePath: string): Promise<LintResult> {

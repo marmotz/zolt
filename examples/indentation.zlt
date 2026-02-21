@@ -87,7 +87,7 @@ Technical indentation (&) vs Semantic quotes (>):
 
 ### Command Line Usage
 
-& Usage: vibe [options] [input]
+& Usage: zolt [options] [input]
 &
 & Options:
 &   -o, --output    Output file
