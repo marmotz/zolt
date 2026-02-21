@@ -393,12 +393,49 @@ export class Parser {
   }
 
   private parseTripleColonBlock(): ASTNode {
-    this.expect(TokenType.TRIPLE_COLON_START);
+    const startToken = this.expect(TokenType.TRIPLE_COLON_START);
+    const value = startToken.value;
+
+    // Extract attributes
+    let attributes: Attributes | undefined;
+    const attrMatch = value.match(/\s+\{([^}]+)}$/);
+    let remaining = value;
+    if (attrMatch) {
+      attributes = InlineParser.parseAttributes(attrMatch[1]);
+      remaining = value.replace(/\s+\{([^}]+)}$/, '').trim();
+    }
+
+    // Extract title [Title]
+    let title: string | undefined;
+    const titleMatch = remaining.match(/\s+\[([^\]]+)]$/);
+    let blockType = remaining;
+    if (titleMatch) {
+      title = titleMatch[1];
+      blockType = remaining.replace(/\s+\[([^\]]+)]$/, '').trim();
+    }
+
+    const children: ASTNode[] = [];
+    this.skipNewlines();
+
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      const block = this.parseBlock();
+      if (block) {
+        children.push(block);
+      }
+      this.skipNewlines();
+    }
+
+    if (this.match(TokenType.TRIPLE_COLON_END)) {
+      this.advance();
+    }
+
     return {
       type: 'TripleColonBlock',
-      blockType: '',
-      content: '',
-    } as ASTNode;
+      blockType,
+      title,
+      children,
+      attributes,
+    } as any;
   }
 
   private parseDoubleBracketBlock(): ASTNode {
@@ -446,7 +483,9 @@ export class Parser {
       type === TokenType.BULLET_LIST ||
       type === TokenType.ORDERED_LIST ||
       type === TokenType.TASK_LIST ||
-      type === TokenType.HORIZONTAL_RULE
+      type === TokenType.HORIZONTAL_RULE ||
+      type === TokenType.TRIPLE_COLON_START ||
+      type === TokenType.TRIPLE_COLON_END
     );
   }
 

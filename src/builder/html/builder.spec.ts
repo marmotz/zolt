@@ -360,6 +360,26 @@ describe('HTMLBuilder', () => {
     expect(html).not.toContain('comment');
   });
 
+  test('should build triple colon columns', () => {
+    const builder = new HTMLBuilder();
+    const node: any = {
+      type: 'TripleColonBlock',
+      blockType: 'columns',
+      children: [
+        {
+          type: 'TripleColonBlock',
+          blockType: 'column',
+          attributes: { width: '50%' },
+          children: [{ type: 'Text', content: 'Half' }]
+        }
+      ]
+    };
+    const html = builder.build(node);
+    expect(html).toContain('class="triple-colon-block columns"');
+    expect(html).toContain('class="triple-colon-block column"');
+    expect(html).toContain('style="width: calc(50% - (var(--zolt-column-gap, 1.5rem) * 0.500))"');
+  });
+
   test('should build definition list', () => {
     const node: ListNode = {
       type: 'List',

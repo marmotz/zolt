@@ -217,9 +217,12 @@ export class Lexer {
       blockType += this.advanceChar();
     }
 
+    const trimmedValue = blockType.trim();
+    const type = trimmedValue === '' ? TokenType.TRIPLE_COLON_END : TokenType.TRIPLE_COLON_START;
+
     return {
-      type: TokenType.TRIPLE_COLON_START,
-      value: blockType.trim(),
+      type,
+      value: trimmedValue,
       line,
       column,
       length: this.pos - start,

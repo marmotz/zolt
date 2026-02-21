@@ -143,11 +143,11 @@
 
 ### Triple Colon Blocks `:::`
 
-- [ ] Semantic containers: `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`, `:::abstract`
-- [ ] Optional titles `:::type [Title]`
-- [ ] Block attributes `{attributes}`
-- [ ] Details/accordion `:::details [Title]`
-- [ ] Details attribute `{open=true}`
+- [x] Semantic containers: `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`, `:::abstract`
+- [x] Optional titles `:::type [Title]`
+- [x] Block attributes `{attributes}`
+- [x] Details/accordion `:::details [Title]`
+- [x] Details attribute `{open=true}`
 
 ### Grid Tables
 
@@ -161,17 +161,17 @@
 
 ### Tabs
 
-- [ ] `:::tabs` container
-- [ ] `:::tab [Title]` items
-- [ ] Tabs container attribute `{default=Name}`
-- [ ] Tab item attribute `{active=true}`
+- [x] `:::tabs` container
+- [x] `:::tab [Title]` items
+- [x] Tabs container attribute `{default=Name}`
+- [x] Tab item attribute `{active=true}`
 
 ### Columns
 
-- [ ] `:::columns` container
-- [ ] `:::column` items
-- [ ] Container attribute `{cols=N}`
-- [ ] Column attributes `{width=%}`, `{width=px}`
+- [x] `:::columns` container
+- [x] `:::column` items
+- [x] Container attribute `{cols=N}`
+- [x] Column attributes `{width=%}`, `{width=px}`
 
 ## 10. Media Management
 

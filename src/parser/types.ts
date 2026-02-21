@@ -227,7 +227,8 @@ export interface FrontmatterNode {
 export interface TripleColonBlockNode {
   type: 'TripleColonBlock';
   blockType: string;
-  content: string;
+  title?: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 

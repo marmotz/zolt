@@ -124,6 +124,69 @@ const DEFAULT_CSS = `
     color: #6d28d9;
     text-decoration-color: #a78bfa;
   }
+  .columns {
+    display: flex;
+    gap: var(--zolt-column-gap, 1.5rem);
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+  }
+  .columns[style*="--zolt-cols"] {
+    display: grid;
+    grid-template-columns: repeat(var(--zolt-cols, 1), 1fr);
+  }
+  .column {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .column[style*="width"] {
+    flex: 0 0 auto;
+  }
+  .triple-colon-block.info, 
+  .triple-colon-block.warning, 
+  .triple-colon-block.error, 
+  .triple-colon-block.success, 
+  .triple-colon-block.note, 
+  .triple-colon-block.abstract {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-left: 4px solid #ccc;
+    background: #f9f9f9;
+  }
+  .triple-colon-block.info { border-left-color: #3b82f6; background: #eff6ff; }
+  .triple-colon-block.warning { border-left-color: #f59e0b; background: #fffbeb; }
+  .triple-colon-block.error { border-left-color: #ef4444; background: #fef2f2; }
+  .triple-colon-block.success { border-left-color: #10b981; background: #ecfdf5; }
+  .triple-colon-block.note { border-left-color: #6366f1; background: #eef2ff; }
+  .triple-colon-block.abstract { border-left-color: #6b7280; background: #f3f4f6; }
+  
+  .block-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  details.triple-colon-block {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin: 1rem 0;
+  }
+  summary {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: #f5f5f5;
+  }
+  .details-content {
+    padding: 1rem;
+  }
+  @media (max-width: 768px) {
+    .columns[style*="--zolt-cols"] {
+      grid-template-columns: 1fr;
+    }
+    .column {
+      flex: 1 1 100% !important;
+      width: 100% !important;
+    }
+  }
 `.trim();
 
 export class HTMLBuilder implements Builder {
@@ -375,8 +438,54 @@ ${childrenHtml}
     }
   
     visitTripleColonBlock(node: TripleColonBlockNode): string {
+      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+
+      // Special handling for details
+      if (node.blockType === 'details') {
+        const open = node.attributes?.open === 'true' ? ' open' : '';
+        const attrs = this.renderAllAttributes(node.attributes);
+        const title = node.title ? this.processInlineContent(node.title) : 'Details';
+        return `<details${attrs}${open} class="triple-colon-block details" data-type="details">
+  <summary>${title}</summary>
+  <div class="details-content">
+${childrenHtml}
+  </div>
+</details>`;
+      }
+
+      // Handle special layout logic for columns
+      if (node.blockType === 'columns' && node.attributes?.cols) {
+        const cols = parseInt(node.attributes.cols);
+        if (!isNaN(cols)) {
+          const style = `--zolt-cols: ${cols};`;
+          node.attributes.style = node.attributes.style ? `${node.attributes.style} ${style}` : style;
+        }
+      }
+
+      if (node.blockType === 'column' && node.attributes?.width?.endsWith('%')) {
+        const p = parseFloat(node.attributes.width);
+        if (!isNaN(p)) {
+          // Formula: width = P% - GAP * (1 - P/100)
+          // This ensures that (Sum of Widths) + (N-1) * GAP = 100%
+          const factor = (1 - p / 100).toFixed(3);
+          node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
+        }
+      }
+
       const attrs = this.renderAllAttributes(node.attributes);
-      return `<div${attrs} class="triple-colon-block" data-type="${node.blockType}">${node.content}</div>`;
+
+      // Add specific classes for columns and column blocks for easier styling
+      const extraClass = (node.blockType === 'columns' || node.blockType === 'column') ? ` ${node.blockType}` : '';
+      const semanticTypes = ['info', 'warning', 'error', 'success', 'note', 'abstract'];
+      const semanticClass = semanticTypes.includes(node.blockType) ? ` ${node.blockType}` : '';
+
+      let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
+      if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
+        const title = this.processInlineContent(node.title);
+        html += `<div class="block-title">${title}</div>\n`;
+      }
+      html += `${childrenHtml}\n</div>`;
+      return html;
     }
   
     visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {

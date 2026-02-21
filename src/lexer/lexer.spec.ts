@@ -70,6 +70,22 @@ describe('Lexer', () => {
     expect(tokens[tokens.length - 1].type).toBe(TokenType.EOF);
   });
 
+  test('should tokenize triple colon blocks', () => {
+    const lexer = new Lexer(':::columns\ncontent\n:::');
+    const tokens = lexer.tokenize();
+    
+    expect(tokens[0].type).toBe(TokenType.TRIPLE_COLON_START);
+    expect(tokens[0].value).toBe('columns');
+    
+    // tokens[1] is NEWLINE
+    // tokens[2] is TEXT
+    // tokens[3] is NEWLINE
+    
+    const endToken = tokens.find(t => t.type === TokenType.TRIPLE_COLON_END);
+    expect(endToken).toBeDefined();
+    expect(endToken?.value).toBe('');
+  });
+
   test('should handle empty input', () => {
     const lexer = new Lexer('');
     const tokens = lexer.tokenize();

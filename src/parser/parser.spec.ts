@@ -169,6 +169,18 @@ describe('Parser', () => {
     expect((ast.children[0] as any).content).toBe('comment');
   });
 
+  test('should parse triple colon block with children', () => {
+    const lexer = new Lexer(':::columns\n# Heading\n:::');
+    const parser = new Parser(lexer.tokenize());
+    const ast = parser.parse();
+
+    const columnBlock = ast.children[0] as any;
+    expect(columnBlock.type).toBe('TripleColonBlock');
+    expect(columnBlock.blockType).toBe('columns');
+    expect(columnBlock.children.length).toBe(1);
+    expect(columnBlock.children[0].type).toBe('Heading');
+  });
+
   test('should parse definition list', () => {
     const lexer = new Lexer(': Term\n:   Definition');
     const tokens = lexer.tokenize();
