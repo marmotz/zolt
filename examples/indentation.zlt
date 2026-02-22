@@ -44,27 +44,7 @@ Technical indentation (&) vs Semantic quotes (>):
 & [WARN] Configuration file not found, using defaults
 & [INFO] Ready to serve requests
 
-### File Contents
-
-& config.json:
-& {
-&   "port": 8080,
-&   "host": "localhost"
-& }
-
 ## Practical Examples
-
-### Configuration File Display
-
-& server {
-&   listen 80;
-&   server_name example.com;
-&
-&   location / {
-&     root /var/www/html;
-&     index index.html;
-&   }
-& }
 
 ### Code Explanation
 
@@ -74,16 +54,6 @@ Technical indentation (&) vs Semantic quotes (>):
 & 3. Start the server
 &
 & The server will be available at http://localhost:3000
-
-### Data Format Example
-
-& User data format:
-& {
-&   "id": 123,
-&   "name": "John Doe",
-&   "email": "john@example.com",
-&   "roles": ["admin", "user"]
-& }
 
 ### Command Line Usage
 
@@ -112,33 +82,11 @@ Complex nested structure:
 ## Styled Indentation
 
 & Regular indented text
-& {color=blue}This is blue indented text
-& {background=yellow}This has a yellow background
+& **Bold** indented text
+& This is blue indented text{color=blue}
+& This has a yellow background{background=yellow}
 
 ## Documentation Examples
-
-### API Response Format
-
-& Response structure:
-& {
-&   "status": "success",
-&   "data": {
-&     "id": 123,
-&     "name": "Product Name"
-&   },
-&   "meta": {
-&     "timestamp": "2026-02-18T10:30:00Z"
-&   }
-& }
-
-### Database Schema
-
-& Table: users
-&& Columns:
-&&& id (INTEGER, PRIMARY KEY)
-&&& username (VARCHAR(50), UNIQUE)
-&&& email (VARCHAR(100), UNIQUE)
-&&& created_at (TIMESTAMP)
 
 ### Error Messages
 
@@ -148,36 +96,6 @@ Complex nested structure:
 && Host: localhost
 && Port: 5432
 && Database: mydb
-
-## Comparisons
-
-### File Structure
-
-& project/
-&& src/
-&&& main.py
-&&& utils.py
-&& tests/
-&&& test_main.py
-&&& test_utils.py
-&& README.md
-&& requirements.txt
-
-### JSON Configuration
-
-& Development environment:
-& development.json:
-&& {
-&&   "debug": true,
-&&   "logLevel": "verbose"
-&& }
-&
-& Production environment:
-& production.json:
-&& {
-&&   "debug": false,
-&&   "logLevel": "error"
-&& }
 
 ## Literary Example
 

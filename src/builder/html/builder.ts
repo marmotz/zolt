@@ -558,7 +558,7 @@ ${childrenHtml}
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
     const attrs = this.renderAllAttributes(node.attributes);
 
-    return `<div${attrs} class="indented" style="margin-left: ${node.level * 2}em">${childrenHtml}</div>`;
+    return `<div${attrs} class="indented" style="margin-left: 2em">${childrenHtml}</div>`;
   }
 
   processInline(text: string): string {

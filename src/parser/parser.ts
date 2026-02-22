@@ -291,6 +291,11 @@ export class Parser {
       return null;
     }
 
+    if (this.match(TokenType.HEADING)) return this.parseHeading();
+    if (this.match(TokenType.CODE_BLOCK_START)) return this.parseCodeBlock();
+    if (this.match(TokenType.HORIZONTAL_RULE)) return this.parseHorizontalRule();
+    if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
+
     if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
       return this.parseBlockquoteList();
     }
@@ -613,37 +618,111 @@ export class Parser {
 
   private parseTechnicalIndentation(): IndentationNode {
     const startToken = this.expect(TokenType.TECHNICAL_INDENT);
-    const level = startToken.value.trim().length;
+    const baseLevel = startToken.level || 1;
 
     const children: ASTNode[] = [];
 
-    // Parse content of the first line
-    const firstLineContent = this.parseParagraph();
+    const firstLineContent = this.parseIndentationLineContent();
     if (firstLineContent) {
       children.push(firstLineContent);
     }
-    this.skipNewlines();
 
-    // Parse consecutive lines with the same indentation level
-    while (!this.isEof() && this.match(TokenType.TECHNICAL_INDENT)) {
-      const nextToken = this.peek();
-      const nextLevel = nextToken.value.trim().length;
+    while (!this.isEof()) {
+      if (this.match(TokenType.TECHNICAL_INDENT)) {
+        const nextLevel = this.currentToken.level || 1;
 
-      if (nextLevel !== level) {
+        if (nextLevel < baseLevel) {
+          break;
+        }
+
+        if (nextLevel > baseLevel) {
+          const nested = this.parseTechnicalIndentation();
+          children.push(nested);
+          continue;
+        }
+
+        this.advance();
+        const lineContent = this.parseIndentationLineContent();
+        if (lineContent) {
+          children.push(lineContent);
+        }
+        continue;
+      }
+
+      if (!this.match(TokenType.NEWLINE)) {
         break;
       }
+      this.advance();
 
-      this.advance(); // consume the technical indent marker
-      const lineContent = this.parseParagraph();
-      if (lineContent) {
-        children.push(lineContent);
+      if (this.match(TokenType.NEWLINE)) {
+        break;
       }
-      this.skipNewlines();
     }
 
     return {
       type: 'Indentation',
-      level,
+      level: baseLevel,
+      children,
+    };
+  }
+
+  private parseIndentationLineContent(): ASTNode | null {
+    if (this.match(TokenType.TECHNICAL_INDENT, TokenType.NEWLINE, TokenType.EOF)) {
+      return null;
+    }
+
+    if (this.match(TokenType.HEADING)) return this.parseHeading();
+    if (this.match(TokenType.CODE_BLOCK_START)) return this.parseCodeBlock();
+    if (this.match(TokenType.HORIZONTAL_RULE)) return this.parseHorizontalRule();
+    if (this.match(TokenType.TRIPLE_COLON_START)) return this.parseTripleColonBlock();
+
+    if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+      return this.parseIndentationList();
+    }
+
+    return this.parseParagraph(false);
+  }
+
+  private parseIndentationList(): ListNode {
+    const kind = this.getListKind(this.currentToken.type);
+    const children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[] = [];
+
+    while (!this.isEof()) {
+      if (!this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+        break;
+      }
+
+      if (this.getListKind(this.currentToken.type) !== kind) {
+        break;
+      }
+
+      const item = this.parseListItem(kind, '');
+      children.push(item);
+      this.skipNewlines();
+
+      if (this.match(TokenType.TECHNICAL_INDENT)) {
+        const nextLevel = this.currentToken.level || 1;
+        if (nextLevel !== 1) {
+          break;
+        }
+        const peekedNext = this.peek(1);
+        if (
+          peekedNext.type !== TokenType.BULLET_LIST &&
+          peekedNext.type !== TokenType.ORDERED_LIST &&
+          peekedNext.type !== TokenType.TASK_LIST
+        ) {
+          break;
+        }
+        if (this.getListKind(peekedNext.type) !== kind) {
+          break;
+        }
+        this.advance();
+      }
+    }
+
+    return {
+      type: 'List',
+      kind,
       children,
     };
   }

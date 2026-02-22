@@ -269,7 +269,7 @@ export class Lexer {
 
   private matchTechnicalIndentation(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^&+\s?/.test(remaining);
+    return /^&+\s/.test(remaining);
   }
 
   private readTechnicalIndentation(): Token {
@@ -278,8 +278,10 @@ export class Lexer {
     const column = this.column;
 
     let value = '';
+    let level = 0;
     while (this.peekChar() === '&') {
       value += this.advanceChar();
+      level++;
     }
     if (this.peekChar() === ' ') {
       value += this.advanceChar();
@@ -291,6 +293,7 @@ export class Lexer {
       line,
       column,
       length: this.pos - start,
+      level,
     };
   }
 

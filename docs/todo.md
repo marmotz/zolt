@@ -129,6 +129,8 @@
 - [x] Simple indentation `& text`
 - [x] Multiple indentation levels `&&`, `&&&`
 - [x] Distinction from blockquotes (`>`)
+- [x] Nested indentation levels (returning to previous level)
+- [x] Lists inside indentation blocks
 
 ## 8. Horizontal Rules
 
