@@ -573,11 +573,32 @@ export class Parser {
   }
 
   private parseHorizontalRule(): HorizontalRuleNode {
-    this.expect(TokenType.HORIZONTAL_RULE);
+    const token = this.expect(TokenType.HORIZONTAL_RULE);
+    const value = token.value;
+
+    const colonIndex = value.indexOf(':');
+    const styleChar = colonIndex !== -1 ? value.substring(0, colonIndex) : value;
+    const attrsStr = colonIndex !== -1 ? value.substring(colonIndex + 1) : '';
+
+    let style: 'solid' | 'thick' | 'thin' = 'solid';
+    if (styleChar.includes('*')) {
+      style = 'thick';
+    } else if (styleChar.includes('_')) {
+      style = 'thin';
+    }
+
+    let attributes: Attributes | undefined;
+    if (attrsStr) {
+      const attrMatch = attrsStr.match(/^\{([^}]+)}$/);
+      if (attrMatch) {
+        attributes = InlineParser.parseAttributes(attrMatch[1]);
+      }
+    }
 
     return {
       type: 'HorizontalRule',
-      style: 'solid',
+      style,
+      attributes,
     };
   }
 
@@ -692,10 +713,6 @@ export class Parser {
   private peek(offset: number = 0): Token {
     const idx = this.pos + offset;
     return this.tokens[idx] || { type: TokenType.EOF, value: '', line: 0, column: 0, length: 0 };
-  }
-
-  private peekNext(): Token {
-    return this.peek(1);
   }
 
   private expect(type: TokenType): Token {

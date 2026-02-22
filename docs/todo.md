@@ -134,10 +134,10 @@
 
 ### Rule Types
 
-- [ ] `---` - Standard separator
-- [ ] `***` - Thick separator
-- [ ] `___` - Thin separator
-- [ ] Separator with attributes `{color}`, `{style}`, `{width}`, `{align}`
+- [x] `---` - Standard separator
+- [x] `***` - Thick separator
+- [x] `___` - Thin separator
+- [x] Separator with attributes `{color}`, `{style}`, `{width}`, `{align}`
 
 ## 9. Structure Blocks
 

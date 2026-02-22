@@ -119,6 +119,60 @@ describe('Parser', () => {
     expect((ast.children[0] as any).content).toBe('code');
   });
 
+  test('should parse horizontal rule', () => {
+    const lexer = new Lexer('---');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('HorizontalRule');
+    expect((ast.children[0] as any).style).toBe('solid');
+  });
+
+  test('should parse thick horizontal rule', () => {
+    const lexer = new Lexer('***');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('HorizontalRule');
+    expect((ast.children[0] as any).style).toBe('thick');
+  });
+
+  test('should parse thin horizontal rule', () => {
+    const lexer = new Lexer('___');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('HorizontalRule');
+    expect((ast.children[0] as any).style).toBe('thin');
+  });
+
+  test('should parse horizontal rule with color attribute', () => {
+    const lexer = new Lexer('--- {color=red}');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('HorizontalRule');
+    expect((ast.children[0] as any).style).toBe('solid');
+    expect((ast.children[0] as any).attributes.color).toBe('red');
+  });
+
+  test('should parse horizontal rule with multiple attributes', () => {
+    const lexer = new Lexer('*** {color=blue style=dashed width=80%}');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('HorizontalRule');
+    expect((ast.children[0] as any).style).toBe('thick');
+    expect((ast.children[0] as any).attributes.color).toBe('blue');
+    expect((ast.children[0] as any).attributes.style).toBe('dashed');
+    expect((ast.children[0] as any).attributes.width).toBe('80%');
+  });
+
   test('should parse multiple blocks', () => {
     const lexer = new Lexer('# Title\n\nParagraph text');
     const tokens = lexer.tokenize();

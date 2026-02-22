@@ -372,7 +372,7 @@ export class Lexer {
 
   private matchHorizontalRule(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^[-*_]{3,}\s*$/.test(remaining);
+    return /^[-*_]{3,}(\s|$)/.test(remaining);
   }
 
   private readHorizontalRule(): Token {
@@ -380,17 +380,25 @@ export class Lexer {
     const line = this.line;
     const column = this.column;
 
+    let style = '';
     while (
       !this.isEof() &&
       this.peekChar() !== '\n' &&
       (this.peekChar() === '-' || this.peekChar() === '*' || this.peekChar() === '_')
     ) {
-      this.advanceChar();
+      style += this.advanceChar();
+    }
+
+    this.skipWhitespace();
+
+    let attributes = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      attributes += this.advanceChar();
     }
 
     return {
       type: TokenType.HORIZONTAL_RULE,
-      value: '',
+      value: `${style}:${attributes.trim()}`,
       line,
       column,
       length: this.pos - start,

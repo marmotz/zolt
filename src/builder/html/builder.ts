@@ -362,328 +362,378 @@ ${childrenHtml}
     return node.children.map((child) => this.build(child)).join('\n');
   }
 
-    visitHeading(node: HeadingNode): string {
-      const level = Math.min(Math.max(node.level, 1), 6);
-      const attrs = this.renderAllAttributes(node.attributes);
-      const content = this.processInlineContent(node.content);
-      const trimmed = content.replace(/\s+/g, ' ').trim();
-      return `<h${level}${attrs}>${trimmed}</h${level}>`;
-    }
-  
-    visitParagraph(node: ParagraphNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      const content = this.processInlineContent(node.content);
-      const trimmed = content.replace(/\s+/g, ' ').trim();
-      return `<p${attrs}>${trimmed}</p>`;
-    }
-  
-    visitBlockquote(node: BlockquoteNode): string {
-      const childrenHtml = node.children.map((child) => this.build(child)).join('');
-  
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
-    }
-  
-    visitList(node: ListNode): string {
-      let tag = 'ul';
-      if (node.kind === 'numbered') {
-        tag = 'ol';
-      } else if (node.kind === 'definition') {
-        tag = 'dl';
-      }
-      
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-  
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<${tag}${attrs}>\n${childrenHtml}\n</${tag}>`;
-    }
-  
-    visitListItem(node: ListItemNode): string {
-      const checkbox =
-        node.checked !== undefined ? `<input type="checkbox" ${node.checked ? 'checked' : ''} onclick="return false;">` : '';
-      const inlineContent = this.processInlineContent(node.content);
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-      const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-      const trimmed = content.replace(/\s+/g, ' ').trim();
-  
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<li${attrs}>${checkbox}${trimmed}</li>`;
+  visitHeading(node: HeadingNode): string {
+    const level = Math.min(Math.max(node.level, 1), 6);
+    const attrs = this.renderAllAttributes(node.attributes);
+    const content = this.processInlineContent(node.content);
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+    return `<h${level}${attrs}>${trimmed}</h${level}>`;
+  }
+
+  visitParagraph(node: ParagraphNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const content = this.processInlineContent(node.content);
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+    return `<p${attrs}>${trimmed}</p>`;
+  }
+
+  visitBlockquote(node: BlockquoteNode): string {
+    const childrenHtml = node.children.map((child) => this.build(child)).join('');
+
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
+  }
+
+  visitList(node: ListNode): string {
+    let tag = 'ul';
+    if (node.kind === 'numbered') {
+      tag = 'ol';
+    } else if (node.kind === 'definition') {
+      tag = 'dl';
     }
 
-    visitDefinitionTerm(node: DefinitionTermNode): string {
-      const inlineContent = this.processInlineContent(node.content);
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-      const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-      const trimmed = content.replace(/\s+/g, ' ').trim();
-  
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<dt${attrs}>${trimmed}</dt>`;
-    }
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
-    visitDefinitionDescription(node: DefinitionDescriptionNode): string {
-      const inlineContent = this.processInlineContent(node.content);
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-      const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-      const trimmed = content.replace(/\s+/g, ' ').trim();
-  
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<dd${attrs}>${trimmed}</dd>`;
-    }
-  
-    visitCodeBlock(node: CodeBlockNode): string {
-      const lang = node.language ? ` class="language-${node.language}"` : '';
-      const attrs = this.renderAllAttributes(node.attributes);
-      const escapedContent = node.content
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-      
-      return `<pre${attrs}><code${lang}>${escapedContent}</code></pre>`;
-    }
-  
-    visitTripleColonBlock(node: TripleColonBlockNode): string {
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<${tag}${attrs}>\n${childrenHtml}\n</${tag}>`;
+  }
 
-      // Special handling for details
-      if (node.blockType === 'details') {
-        const open = node.attributes?.open === 'true' ? ' open' : '';
-        const attrs = this.renderAllAttributes(node.attributes);
-        const title = node.title ? this.processInlineContent(node.title) : 'Details';
-        return `<details${attrs}${open} class="triple-colon-block details" data-type="details">
+  visitListItem(node: ListItemNode): string {
+    const checkbox =
+      node.checked !== undefined
+        ? `<input type="checkbox" ${node.checked ? 'checked' : ''} onclick="return false;">`
+        : '';
+    const inlineContent = this.processInlineContent(node.content);
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<li${attrs}>${checkbox}${trimmed}</li>`;
+  }
+
+  visitDefinitionTerm(node: DefinitionTermNode): string {
+    const inlineContent = this.processInlineContent(node.content);
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<dt${attrs}>${trimmed}</dt>`;
+  }
+
+  visitDefinitionDescription(node: DefinitionDescriptionNode): string {
+    const inlineContent = this.processInlineContent(node.content);
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
+    const trimmed = content.replace(/\s+/g, ' ').trim();
+
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<dd${attrs}>${trimmed}</dd>`;
+  }
+
+  visitCodeBlock(node: CodeBlockNode): string {
+    const lang = node.language ? ` class="language-${node.language}"` : '';
+    const attrs = this.renderAllAttributes(node.attributes);
+    const escapedContent = node.content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    return `<pre${attrs}><code${lang}>${escapedContent}</code></pre>`;
+  }
+
+  visitTripleColonBlock(node: TripleColonBlockNode): string {
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+
+    // Special handling for details
+    if (node.blockType === 'details') {
+      const open = node.attributes?.open === 'true' ? ' open' : '';
+      const attrs = this.renderAllAttributes(node.attributes);
+      const title = node.title ? this.processInlineContent(node.title) : 'Details';
+      return `<details${attrs}${open} class="triple-colon-block details" data-type="details">
   <summary>${title}</summary>
   <div class="details-content">
 ${childrenHtml}
   </div>
 </details>`;
-      }
+    }
 
-      // Handle special layout logic for columns
-      if (node.blockType === 'columns' && node.attributes?.cols) {
-        const cols = parseInt(node.attributes.cols);
-        if (!isNaN(cols)) {
-          const style = `--zolt-cols: ${cols};`;
-          node.attributes.style = node.attributes.style ? `${node.attributes.style} ${style}` : style;
-        }
+    // Handle special layout logic for columns
+    if (node.blockType === 'columns' && node.attributes?.cols) {
+      const cols = parseInt(node.attributes.cols);
+      if (!isNaN(cols)) {
+        const style = `--zolt-cols: ${cols};`;
+        node.attributes.style = node.attributes.style ? `${node.attributes.style} ${style}` : style;
       }
+    }
 
-      if (node.blockType === 'column' && node.attributes?.width?.endsWith('%')) {
-        const p = parseFloat(node.attributes.width);
-        if (!isNaN(p)) {
-          // Formula: width = P% - GAP * (1 - P/100)
-          // This ensures that (Sum of Widths) + (N-1) * GAP = 100%
-          const factor = (1 - p / 100).toFixed(3);
-          node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
-        }
+    if (node.blockType === 'column' && node.attributes?.width?.endsWith('%')) {
+      const p = parseFloat(node.attributes.width);
+      if (!isNaN(p)) {
+        // Formula: width = P% - GAP * (1 - P/100)
+        // This ensures that (Sum of Widths) + (N-1) * GAP = 100%
+        const factor = (1 - p / 100).toFixed(3);
+        node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
       }
+    }
 
-      const attrs = this.renderAllAttributes(node.attributes);
+    const attrs = this.renderAllAttributes(node.attributes);
 
-      // Add specific classes for columns and column blocks for easier styling
-      const extraClass = (node.blockType === 'columns' || node.blockType === 'column') ? ` ${node.blockType}` : '';
-      const semanticTypes = ['info', 'warning', 'error', 'success', 'note', 'abstract'];
-      const semanticClass = semanticTypes.includes(node.blockType) ? ` ${node.blockType}` : '';
+    // Add specific classes for columns and column blocks for easier styling
+    const extraClass = node.blockType === 'columns' || node.blockType === 'column' ? ` ${node.blockType}` : '';
+    const semanticTypes = ['info', 'warning', 'error', 'success', 'note', 'abstract'];
+    const semanticClass = semanticTypes.includes(node.blockType) ? ` ${node.blockType}` : '';
 
-      let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
-      if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
-        const title = this.processInlineContent(node.title);
-        html += `<div class="block-title">${title}</div>\n`;
-      }
-      html += `${childrenHtml}\n</div>`;
-      return html;
+    let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
+    if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
+      const title = this.processInlineContent(node.title);
+      html += `<div class="block-title">${title}</div>\n`;
     }
-  
-    visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
+    html += `${childrenHtml}\n</div>`;
+    return html;
+  }
+
+  visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
+  }
+
+  visitHorizontalRule(node: HorizontalRuleNode): string {
+    const attrs: Attributes = node.attributes ? { ...node.attributes } : {};
+    const cssProps: string[] = [];
+
+    if (node.style === 'thick') {
+      cssProps.push('border-top-width: 4px');
+    } else if (node.style === 'thin') {
+      cssProps.push('border-top-width: 1px');
+    } else {
+      cssProps.push('border-top-width: 2px');
     }
-  
-    visitHorizontalRule(node: HorizontalRuleNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<hr${attrs}>`;
-    }
-  
-    visitIndentation(node: IndentationNode): string {
-      const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-      const attrs = this.renderAllAttributes(node.attributes);
-  
-      return `<div${attrs} class="indented" style="margin-left: ${node.level * 2}em">${childrenHtml}</div>`;
-    }
-  
-    processInline(text: string): string {
-      const nodes = this.inlineParser.parse(text);
-      return nodes.map((node) => this.buildInlineNode(node)).join('');
-    }
-  
-    processInlineContent(text: string): string {
-      if (!text) return '';
-      return this.processInline(text);
-    }
-  
-    private buildInlineNode(node: ASTNode): string {
-      switch (node.type) {
-        case 'Text':
-          return (node as any).content;
-        case 'Bold':
-          return this.visitBold(node as BoldNode);
-        case 'Italic':
-          return this.visitItalic(node as ItalicNode);
-        case 'Underline':
-          return this.visitUnderline(node as UnderlineNode);
-        case 'Strikethrough':
-          return this.visitStrikethrough(node as StrikethroughNode);
-        case 'Code':
-          return this.visitCode(node as CodeNode);
-        case 'Superscript':
-          return this.visitSuperscript(node as SuperscriptNode);
-        case 'Subscript':
-          return this.visitSubscript(node as SubscriptNode);
-        case 'Highlight':
-          return this.visitHighlight(node as HighlightNode);
-        case 'InlineStyle':
-          return this.visitInlineStyle(node as InlineStyleNode);
-        case 'Link':
-          return this.visitLink(node as LinkNode);
-        case 'Image':
-          return this.visitImage(node as ImageNode);
-        case 'Video':
-          return this.visitVideo(node as VideoNode);
-        case 'Audio':
-          return this.visitAudio(node as AudioNode);
-        case 'Embed':
-          return this.visitEmbed(node as EmbedNode);
-        case 'File':
-          return this.visitFile(node as FileNode);
-        case 'Abbreviation':
-          return this.visitAbbreviation(node as AbbreviationNode);
-        case 'CommentInline':
-          return this.visitCommentInline(node as any);
-        default:
-          return (node as any).content || '';
+
+    let borderStyle = 'solid';
+    if (attrs.style) {
+      if (attrs.style === 'dashed' || attrs.style === 'dotted' || attrs.style === 'solid' || attrs.style === 'double') {
+        borderStyle = attrs.style;
+        delete attrs.style;
       }
     }
-  
-    visitBold(node: BoldNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<strong${attrs}>${node.content}</strong>`;
+    cssProps.push(`border-top-style: ${borderStyle}`);
+
+    if (attrs.color) {
+      cssProps.push(`border-top-color: ${attrs.color}`);
+      delete attrs.color;
     }
-  
-    visitItalic(node: ItalicNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<em${attrs}>${node.content}</em>`;
-    }
-  
-    visitUnderline(node: UnderlineNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<u${attrs}>${node.content}</u>`;
-    }
-  
-    visitStrikethrough(node: StrikethroughNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<del${attrs}>${node.content}</del>`;
-    }
-  
-    visitCode(node: CodeNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<code${attrs}>${node.content}</code>`;
-    }
-  
-    visitSuperscript(node: SuperscriptNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<sup${attrs}>${node.content}</sup>`;
-    }
-  
-    visitSubscript(node: SubscriptNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<sub${attrs}>${node.content}</sub>`;
-    }
-  
-    visitHighlight(node: HighlightNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<mark${attrs}>${node.content}</mark>`;
-    }
-  
-    visitInlineStyle(node: InlineStyleNode): string {
-      const attrs = this.renderAllAttributes(node.attributes);
-      return `<span${attrs}>${node.content}</span>`;
-    }
-  
-    private renderAllAttributes(attrs?: Attributes): string {
-      if (!attrs) return '';
-  
-      const htmlAttrs = this.filterCssProperties(attrs);
-      const styleStr = this.buildStyleAttribute(attrs);
-      const otherAttrs = this.buildAttributes(htmlAttrs);
-  
-      return `${styleStr}${otherAttrs}`;
-    }
-  
-    private buildStyleAttribute(attrs?: Attributes): string {
-      if (!attrs) return '';
-  
-      const cssProps: string[] = [];
-      const cssPropertyMap: Record<string, string> = {
-        'font-weight': 'font-weight',
-        'font-size': 'font-size',
-        'font-style': 'font-style',
-        'font-family': 'font-family',
-        'text-decoration': 'text-decoration',
-        'text-align': 'text-align',
-        color: 'color',
-        background: 'background',
-        'background-color': 'background-color',
-        border: 'border',
-        'border-radius': 'border-radius',
-        padding: 'padding',
-        margin: 'margin',
-        display: 'display',
-        opacity: 'opacity',
-        transform: 'transform',
-        width: 'width',
-        height: 'height',
-        float: 'float',
-      };
-  
-      for (const [key, value] of Object.entries(attrs)) {
-        if (value !== undefined && cssPropertyMap[key]) {
-          cssProps.push(`${cssPropertyMap[key]}: ${value}`);
-        }
+    if (attrs.width) {
+      if (
+        attrs.width.endsWith('%') ||
+        attrs.width.endsWith('px') ||
+        attrs.width.endsWith('em') ||
+        attrs.width.endsWith('rem')
+      ) {
+        cssProps.push(`width: ${attrs.width}`);
+        delete attrs.width;
       }
-  
-      return cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
     }
-  
-    private filterCssProperties(attrs: Attributes): Attributes {
-      const cssProps = new Set([
-        'font-weight',
-        'font-size',
-        'font-style',
-        'font-family',
-        'text-decoration',
-        'text-align',
-        'color',
-        'background',
-        'background-color',
-        'border',
-        'border-radius',
-        'padding',
-        'margin',
-        'display',
-        'opacity',
-        'transform',
-        'width',
-        'height',
-        'float',
-      ]);
-      const filtered: Attributes = {};
-      for (const [key, value] of Object.entries(attrs)) {
-        if (!cssProps.has(key)) {
-          filtered[key] = value;
-        }
+    if (attrs.align) {
+      if (attrs.align === 'center') {
+        cssProps.push(`margin-left: auto`);
+        cssProps.push(`margin-right: auto`);
+      } else if (attrs.align === 'left') {
+        cssProps.push(`margin-right: auto`);
+      } else if (attrs.align === 'right') {
+        cssProps.push(`margin-left: auto`);
       }
-      return filtered;
+      delete attrs.align;
     }
+
+    const styleStr = cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
+    const otherAttrs = this.renderAllAttributes(attrs);
+    return `<hr${styleStr}${otherAttrs}>`;
+  }
+
+  visitIndentation(node: IndentationNode): string {
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const attrs = this.renderAllAttributes(node.attributes);
+
+    return `<div${attrs} class="indented" style="margin-left: ${node.level * 2}em">${childrenHtml}</div>`;
+  }
+
+  processInline(text: string): string {
+    const nodes = this.inlineParser.parse(text);
+    return nodes.map((node) => this.buildInlineNode(node)).join('');
+  }
+
+  processInlineContent(text: string): string {
+    if (!text) return '';
+    return this.processInline(text);
+  }
+
+  private buildInlineNode(node: ASTNode): string {
+    switch (node.type) {
+      case 'Text':
+        return (node as any).content;
+      case 'Bold':
+        return this.visitBold(node as BoldNode);
+      case 'Italic':
+        return this.visitItalic(node as ItalicNode);
+      case 'Underline':
+        return this.visitUnderline(node as UnderlineNode);
+      case 'Strikethrough':
+        return this.visitStrikethrough(node as StrikethroughNode);
+      case 'Code':
+        return this.visitCode(node as CodeNode);
+      case 'Superscript':
+        return this.visitSuperscript(node as SuperscriptNode);
+      case 'Subscript':
+        return this.visitSubscript(node as SubscriptNode);
+      case 'Highlight':
+        return this.visitHighlight(node as HighlightNode);
+      case 'InlineStyle':
+        return this.visitInlineStyle(node as InlineStyleNode);
+      case 'Link':
+        return this.visitLink(node as LinkNode);
+      case 'Image':
+        return this.visitImage(node as ImageNode);
+      case 'Video':
+        return this.visitVideo(node as VideoNode);
+      case 'Audio':
+        return this.visitAudio(node as AudioNode);
+      case 'Embed':
+        return this.visitEmbed(node as EmbedNode);
+      case 'File':
+        return this.visitFile(node as FileNode);
+      case 'Abbreviation':
+        return this.visitAbbreviation(node as AbbreviationNode);
+      case 'CommentInline':
+        return this.visitCommentInline();
+      default:
+        return (node as any).content || '';
+    }
+  }
+
+  visitBold(node: BoldNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<strong${attrs}>${node.content}</strong>`;
+  }
+
+  visitItalic(node: ItalicNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<em${attrs}>${node.content}</em>`;
+  }
+
+  visitUnderline(node: UnderlineNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<u${attrs}>${node.content}</u>`;
+  }
+
+  visitStrikethrough(node: StrikethroughNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<del${attrs}>${node.content}</del>`;
+  }
+
+  visitCode(node: CodeNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<code${attrs}>${node.content}</code>`;
+  }
+
+  visitSuperscript(node: SuperscriptNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<sup${attrs}>${node.content}</sup>`;
+  }
+
+  visitSubscript(node: SubscriptNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<sub${attrs}>${node.content}</sub>`;
+  }
+
+  visitHighlight(node: HighlightNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<mark${attrs}>${node.content}</mark>`;
+  }
+
+  visitInlineStyle(node: InlineStyleNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<span${attrs}>${node.content}</span>`;
+  }
+
+  private renderAllAttributes(attrs?: Attributes): string {
+    if (!attrs) return '';
+
+    const htmlAttrs = this.filterCssProperties(attrs);
+    const styleStr = this.buildStyleAttribute(attrs);
+    const otherAttrs = this.buildAttributes(htmlAttrs);
+
+    return `${styleStr}${otherAttrs}`;
+  }
+
+  private buildStyleAttribute(attrs?: Attributes): string {
+    if (!attrs) return '';
+
+    const cssProps: string[] = [];
+    const cssPropertyMap: Record<string, string> = {
+      'font-weight': 'font-weight',
+      'font-size': 'font-size',
+      'font-style': 'font-style',
+      'font-family': 'font-family',
+      'text-decoration': 'text-decoration',
+      'text-align': 'text-align',
+      color: 'color',
+      background: 'background',
+      'background-color': 'background-color',
+      border: 'border',
+      'border-radius': 'border-radius',
+      padding: 'padding',
+      margin: 'margin',
+      display: 'display',
+      opacity: 'opacity',
+      transform: 'transform',
+      width: 'width',
+      height: 'height',
+      float: 'float',
+    };
+
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value !== undefined && cssPropertyMap[key]) {
+        cssProps.push(`${cssPropertyMap[key]}: ${value}`);
+      }
+    }
+
+    return cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
+  }
+
+  private filterCssProperties(attrs: Attributes): Attributes {
+    const cssProps = new Set([
+      'font-weight',
+      'font-size',
+      'font-style',
+      'font-family',
+      'text-decoration',
+      'text-align',
+      'color',
+      'background',
+      'background-color',
+      'border',
+      'border-radius',
+      'padding',
+      'margin',
+      'display',
+      'opacity',
+      'transform',
+      'width',
+      'height',
+      'float',
+    ]);
+    const filtered: Attributes = {};
+    for (const [key, value] of Object.entries(attrs)) {
+      if (!cssProps.has(key)) {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  }
 
   private transformHref(href: string): string {
     if (href.endsWith('.zlt')) {
@@ -756,7 +806,7 @@ ${childrenHtml}
     return '';
   }
 
-  visitCommentInline(node: any): string {
+  visitCommentInline(): string {
     return '';
   }
 

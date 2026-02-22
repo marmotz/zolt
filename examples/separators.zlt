@@ -4,79 +4,79 @@
 
 Three types of horizontal rules:
 
+Standard separator (three dashes):
 ---
-Standard separator (three dashes)
 
+Thick separator (three asterisks):
 ***
-Thick separator (three asterisks)
 
+Thin separator (three underscores):
 ___
-Thin separator (three underscores)
 
 ## Styled Separators
 
 Separators with attributes:
 
+Red separator:
 --- {color=red}
-Red separator
 
+Blue thick separator:
 *** {color=blue}
-Blue thick separator
 
+Green thin separator:
 ___ {color=green}
-Green thin separator
 
 ## Dashed Separators
 
 Different styles:
 
+Dashed separator:
 --- {style=dashed}
-Dashed separator
 
+Dotted separator:
 --- {style=dotted}
-Dotted separator
 
+Solid separator (default):
 --- {style=solid}
-Solid separator (default)
 
 ## Width Variations
 
 Different widths:
 
+50% width separator:
 --- {width=50%}
-50% width separator
 
+200 pixel width separator:
 --- {width=200px}
-200 pixel width separator
 
+30 em width separator:
 --- {width=30em}
-30 em width separator
 
 ## Alignment
 
 Separator alignment:
 
---- {align=left}
-Left aligned
+Left aligned:
+--- {width=50% align=left}
 
---- {align=center}
-Center aligned
+Center aligned:
+--- {width=50% align=center}
 
---- {align=right}
-Right aligned
+Right aligned:
+--- {width=50% align=right}
 
 ## Combined Styling
 
 Multiple attributes together:
 
+Blue dashed 80% width:
 --- {color=blue style=dashed width=80%}
-Blue dashed 80% width
 
+Red solid 300px centered:
 *** {color=red style=solid width=300px align=center}
-Red solid 300px centered
 
+Purple dotted 60% right:
 ___ {color=purple style=dotted width=60% align=right}
-Purple dotted 60% right
 
 ## Practical Examples
 
@@ -98,14 +98,6 @@ More content here...
 
 Final chapter...
 
-### Scene Breaks in Stories
-
-The hero stood at the edge of the cliff, uncertain of what lay below.
-
-* * *
-
-He took a deep breath and made the leap.
-
 ### Thematic Breaks
 
 ## Introduction
@@ -118,7 +110,7 @@ Welcome to our guide.
 
 Let's begin with the basics.
 
-* * *
+***
 
 ## Advanced Topics
 
@@ -168,16 +160,6 @@ Content...
 
 Content...
 
-### Creative Uses
-
-### Emotional Pauses
-
-She hesitated, her hand hovering over the button.
-
-* * *
-
-With a deep breath, she pressed it.
-
 ### Perspective Shifts
 
 From the engineer's perspective:
@@ -186,27 +168,21 @@ From the engineer's perspective:
 
 The code was elegant and efficient.
 
-* * *
-
-From the user's perspective:
-
-It was confusing and frustrating.
-
 ### Level Progression
 
-=== Level 1: Beginner ===
+==Level 1: Beginner==
 
 Content for beginners...
 
 *** {color=green}
 
-=== Level 2: Intermediate ===
+==Level 2: Intermediate==
 
 Content for intermediate learners...
 
 *** {color=orange}
 
-=== Level 3: Advanced ===
+==Level 3: Advanced==
 
 Content for advanced users...
 
@@ -219,16 +195,6 @@ Content for advanced users...
 Author Name
 
 ---
-
-## Chapter 1
-
-Chapter content...
-
-* * *
-
-## Chapter 2
-
-More chapter content...
 
 ### Modern Web Design
 

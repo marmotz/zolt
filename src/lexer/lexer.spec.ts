@@ -71,6 +71,39 @@ describe('Lexer', () => {
     const tokens = lexer.tokenize();
 
     expect(tokens[0].type).toBe(TokenType.HORIZONTAL_RULE);
+    expect(tokens[0].value).toBe('---:');
+  });
+
+  test('should tokenize thick horizontal rule', () => {
+    const lexer = new Lexer('***');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HORIZONTAL_RULE);
+    expect(tokens[0].value).toBe('***:');
+  });
+
+  test('should tokenize thin horizontal rule', () => {
+    const lexer = new Lexer('___');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HORIZONTAL_RULE);
+    expect(tokens[0].value).toBe('___:');
+  });
+
+  test('should tokenize horizontal rule with attributes', () => {
+    const lexer = new Lexer('--- {color=red}');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HORIZONTAL_RULE);
+    expect(tokens[0].value).toBe('---:{color=red}');
+  });
+
+  test('should tokenize thick horizontal rule with attributes', () => {
+    const lexer = new Lexer('*** {color=blue style=dashed}');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.HORIZONTAL_RULE);
+    expect(tokens[0].value).toBe('***:{color=blue style=dashed}');
   });
 
   test('should tokenize code block', () => {

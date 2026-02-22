@@ -114,7 +114,140 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitHorizontalRule(node);
-    expect(html).toBe('<hr>');
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-width: 2px');
+    expect(html).toContain('border-top-style: solid');
+  });
+
+  test('should build thick horizontal rule', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'thick',
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-width: 4px');
+  });
+
+  test('should build thin horizontal rule', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'thin',
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-width: 1px');
+  });
+
+  test('should build horizontal rule with color attribute', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        color: 'red',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-color: red');
+  });
+
+  test('should build horizontal rule with dashed style', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        style: 'dashed',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-style: dashed');
+  });
+
+  test('should build horizontal rule with width', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        width: '50%',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('width: 50%');
+  });
+
+  test('should build horizontal rule with center alignment', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        align: 'center',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('margin-left: auto');
+    expect(html).toContain('margin-right: auto');
+  });
+
+  test('should build horizontal rule with left alignment', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        align: 'left',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('margin-right: auto');
+    expect(html).not.toContain('margin-left: auto');
+  });
+
+  test('should build horizontal rule with right alignment', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'solid',
+      attributes: {
+        align: 'right',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('margin-left: auto');
+    expect(html).not.toContain('margin-right: auto');
+  });
+
+  test('should build horizontal rule with multiple attributes', () => {
+    const node: HorizontalRuleNode = {
+      type: 'HorizontalRule',
+      style: 'thick',
+      attributes: {
+        color: 'blue',
+        style: 'dashed',
+        width: '80%',
+        align: 'center',
+      },
+    };
+
+    const html = builder.visitHorizontalRule(node);
+    expect(html).toContain('<hr');
+    expect(html).toContain('border-top-width: 4px');
+    expect(html).toContain('border-top-style: dashed');
+    expect(html).toContain('border-top-color: blue');
+    expect(html).toContain('width: 80%');
+    expect(html).toContain('margin-left: auto');
+    expect(html).toContain('margin-right: auto');
   });
 
   test('should build code block', () => {
@@ -375,7 +508,7 @@ describe('HTMLBuilder', () => {
 
   test('should return empty string for CommentInline', () => {
     const node = { type: 'CommentInline', content: 'comment' };
-    const html = builder.visitCommentInline(node as any);
+    const html = builder.visitCommentInline();
     expect(html).toBe('');
   });
 
@@ -396,9 +529,9 @@ describe('HTMLBuilder', () => {
           type: 'TripleColonBlock',
           blockType: 'column',
           attributes: { width: '50%' },
-          children: [{ type: 'Text', content: 'Half' }]
-        }
-      ]
+          children: [{ type: 'Text', content: 'Half' }],
+        },
+      ],
     };
     const html = builder.build(node);
     expect(html).toContain('class="triple-colon-block columns"');
