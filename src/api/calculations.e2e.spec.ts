@@ -398,4 +398,48 @@ describe('Calculations: Complex Examples', () => {
     expect(html).toContain('Amount:');
     expect(html).toContain('1161');
   });
+
+  test('should calculate simple interest with variables', async () => {
+    const html = await buildString(
+      '$principal = 1000\n$rate = 0.05\n$years = 3\n' + 'Simple Interest: {{ $principal * $rate * $years }}'
+    );
+    expect(html).toContain('Simple Interest: 150');
+  });
+
+  test('should calculate total amount with simple interest', async () => {
+    const html = await buildString(
+      '$principal = 1000\n$rate = 0.05\n$years = 3\n' + 'Total Amount: {{ $principal + ($principal * $rate * $years) }}'
+    );
+    expect(html).toContain('Total Amount: 1150');
+  });
+
+  test('should use variable values at time of calculation, not final values', async () => {
+    const html = await buildString(
+      '$principal = 1000\n' +
+        '$rate = 0.05\n' +
+        '$years = 3\n' +
+        'First: {{ $principal * $rate * $years }}\n' +
+        '$principal = 200000\n' +
+        '$rate = 0.045\n' +
+        'Second: {{ $principal * $rate * $years }}'
+    );
+    expect(html).toContain('First: 150');
+    expect(html).toContain('Second: 27000');
+  });
+
+  test('should evaluate expressions in variable definitions at definition time', async () => {
+    const html = await buildString(
+      '$base = 100\n' +
+        '$multiplier = 3\n' +
+        '$result = $base * $multiplier\n' +
+        'Result: {$result}\n' +
+        '$base = 500\n' +
+        '$multiplier = 2\n' +
+        'New base: {$base}, New multiplier: {$multiplier}, Result unchanged: {$result}'
+    );
+    expect(html).toContain('Result: 300');
+    expect(html).toContain('New base: 500');
+    expect(html).toContain('New multiplier: 2');
+    expect(html).toContain('Result unchanged: 300');
+  });
 });

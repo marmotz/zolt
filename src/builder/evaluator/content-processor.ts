@@ -12,14 +12,6 @@ export class ContentProcessor {
   processContent(content: string): string {
     if (!content) return '';
 
-    let result = this.processVariableDefinitions(content);
-    result = this.processExpressions(result);
-    result = this.processVariableReferences(result);
-
-    return result;
-  }
-
-  private processVariableDefinitions(content: string): string {
     const lines = content.split('\n');
     const resultLines: string[] = [];
     let pendingDefinition: { varName: string; valueStart: string; isGlobal: boolean } | null = null;
@@ -35,7 +27,7 @@ export class ContentProcessor {
         const valuePart = combined.substring(combined.indexOf('=') + 1).trim();
 
         if (this.isCompleteValue(valuePart)) {
-          const value = this.evaluator.parseValue(valuePart);
+          const value = this.parseOrEvaluateValue(valuePart);
           this.evaluator.setVariable(pendingDefinition.varName, value);
           for (let j = 0; j < pendingLines.length; j++) {
             resultLines.push('');
@@ -54,7 +46,7 @@ export class ContentProcessor {
         const varValue = localVarMatch[2].trim();
 
         if (this.isCompleteValue(varValue)) {
-          const value = this.evaluator.parseValue(varValue);
+          const value = this.parseOrEvaluateValue(varValue);
           this.evaluator.setVariable(varName, value);
           resultLines.push('');
         } else {
@@ -66,7 +58,7 @@ export class ContentProcessor {
         const varValue = globalVarMatch[2].trim();
 
         if (this.isCompleteValue(varValue)) {
-          const value = this.evaluator.parseValue(varValue);
+          const value = this.parseOrEvaluateValue(varValue);
           this.evaluator.setVariable(varName, value);
           resultLines.push('');
         } else {
@@ -74,7 +66,9 @@ export class ContentProcessor {
           pendingLines = [line];
         }
       } else {
-        resultLines.push(line);
+        let processedLine = this.processExpressions(line);
+        processedLine = this.processVariableReferences(processedLine);
+        resultLines.push(processedLine);
       }
     }
 
@@ -93,6 +87,50 @@ export class ContentProcessor {
     }
 
     return true;
+  }
+
+  private parseOrEvaluateValue(value: string): Value {
+    let trimmed = value.trim();
+
+    const commentIndex = trimmed.indexOf(' # ');
+    if (commentIndex !== -1) {
+      trimmed = trimmed.substring(0, commentIndex).trim();
+    }
+
+    if (trimmed.startsWith('[') || (trimmed.startsWith('{') && this.looksLikeObject(trimmed))) {
+      return this.evaluator.parseValue(trimmed);
+    }
+
+    if (trimmed.startsWith('"') || trimmed.startsWith("'")) {
+      return this.evaluator.parseValue(trimmed);
+    }
+
+    if (this.isExpression(trimmed)) {
+      try {
+        return this.evaluator.evaluate(trimmed);
+      } catch {
+        return this.evaluator.parseValue(trimmed);
+      }
+    }
+
+    return this.evaluator.parseValue(trimmed);
+  }
+
+  private isExpression(value: string): boolean {
+    const trimmed = value.trim();
+
+    if (trimmed.startsWith('$')) return true;
+
+    if (/[+\-*/%^]/.test(trimmed)) {
+      const numOnly = /^-?\d+(?:\.\d+)?$/.test(trimmed);
+      if (!numOnly) return true;
+    }
+
+    if (/^Math\.\w+\(/.test(trimmed)) return true;
+    if (/^List\.\w+\(/.test(trimmed)) return true;
+    if (/^String\.\w+\(/.test(trimmed)) return true;
+
+    return false;
   }
 
   private looksLikeObject(str: string): boolean {

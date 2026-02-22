@@ -330,7 +330,6 @@ export class HTMLBuilder implements Builder {
     this.hasTabs = false;
 
     this.collectAbbreviations(node);
-    this.preProcessVariables(node);
     this.preprocessVariableDefinitions(node.children);
 
     const allAbbreviations = new Map<string, string>([
@@ -466,54 +465,90 @@ ${tabsScript}
   }
 
   private preprocessVariableDefinitions(children: ASTNode[]): void {
-    const lines: string[] = [];
-    const nodeLineMap: {
-      nodeIndex: number;
-      lineStart: number;
-      lineCount: number;
-      childIndex?: number;
-    }[] = [];
+    for (const child of children) {
+      this.processNodeVariables(child);
+    }
+  }
 
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      const lineStart = lines.length;
-
-      if (child.type === 'Paragraph') {
-        const para = child as ParagraphNode;
-        lines.push(para.content);
-        nodeLineMap.push({ nodeIndex: i, lineStart, lineCount: 1 });
-      } else if (child.type === 'Indentation') {
-        const indent = child as IndentationNode;
-        for (let j = 0; j < indent.children.length; j++) {
-          const subChild = indent.children[j];
-          if (subChild.type === 'Paragraph') {
-            lines.push('  '.repeat(indent.level) + (subChild as ParagraphNode).content);
-            nodeLineMap.push({ nodeIndex: i, lineStart: lines.length - 1, lineCount: 1, childIndex: j });
+  private processNodeVariables(node: ASTNode): void {
+    switch (node.type) {
+      case 'Paragraph':
+      case 'Heading': {
+        const contentNode = node as ParagraphNode | HeadingNode;
+        const processed = this.contentProcessor.processContent(contentNode.content);
+        contentNode.content = processed;
+        break;
+      }
+      case 'List': {
+        const list = node as ListNode;
+        for (const item of list.children) {
+          this.processNodeVariables(item);
+        }
+        break;
+      }
+      case 'ListItem': {
+        const item = node as ListItemNode;
+        const processed = this.contentProcessor.processContent(item.content);
+        item.content = processed;
+        for (const child of item.children) {
+          this.processNodeVariables(child);
+        }
+        break;
+      }
+      case 'DefinitionTerm':
+      case 'DefinitionDescription': {
+        const defNode = node as DefinitionTermNode | DefinitionDescriptionNode;
+        const processed = this.contentProcessor.processContent(defNode.content);
+        defNode.content = processed;
+        for (const child of defNode.children) {
+          this.processNodeVariables(child);
+        }
+        break;
+      }
+      case 'Indentation': {
+        const indent = node as IndentationNode;
+        for (const child of indent.children) {
+          this.processNodeVariables(child);
+        }
+        break;
+      }
+      case 'TripleColonBlock': {
+        const block = node as TripleColonBlockNode;
+        if (block.title) {
+          block.title = this.contentProcessor.processContent(block.title);
+        }
+        const foreachInfo = this.contentProcessor.parseForeach(block.blockType);
+        const isIfBlock = block.blockType.match(/^if\s+(.+)$/);
+        if (!foreachInfo && !isIfBlock) {
+          for (const child of block.children) {
+            this.processNodeVariables(child);
           }
         }
+        break;
       }
-    }
-
-    const fullContent = lines.join('\n');
-    const cleanedContent = this.contentProcessor.processContent(fullContent);
-    const cleanedLines = cleanedContent.split('\n');
-
-    for (const mapping of nodeLineMap) {
-      const child = children[mapping.nodeIndex];
-      if (child.type === 'Paragraph') {
-        const para = child as ParagraphNode;
-        para.content = cleanedLines
-          .slice(mapping.lineStart, mapping.lineStart + mapping.lineCount)
-          .join('\n')
-          .trim();
-      } else if (child.type === 'Indentation' && mapping.childIndex !== undefined) {
-        const indent = child as IndentationNode;
-        const subChild = indent.children[mapping.childIndex];
-        if (subChild.type === 'Paragraph') {
-          const para = subChild as ParagraphNode;
-          para.content = cleanedLines[mapping.lineStart].trim();
+      case 'Table': {
+        const table = node as TableNode;
+        if (table.header) {
+          for (const cell of table.header.cells) {
+            cell.content = this.contentProcessor.processContent(cell.content);
+          }
         }
+        for (const row of table.rows) {
+          for (const cell of row.cells) {
+            cell.content = this.contentProcessor.processContent(cell.content);
+          }
+        }
+        break;
       }
+      case 'Blockquote': {
+        const blockquote = node as BlockquoteNode;
+        for (const child of blockquote.children) {
+          this.processNodeVariables(child);
+        }
+        break;
+      }
+      default:
+        break;
     }
   }
 
