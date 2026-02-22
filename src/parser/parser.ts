@@ -186,11 +186,16 @@ export class Parser {
     let content = token.value.trim();
 
     // Extract attributes at the end of content
+    // IMPORTANT: Do NOT treat {$...} (variable references) or {{...}} (expressions) as attributes
     let attributes: Attributes | undefined;
     const attrMatch = content.match(/\s+\{([^}]+)}$/);
     if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
-      content = content.slice(0, -attrMatch[0].length).trim();
+      const attrContent = attrMatch[1];
+      // Skip if this looks like a variable reference {$...} or expression {{...}}
+      if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+        attributes = InlineParser.parseAttributes(attrContent);
+        content = content.slice(0, -attrMatch[0].length).trim();
+      }
     }
 
     return {
@@ -218,15 +223,27 @@ export class Parser {
 
     content = content.trim();
 
+    // Check if this is a variable definition
+    // Variable definitions like $var = value or $var = {key: value} should NOT have attributes extracted
+    const isVariableDef = /^\$+\w+\s*=/.test(content);
+
     // Extract attributes at the end of content
     // In blockquotes, allow attributes without preceding space
     // In regular paragraphs, require space to avoid stealing attributes from inline elements
+    // IMPORTANT: Do NOT treat {$...} (variable references) or {{...}} (expressions) as attributes
+    // Also skip if this is a variable definition
     let attributes: Attributes | undefined;
-    const pattern = requireSpaceBeforeAttrs ? /\s+\{([^}]+)}$/ : /\s*\{([^}]+)}$/;
-    const attrMatch = content.match(pattern);
-    if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
-      content = content.slice(0, -attrMatch[0].length).trim();
+    if (!isVariableDef) {
+      const pattern = requireSpaceBeforeAttrs ? /\s+\{([^}]+)}$/ : /\s*\{([^}]+)}$/;
+      const attrMatch = content.match(pattern);
+      if (attrMatch) {
+        const attrContent = attrMatch[1];
+        // Skip if this looks like a variable reference {$...} or expression {{...}}
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+          attributes = InlineParser.parseAttributes(attrContent);
+          content = content.slice(0, -attrMatch[0].length).trim();
+        }
+      }
     }
 
     return {
@@ -526,8 +543,12 @@ export class Parser {
     const attrMatch = value.match(/\s+\{([^}]+)}$/);
     let remaining = value;
     if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
-      remaining = value.replace(/\s+\{([^}]+)}$/, '').trim();
+      const attrContent = attrMatch[1];
+      // Skip if this looks like a variable reference {$...}, expression {{...}}, or foreach/if condition
+      if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !attrContent.includes(' as $')) {
+        attributes = InlineParser.parseAttributes(attrContent);
+        remaining = value.replace(/\s+\{([^}]+)}$/, '').trim();
+      }
     }
 
     // Extract title [Title]

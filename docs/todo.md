@@ -189,41 +189,59 @@
 
 ### Basic Operators
 
-- [ ] Addition `{{ a + b }}`
-- [ ] Subtraction `{{ a - b }}`
-- [ ] Multiplication `{{ a * b }}`
-- [ ] Division `{{ a / b }}`
-- [ ] Modulo `{{ a % b }}`
-- [ ] Power `{{ a ^ b }}`
-- [ ] Operator precedence (parentheses, power, mult/div/mod, add/sub) - PARTIAL
+- [x] Addition `{{ a + b }}`
+- [x] Subtraction `{{ a - b }}`
+- [x] Multiplication `{{ a * b }}`
+- [x] Division `{{ a / b }}`
+- [x] Modulo `{{ a % b }}`
+- [x] Power `{{ a ^ b }}`
+- [x] Operator precedence (parentheses, power, mult/div/mod, add/sub)
 
 ### Math Namespace
 
-- [ ] `Math.floor(value)`
-- [ ] `Math.ceil(value)`
-- [ ] `Math.round(value)`
-- [ ] `Math.abs(value)`
-- [ ] `Math.pow(base, exp)`
-- [ ] `Math.sqrt(value)`
-- [ ] `Math.min(a, b)`
-- [ ] `Math.max(a, b)`
+- [x] `Math.floor(value)`
+- [x] `Math.ceil(value)`
+- [x] `Math.round(value)`
+- [x] `Math.abs(value)`
+- [x] `Math.pow(base, exp)`
+- [x] `Math.sqrt(value)`
+- [x] `Math.min(a, b, ...)`
+- [x] `Math.max(a, b, ...)`
 
 ### List Namespace
 
-- [ ] `List.length(array)`
-- [ ] `List.first(array)`
-- [ ] `List.last(array)`
-- [ ] `List.sum(array)`
-- [ ] `List.avg(array)`
-- [ ] `List.count(array)`
+- [x] `List.length(array)`
+- [x] `List.first(array)`
+- [x] `List.last(array)`
+- [x] `List.sum(array)`
+- [x] `List.avg(array)`
+- [x] `List.count(array)` (alias of length)
+- [x] `List.min(array)`
+- [x] `List.max(array)`
 
 ### String Namespace
 
-- [ ] `String.upper(text)` - NOT TESTED
-- [ ] `String.lower(text)` - NOT TESTED
-- [ ] `String.length(text)` - NOT TESTED
-- [ ] `String.trim(text)` - NOT TESTED
-- [ ] `String.replace(text, search, replacement, limit?, offset?)`
+- [x] `String.upper(text)`
+- [x] `String.lower(text)`
+- [x] `String.length(text)`
+- [x] `String.trim(text)`
+- [x] `String.replace(text, search, replacement)`
+- [x] `String.split(text, separator)`
+- [x] `String.join(array, separator)`
+
+### Variables
+
+- [x] Variable definitions `$var = value`
+- [x] Multiline array/object definitions
+- [x] Variable references `{$var}`
+- [x] Property access `{$obj.property}`
+- [x] Array access `{$arr[index]}`
+
+### Conditionals
+
+- [x] Comparison operators `==`, `!=`, `<`, `<=`, `>`, `>=`
+- [x] Logical operators `and`, `or`
+- [x] Conditional blocks `:::if {{ condition }}`
 
 ## 12. Document Logic
 
@@ -247,11 +265,11 @@
 
 ### Loops
 
-- [ ] `:::foreach {$array as $item}`
-- [ ] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
+- [x] `:::foreach {$array as $item}`
+- [x] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
       `{$foreach.odd}`
 - [ ] Nested loops
-- [ ] Conditional rendering in loops with `:::if`
+- [x] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles
 
 ### File Inclusion

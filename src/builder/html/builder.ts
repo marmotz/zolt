@@ -1,8 +1,8 @@
 import { InlineParser } from '../../parser/inline-parser';
 import {
-  ASTNode,
   AbbreviationDefinitionNode,
   AbbreviationNode,
+  ASTNode,
   Attributes,
   AudioNode,
   BlockquoteNode,
@@ -41,6 +41,8 @@ import {
   VideoNode,
 } from '../../parser/types';
 import { Builder } from '../builder';
+import { ContentProcessor } from '../evaluator/content-processor';
+import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 
 const DEFAULT_CSS = `
   * {
@@ -235,17 +237,16 @@ export class HTMLBuilder implements Builder {
   private static globalAbbreviations: Map<string, string> = new Map();
   private tabsCounter: number = 0;
   private hasTabs: boolean = false;
+  private evaluator: ExpressionEvaluator;
+  private contentProcessor: ContentProcessor;
 
-  static setGlobalAbbreviation(abbreviation: string, definition: string): void {
-    this.globalAbbreviations.set(abbreviation, definition);
+  constructor() {
+    this.evaluator = new ExpressionEvaluator();
+    this.contentProcessor = new ContentProcessor(this.evaluator);
   }
 
   static clearGlobalAbbreviations(): void {
     this.globalAbbreviations.clear();
-  }
-
-  static getGlobalAbbreviations(): Map<string, string> {
-    return this.globalAbbreviations;
   }
 
   build(node: ASTNode): string {
@@ -329,6 +330,8 @@ export class HTMLBuilder implements Builder {
     this.hasTabs = false;
 
     this.collectAbbreviations(node);
+    this.preProcessVariables(node);
+    this.preprocessVariableDefinitions(node.children);
 
     const allAbbreviations = new Map<string, string>([
       ...HTMLBuilder.globalAbbreviations.entries(),
@@ -386,6 +389,35 @@ ${tabsScript}
 </html>`;
   }
 
+  private preProcessVariables(node: ASTNode): void {
+    if (node.type === 'Paragraph' || node.type === 'Heading') {
+      const content = (node as any).content;
+      if (typeof content === 'string') {
+        const trimmed = content.trim();
+        const localVarMatch = trimmed.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+        const globalVarMatch = trimmed.match(/^\$\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+
+        if (localVarMatch) {
+          const varName = localVarMatch[1];
+          const varValue = localVarMatch[2].trim();
+          const value = this.evaluator.parseValue(varValue);
+          this.evaluator.setVariable(varName, value);
+        } else if (globalVarMatch) {
+          const varName = globalVarMatch[1];
+          const varValue = globalVarMatch[2].trim();
+          const value = this.evaluator.parseValue(varValue);
+          this.evaluator.setVariable(varName, value);
+        }
+      }
+    }
+
+    if ('children' in node && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        this.preProcessVariables(child);
+      }
+    }
+  }
+
   private collectAbbreviations(node: ASTNode): void {
     if (node.type === 'AbbreviationDefinition') {
       this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
@@ -433,7 +465,60 @@ ${tabsScript}
     }
   }
 
+  private preprocessVariableDefinitions(children: ASTNode[]): void {
+    const lines: string[] = [];
+    const nodeLineMap: {
+      nodeIndex: number;
+      lineStart: number;
+      lineCount: number;
+      childIndex?: number;
+    }[] = [];
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const lineStart = lines.length;
+
+      if (child.type === 'Paragraph') {
+        const para = child as ParagraphNode;
+        lines.push(para.content);
+        nodeLineMap.push({ nodeIndex: i, lineStart, lineCount: 1 });
+      } else if (child.type === 'Indentation') {
+        const indent = child as IndentationNode;
+        for (let j = 0; j < indent.children.length; j++) {
+          const subChild = indent.children[j];
+          if (subChild.type === 'Paragraph') {
+            lines.push('  '.repeat(indent.level) + (subChild as ParagraphNode).content);
+            nodeLineMap.push({ nodeIndex: i, lineStart: lines.length - 1, lineCount: 1, childIndex: j });
+          }
+        }
+      }
+    }
+
+    const fullContent = lines.join('\n');
+    const cleanedContent = this.contentProcessor.processContent(fullContent);
+    const cleanedLines = cleanedContent.split('\n');
+
+    for (const mapping of nodeLineMap) {
+      const child = children[mapping.nodeIndex];
+      if (child.type === 'Paragraph') {
+        const para = child as ParagraphNode;
+        para.content = cleanedLines
+          .slice(mapping.lineStart, mapping.lineStart + mapping.lineCount)
+          .join('\n')
+          .trim();
+      } else if (child.type === 'Indentation' && mapping.childIndex !== undefined) {
+        const indent = child as IndentationNode;
+        const subChild = indent.children[mapping.childIndex];
+        if (subChild.type === 'Paragraph') {
+          const para = subChild as ParagraphNode;
+          para.content = cleanedLines[mapping.lineStart].trim();
+        }
+      }
+    }
+  }
+
   visitDocument(node: DocumentNode): string {
+    this.preprocessVariableDefinitions(node.children);
     return node.children.map((child) => this.build(child)).join('\n');
   }
 
@@ -529,6 +614,21 @@ ${tabsScript}
       return this.visitTabBlock(node);
     }
 
+    const foreachInfo = this.contentProcessor.parseForeach(node.blockType);
+    if (foreachInfo) {
+      return this.visitForeachBlock(node, foreachInfo.collection, foreachInfo.iterator);
+    }
+
+    const ifMatch = node.blockType.match(/^if\s+(.+)$/);
+    if (ifMatch) {
+      const condition = ifMatch[1];
+      if (!this.contentProcessor.evaluateCondition(condition)) {
+        return '';
+      }
+
+      return node.children.map((child) => this.build(child)).join('\n');
+    }
+
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
     if (node.blockType === 'details') {
@@ -572,6 +672,48 @@ ${childrenHtml}
     }
     html += `${childrenHtml}\n</div>`;
     return html;
+  }
+
+  private visitForeachBlock(node: TripleColonBlockNode, collectionVar: string, iteratorName: string): string {
+    const collection = this.contentProcessor.getCollection(collectionVar);
+    if (collection.length === 0) return '';
+
+    const results: string[] = [];
+
+    for (let i = 0; i < collection.length; i++) {
+      const item = collection[i];
+
+      const childEvaluator = this.evaluator.createChildScope();
+      childEvaluator.setVariable(iteratorName, item);
+      childEvaluator.setVariable('foreach', {
+        index: i,
+        index1: i + 1,
+        first: i === 0,
+        last: i === collection.length - 1,
+        even: i % 2 === 0,
+        odd: i % 2 === 1,
+      });
+
+      const childBuilder = new HTMLBuilder();
+      childBuilder.evaluator = childEvaluator;
+      childBuilder.contentProcessor = new ContentProcessor(childEvaluator);
+      childBuilder.abbreviationDefinitions = this.abbreviationDefinitions;
+      childBuilder.tabsCounter = this.tabsCounter;
+      childBuilder.hasTabs = this.hasTabs;
+      childBuilder.inlineParser = this.inlineParser;
+
+      for (const child of node.children) {
+        const childHtml = childBuilder.build(child);
+        if (childHtml) {
+          results.push(childHtml);
+        }
+      }
+
+      this.tabsCounter = childBuilder.tabsCounter;
+      this.hasTabs = childBuilder.hasTabs || this.hasTabs;
+    }
+
+    return results.join('\n');
   }
 
   private visitTabsBlock(node: TripleColonBlockNode): string {
@@ -712,7 +854,87 @@ ${childrenHtml}
 
   processInlineContent(text: string): string {
     if (!text) return '';
-    return this.processInline(text);
+
+    const trimmed = text.trim();
+    const localVarMatch = trimmed.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+    const globalVarMatch = trimmed.match(/^\$\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+
+    if (localVarMatch || globalVarMatch) {
+      return '';
+    }
+
+    const processed = this.contentProcessor.processContent(text);
+
+    return this.processInlineWithExpressions(processed);
+  }
+
+  private processInlineWithExpressions(text: string): string {
+    if (!text) return '';
+
+    const parts: { type: 'text' | 'expr' | 'var'; content: string }[] = [];
+    let remaining = text;
+
+    while (remaining.length > 0) {
+      const exprMatch = remaining.match(/\{\{(.+?)}}/);
+      const varMatch = remaining.match(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/);
+
+      let firstMatch: { type: 'expr' | 'var'; index: number; length: number; content: string } | null = null;
+
+      if (exprMatch && exprMatch.index !== undefined) {
+        firstMatch = { type: 'expr', index: exprMatch.index, length: exprMatch[0].length, content: exprMatch[1] };
+      }
+
+      if (varMatch && varMatch.index !== undefined) {
+        if (!firstMatch || varMatch.index < firstMatch.index) {
+          firstMatch = { type: 'var', index: varMatch.index, length: varMatch[0].length, content: varMatch[1] };
+        }
+      }
+
+      if (firstMatch) {
+        if (firstMatch.index > 0) {
+          parts.push({ type: 'text', content: remaining.slice(0, firstMatch.index) });
+        }
+
+        if (firstMatch.type === 'expr') {
+          const value = this.evaluator.evaluate(firstMatch.content);
+          parts.push({ type: 'text', content: this.formatValue(value) });
+        } else {
+          const value = this.evaluator.evaluate('$' + firstMatch.content);
+          parts.push({ type: 'text', content: this.formatValue(value) });
+        }
+
+        remaining = remaining.slice(firstMatch.index + firstMatch.length);
+      } else {
+        parts.push({ type: 'text', content: remaining });
+        break;
+      }
+    }
+
+    const textOnly = parts.map((p) => p.content).join('');
+    return this.processInline(textOnly);
+  }
+
+  private formatValue(value: any): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false';
+    }
+    if (typeof value === 'number') {
+      if (Number.isInteger(value)) {
+        return value.toString();
+      }
+      const formatted = value.toFixed(10);
+      return parseFloat(formatted).toString();
+    }
+    if (Array.isArray(value)) {
+      return JSON.stringify(value);
+    }
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return String(value);
   }
 
   private buildInlineNode(node: ASTNode): string {
