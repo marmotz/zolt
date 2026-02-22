@@ -409,6 +409,10 @@
 - [x] Recursive dependency tracking (links and includes) for watch mode
 - [x] Automatic output directory creation
 
+## 23. CLI Improvements
+
+- [x] Add color to logs for lint and build commands
+
 ---
 
 ## Legend

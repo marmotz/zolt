@@ -4,6 +4,7 @@ import { watch as watchFile } from 'fs';
 import { copyFile, mkdir, stat } from 'fs/promises';
 import { basename, dirname, join, resolve } from 'path';
 import { parseArgs } from 'util';
+import pc from 'picocolors';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 
@@ -33,7 +34,7 @@ async function buildFileWithDeps(
 
   await mkdir(dirname(outputFile), { recursive: true });
   await buildFile(absoluteInput, outputFile, { type });
-  console.log(`Built: ${outputFile}`);
+  console.log(`${pc.green('Built:')} ${outputFile}`);
 
   const inputDir = dirname(absoluteInput);
 
@@ -52,7 +53,7 @@ async function buildFileWithDeps(
         // console.log(`Copied asset: ${asset} -> ${destAssetPath}`);
       }
     } catch {
-      console.warn(`Warning: Asset file not found: ${fullAssetPath}`);
+      console.warn(`${pc.yellow('Warning:')} Asset file not found: ${fullAssetPath}`);
     }
   }
 
@@ -71,7 +72,7 @@ async function buildFileWithDeps(
         }
       }
     } catch {
-      console.warn(`Warning: Linked file not found: ${fullLinkedPath}`);
+      console.warn(`${pc.yellow('Warning:')} Linked file not found: ${fullLinkedPath}`);
     }
   }
 
@@ -109,7 +110,7 @@ async function main() {
       printHelp();
       break;
     default:
-      console.error(`Unknown command: ${command}`);
+      console.error(`${pc.red('Error:')} Unknown command: ${command}`);
       printHelp();
       process.exit(1);
   }
@@ -117,35 +118,35 @@ async function main() {
 
 function printHelp() {
   console.log(`
-Zolt - The high-voltage successor to Markdown
+${pc.bold('Zolt')} - The high-voltage successor to Markdown
 v${version}
 
-Usage:
+${pc.bold('Usage:')}
   zolt <command> [options]
 
-Commands:
-  lint <files...>
+${pc.bold('Commands:')}
+  ${pc.cyan('lint')} <files...>
     Analyze .zlt files for errors and warnings
     
-  build <files...>
+  ${pc.cyan('build')} <files...>
     Compile .zlt files to output formats
     
-  version
+  ${pc.cyan('version')}
     Show version information
 
-Options:
+${pc.bold('Options:')}
   --help, -h             Show this help message
 
-Lint Options:
+${pc.bold('Lint Options:')}
   --format <json|text>   Output format (default: text)
   --fix                  Auto-fix fixable issues
 
-Build Options:
+${pc.bold('Build Options:')}
   -o, --output <path>    Output file or directory
   -t, --type <html>  Output type (default: html)
   -w, --watch            Watch for file changes and rebuild
 
-Examples:
+${pc.bold('Examples:')}
   zolt lint document.zlt
   zolt lint *.zlt --format json
   zolt build document.zlt -o output.html
@@ -173,7 +174,7 @@ async function handleLint(args: string[]) {
   const files = positionals;
 
   if (files.length === 0) {
-    console.error('Error: No files specified for linting');
+    console.error(`${pc.red('Error:')} No files specified for linting`);
     process.exit(1);
   }
 
@@ -187,25 +188,25 @@ async function handleLint(args: string[]) {
       if (format === 'json') {
         console.log(JSON.stringify(result, null, 2));
       } else {
-        console.log(`\nFile: ${file}`);
+        console.log(`\n${pc.bold('File:')} ${pc.cyan(file)}`);
 
         if (result.errors.length > 0) {
           hasErrors = true;
-          console.log('  Errors:');
+          console.log(`  ${pc.red('Errors:')}`);
           for (const error of result.errors) {
-            console.log(`    Line ${error.line}:${error.column} - ${error.message}`);
+            console.log(`    ${pc.dim(`Line ${error.line}:${error.column}`)} - ${error.message}`);
           }
         }
 
         if (result.warnings.length > 0) {
-          console.log('  Warnings:');
+          console.log(`  ${pc.yellow('Warnings:')}`);
           for (const warning of result.warnings) {
-            console.log(`    Line ${warning.line}:${warning.column} - ${warning.message}`);
+            console.log(`    ${pc.dim(`Line ${warning.line}:${warning.column}`)} - ${warning.message}`);
           }
         }
 
         if (result.errors.length === 0 && result.warnings.length === 0) {
-          console.log('  ✓ No issues found');
+          console.log(`  ${pc.green('✓ No issues found')}`);
         }
       }
     } catch (error) {
@@ -231,7 +232,7 @@ async function handleLint(args: string[]) {
           )
         );
       } else {
-        console.error(`Error processing ${file}:`, error instanceof Error ? error.message : 'Unknown error');
+        console.error(`${pc.red(`Error processing ${file}:`)}`, error instanceof Error ? error.message : 'Unknown error');
       }
     }
   }
@@ -287,7 +288,7 @@ async function performBuild(
 }
 
 async function handleWatch(files: string[], output: string | undefined, type: 'html' | 'pdf') {
-  console.log('Watching for changes... (Press Ctrl+C to stop)');
+  console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)`);
 
   const watchers = new Map<string, any>();
   let buildTimeout: any = null;
@@ -311,15 +312,15 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
             buildTimeout = setTimeout(async () => {
               if (isBuilding) return;
               isBuilding = true;
-              console.log('\nChange detected, rebuilding...');
+              console.log(`\n${pc.yellow('Change detected, rebuilding...')}`);
               try {
                 const newTouchedFiles = await performBuild(files, output, type);
                 updateWatchers(newTouchedFiles);
               } catch (err) {
-                console.error('Rebuild failed:', err instanceof Error ? err.message : 'Unknown error');
+                console.error(`${pc.red('Rebuild failed:')}`, err instanceof Error ? err.message : 'Unknown error');
               } finally {
                 isBuilding = false;
-                console.log('Watching for changes...');
+                console.log(`\n${pc.cyan('Waiting for changes...')}`);
               }
             }, 100);
           });
@@ -340,8 +341,9 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
   try {
     const initialTouchedFiles = await performBuild(files, output, type);
     updateWatchers(initialTouchedFiles);
+    console.log(`\n${pc.cyan('Waiting for changes...')}`);
   } catch (err) {
-    console.error('Initial build failed:', err instanceof Error ? err.message : 'Unknown error');
+    console.error(`${pc.red('Initial build failed:')}`, err instanceof Error ? err.message : 'Unknown error');
     updateWatchers(new Set(files.map((f) => resolve(f))));
   }
 
@@ -380,7 +382,7 @@ async function handleBuild(args: string[]) {
   const watch = values.watch as boolean;
 
   if (files.length === 0) {
-    console.error('Error: No files specified for building');
+    console.error(`${pc.red('Error:')} No files specified for building`);
     process.exit(1);
   }
 
@@ -391,8 +393,9 @@ async function handleBuild(args: string[]) {
 
   try {
     await performBuild(files, output, type);
+    console.log(`\n${pc.green(pc.bold('Build successful!'))}`);
   } catch (error) {
-    console.error('Build error:', error instanceof Error ? error.message : 'Unknown error');
+    console.error(`${pc.red('Build error:')}`, error instanceof Error ? error.message : 'Unknown error');
     process.exit(1);
   }
 }

@@ -34,5 +34,8 @@
     "lint": "bun x prettier --check ."
   },
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "picocolors": "^1.1.1"
+  }
 }
