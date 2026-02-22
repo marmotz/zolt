@@ -67,11 +67,10 @@ Alternate row colors:
 
 :::foreach {$products as $product}
 :::if {$foreach.even}
-- {$product.name} {.row-even}
+- {$product.name} {background=#EEE}
 :::
 :::if {$foreach.odd}
-- {$product.name} {.row-odd}
-:::
+- {$product.name} {background=#DDD}
 :::
 :::
 
@@ -102,7 +101,6 @@ $category_products = {
 - {$product.name}: ${{$product.price}}
 :::
 :::
-:::
 
 ## Loop with Condition
 
@@ -111,7 +109,6 @@ Filter products by price:
 :::foreach {$products as $product}
 :::if {$product.price > 100}
 - **{$product.name}** - Premium (${{$product.price}})
-:::
 :::
 :::
 
@@ -125,7 +122,6 @@ Even step: {$task}
 :::
 :::if {$foreach.index1 % 2 == 1}
 Odd step: {$task}
-:::
 :::
 :::
 

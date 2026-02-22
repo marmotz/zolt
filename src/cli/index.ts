@@ -3,8 +3,8 @@
 import { watch as watchFile } from 'fs';
 import { copyFile, mkdir, stat } from 'fs/promises';
 import { basename, dirname, join, resolve } from 'path';
-import { parseArgs } from 'util';
 import pc from 'picocolors';
+import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 
@@ -84,7 +84,7 @@ async function main() {
 
   if (args.length === 0) {
     printHelp();
-    process.exit(1);
+    process.exit(0);
   }
 
   const command = args[0];
@@ -117,40 +117,45 @@ async function main() {
 }
 
 function printHelp() {
+  const cmd = pc.cyan;
+  const opt = pc.magenta;
+  const arg = pc.yellow;
+  const dim = pc.dim;
+
   console.log(`
-${pc.bold('Zolt')} - The high-voltage successor to Markdown
-v${version}
+${pc.bold(pc.green('Zolt'))} - ${dim('The high-voltage successor to Markdown')}
+${dim('v' + version)}
 
 ${pc.bold('Usage:')}
-  zolt <command> [options]
+  zolt ${arg('<command>')} ${dim('[options]')}
 
 ${pc.bold('Commands:')}
-  ${pc.cyan('lint')} <files...>
+  ${cmd('lint')} ${arg('<files...>')}
     Analyze .zlt files for errors and warnings
     
-  ${pc.cyan('build')} <files...>
+  ${cmd('build')} ${arg('<files...>')}
     Compile .zlt files to output formats
     
-  ${pc.cyan('version')}
+  ${cmd('version')}
     Show version information
 
 ${pc.bold('Options:')}
-  --help, -h             Show this help message
+  ${opt('--help')}, ${opt('-h')}             Show this help message
 
 ${pc.bold('Lint Options:')}
-  --format <json|text>   Output format (default: text)
-  --fix                  Auto-fix fixable issues
+  ${opt('--format')} ${arg('<json|text>')}   Output format ${dim('(default: text)')}
+  ${opt('--fix')}                  Auto-fix fixable issues
 
 ${pc.bold('Build Options:')}
-  -o, --output <path>    Output file or directory
-  -t, --type <html>  Output type (default: html)
-  -w, --watch            Watch for file changes and rebuild
+  ${opt('-o')}, ${opt('--output')} ${arg('<path>')}    Output file or directory
+  ${opt('-t')}, ${opt('--type')}   ${arg('<html>')}    Output type ${dim('(default: html)')}
+  ${opt('-w')}, ${opt('--watch')}            Watch for file changes and rebuild
 
 ${pc.bold('Examples:')}
-  zolt lint document.zlt
-  zolt lint *.zlt --format json
-  zolt build document.zlt -o output.html
-  zolt build *.zlt -o dist/ -t html
+  ${dim('$')} zolt ${cmd('lint')} document.zlt
+  ${dim('$')} zolt ${cmd('lint')} *.zlt ${opt('--format')} json
+  ${dim('$')} zolt ${cmd('build')} document.zlt ${opt('-o')} output.html
+  ${dim('$')} zolt ${cmd('build')} *.zlt ${opt('-o')} dist/ ${opt('-t')} html
 `);
 }
 
@@ -232,7 +237,10 @@ async function handleLint(args: string[]) {
           )
         );
       } else {
-        console.error(`${pc.red(`Error processing ${file}:`)}`, error instanceof Error ? error.message : 'Unknown error');
+        console.error(
+          `${pc.red(`Error processing ${file}:`)}`,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
       }
     }
   }
@@ -240,11 +248,7 @@ async function handleLint(args: string[]) {
   process.exit(hasErrors ? 1 : 0);
 }
 
-async function performBuild(
-  files: string[],
-  output: string | undefined,
-  type: 'html' | 'pdf'
-): Promise<Set<string>> {
+async function performBuild(files: string[], output: string | undefined, type: 'html' | 'pdf'): Promise<Set<string>> {
   const allTouchedFiles = new Set<string>();
   const visited = new Set<string>();
 

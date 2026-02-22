@@ -403,6 +403,64 @@ MIDDLE: {$item}
     expect(html).toContain('LAST: C');
     expect(html).not.toContain('MIDDLE: C');
   });
+
+  test('should handle nested foreach with dynamic collection path', async () => {
+    const input = `
+$categories = [
+  {id: "tech", name: "Technology"},
+  {id: "home", name: "Home"}
+]
+$category_products = {
+  tech: [{name: "Laptop"}],
+  home: [{name: "Lamp"}]
+}
+:::foreach {$categories as $category}
+## {$category.name}
+:::foreach {$category_products[$category.id] as $product}
+- {$product.name}
+:::
+:::
+`;
+    const html = await buildString(input);
+    expect(html).toContain('<h2>Technology</h2>');
+    expect(html).toContain('<li>Laptop</li>');
+    expect(html).toContain('<h2>Home</h2>');
+    expect(html).toContain('<li>Lamp</li>');
+  });
+
+  test('should handle if block inside foreach loop', async () => {
+    const input = `
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29}
+]
+:::foreach {$products as $product}
+:::if {$product.price > 100}
+- {$product.name}
+:::
+:::
+`;
+    const html = await buildString(input);
+    expect(html).toContain('<li>Laptop</li>');
+    expect(html).not.toContain('Mouse');
+  });
+
+  test('should handle modulo in foreach loop', async () => {
+    const input = `
+$tasks = ["Task 1", "Task 2"]
+:::foreach {$tasks as $task}
+:::if {$foreach.index1 % 2 == 0}
+Even: {$task}
+:::
+:::if {$foreach.index1 % 2 == 1}
+Odd: {$task}
+:::
+:::
+`;
+    const html = await buildString(input);
+    expect(html).toContain('Odd: Task 1');
+    expect(html).toContain('Even: Task 2');
+  });
 });
 
 describe('Calculations: Complex Examples', () => {

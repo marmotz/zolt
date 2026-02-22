@@ -177,6 +177,38 @@ Paragraph with [link](url).
       expect(html).toContain('<code>{{1 + 1}}</code>');
       expect(html).not.toContain('<code>2</code>');
     });
+
+    test('should merge list items generated in a loop into a single list', async () => {
+      const zolt = `
+$items = ["Apple", "Banana", "Cherry"]
+
+:::foreach {$items as $item}
+- {$item}
+:::
+`;
+      const html = await buildString(zolt);
+      const ulCount = (html.match(/<ul>/g) || []).length;
+      const liCount = (html.match(/<li>/g) || []).length;
+
+      expect(ulCount).toBe(1);
+      expect(liCount).toBe(3);
+    });
+
+    test('should merge lists separated by a conditional block', async () => {
+      const zolt = `
+- Item 1
+:::if {true}
+- Item 2
+:::
+- Item 3
+`;
+      const html = await buildString(zolt);
+      const ulCount = (html.match(/<ul>/g) || []).length;
+      const liCount = (html.match(/<li>/g) || []).length;
+
+      expect(ulCount).toBe(1);
+      expect(liCount).toBe(3);
+    });
   });
 
   describe('superscript and subscript', () => {

@@ -82,7 +82,7 @@ export class ContentProcessor {
     if (trimmed.startsWith('[')) {
       return this.isBalanced(trimmed, '[', ']');
     }
-    if (trimmed.startsWith('{') && this.looksLikeObject(trimmed)) {
+    if (trimmed.startsWith('{')) {
       return this.isBalanced(trimmed, '{', '}');
     }
 
@@ -135,8 +135,8 @@ export class ContentProcessor {
 
   private looksLikeObject(str: string): boolean {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return false;
-    return /^[a-zA-Z_]\w*\s*:/.test(inner);
+    if (inner === '') return true; // Empty object {} or just {
+    return /^[a-zA-Z_]\w*\s*:/.test(inner) || /^['"]/.test(inner);
   }
 
   private isBalanced(str: string, open: string, close: string): boolean {
@@ -187,7 +187,7 @@ export class ContentProcessor {
   }
 
   private processVariableReferences(content: string): string {
-    const combinedRegex = /`[^`]*`|\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/g;
+    const combinedRegex = /`[^`]*`|\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g;
 
     return content.replace(combinedRegex, (match, varPath) => {
       if (match.startsWith('`')) {
@@ -227,20 +227,22 @@ export class ContentProcessor {
 
   evaluateCondition(condition: string): boolean {
     let expr = condition.trim();
-    if (expr.startsWith('{') && expr.endsWith('}')) {
-      // Only strip if it's a single group and not a special marker
+    if (expr.startsWith('{{') && expr.endsWith('}}')) {
+      // Keep double braces for the regex below
+    } else if (expr.startsWith('{') && expr.endsWith('}')) {
+      // Strip outer braces if they are balanced
       let depth = 0;
-      let singleGroup = true;
+      let isBalanced = true;
       for (let i = 0; i < expr.length; i++) {
         if (expr[i] === '{') depth++;
         else if (expr[i] === '}') depth--;
         if (depth === 0 && i < expr.length - 1) {
-          singleGroup = false;
+          isBalanced = false;
           break;
         }
       }
 
-      if (singleGroup && !expr.startsWith('{{') && !expr.startsWith('{$')) {
+      if (isBalanced) {
         expr = expr.slice(1, -1).trim();
       }
     }
@@ -254,7 +256,7 @@ export class ContentProcessor {
       }
     });
 
-    expr = expr.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/g, (_, varPath) => {
+    expr = expr.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g, (_, varPath) => {
       try {
         const value = this.evaluator.evaluate('$' + varPath);
         return this.formatValue(value);
@@ -277,7 +279,7 @@ export class ContentProcessor {
 
   parseForeach(blockType: string): { collection: string; iterator: string } | null {
     const match = blockType.match(
-      /^foreach\s+\{\s*\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)\s+as\s+\$([a-zA-Z_][a-zA-Z0-9_]*)\s*}$/
+      /^foreach\s+\{\s*\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)\s+as\s+\$([a-zA-Z_][a-zA-Z0-9_]*)\s*}$/
     );
     if (!match) return null;
 

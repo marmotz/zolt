@@ -330,7 +330,6 @@ export class HTMLBuilder implements Builder {
     this.hasTabs = false;
 
     this.collectAbbreviations(node);
-    this.preprocessVariableDefinitions(node.children);
 
     const allAbbreviations = new Map<string, string>([
       ...HTMLBuilder.globalAbbreviations.entries(),
@@ -339,7 +338,8 @@ export class HTMLBuilder implements Builder {
 
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
 
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const childrenHtmlParts = node.children.map((child) => this.build(child)).filter(h => h !== '');
+    const childrenHtml = this.mergeAdjacentListHTML(childrenHtmlParts).join('\n');
 
     const tabsScript = this.hasTabs
       ? `
@@ -435,100 +435,9 @@ ${tabsScript}
     }
   }
 
-  private preprocessVariableDefinitions(children: ASTNode[]): void {
-    for (const child of children) {
-      this.processNodeVariables(child);
-    }
-  }
-
-  private processNodeVariables(node: ASTNode): void {
-    switch (node.type) {
-      case 'Paragraph':
-      case 'Heading': {
-        const contentNode = node as ParagraphNode | HeadingNode;
-        contentNode.content = this.contentProcessor.processContent(contentNode.content);
-        break;
-      }
-      case 'List': {
-        const list = node as ListNode;
-        for (const item of list.children) {
-          this.processNodeVariables(item);
-        }
-        break;
-      }
-      case 'ListItem': {
-        const item = node as ListItemNode;
-        item.content = this.contentProcessor.processContent(item.content);
-        for (const child of item.children) {
-          this.processNodeVariables(child);
-        }
-        break;
-      }
-      case 'DefinitionTerm':
-      case 'DefinitionDescription': {
-        const defNode = node as DefinitionTermNode | DefinitionDescriptionNode;
-        defNode.content = this.contentProcessor.processContent(defNode.content);
-        for (const child of defNode.children) {
-          this.processNodeVariables(child);
-        }
-        break;
-      }
-      case 'Indentation': {
-        const indent = node as IndentationNode;
-        for (const child of indent.children) {
-          this.processNodeVariables(child);
-        }
-        break;
-      }
-      case 'TripleColonBlock': {
-        const block = node as TripleColonBlockNode;
-        const foreachInfo = this.contentProcessor.parseForeach(block.blockType);
-        const isIfBlock = block.blockType.match(/^(if|foreach)(\s|{|$)/);
-
-        if (foreachInfo || isIfBlock) {
-          // DO NOT process variables in if/foreach blocks during pre-processing
-          // as they must be evaluated per-iteration with specific scope.
-          break;
-        }
-
-        if (block.title) {
-          block.title = this.contentProcessor.processContent(block.title);
-        }
-
-        for (const child of block.children) {
-          this.processNodeVariables(child);
-        }
-        break;
-      }
-      case 'Table': {
-        const table = node as TableNode;
-        if (table.header) {
-          for (const cell of table.header.cells) {
-            cell.content = this.contentProcessor.processContent(cell.content);
-          }
-        }
-        for (const row of table.rows) {
-          for (const cell of row.cells) {
-            cell.content = this.contentProcessor.processContent(cell.content);
-          }
-        }
-        break;
-      }
-      case 'Blockquote': {
-        const blockquote = node as BlockquoteNode;
-        for (const child of blockquote.children) {
-          this.processNodeVariables(child);
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  }
-
   visitDocument(node: DocumentNode): string {
-    this.preprocessVariableDefinitions(node.children);
-    return node.children.map((child) => this.build(child)).join('\n');
+    const htmlParts = node.children.map((child) => this.build(child)).filter(h => h !== '');
+    return this.mergeAdjacentListHTML(htmlParts).join('\n');
   }
 
   visitHeading(node: HeadingNode): string {
@@ -536,6 +445,7 @@ ${tabsScript}
     const attrs = this.renderAllAttributes(node.attributes);
     const content = this.processInlineContent(node.content);
     const trimmed = content.replace(/\s+/g, ' ').trim();
+    if (!trimmed) return '';
     return `<h${level}${attrs}>${trimmed}</h${level}>`;
   }
 
@@ -543,6 +453,7 @@ ${tabsScript}
     const attrs = this.renderAllAttributes(node.attributes);
     const content = this.processInlineContent(node.content);
     const trimmed = content.replace(/\s+/g, ' ').trim();
+    if (!trimmed) return '';
     return `<p${attrs}>${trimmed}</p>`;
   }
 
@@ -636,10 +547,10 @@ ${tabsScript}
         return '';
       }
 
-      return node.children.map((child) => this.build(child)).join('\n');
+      return this.joinChildren(node.children);
     }
 
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const childrenHtml = this.joinChildren(node.children);
 
     if (node.blockType === 'details') {
       const open = node.attributes?.open === 'true' ? ' open' : '';
@@ -713,12 +624,7 @@ ${childrenHtml}
       childBuilder.inlineParser = this.inlineParser;
 
       for (const child of node.children) {
-        // We need to clone the node or at least ensure we don't overwrite
-        // the original node's content if it's shared across iterations.
-        // However, AST nodes are currently being modified in place by processNodeVariables.
-        // For foreach, we MUST process them in each iteration with the current scope.
         const childClone = JSON.parse(JSON.stringify(child));
-        childBuilder.processNodeVariables(childClone);
         const childHtml = childBuilder.build(childClone);
         if (childHtml) {
           results.push(childHtml);
@@ -729,7 +635,7 @@ ${childrenHtml}
       this.hasTabs = childBuilder.hasTabs || this.hasTabs;
     }
 
-    return results.join('\n');
+    return this.mergeAdjacentListHTML(results).join('\n');
   }
 
   private visitTabsBlock(node: TripleColonBlockNode): string {
@@ -789,7 +695,7 @@ ${panels.join('\n')}
   }
 
   private visitTabBlock(node: TripleColonBlockNode): string {
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const childrenHtml = this.joinChildren(node.children);
     const activeAttr = node.attributes?.active === 'true' ? ' data-active="true"' : '';
     const attrs = this.renderAllAttributes(node.attributes);
 
@@ -857,7 +763,8 @@ ${childrenHtml}
   }
 
   visitIndentation(node: IndentationNode): string {
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const childrenHtml = this.joinChildren(node.children);
+    if (!childrenHtml.trim()) return '';
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="indented" style="margin-left: 2em">${childrenHtml}</div>`;
@@ -870,14 +777,6 @@ ${childrenHtml}
 
   processInlineContent(text: string): string {
     if (!text) return '';
-
-    const trimmed = text.trim();
-    const localVarMatch = trimmed.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
-    const globalVarMatch = trimmed.match(/^\$\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
-
-    if (localVarMatch || globalVarMatch) {
-      return '';
-    }
 
     const processed = this.contentProcessor.processContent(text);
 
@@ -892,7 +791,7 @@ ${childrenHtml}
 
     while (remaining.length > 0) {
       const exprMatch = remaining.match(/\{\{(.+?)}}/);
-      const varMatch = remaining.match(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/);
+      const varMatch = remaining.match(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/);
       const codeMatch = remaining.match(/`[^`]*`/);
 
       let firstMatch: { type: 'expr' | 'var' | 'code'; index: number; length: number; content: string } | null = null;
@@ -1063,6 +962,49 @@ ${childrenHtml}
     return `${styleStr}${otherAttrs}`;
   }
 
+  private mergeAdjacentListHTML(htmlStrings: string[]): string[] {
+    if (htmlStrings.length <= 1) return htmlStrings;
+
+    const merged: string[] = [];
+    let current = htmlStrings[0];
+
+    for (let i = 1; i < htmlStrings.length; i++) {
+      const next = htmlStrings[i];
+      const mergedContent = this.tryMergeLists(current, next);
+
+      if (mergedContent) {
+        current = mergedContent;
+      } else {
+        merged.push(current);
+        current = next;
+      }
+    }
+    merged.push(current);
+    return merged;
+  }
+
+  private tryMergeLists(html1: string, html2: string): string | null {
+    const h1 = html1.trim();
+    const h2 = html2.trim();
+
+    const ulRegex = /^<(ul|ol|dl)([^>]*)>([\s\S]*)<\/\1>$/i;
+    const match1 = h1.match(ulRegex);
+    const match2 = h2.match(ulRegex);
+
+    if (match1 && match2 && match1[1].toLowerCase() === match2[1].toLowerCase()) {
+      const attrs1 = match1[2].trim();
+      const attrs2 = match2[2].trim();
+
+      if (attrs1 === attrs2) {
+        const content1 = match1[3].trim();
+        const content2 = match2[3].trim();
+        return `<${match1[1]}${match1[2]}>\n${content1}\n${content2}\n</${match1[1]}>`;
+      }
+    }
+
+    return null;
+  }
+
   private buildStyleAttribute(attrs?: Attributes): string {
     if (!attrs) return '';
 
@@ -1222,5 +1164,10 @@ ${childrenHtml}
     }
 
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+
+  private joinChildren(nodes: ASTNode[]): string {
+    const htmlParts = nodes.map((child) => this.build(child)).filter((h) => h !== '');
+    return this.mergeAdjacentListHTML(htmlParts).join('\n');
   }
 }

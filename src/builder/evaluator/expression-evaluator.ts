@@ -65,8 +65,9 @@ export class ExpressionEvaluator {
 
   private looksLikeObject(str: string): boolean {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return false;
-    return /^[a-zA-Z_]\w*\s*:/.test(inner);
+    if (inner === '') return true; // Empty object {}
+    // Check if it looks like key: value or "key": value
+    return /^[a-zA-Z_]\w*\s*:/.test(inner) || /^['"]/.test(inner);
   }
 
   private parseArray(str: string): Value[] {
@@ -605,7 +606,7 @@ export class ExpressionEvaluator {
   private resolveVariable(varExpr: string): Value {
     const parts: (string | number)[] = [];
     let current = '';
-    let i = 1;
+    let i = 1; // Skip initial $
 
     while (i < varExpr.length) {
       const char = varExpr[i];
@@ -617,17 +618,26 @@ export class ExpressionEvaluator {
       } else if (char === '[') {
         if (current) parts.push(current);
         current = '';
+        
+        // Find matching ] while handling nested brackets
+        let depth = 1;
+        let j = i + 1;
         let indexStr = '';
-        i++;
-        while (i < varExpr.length && varExpr[i] !== ']') {
-          indexStr += varExpr[i];
-          i++;
+        while (j < varExpr.length && depth > 0) {
+          if (varExpr[j] === '[') depth++;
+          else if (varExpr[j] === ']') depth--;
+          
+          if (depth > 0) indexStr += varExpr[j];
+          j++;
         }
-        i++;
-        const index = parseInt(indexStr);
-        if (!isNaN(index)) {
-          parts.push(index);
+        
+        // Evaluate the index expression
+        const indexValue = this.evaluate(indexStr);
+        if (typeof indexValue === 'number' || typeof indexValue === 'string') {
+          parts.push(indexValue as string | number);
         }
+        
+        i = j;
       } else {
         current += char;
         i++;
@@ -645,8 +655,15 @@ export class ExpressionEvaluator {
       if (typeof part === 'number') {
         value = Array.isArray(value) ? (value[part] ?? null) : null;
       } else {
-        value =
-          typeof value === 'object' && !Array.isArray(value) ? ((value as Record<string, Value>)[part] ?? null) : null;
+        if (Array.isArray(value)) {
+          // Allow numeric strings as indices for arrays
+          const numIndex = parseInt(String(part));
+          value = !isNaN(numIndex) ? (value[numIndex] ?? null) : null;
+        } else if (typeof value === 'object') {
+          value = (value as Record<string, Value>)[part] ?? null;
+        } else {
+          value = null;
+        }
       }
     }
 

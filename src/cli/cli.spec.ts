@@ -54,6 +54,18 @@ describe('CLI', () => {
   });
 
   describe('help', () => {
+    test('should display help with no arguments and exit 0', async () => {
+      const { output, exitCode } = await new Promise<{ output: string; exitCode: number }>((resolve, reject) => {
+        const proc = spawn(CLI, [], { shell: true });
+        let data = '';
+        proc.stdout.on('data', (chunk) => (data += chunk));
+        proc.on('close', (code) => resolve({ output: data, exitCode: code ?? 1 }));
+        proc.on('error', reject);
+      });
+      expect(output).toContain('Zolt - The high-voltage successor to Markdown');
+      expect(exitCode).toBe(0);
+    });
+
     test('should display help with --help flag', async () => {
       const output = await new Promise<string>((resolve, reject) => {
         const proc = spawn(CLI, ['--help'], { shell: true });
