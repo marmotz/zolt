@@ -68,8 +68,8 @@
 - [ ] `//text//` → Italic
 - [ ] `__text__` → Underline
 - [ ] `~~text~~` → Strikethrough
-- [ ] `^{text}` → Superscript (with nesting support)
-- [ ] `_{text}` → Subscript (with nesting support)
+- [x] `^{text}` → Superscript (with nesting support)
+- [x] `_{text}` → Subscript (with nesting support)
 - [ ] `==text==` → Highlight/Mark
 
 ### Styled Inline Groups

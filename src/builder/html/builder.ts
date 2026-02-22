@@ -1007,12 +1007,14 @@ ${childrenHtml}
 
   visitSuperscript(node: SuperscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<sup${attrs}>${node.content}</sup>`;
+    const content = this.processInline(node.content);
+    return `<sup${attrs}>${content}</sup>`;
   }
 
   visitSubscript(node: SubscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<sub${attrs}>${node.content}</sub>`;
+    const content = this.processInline(node.content);
+    return `<sub${attrs}>${content}</sub>`;
   }
 
   visitHighlight(node: HighlightNode): string {

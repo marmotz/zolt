@@ -555,4 +555,54 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('<dd>Definition</dd>');
     expect(html).toContain('</dl>');
   });
+
+  test('should process inline superscript', () => {
+    const html = builder.processInline('2^{10}');
+    expect(html).toBe('2<sup>10</sup>');
+  });
+
+  test('should process inline subscript', () => {
+    const html = builder.processInline('H_{2}O');
+    expect(html).toBe('H<sub>2</sub>O');
+  });
+
+  test('should process nested superscript', () => {
+    const html = builder.processInline('2^{3^{2}}');
+    expect(html).toBe('2<sup>3<sup>2</sup></sup>');
+  });
+
+  test('should process deeply nested superscript', () => {
+    const html = builder.processInline('a^{b^{c^{d}}}');
+    expect(html).toBe('a<sup>b<sup>c<sup>d</sup></sup></sup>');
+  });
+
+  test('should process nested subscript', () => {
+    const html = builder.processInline('x_{y_{z}}');
+    expect(html).toBe('x<sub>y<sub>z</sub></sub>');
+  });
+
+  test('should process mixed nested superscript and subscript', () => {
+    const html = builder.processInline('a^{b_{c}}');
+    expect(html).toBe('a<sup>b<sub>c</sub></sup>');
+  });
+
+  test('should process superscript with subscript inside', () => {
+    const html = builder.processInline('x^{y_{2}}');
+    expect(html).toBe('x<sup>y<sub>2</sub></sup>');
+  });
+
+  test('should process subscript with superscript inside', () => {
+    const html = builder.processInline('x_{y^{2}}');
+    expect(html).toBe('x<sub>y<sup>2</sup></sub>');
+  });
+
+  test('should process superscript with other inline elements', () => {
+    const html = builder.processInline('2^{**bold**}');
+    expect(html).toBe('2<sup><strong>bold</strong></sup>');
+  });
+
+  test('should process subscript with other inline elements', () => {
+    const html = builder.processInline('H_{//italic//}');
+    expect(html).toBe('H<sub><em>italic</em></sub>');
+  });
 });

@@ -306,23 +306,48 @@ export class InlineParser {
   }
 
   private parseSuperscript(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\^\{([^}]+)}/);
-    if (!match) return null;
+    if (!text.startsWith('^{')) return null;
+
+    const content = this.extractBalancedBraces(text, 2);
+    if (content === null) return null;
 
     return {
-      node: { type: 'Superscript', content: match[1] } as SuperscriptNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Superscript', content } as SuperscriptNode,
+      remaining: text.slice(2 + content.length + 1),
     };
   }
 
   private parseSubscript(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^_\{([^}]+)}/);
-    if (!match) return null;
+    if (!text.startsWith('_{')) return null;
+
+    const content = this.extractBalancedBraces(text, 2);
+    if (content === null) return null;
 
     return {
-      node: { type: 'Subscript', content: match[1] } as SubscriptNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Subscript', content } as SubscriptNode,
+      remaining: text.slice(2 + content.length + 1),
     };
+  }
+
+  private extractBalancedBraces(text: string, startIndex: number): string | null {
+    if (startIndex >= text.length || text[startIndex - 1] !== '{') return null;
+
+    let depth = 1;
+    let i = startIndex;
+
+    while (i < text.length && depth > 0) {
+      const char = text[i];
+      if (char === '{') {
+        depth++;
+      } else if (char === '}') {
+        depth--;
+      }
+      i++;
+    }
+
+    if (depth !== 0) return null;
+
+    return text.slice(startIndex, i - 1);
   }
 
   private parseInlineStyle(text: string): { node: ASTNode; remaining: string } | null {

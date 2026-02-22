@@ -165,6 +165,50 @@ Paragraph with [link](url).
     });
   });
 
+  describe('superscript and subscript', () => {
+    test('should build superscript', async () => {
+      const html = await buildString('2^{10} = 1024');
+
+      expect(html).toContain('<sup>10</sup>');
+    });
+
+    test('should build subscript', async () => {
+      const html = await buildString('H_{2}O is water');
+
+      expect(html).toContain('<sub>2</sub>');
+    });
+
+    test('should build nested superscript', async () => {
+      const html = await buildString('2^{3^{2}} = 512');
+
+      expect(html).toContain('<sup>3<sup>2</sup></sup>');
+    });
+
+    test('should build deeply nested superscript', async () => {
+      const html = await buildString('a^{b^{c^{d}}}');
+
+      expect(html).toContain('<sup>b<sup>c<sup>d</sup></sup></sup>');
+    });
+
+    test('should build nested subscript', async () => {
+      const html = await buildString('x_{y_{z}}');
+
+      expect(html).toContain('<sub>y<sub>z</sub></sub>');
+    });
+
+    test('should build superscript with subscript inside', async () => {
+      const html = await buildString('a^{b_{c}}');
+
+      expect(html).toContain('<sup>b<sub>c</sub></sup>');
+    });
+
+    test('should build subscript with superscript inside', async () => {
+      const html = await buildString('a_{b^{c}}');
+
+      expect(html).toContain('<sub>b<sup>c</sup></sub>');
+    });
+  });
+
   describe('buildFile', () => {
     test('should build file to output', async () => {
       await buildFile(testFilePath, testOutputPath);
