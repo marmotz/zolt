@@ -187,12 +187,54 @@ const DEFAULT_CSS = `
       width: 100% !important;
     }
   }
+  .zolt-tabs {
+    margin: 1rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .zolt-tab-list {
+    display: flex;
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+    overflow-x: auto;
+  }
+  .zolt-tab-button {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .zolt-tab-button:hover {
+    color: #333;
+    background: #eee;
+  }
+  .zolt-tab-button.active {
+    color: #0066cc;
+    border-bottom-color: #0066cc;
+    background: #fff;
+  }
+  .zolt-tab-panel {
+    padding: 1rem;
+    display: none;
+  }
+  .zolt-tab-panel.active {
+    display: block;
+  }
 `.trim();
 
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
   private static globalAbbreviations: Map<string, string> = new Map();
+  private tabsCounter: number = 0;
+  private hasTabs: boolean = false;
 
   static setGlobalAbbreviation(abbreviation: string, definition: string): void {
     this.globalAbbreviations.set(abbreviation, definition);
@@ -283,8 +325,9 @@ export class HTMLBuilder implements Builder {
 
   buildDocument(node: DocumentNode): string {
     this.abbreviationDefinitions.clear();
+    this.tabsCounter = 0;
+    this.hasTabs = false;
 
-    // Collect all abbreviations from the document
     this.collectAbbreviations(node);
 
     const allAbbreviations = new Map<string, string>([
@@ -295,6 +338,37 @@ export class HTMLBuilder implements Builder {
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
 
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+
+    const tabsScript = this.hasTabs
+      ? `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.zolt-tabs').forEach(function(tabsContainer) {
+        var buttons = tabsContainer.querySelectorAll('.zolt-tab-button');
+        var panels = tabsContainer.querySelectorAll('.zolt-tab-panel');
+        
+        buttons.forEach(function(button) {
+          button.addEventListener('click', function() {
+            var tabIndex = this.getAttribute('data-tab-index');
+            
+            buttons.forEach(function(btn) {
+              btn.classList.remove('active');
+              btn.setAttribute('aria-selected', 'false');
+            });
+            panels.forEach(function(panel) {
+              panel.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            this.setAttribute('aria-selected', 'true');
+            tabsContainer.querySelector('.zolt-tab-panel[data-tab-index="' + tabIndex + '"]').classList.add('active');
+          });
+        });
+      });
+    });
+  </script>`
+      : '';
+
     return `<!DOCTYPE html>
 <html lang="">
 <head>
@@ -307,6 +381,7 @@ ${DEFAULT_CSS}
 </head>
 <body>
 ${childrenHtml}
+${tabsScript}
 </body>
 </html>`;
   }
@@ -446,9 +521,16 @@ ${childrenHtml}
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
+    if (node.blockType === 'tabs') {
+      return this.visitTabsBlock(node);
+    }
+
+    if (node.blockType === 'tab') {
+      return this.visitTabBlock(node);
+    }
+
     const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
 
-    // Special handling for details
     if (node.blockType === 'details') {
       const open = node.attributes?.open === 'true' ? ' open' : '';
       const attrs = this.renderAllAttributes(node.attributes);
@@ -461,7 +543,6 @@ ${childrenHtml}
 </details>`;
     }
 
-    // Handle special layout logic for columns
     if (node.blockType === 'columns' && node.attributes?.cols) {
       const cols = parseInt(node.attributes.cols);
       if (!isNaN(cols)) {
@@ -473,8 +554,6 @@ ${childrenHtml}
     if (node.blockType === 'column' && node.attributes?.width?.endsWith('%')) {
       const p = parseFloat(node.attributes.width);
       if (!isNaN(p)) {
-        // Formula: width = P% - GAP * (1 - P/100)
-        // This ensures that (Sum of Widths) + (N-1) * GAP = 100%
         const factor = (1 - p / 100).toFixed(3);
         node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
       }
@@ -482,7 +561,6 @@ ${childrenHtml}
 
     const attrs = this.renderAllAttributes(node.attributes);
 
-    // Add specific classes for columns and column blocks for easier styling
     const extraClass = node.blockType === 'columns' || node.blockType === 'column' ? ` ${node.blockType}` : '';
     const semanticTypes = ['info', 'warning', 'error', 'success', 'note', 'abstract'];
     const semanticClass = semanticTypes.includes(node.blockType) ? ` ${node.blockType}` : '';
@@ -494,6 +572,72 @@ ${childrenHtml}
     }
     html += `${childrenHtml}\n</div>`;
     return html;
+  }
+
+  private visitTabsBlock(node: TripleColonBlockNode): string {
+    this.hasTabs = true;
+    const tabsId = `zolt-tabs-${this.tabsCounter++}`;
+    const defaultTab = node.attributes?.default || null;
+
+    const tabChildren = node.children.filter(
+      (child): child is TripleColonBlockNode =>
+        child.type === 'TripleColonBlock' && (child as TripleColonBlockNode).blockType === 'tab'
+    );
+
+    const buttons: string[] = [];
+    const panels: string[] = [];
+
+    let activeIndex = 0;
+    if (defaultTab) {
+      const idx = tabChildren.findIndex((tab) => tab.title === defaultTab);
+      if (idx !== -1) {
+        activeIndex = idx;
+      }
+    }
+
+    tabChildren.forEach((tab, index) => {
+      const isActiveByAttr = tab.attributes?.active === 'true';
+      if (isActiveByAttr) {
+        activeIndex = index;
+      }
+    });
+
+    tabChildren.forEach((tab, index) => {
+      const panelId = `${tabsId}-panel-${index}`;
+      const buttonId = `${tabsId}-button-${index}`;
+      const isActive = index === activeIndex;
+      const title = tab.title || `Tab ${index + 1}`;
+
+      buttons.push(
+        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.processInlineContent(title)}</button>`
+      );
+
+      const tabContent = tab.children.map((child) => this.build(child)).join('\n');
+      panels.push(
+        `  <div id="${panelId}" class="zolt-tab-panel${isActive ? ' active' : ''}" role="tabpanel" aria-labelledby="${buttonId}" data-tab-index="${index}">
+${tabContent}
+  </div>`
+      );
+    });
+
+    const defaultAttr = defaultTab ? ` data-default="${defaultTab}"` : '';
+
+    return `<div id="${tabsId}" class="zolt-tabs"${defaultAttr}>
+  <div class="zolt-tab-list" role="tablist">
+${buttons.join('\n')}
+  </div>
+${panels.join('\n')}
+</div>`;
+  }
+
+  private visitTabBlock(node: TripleColonBlockNode): string {
+    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const activeAttr = node.attributes?.active === 'true' ? ' data-active="true"' : '';
+    const attrs = this.renderAllAttributes(node.attributes);
+
+    return `<div${attrs} class="zolt-tab-placeholder"${activeAttr} data-type="tab">
+${childrenHtml}
+</div>`;
   }
 
   visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {
