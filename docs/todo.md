@@ -403,6 +403,12 @@
 - [x] Update `AGENTS.md` with new test patterns
 - [x] Clean up unused interfaces in CLI (`BuildOptions`, `LintOptions`)
 
+## 22. CLI Features
+
+- [x] Implement `--watch` option for automatic rebuilding
+- [x] Recursive dependency tracking (links and includes) for watch mode
+- [x] Automatic output directory creation
+
 ---
 
 ## Legend

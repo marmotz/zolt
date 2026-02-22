@@ -29,7 +29,7 @@ $products = [
 1-based indexing:
 
 :::foreach {$products as $product}
-{$foreach.index1}. **{$product.name}**
+{$foreach.index1}. {$product.name}
 :::
 
 ## Loop Variables

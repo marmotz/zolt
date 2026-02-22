@@ -96,6 +96,9 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
       case 'Link':
         checkHref(node.href);
         break;
+      case 'Include':
+        checkHref(node.path);
+        break;
       case 'Image':
       case 'Video':
       case 'Audio':

@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { watch as watchFile } from 'fs';
 import { copyFile, mkdir, stat } from 'fs/promises';
 import { basename, dirname, join, resolve } from 'path';
 import { parseArgs } from 'util';
@@ -12,13 +13,15 @@ async function buildFileWithDeps(
   type: 'html' | 'pdf',
   visited: Set<string>,
   customOutputFile?: string
-): Promise<void> {
+): Promise<Set<string>> {
   const absoluteInput = resolve(inputFile);
+  const touchedFiles = new Set<string>();
 
   if (visited.has(absoluteInput)) {
-    return;
+    return touchedFiles;
   }
   visited.add(absoluteInput);
+  touchedFiles.add(absoluteInput);
 
   let outputFile: string;
   if (customOutputFile) {
@@ -28,6 +31,7 @@ async function buildFileWithDeps(
     outputFile = join(outputDir, baseName);
   }
 
+  await mkdir(dirname(outputFile), { recursive: true });
   await buildFile(absoluteInput, outputFile, { type });
   console.log(`Built: ${outputFile}`);
 
@@ -42,6 +46,7 @@ async function buildFileWithDeps(
     try {
       const assetStat = await stat(fullAssetPath);
       if (assetStat.isFile()) {
+        touchedFiles.add(fullAssetPath);
         await mkdir(dirname(destAssetPath), { recursive: true });
         await copyFile(fullAssetPath, destAssetPath);
         // console.log(`Copied asset: ${asset} -> ${destAssetPath}`);
@@ -60,12 +65,17 @@ async function buildFileWithDeps(
     try {
       const linkedStat = await stat(fullLinkedPath);
       if (linkedStat.isFile()) {
-        await buildFileWithDeps(fullLinkedPath, outputDir, type, visited);
+        const subDeps = await buildFileWithDeps(fullLinkedPath, outputDir, type, visited);
+        for (const dep of subDeps) {
+          touchedFiles.add(dep);
+        }
       }
     } catch {
       console.warn(`Warning: Linked file not found: ${fullLinkedPath}`);
     }
   }
+
+  return touchedFiles;
 }
 
 async function main() {
@@ -229,6 +239,119 @@ async function handleLint(args: string[]) {
   process.exit(hasErrors ? 1 : 0);
 }
 
+async function performBuild(
+  files: string[],
+  output: string | undefined,
+  type: 'html' | 'pdf'
+): Promise<Set<string>> {
+  const allTouchedFiles = new Set<string>();
+  const visited = new Set<string>();
+
+  if (files.length === 1) {
+    const inputFile = files[0];
+    let outputFile = output;
+
+    if (output) {
+      const outputStat = await stat(output).catch(() => null);
+      if (outputStat?.isDirectory()) {
+        const touched = await buildFileWithDeps(inputFile, output, type, visited);
+        for (const f of touched) allTouchedFiles.add(f);
+        return allTouchedFiles;
+      } else {
+        outputFile = output;
+      }
+    } else {
+      outputFile = inputFile.replace(/\.zlt$/, '.html');
+    }
+
+    const outputDir = dirname(resolve(outputFile));
+    const touched = await buildFileWithDeps(inputFile, outputDir, type, visited, outputFile);
+    for (const f of touched) allTouchedFiles.add(f);
+  } else {
+    if (!output) {
+      throw new Error('Output directory required for multiple files');
+    }
+
+    const outputStat = await stat(output).catch(() => null);
+    if (!outputStat?.isDirectory()) {
+      throw new Error('Output must be a directory for multiple files');
+    }
+
+    for (const inputFile of files) {
+      const touched = await buildFileWithDeps(inputFile, output, type, visited);
+      for (const f of touched) allTouchedFiles.add(f);
+    }
+  }
+
+  return allTouchedFiles;
+}
+
+async function handleWatch(files: string[], output: string | undefined, type: 'html' | 'pdf') {
+  console.log('Watching for changes... (Press Ctrl+C to stop)');
+
+  const watchers = new Map<string, any>();
+  let buildTimeout: any = null;
+  let isBuilding = false;
+
+  const updateWatchers = (touchedFiles: Set<string>) => {
+    // Files that are currently being watched but are no longer in the dependency graph
+    for (const [filePath, watcher] of watchers) {
+      if (!touchedFiles.has(filePath)) {
+        watcher.close();
+        watchers.delete(filePath);
+      }
+    }
+
+    // New files in the dependency graph
+    for (const filePath of touchedFiles) {
+      if (!watchers.has(filePath)) {
+        try {
+          const watcher = watchFile(filePath, () => {
+            if (buildTimeout) clearTimeout(buildTimeout);
+            buildTimeout = setTimeout(async () => {
+              if (isBuilding) return;
+              isBuilding = true;
+              console.log('\nChange detected, rebuilding...');
+              try {
+                const newTouchedFiles = await performBuild(files, output, type);
+                updateWatchers(newTouchedFiles);
+              } catch (err) {
+                console.error('Rebuild failed:', err instanceof Error ? err.message : 'Unknown error');
+              } finally {
+                isBuilding = false;
+                console.log('Watching for changes...');
+              }
+            }, 100);
+          });
+
+          watcher.on('error', () => {
+            watchers.delete(filePath);
+            watcher.close();
+          });
+
+          watchers.set(filePath, watcher);
+        } catch {
+          // Ignore files that cannot be watched (e.g., deleted during build)
+        }
+      }
+    }
+  };
+
+  try {
+    const initialTouchedFiles = await performBuild(files, output, type);
+    updateWatchers(initialTouchedFiles);
+  } catch (err) {
+    console.error('Initial build failed:', err instanceof Error ? err.message : 'Unknown error');
+    updateWatchers(new Set(files.map((f) => resolve(f))));
+  }
+
+  // Handle termination
+  process.on('SIGINT', () => {
+    for (const watcher of watchers.values()) watcher.close();
+    process.exit(0);
+  });
+}
+
 async function handleBuild(args: string[]) {
   const { values, positionals } = parseArgs({
     args,
@@ -262,48 +385,12 @@ async function handleBuild(args: string[]) {
   }
 
   if (watch) {
-    console.log('Watch mode is not yet implemented');
-    process.exit(1);
+    await handleWatch(files, output, type);
+    return;
   }
 
   try {
-    if (files.length === 1) {
-      const inputFile = files[0];
-      let outputFile = output;
-
-      if (output) {
-        const outputStat = await stat(output).catch(() => null);
-        if (outputStat?.isDirectory()) {
-          const visited = new Set<string>();
-          await buildFileWithDeps(inputFile, output, type, visited);
-          return;
-        } else {
-          outputFile = output;
-        }
-      } else {
-        outputFile = inputFile.replace(/\.zlt$/, '.html');
-      }
-
-      const outputDir = dirname(resolve(outputFile));
-      const visited = new Set<string>();
-      await buildFileWithDeps(inputFile, outputDir, type, visited, outputFile);
-    } else {
-      if (!output) {
-        console.error('Error: Output directory required for multiple files');
-        process.exit(1);
-      }
-
-      const outputStat = await stat(output).catch(() => null);
-      if (!outputStat?.isDirectory()) {
-        console.error('Error: Output must be a directory for multiple files');
-        process.exit(1);
-      }
-
-      const visited = new Set<string>();
-      for (const inputFile of files) {
-        await buildFileWithDeps(inputFile, output, type, visited);
-      }
-    }
+    await performBuild(files, output, type);
   } catch (error) {
     console.error('Build error:', error instanceof Error ? error.message : 'Unknown error');
     process.exit(1);
