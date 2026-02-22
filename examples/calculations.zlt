@@ -228,7 +228,7 @@ $n = 12              # Monthly payments
 $monthly_rate = $rate / $n
 $num_payments = $years * $n
 
-* **Monthly Payment:** {{ $principal * ($monthly_rate * Math.pow(1 + $monthly_rate, $num_payments)) / (Math.pow(1 + $monthly_rate, $num_payments) - 1) }}  # 1014.11
+* **Monthly Payment:** {{ $principal * ($monthly_rate * Math.pow(1 + $monthly_rate, $num_payments)) / (Math.pow(1 + $monthly_rate, $num_payments) - 1) }}  # 1013.37
 
 ### BMI Calculator
 
@@ -242,7 +242,7 @@ $height_m = 1.75
 Underweight
 :::
 :::if {{ $weight_kg / ($height_m * $height_m) >= 18.5 }} and {{ $weight_kg / ($height_m * $height_m) < 25 }}
-Normal weight
+Normal weight # Normal weight
 :::
 :::if {{ $weight_kg / ($height_m * $height_m) >= 25 }} and {{ $weight_kg / ($height_m * $height_m) < 30 }}
 Overweight
@@ -328,11 +328,15 @@ Cannot divide by zero
 
 ### Readability
 
+```
 $subtotal = $quantity * $unit_price
 $total = $subtotal * (1 + $tax_rate)
+```
 
 Better than:
 
-* {{ $quantity * $unit_price * (1 + $tax_rate) }}
+```
+$total = $quantity * $unit_price * (1 + $tax_rate) }}
+```
 
 [← Back to Examples Index](index.zlt)

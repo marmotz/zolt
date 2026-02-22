@@ -236,6 +236,21 @@ describe('Calculations: Lists and Objects', () => {
     expect(html).toBeDefined();
   });
 
+  test('should parse and render multi-line list', async () => {
+    const html = await buildString('$items = [\n  1,\n  2,\n  3\n]\n:::foreach {$items as $item}\n- {$item}\n:::');
+    expect(html).toContain('<li>1</li>');
+    expect(html).toContain('<li>2</li>');
+    expect(html).toContain('<li>3</li>');
+  });
+
+  test('should parse and render multi-line object list', async () => {
+    const html = await buildString(
+      '$items = [\n  {name: "A", val: 1},\n  {name: "B", val: 2}\n]\n:::foreach {$items as $item}\n- {$item.name}: {$item.val}\n:::'
+    );
+    expect(html).toContain('<li>A: 1</li>');
+    expect(html).toContain('<li>B: 2</li>');
+  });
+
   test('should parse and render object', async () => {
     const html = await buildString('$item = {name: "Widget", price: 19.99}');
     expect(html).toBeDefined();

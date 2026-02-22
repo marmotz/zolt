@@ -4,36 +4,36 @@ type Value = number | string | boolean | null | Value[] | { [key: string]: Value
 
 export class ContentProcessor {
   private evaluator: ExpressionEvaluator;
+  private pendingDefinition: { varName: string; valueStart: string; isGlobal: boolean } | null = null;
+  private pendingLines: string[] = [];
 
   constructor(evaluator: ExpressionEvaluator) {
     this.evaluator = evaluator;
   }
 
   processContent(content: string): string {
-    if (!content) return '';
+    if (!content && !this.pendingDefinition) return '';
 
     const lines = content.split('\n');
     const resultLines: string[] = [];
-    let pendingDefinition: { varName: string; valueStart: string; isGlobal: boolean } | null = null;
-    let pendingLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const trimmed = line.trim();
 
-      if (pendingDefinition) {
-        pendingLines.push(line);
-        const combined = pendingLines.join('\n');
+      if (this.pendingDefinition) {
+        this.pendingLines.push(line);
+        const combined = this.pendingLines.join('\n');
         const valuePart = combined.substring(combined.indexOf('=') + 1).trim();
 
         if (this.isCompleteValue(valuePart)) {
           const value = this.parseOrEvaluateValue(valuePart);
-          this.evaluator.setVariable(pendingDefinition.varName, value);
-          for (let j = 0; j < pendingLines.length; j++) {
+          this.evaluator.setVariable(this.pendingDefinition.varName, value);
+          for (let j = 0; j < this.pendingLines.length; j++) {
             resultLines.push('');
           }
-          pendingDefinition = null;
-          pendingLines = [];
+          this.pendingDefinition = null;
+          this.pendingLines = [];
         }
         continue;
       }
@@ -50,8 +50,8 @@ export class ContentProcessor {
           this.evaluator.setVariable(varName, value);
           resultLines.push('');
         } else {
-          pendingDefinition = { varName, valueStart: varValue, isGlobal: false };
-          pendingLines = [line];
+          this.pendingDefinition = { varName, valueStart: varValue, isGlobal: false };
+          this.pendingLines = [line];
         }
       } else if (globalVarMatch) {
         const varName = globalVarMatch[1];
@@ -62,8 +62,8 @@ export class ContentProcessor {
           this.evaluator.setVariable(varName, value);
           resultLines.push('');
         } else {
-          pendingDefinition = { varName, valueStart: varValue, isGlobal: true };
-          pendingLines = [line];
+          this.pendingDefinition = { varName, valueStart: varValue, isGlobal: true };
+          this.pendingLines = [line];
         }
       } else {
         let processedLine = this.processExpressions(line);

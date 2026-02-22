@@ -444,8 +444,12 @@ export class Parser {
     let attributes: Attributes | undefined;
     const attrMatch = content.match(/\s+\{([^}]+)}$/);
     if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
-      content = content.slice(0, -attrMatch[0].length).trim();
+      const attrContent = attrMatch[1];
+      // Skip if this looks like a variable reference {$...} or expression {{...}}
+      if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+        attributes = InlineParser.parseAttributes(attrContent);
+        content = content.slice(0, -attrMatch[0].length).trim();
+      }
     }
 
     this.skipNewlines();
@@ -501,8 +505,12 @@ export class Parser {
     const attrMatch = value.match(/\s+\{([^}]+)}$/);
     let language = value;
     if (attrMatch) {
-      attributes = InlineParser.parseAttributes(attrMatch[1]);
-      language = value.replace(/\s+\{([^}]+)}$/, '').trim();
+      const attrContent = attrMatch[1];
+      // Skip if this looks like a variable reference {$...} or expression {{...}}
+      if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+        attributes = InlineParser.parseAttributes(attrContent);
+        language = value.replace(/\s+\{([^}]+)}$/, '').trim();
+      }
     }
 
     let content = '';
@@ -617,7 +625,11 @@ export class Parser {
     if (attrsStr) {
       const attrMatch = attrsStr.match(/^\{([^}]+)}$/);
       if (attrMatch) {
-        attributes = InlineParser.parseAttributes(attrMatch[1]);
+        const attrContent = attrMatch[1];
+        // Skip if this looks like a variable reference {$...} or expression {{...}}
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+          attributes = InlineParser.parseAttributes(attrContent);
+        }
       }
     }
 
