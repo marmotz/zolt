@@ -388,35 +388,6 @@ ${tabsScript}
 </html>`;
   }
 
-  private preProcessVariables(node: ASTNode): void {
-    if (node.type === 'Paragraph' || node.type === 'Heading') {
-      const content = (node as any).content;
-      if (typeof content === 'string') {
-        const trimmed = content.trim();
-        const localVarMatch = trimmed.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
-        const globalVarMatch = trimmed.match(/^\$\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
-
-        if (localVarMatch) {
-          const varName = localVarMatch[1];
-          const varValue = localVarMatch[2].trim();
-          const value = this.evaluator.parseValue(varValue);
-          this.evaluator.setVariable(varName, value);
-        } else if (globalVarMatch) {
-          const varName = globalVarMatch[1];
-          const varValue = globalVarMatch[2].trim();
-          const value = this.evaluator.parseValue(varValue);
-          this.evaluator.setVariable(varName, value);
-        }
-      }
-    }
-
-    if ('children' in node && Array.isArray(node.children)) {
-      for (const child of node.children) {
-        this.preProcessVariables(child);
-      }
-    }
-  }
-
   private collectAbbreviations(node: ASTNode): void {
     if (node.type === 'AbbreviationDefinition') {
       this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
@@ -475,8 +446,7 @@ ${tabsScript}
       case 'Paragraph':
       case 'Heading': {
         const contentNode = node as ParagraphNode | HeadingNode;
-        const processed = this.contentProcessor.processContent(contentNode.content);
-        contentNode.content = processed;
+        contentNode.content = this.contentProcessor.processContent(contentNode.content);
         break;
       }
       case 'List': {
@@ -488,8 +458,7 @@ ${tabsScript}
       }
       case 'ListItem': {
         const item = node as ListItemNode;
-        const processed = this.contentProcessor.processContent(item.content);
-        item.content = processed;
+        item.content = this.contentProcessor.processContent(item.content);
         for (const child of item.children) {
           this.processNodeVariables(child);
         }
@@ -498,8 +467,7 @@ ${tabsScript}
       case 'DefinitionTerm':
       case 'DefinitionDescription': {
         const defNode = node as DefinitionTermNode | DefinitionDescriptionNode;
-        const processed = this.contentProcessor.processContent(defNode.content);
-        defNode.content = processed;
+        defNode.content = this.contentProcessor.processContent(defNode.content);
         for (const child of defNode.children) {
           this.processNodeVariables(child);
         }
@@ -514,15 +482,21 @@ ${tabsScript}
       }
       case 'TripleColonBlock': {
         const block = node as TripleColonBlockNode;
+        const foreachInfo = this.contentProcessor.parseForeach(block.blockType);
+        const isIfBlock = block.blockType.match(/^(if|foreach)(\s|{|$)/);
+
+        if (foreachInfo || isIfBlock) {
+          // DO NOT process variables in if/foreach blocks during pre-processing
+          // as they must be evaluated per-iteration with specific scope.
+          break;
+        }
+
         if (block.title) {
           block.title = this.contentProcessor.processContent(block.title);
         }
-        const foreachInfo = this.contentProcessor.parseForeach(block.blockType);
-        const isIfBlock = block.blockType.match(/^if\s+(.+)$/);
-        if (!foreachInfo && !isIfBlock) {
-          for (const child of block.children) {
-            this.processNodeVariables(child);
-          }
+
+        for (const child of block.children) {
+          this.processNodeVariables(child);
         }
         break;
       }
@@ -641,6 +615,7 @@ ${tabsScript}
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
+    console.log(`VISIT TRIPLE COLON: type="${node.blockType}"`);
     if (node.blockType === 'tabs') {
       return this.visitTabsBlock(node);
     }
@@ -738,7 +713,13 @@ ${childrenHtml}
       childBuilder.inlineParser = this.inlineParser;
 
       for (const child of node.children) {
-        const childHtml = childBuilder.build(child);
+        // We need to clone the node or at least ensure we don't overwrite
+        // the original node's content if it's shared across iterations.
+        // However, AST nodes are currently being modified in place by processNodeVariables.
+        // For foreach, we MUST process them in each iteration with the current scope.
+        const childClone = JSON.parse(JSON.stringify(child));
+        childBuilder.processNodeVariables(childClone);
+        const childHtml = childBuilder.build(childClone);
         if (childHtml) {
           results.push(childHtml);
         }
@@ -912,8 +893,9 @@ ${childrenHtml}
     while (remaining.length > 0) {
       const exprMatch = remaining.match(/\{\{(.+?)}}/);
       const varMatch = remaining.match(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/);
+      const codeMatch = remaining.match(/`[^`]*`/);
 
-      let firstMatch: { type: 'expr' | 'var'; index: number; length: number; content: string } | null = null;
+      let firstMatch: { type: 'expr' | 'var' | 'code'; index: number; length: number; content: string } | null = null;
 
       if (exprMatch && exprMatch.index !== undefined) {
         firstMatch = { type: 'expr', index: exprMatch.index, length: exprMatch[0].length, content: exprMatch[1] };
@@ -925,6 +907,12 @@ ${childrenHtml}
         }
       }
 
+      if (codeMatch && codeMatch.index !== undefined) {
+        if (!firstMatch || codeMatch.index < firstMatch.index) {
+          firstMatch = { type: 'code', index: codeMatch.index, length: codeMatch[0].length, content: codeMatch[0] };
+        }
+      }
+
       if (firstMatch) {
         if (firstMatch.index > 0) {
           parts.push({ type: 'text', content: remaining.slice(0, firstMatch.index) });
@@ -933,9 +921,12 @@ ${childrenHtml}
         if (firstMatch.type === 'expr') {
           const value = this.evaluator.evaluate(firstMatch.content);
           parts.push({ type: 'text', content: this.formatValue(value) });
-        } else {
+        } else if (firstMatch.type === 'var') {
           const value = this.evaluator.evaluate('$' + firstMatch.content);
           parts.push({ type: 'text', content: this.formatValue(value) });
+        } else {
+          // code
+          parts.push({ type: 'text', content: firstMatch.content });
         }
 
         remaining = remaining.slice(firstMatch.index + firstMatch.length);

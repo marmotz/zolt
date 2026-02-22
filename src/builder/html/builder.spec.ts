@@ -605,4 +605,12 @@ describe('HTMLBuilder', () => {
     const html = builder.processInline('H_{//italic//}');
     expect(html).toBe('H<sub><em>italic</em></sub>');
   });
+
+  test('should not replace variables inside code spans in processInlineContent', () => {
+    const localBuilder = new HTMLBuilder();
+    (localBuilder as any).evaluator.setVariable('var', 'REPLACED');
+    const html = localBuilder.processInlineContent('Code: `{$var}` and Var: {$var}');
+    expect(html).toContain('Code: <code>{$var}</code>');
+    expect(html).toContain('Var: REPLACED');
+  });
 });

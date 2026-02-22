@@ -41,4 +41,11 @@ describe('Code Blocks E2E', () => {
     expect(html).toContain('title="My Script"');
     expect(html).toContain('<code class="language-javascript">const x = 1;');
   });
+
+  test('should NOT replace variables inside code block', async () => {
+    const zolt = '$var = "REPLACED"\n```\n{$var}\n```';
+    const html = await buildString(zolt);
+    expect(html).toContain('<code>{$var}</code>');
+    expect(html).not.toContain('REPLACED');
+  });
 });

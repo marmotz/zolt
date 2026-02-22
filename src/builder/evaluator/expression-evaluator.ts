@@ -182,9 +182,43 @@ export class ExpressionEvaluator {
   }
 
   evaluate(expression: string): Value {
-    const trimmed = expression.trim();
+    let trimmed = expression.trim();
 
     if (!trimmed) return null;
+
+    if (trimmed === 'true') return true;
+    if (trimmed === 'false') return false;
+    if (trimmed === 'null') return null;
+
+    // Handle logical AND (&& or and)
+    if (trimmed.includes(' && ') || trimmed.toLowerCase().includes(' and ')) {
+      const parts = trimmed.split(/ && | and /i);
+      for (const part of parts) {
+        const val = this.evaluate(part);
+        if (!this.isTruthy(val)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Handle logical OR (|| or or)
+    if (trimmed.includes(' || ') || trimmed.toLowerCase().includes(' or ')) {
+      const parts = trimmed.split(/ \|\| | or /i);
+      for (const part of parts) {
+        const val = this.evaluate(part);
+        if (this.isTruthy(val)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Handle negation !
+    if (trimmed.startsWith('!')) {
+      const operand = this.evaluate(trimmed.slice(1));
+      return !this.isTruthy(operand);
+    }
 
     const conditionalMatch = trimmed.match(/^(.+?)\s*(==|!=|<=?|>=?)\s*(.+)$/);
     if (conditionalMatch) {
@@ -192,28 +226,6 @@ export class ExpressionEvaluator {
       const op = conditionalMatch[2];
       const right = this.evaluate(conditionalMatch[3]);
       return this.compare(left, op, right);
-    }
-
-    const andMatch = trimmed.match(/\s+and\s+/i);
-    if (andMatch) {
-      const parts = trimmed.split(/\s+and\s+/i);
-      for (const part of parts) {
-        if (!this.evaluate(part)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    const orMatch = trimmed.match(/\s+or\s+/i);
-    if (orMatch) {
-      const parts = trimmed.split(/\s+or\s+/i);
-      for (const part of parts) {
-        if (this.evaluate(part)) {
-          return true;
-        }
-      }
-      return false;
     }
 
     return this.evaluateExpression(trimmed);
@@ -657,7 +669,11 @@ export class ExpressionEvaluator {
     if (value === null || value === undefined) return false;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'number') return value !== 0;
-    if (typeof value === 'string') return value.length > 0;
+    if (typeof value === 'string') {
+      if (value.toLowerCase() === 'false') return false;
+      if (value.toLowerCase() === 'null') return false;
+      return value.length > 0;
+    }
     if (Array.isArray(value)) return value.length > 0;
     if (typeof value === 'object') return Object.keys(value).length > 0;
     return true;

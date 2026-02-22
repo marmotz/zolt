@@ -380,6 +380,29 @@ describe('Calculations: Conditional', () => {
     const html = await buildString('$a = 5\n$b = 10\n:::if {{ $a > 3 }} and {{ $b < 20 }}\nBoth true\n:::');
     expect(html).toContain('Both true');
   });
+
+  test('should handle complex conditions in foreach loop', async () => {
+    const input = `
+$items = ["A", "B", "C"]
+:::foreach {$items as $item}
+:::if {$foreach.first}
+FIRST: {$item}
+:::
+:::if {$foreach.last}
+LAST: {$item}
+:::
+:::if {!$foreach.first && !$foreach.last}
+MIDDLE: {$item}
+:::
+:::
+`;
+    const html = await buildString(input);
+    expect(html).toContain('FIRST: A');
+    expect(html).not.toContain('MIDDLE: A');
+    expect(html).toContain('MIDDLE: B');
+    expect(html).toContain('LAST: C');
+    expect(html).not.toContain('MIDDLE: C');
+  });
 });
 
 describe('Calculations: Complex Examples', () => {

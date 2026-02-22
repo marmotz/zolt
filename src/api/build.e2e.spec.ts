@@ -163,6 +163,20 @@ Paragraph with [link](url).
 
       expect(html).toContain('<span style="color: #8B5CF6">Purple</span>');
     });
+
+    test('should NOT replace variables inside inline code spans', async () => {
+      const html = await buildString('$var = "REPLACED"\nCode: `{$var}`');
+
+      expect(html).toContain('<code>{$var}</code>');
+      expect(html).not.toContain('<code>REPLACED</code>');
+    });
+
+    test('should NOT replace expressions inside inline code spans', async () => {
+      const html = await buildString('Code: `{{1 + 1}}`');
+
+      expect(html).toContain('<code>{{1 + 1}}</code>');
+      expect(html).not.toContain('<code>2</code>');
+    });
   });
 
   describe('superscript and subscript', () => {

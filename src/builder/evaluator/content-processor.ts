@@ -171,9 +171,12 @@ export class ContentProcessor {
   }
 
   private processExpressions(content: string): string {
-    const expressionRegex = /\{\{\s*(.+?)\s*}}/g;
+    const combinedRegex = /`[^`]*`|\{\{\s*(.+?)\s*}}/g;
 
-    return content.replace(expressionRegex, (match, expression) => {
+    return content.replace(combinedRegex, (match, expression) => {
+      if (match.startsWith('`')) {
+        return match;
+      }
       try {
         const value = this.evaluator.evaluate(expression);
         return this.formatValue(value);
@@ -184,9 +187,12 @@ export class ContentProcessor {
   }
 
   private processVariableReferences(content: string): string {
-    const varRefRegex = /\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/g;
+    const combinedRegex = /`[^`]*`|\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/g;
 
-    return content.replace(varRefRegex, (match, varPath) => {
+    return content.replace(combinedRegex, (match, varPath) => {
+      if (match.startsWith('`')) {
+        return match;
+      }
       try {
         const value = this.evaluator.evaluate('$' + varPath);
         return this.formatValue(value);
@@ -220,12 +226,40 @@ export class ContentProcessor {
   }
 
   evaluateCondition(condition: string): boolean {
-    const expr = condition.replace(/\{\{\s*(.+?)\s*}}/g, (_, expr) => {
+    let expr = condition.trim();
+    if (expr.startsWith('{') && expr.endsWith('}')) {
+      // Only strip if it's a single group and not a special marker
+      let depth = 0;
+      let singleGroup = true;
+      for (let i = 0; i < expr.length; i++) {
+        if (expr[i] === '{') depth++;
+        else if (expr[i] === '}') depth--;
+        if (depth === 0 && i < expr.length - 1) {
+          singleGroup = false;
+          break;
+        }
+      }
+
+      if (singleGroup && !expr.startsWith('{{') && !expr.startsWith('{$')) {
+        expr = expr.slice(1, -1).trim();
+      }
+    }
+
+    expr = expr.replace(/\{\{\s*(.+?)\s*}}/g, (_, expr) => {
       try {
         const value = this.evaluator.evaluate(expr);
         return this.formatValue(value);
       } catch {
         return 'false';
+      }
+    });
+
+    expr = expr.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+])*)}/g, (_, varPath) => {
+      try {
+        const value = this.evaluator.evaluate('$' + varPath);
+        return this.formatValue(value);
+      } catch {
+        return 'null';
       }
     });
 

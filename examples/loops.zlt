@@ -51,12 +51,13 @@ Available automatic variables:
 :::if {$foreach.first}
 ### 🏆 Featured Product: {$product.name}
 :::
+
 :::if {$foreach.last}
 ### Clearance Item: {$product.name}
 :::
+
 :::if {!$foreach.first && !$foreach.last}
 **{$product.name}**
-:::
 :::
 :::
 

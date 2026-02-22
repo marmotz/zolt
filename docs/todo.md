@@ -17,7 +17,7 @@
 ### Phase 1: Variables
 
 - [x] Parse variable definitions `$var = "value"`
-- [x] Replace variable occurrences `{$var}`
+- [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and blocks)
 - [ ] Implement automatic date variables (`{$created}`, `{$modified}`)
 - [ ] Support date formatting with tokens (`DD`, `MM`, `YYYY`, `YY`, `HH`, `mm`, `ss`)
 - [ ] Support timezone configuration

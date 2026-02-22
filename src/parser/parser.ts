@@ -553,7 +553,24 @@ export class Parser {
     if (attrMatch) {
       const attrContent = attrMatch[1];
       // Skip if this looks like a variable reference {$...}, expression {{...}}, or foreach/if condition
-      if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !attrContent.includes(' as $')) {
+      const isSpecialBlock = value.trim().startsWith('if ') || value.trim().startsWith('foreach ');
+      let shouldSkip = attrContent.startsWith('$') || 
+                       attrContent.startsWith('{') || 
+                       attrContent.includes(' as $') || 
+                       attrContent.startsWith('!') ||
+                       attrContent.startsWith('(');
+      
+      if (isSpecialBlock && !shouldSkip) {
+        // If it's a special block and we haven't decided to skip yet, 
+        // check if there are other braces before these attributes.
+        // If not, these braces likely contain the condition/loop info.
+        const beforeAttrs = value.substring(0, value.length - attrMatch[0].length);
+        if (!beforeAttrs.includes('{')) {
+          shouldSkip = true;
+        }
+      }
+
+      if (!shouldSkip) {
         attributes = InlineParser.parseAttributes(attrContent);
         remaining = value.replace(/\s+\{([^}]+)}$/, '').trim();
       }
@@ -561,7 +578,8 @@ export class Parser {
 
     // Extract title [Title]
     let title: string | undefined;
-    const titleMatch = remaining.match(/\s+\[([^\]]+)]$/);
+    const isSpecialBlock = remaining.match(/^(if|foreach)(\s|{|$)/) || remaining === 'if true' || remaining === 'if false' || remaining === 'if null';
+    const titleMatch = !isSpecialBlock ? remaining.match(/\s+\[([^\]]+)]$/) : null;
     let blockType = remaining;
     if (titleMatch) {
       title = titleMatch[1];
