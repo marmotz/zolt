@@ -742,7 +742,7 @@ print("Hello")
 | Élément   | Attribut      | Description                   |
 |-----------|---------------|-------------------------------|
 | `:::tabs` | `default=Nom` | Onglet actif par défaut       |
-| `:::tab`  | `active=true` | Marque cet onglet comme actif |
+| `:::tab`  | `active=true` | Marque cet onglet comme actif | 
 
 #### Exemple Complet
 
@@ -1263,27 +1263,34 @@ Le Zolt fournit des variables automatiques pour les dates de fichier.
 #### Variables Disponibles
 
 ```
-{$created}      # Date de création du fichier
-{$modified}     # Date de dernière modification
+{$created}      # Date de création du fichier (timestamp ISO 8601)
+{$modified}     # Date de dernière modification (timestamp ISO 8601)
 ```
 
-#### Formatage des Dates
+Les variables `{$created}` et `{$modified}` retournent des timestamps au format ISO 8601 (ex:
+`2026-02-23T14:30:45.123Z`).
 
-Le format peut être configuré globalement :
+#### Namespace Date
+
+Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux namespaces `Math`, `String` et `List`.
 
 ```
-$date_format = "DD/MM/YYYY"
-$datetime_format = "DD/MM/YYYY HH:mm"
-
-Date de création : {$created}
-Dernière modification : {$modified}
+{{ Date.format($created, "DD/MM/YYYY") }}        # 23/02/2026
+{{ Date.format($modified, "YYYY-MM-DD HH:mm") }} # 2026-02-23 14:30
 ```
 
-#### Formats Disponibles
+#### Fonctions Disponibles
+
+| Fonction                    | Description             | Exemple                               |
+|-----------------------------|-------------------------|---------------------------------------|
+| `Date.format(date, format)` | Formate une date        | `Date.format($created, "DD/MM/YYYY")` |
+| `Date.now()`                | Date et heure actuelles | `Date.now()`                          |
+
+#### Format Tokens
 
 | Token  | Description        | Exemple |
 |--------|--------------------|---------|
-| `DD`   | Jour (2 chiffres)  | 18      |
+| `DD`   | Jour (2 chiffres)  | 23      |
 | `MM`   | Mois (2 chiffres)  | 02      |
 | `YYYY` | Année (4 chiffres) | 2026    |
 | `YY`   | Année (2 chiffres) | 26      |
@@ -1291,24 +1298,34 @@ Dernière modification : {$modified}
 | `mm`   | Minutes            | 30      |
 | `ss`   | Secondes           | 45      |
 
-#### Fuseaux Horaires
+#### Exemples d'Utilisation
 
 ```
-$timezone = "Europe/Paris"
-$created      # Utilise le fuseau configuré
+# Dates brutes (format ISO 8601)
+Créé le : {$created}
+Modifié le : {$modified}
+
+# Dates formatées
+Date de création : {{ Date.format($created, "DD/MM/YYYY") }}
+Dernière modification : {{ Date.format($modified, "DD MMMM YYYY à HH:mm") }}
+
+# Format ISO
+Publié le : {{ Date.format($created, "YYYY-MM-DD") }}
+
+# Format américain
+Date : {{ Date.format($created, "MM/DD/YYYY") }}
 ```
 
-#### Exemple d'Utilisation
+#### Combinaison avec d'autres Fonctions
 
 ```
----
-title: "Document Zolt"
-date: {$created}
-last_update: {$modified}
----
+# Dans une expression
+Année de création : {{ String.upper(Date.format($created, "YYYY")) }}
 
-Ce document a été créé le {$created}.
-Dernière mise à jour : {$modified}.
+# Formatage conditionnel
+:::if {{ $modified > $created }}
+Dernière mise à jour : {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+:::
 ```
 
 ### 5.8 Abbréviations

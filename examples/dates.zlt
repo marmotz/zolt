@@ -7,473 +7,186 @@ Using automatic date variables:
 This document was created on: {$created}
 Last modified: {$modified}
 
-## Date Formatting
+## Date Formatting with Date.format()
 
-Configure global date format:
+Use the `Date.format()` function to format dates:
 
-```
-$date_format = "DD/MM/YYYY"
-$datetime_format = "DD/MM/YYYY HH:mm"
-```
-
-### Formatted Output
-
-**Date only:** {$created}
-**Date and time:** {$datetime_format}
+**Date only:** {{ Date.format($created, "DD/MM/YYYY") }}
+**Date and time:** {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+**ISO format:** {{ Date.format($created, "YYYY-MM-DD") }}
 
 ## Format Tokens
 
 Available format tokens:
 
-| Token | Description | Example |
-|-------|-------------|---------|
-| `DD` | Day (2 digits) | 18 |
-| `MM` | Month (2 digits) | 02 |
-| `YYYY` | Year (4 digits) | 2026 |
-| `YY` | Year (2 digits) | 26 |
-| `HH` | Hour (24h) | 14 |
-| `mm` | Minutes | 30 |
-| `ss` | Seconds | 45 |
+| Token  | Description      | Example |
+|--------|------------------|---------|
+| `DD`   | Day (2 digits)   | 23      |
+| `MM`   | Month (2 digits) | 02      |
+| `YYYY` | Year (4 digits)  | 2026    |
+| `YY`   | Year (2 digits)  | 26      |
+| `HH`   | Hour (24h)       | 14      |
+| `mm`   | Minutes          | 30      |
+| `ss`   | Seconds          | 45      |
 
 ## Common Date Formats
 
 ### ISO Format
 
-```yaml
----
-$date_format = "YYYY-MM-DD"
----
-
-Created: {$created}
-```
+Created: {{ Date.format($created, "YYYY-MM-DD") }}
 
 ### European Format
 
-```yaml
----
-$date_format = "DD/MM/YYYY"
----
-
-Created: {$created}
-```
+Created: {{ Date.format($created, "DD/MM/YYYY") }}
 
 ### US Format
 
-```yaml
----
-$date_format = "MM/DD/YYYY"
----
-
-Created: {$created}
-```
+Created: {{ Date.format($created, "MM/DD/YYYY") }}
 
 ### Custom Format
 
-```yaml
----
-$date_format = "DD MMM, YYYY"
----
-
-Created: {$created}
-```
+Created: {{ Date.format($created, "DD MMM, YYYY") }}
 
 ## Practical Examples
 
 ### Document Header
 
-```yaml
----
-$date_format = "DD MMMM YYYY"
----
-```
-
 # My Document
 
-**Created:** {$created}
-**Last Updated:** {$modified}
+**Created:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Last Updated:** {{ Date.format($modified, "DD MMMM YYYY à HH:mm") }}
 
 ### Version History
 
-```yaml
----
-$date_format = "YYYY-MM-DD HH:mm"
----
-```
-
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | {$created} | Initial release |
-| 1.1.0 | {$modified} | Bug fixes and improvements |
+| Version | Date                                       | Changes                    |
+|---------|--------------------------------------------|----------------------------|
+| 1.0.0   | {{ Date.format($created, "YYYY-MM-DD") }}  | Initial release            |
+| 1.1.0   | {{ Date.format($modified, "YYYY-MM-DD") }} | Bug fixes and improvements |
 
 ### Blog Post
 
-```yaml
----
-$date_format = "MMMM DD, YYYY"
----
-```
-
 # Post Title
 
-**Published:** {$created}
+**Published:** {{ Date.format($created, "MMMM DD, YYYY") }}
 
 ### Technical Report
 
-```yaml
----
-$date_format = "DD/MM/YYYY HH:mm"
-$timezone = "UTC"
----
-```
+**Report Generated:** {{ Date.format($created, "DD/MM/YYYY HH:mm") }}
 
-**Report Generated:** {$created} (UTC)
+## Multiple Date Formats in Same Document
 
-## Time Zones
+**Short format:** {{ Date.format($created, "DD/MM/YYYY") }}
+**Long format:** {{ Date.format($created, "DD MMMM, YYYY") }}
+**Full datetime:** {{ Date.format($created, "YYYY-MM-DD HH:mm:ss") }}
+**Compact:** {{ Date.format($created, "YYYYMMDD") }}
 
-### Setting Time Zone
+## Combining with Other Functions
 
-```yaml
----
-$timezone = "America/New_York"
-$datetime_format = "DD/MM/YYYY HH:mm"
----
+### With String Functions
 
-Created: {$created}
-```
+Year: {{ String.upper(Date.format($created, "YYYY")) }}
+Compact date: {{ String.replace(Date.format($created, "YYYY-MM-DD"), "-", "") }}
 
-### Available Time Zones
+### With Math Functions
 
-Common time zones:
+Timestamp in seconds: {{ Math.floor($created / 1000) }}
 
-```yaml
----
-# US Time Zones
-$timezone = "America/New_York"    # EST/EDT
-$timezone = "America/Chicago"      # CST/CDT
-$timezone = "America/Los_Angeles"  # PST/PDT
+### In Conditional Blocks
 
-# European Time Zones
-$timezone = "Europe/London"        # GMT/BST
-$timezone = "Europe/Paris"         # CET/CEST
-$timezone = "Europe/Berlin"        # CET/CEST
-
-# Asian Time Zones
-$timezone = "Asia/Tokyo"           # JST
-$timezone = "Asia/Shanghai"        # CST
-$timezone = "Asia/Dubai"           # GST
-
-# UTC
-$timezone = "UTC"                  # Coordinated Universal Time
----
-```
-
-## Multiple Date Formats
-
-Using different formats in the same document:
-
-```yaml
----
-$date_short = "DD/MM/YYYY"
-$date_long = "DD MMMM, YYYY"
-$datetime = "YYYY-MM-DD HH:mm:ss"
----
-```
-
-**Short:** {$date_short}
-**Long:** {$date_long}
-**Full:** {$datetime}
-
-## Date Calculations
-
-### Relative Dates
-
-Document age: {{ Math.floor(({$modified} - {$created}) / 86400) }} days
-
-**Note:** This assumes date calculations are supported in your Zolt implementation.
-
-### Example Usage
-
-```yaml
----
-$date_format = "DD MMMM YYYY"
----
-```
-
-# Project Documentation
-
-**Created:** {$created}
-**Last Modified:** {$modified}
-
-:::if {$modified > {$created}}
+:::if {{ $modified > $created }}
 *This document has been updated since creation.*
+Last update: {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
 :::
-
-## Metadata Integration
-
-### Frontmatter with Dates
-
-```yaml
----
-title: "My Document"
-created: {$created}
-modified: {$modified}
-date_format: "DD/MM/YYYY"
----
-```
-
-### Publishing Workflow
-
-```yaml
----
-title: "Blog Post"
-published_at: {$created}
-last_updated: {$modified}
-status: "published"
----
-```
-
-## Date Display Patterns
-
-### Human-Readable Dates
-
-```yaml
----
-$date_human = "MMMM DD, YYYY"
----
-```
-
-Today is {$date_human}
-
-### Compact Dates
-
-```yaml
----
-$date_compact = "YYYYMMDD"
----
-```
-
-File: document_{$date_compact}.zlt
-
-### Verbose Dates
-
-```yaml
----
-$date_verbose = "dddd, MMMM DD, YYYY 'at' HH:mm"
----
-```
-
-Full timestamp: {$date_verbose}
 
 ## Use Cases
 
 ### Document Templates
 
-```yaml
----
-title: "Meeting Minutes"
-$date_format = "DD MMMM YYYY"
-$meeting_date = {$created}
----
-```
+# Meeting Minutes - {{ Date.format($created, "DD MMMM YYYY") }}
 
-# Meeting Minutes - {$meeting_date}
+**Date:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Time:** {{ Date.format($created, "HH:mm") }}
 
-**Date:** {$meeting_date}
-**Time:** {$datetime_format}
-
-### Version Control
-
-```yaml
----
-title: "Changelog"
-$date_format = "YYYY-MM-DD"
----
-```
+### Changelog
 
 ## Changelog
 
-### Version 1.0.0 ({$created})
+### Version 1.0.0 ({{ Date.format($created, "YYYY-MM-DD") }})
 - Initial release
 - Core features implemented
 
-### Version 1.1.0 ({$modified})
+### Version 1.1.0 ({{ Date.format($modified, "YYYY-MM-DD") }})
 - Bug fixes
 - Performance improvements
 
 ### Legal Documents
 
-```yaml
----
-title: "Terms of Service"
-$date_format = "MMMM DD, YYYY"
-$effective_date = {$created}
----
-```
+**Effective Date:** {{ Date.format($created, "MMMM DD, YYYY") }}
 
-**Effective Date:** {$effective_date}
-
-**Last Updated:** {$modified}
+**Last Updated:** {{ Date.format($modified, "MMMM DD, YYYY") }}
 
 ## Date Localization
 
-### Multi-Language Support
+### French Format
 
-```yaml
----
-$lang = "fr"
-$date_format = "DD/MM/YYYY"
----
-```
+**Date de création:** {{ Date.format($created, "DD/MM/YYYY") }}
+**Dernière modification:** {{ Date.format($modified, "DD/MM/YYYY") }}
 
-**Date de création:** {$created}
-**Dernière modification:** {$modified}
+### German Format
 
-```yaml
----
-$lang = "de"
-$date_format = "DD.MM.YYYY"
----
-```
+**Erstellungsdatum:** {{ Date.format($created, "DD.MM.YYYY") }}
+**Letzte Änderung:** {{ Date.format($modified, "DD.MM.YYYY") }}
 
-**Erstellungsdatum:** {$created}
-**Letzte Änderung:** {$modified}
+### International Format
 
-## Dynamic Dates
+**Created:** {{ Date.format($created, "YYYY-MM-DD") }}
+**Modified:** {{ Date.format($modified, "YYYY-MM-DD") }}
 
-### Publication Schedule
+## Date.now() Function
 
-```yaml
----
-$scheduled_date = "2026-03-01"
-$date_format = "DD MMMM YYYY"
----
-```
+Get the current date and time:
 
-**Scheduled for:** {$scheduled_date}
+**Current date:** {{ Date.format(Date.now(), "DD/MM/YYYY") }}
+**Current datetime:** {{ Date.format(Date.now(), "YYYY-MM-DD HH:mm:ss") }}
 
-### Expiration Date
+## Complex Examples
 
-```yaml
----
-$expires = "2026-12-31"
-$date_format = "DD MMMM YYYY"
----
-```
+### Software Release
 
-**This document expires on:** {$expires}
+# Release Notes v2.0
+
+**Release Date:** {{ Date.format($created, "DD MMMM YYYY") }}
+
+This version was released on {{ Date.format($created, "DD/MM/YYYY") }}.
+
+### Event Planning
+
+# Conference Schedule
+
+**Event Date:** {{ Date.format($created, "dddd, MMMM DD, YYYY") }}
+
+### Academic Paper
+
+# Research Paper
+
+**Submitted:** {{ Date.format($created, "YYYY-MM-DD") }}
 
 ## Best Practices
 
 ### Consistent Formatting
 
-Use consistent date formats throughout a project:
+Define a variable for repeated formats:
 
-```yaml
----
-# Project-wide configuration
-$date_format = "YYYY-MM-DD"
-$datetime_format = "YYYY-MM-DD HH:mm"
-$timezone = "UTC"
----
-```
+$fmt = "DD/MM/YYYY"
 
-### Always Show Modified Date
+Created: {{ Date.format($created, $fmt) }}
+Modified: {{ Date.format($modified, $fmt) }}
 
-```yaml
----
-$date_format = "DD MMMM YYYY 'at' HH:mm"
----
-```
+### Always Show Both Dates
 
-**Created:** {$created}
-**Last modified:** {$modified}
-
-### Date Validation
-
-```yaml
----
-# Ensure dates are in the correct format
-created: {$created}
-modified: {$modified}
----
-```
-
-:::if {$modified < {$created}}
-:::warning [Invalid Date]
-Modified date is before creation date!
-:::
-:::
-
-## Examples
-
-### Software Release
-
-```yaml
----
-title: "Release Notes v2.0"
-release_date: {$created}
-date_format: "DD MMMM YYYY"
----
-```
-
-# Release Date: {$release_date}
-
-This version was released on {$release_date}.
-
-### Event Planning
-
-```yaml
----
-title: "Conference Schedule"
-event_date: {$created}
-date_format: "dddd, MMMM DD, YYYY"
----
-```
-
-**Event Date:** {$event_date}
-
-### Academic Paper
-
-```yaml
----
-title: "Research Paper"
-submission_date: {$created}
-date_format: "YYYY-MM-DD"
----
-```
-
-**Submitted:** {$submission_date}
-
-## Time-Sensitive Content
-
-### Deadlines
-
-```yaml
----
-$deadline = "2026-03-31"
-$date_format = "DD MMMM YYYY"
----
-```
-
-**Deadline:** {$deadline}
-
-:::if {$created > {$deadline}}
-:::error [Overdue]
-This document is past the deadline!
-:::
-:::
-
-### Maintenance Windows
-
-```yaml
----
-$maintenance = "2026-02-20 02:00"
-$datetime_format = "YYYY-MM-DD HH:mm"
----
-```
-
-**Next Maintenance:** {$maintenance}
+**Created:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Last modified:** {{ Date.format($modified, "DD MMMM YYYY 'at' HH:mm") }}
 
 [← Back to Examples Index](index.zlt)

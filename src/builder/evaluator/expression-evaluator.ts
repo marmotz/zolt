@@ -289,7 +289,7 @@ export class ExpressionEvaluator {
   }
 
   private tryNamespaceFunction(expr: string): Value | null {
-    const match = expr.match(/^(Math|List|String)\.(\w+)\((.*)\)$/);
+    const match = expr.match(/^(Math|List|String|Date)\.(\w+)\((.*)\)$/);
     if (!match) return null;
 
     const namespace = match[1];
@@ -305,6 +305,8 @@ export class ExpressionEvaluator {
         return this.evaluateListFunction(func, args);
       case 'String':
         return this.evaluateStringFunction(func, args);
+      case 'Date':
+        return this.evaluateDateFunction(func, args);
       default:
         return null;
     }
@@ -456,6 +458,57 @@ export class ExpressionEvaluator {
       default:
         return null;
     }
+  }
+
+  private evaluateDateFunction(func: string, args: Value[]): Value {
+    switch (func) {
+      case 'format': {
+        const dateValue = args[0];
+        const formatStr = String(args[1] ?? 'YYYY-MM-DD');
+
+        if (dateValue === null || dateValue === undefined) {
+          return '';
+        }
+
+        let date: Date;
+        if (typeof dateValue === 'number') {
+          date = new Date(dateValue);
+        } else if (typeof dateValue === 'string') {
+          date = new Date(dateValue);
+        } else {
+          return '';
+        }
+
+        if (isNaN(date.getTime())) {
+          return '';
+        }
+
+        return this.formatDate(date, formatStr);
+      }
+      case 'now':
+        return Date.now();
+      default:
+        return null;
+    }
+  }
+
+  private formatDate(date: Date, format: string): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const shortYear = year.toString().slice(-2);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+
+    return format
+      .replace(/YYYY/g, year.toString())
+      .replace(/YY/g, shortYear)
+      .replace(/MM/g, month)
+      .replace(/DD/g, day)
+      .replace(/HH/g, hours)
+      .replace(/mm/g, minutes)
+      .replace(/ss/g, seconds);
   }
 
   private escapeRegex(str: string): string {
@@ -618,7 +671,7 @@ export class ExpressionEvaluator {
       } else if (char === '[') {
         if (current) parts.push(current);
         current = '';
-        
+
         // Find matching ] while handling nested brackets
         let depth = 1;
         let j = i + 1;
@@ -626,17 +679,17 @@ export class ExpressionEvaluator {
         while (j < varExpr.length && depth > 0) {
           if (varExpr[j] === '[') depth++;
           else if (varExpr[j] === ']') depth--;
-          
+
           if (depth > 0) indexStr += varExpr[j];
           j++;
         }
-        
+
         // Evaluate the index expression
         const indexValue = this.evaluate(indexStr);
         if (typeof indexValue === 'number' || typeof indexValue === 'string') {
           parts.push(indexValue as string | number);
         }
-        
+
         i = j;
       } else {
         current += char;

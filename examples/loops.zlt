@@ -142,7 +142,6 @@ $team = [
 - ✅ {$member.name} ({$member.role})
 :::
 :::
-:::
 
 ### User List
 
@@ -164,8 +163,7 @@ $users = [
 **Email:** {$user.email}
 
 :::if {$foreach.last}
-*Last updated: {$modified}*
-:::
+//Last updated: {{ Date.format($modified, "DD/MM/YYYY HH:mm:ss") }}//
 :::
 :::
 

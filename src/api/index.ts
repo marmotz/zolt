@@ -1,14 +1,16 @@
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, stat, writeFile } from 'fs/promises';
 import { Builder } from '../builder/builder';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
+import { createFileDateVariables } from '../utils/file-metadata';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
   variables?: Record<string, unknown>;
-  frontmatter?: boolean;
+  frontMatter?: boolean;
+  filePath?: string;
 }
 
 export interface LintOptions {
@@ -44,10 +46,26 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const parser = new Parser(tokens);
   const ast = parser.parse();
 
+  const initialVariables: Record<string, string> = {};
+
+  if (options?.filePath) {
+    try {
+      const fileStats = await stat(options.filePath);
+      const dateVars = createFileDateVariables({
+        created: fileStats.birthtime,
+        modified: fileStats.mtime,
+      });
+      initialVariables.created = dateVars.created;
+      initialVariables.modified = dateVars.modified;
+    } catch {
+      // File stats unavailable, leave variables empty
+    }
+  }
+
   let builder: Builder;
 
   if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder();
+    builder = new HTMLBuilder(initialVariables);
   } else {
     throw new Error(`Unsupported output type: ${options.type}`);
   }
@@ -57,13 +75,13 @@ export async function buildString(content: string, options?: BuildOptions): Prom
 
 export async function buildFile(inputPath: string, outputPath: string, options?: BuildOptions): Promise<void> {
   const content = await readFile(inputPath, 'utf-8');
-  const html = await buildString(content, options);
+  const html = await buildString(content, { ...options, filePath: inputPath });
   await writeFile(outputPath, html, 'utf-8');
 }
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
-  return buildString(content, options);
+  return buildString(content, { ...options, filePath });
 }
 
 export function extractAllAssets(content: string): { zltLinks: string[]; otherAssets: string[] } {
@@ -81,7 +99,12 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
 
     const checkHref = (href: string) => {
       if (!href) return;
-      if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#') || href.startsWith('mailto:')) {
+      if (
+        href.startsWith('http://') ||
+        href.startsWith('https://') ||
+        href.startsWith('#') ||
+        href.startsWith('mailto:')
+      ) {
         return;
       }
 

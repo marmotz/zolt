@@ -195,6 +195,9 @@ export class ContentProcessor {
       }
       try {
         const value = this.evaluator.evaluate('$' + varPath);
+        if (value === null || value === undefined) {
+          return match;
+        }
         return this.formatValue(value);
       } catch {
         return match;

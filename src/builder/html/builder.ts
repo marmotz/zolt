@@ -231,6 +231,8 @@ const DEFAULT_CSS = `
   }
 `.trim();
 
+type InitialVariables = Record<string, number | string | boolean | null | undefined>;
+
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
@@ -240,8 +242,15 @@ export class HTMLBuilder implements Builder {
   private evaluator: ExpressionEvaluator;
   private contentProcessor: ContentProcessor;
 
-  constructor() {
+  constructor(initialVariables?: InitialVariables) {
     this.evaluator = new ExpressionEvaluator();
+    if (initialVariables) {
+      for (const [key, value] of Object.entries(initialVariables)) {
+        if (value !== undefined) {
+          this.evaluator.setVariable(key, value as any);
+        }
+      }
+    }
     this.contentProcessor = new ContentProcessor(this.evaluator);
   }
 
@@ -338,7 +347,7 @@ export class HTMLBuilder implements Builder {
 
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
 
-    const childrenHtmlParts = node.children.map((child) => this.build(child)).filter(h => h !== '');
+    const childrenHtmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
     const childrenHtml = this.mergeAdjacentListHTML(childrenHtmlParts).join('\n');
 
     const tabsScript = this.hasTabs
@@ -436,7 +445,7 @@ ${tabsScript}
   }
 
   visitDocument(node: DocumentNode): string {
-    const htmlParts = node.children.map((child) => this.build(child)).filter(h => h !== '');
+    const htmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
     return this.mergeAdjacentListHTML(htmlParts).join('\n');
   }
 
@@ -822,9 +831,15 @@ ${childrenHtml}
           parts.push({ type: 'text', content: this.formatValue(value) });
         } else if (firstMatch.type === 'var') {
           const value = this.evaluator.evaluate('$' + firstMatch.content);
-          parts.push({ type: 'text', content: this.formatValue(value) });
+          if (value === null || value === undefined) {
+            parts.push({
+              type: 'text',
+              content: remaining.slice(firstMatch.index, firstMatch.index + firstMatch.length),
+            });
+          } else {
+            parts.push({ type: 'text', content: this.formatValue(value) });
+          }
         } else {
-          // code
           parts.push({ type: 'text', content: firstMatch.content });
         }
 

@@ -17,10 +17,10 @@
 ### Phase 1: Variables
 
 - [x] Parse variable definitions `$var = "value"`
-- [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and blocks)
-- [ ] Implement automatic date variables (`{$created}`, `{$modified}`)
-- [ ] Support date formatting with tokens (`DD`, `MM`, `YYYY`, `YY`, `HH`, `mm`, `ss`)
-- [ ] Support timezone configuration
+- [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and code blocks)
+- [x] Implement automatic date variables (`{$created}`, `{$modified}`)
+- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `mm`, `ss`)
+- [ ] Support timezone configuration (`$timezone = "Europe/Paris"`)
 
 ## 2. Universal Attribute System `{}`
 
@@ -228,6 +228,14 @@
 - [x] `String.replace(text, search, replacement)`
 - [x] `String.split(text, separator)`
 - [x] `String.join(array, separator)`
+
+### Date Namespace
+
+- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, mm, ss)
+- [x] `Date.now()` - Get current timestamp
+- [ ] `Date.parse(text, format)` - Parse a date string
+- [ ] `Date.add(date, duration)` - Add duration to date
+- [ ] `Date.diff(date1, date2)` - Calculate difference between dates
 
 ### Variables
 
