@@ -661,4 +661,68 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('Code: <code>{$var}</code>');
     expect(html).toContain('Var: REPLACED');
   });
+
+  describe('Universal Attributes Rendering', () => {
+    test('should build paragraph with ID', () => {
+      const node: ParagraphNode = {
+        type: 'Paragraph',
+        children: [{ type: 'Text', content: 'Text' }],
+        attributes: { id: 'para-1' },
+      };
+      const html = builder.visitParagraph(node);
+      expect(html).toBe('<p id="para-1">Text</p>');
+    });
+
+    test('should build list with ID', () => {
+      const node: ListNode = {
+        type: 'List',
+        kind: 'bullet',
+        children: [{ type: 'ListItem', content: 'Item', children: [] }],
+        attributes: { id: 'list-1' },
+      };
+      const html = builder.visitList(node);
+      expect(html).toContain('<ul id="list-1">');
+    });
+
+    test('should build blockquote with ID', () => {
+      const node: BlockquoteNode = {
+        type: 'Blockquote',
+        level: 1,
+        children: [{ type: 'Paragraph', content: 'Quote' }],
+        attributes: { id: 'quote-1' },
+      };
+      const html = builder.visitBlockquote(node);
+      expect(html).toContain('<blockquote id="quote-1">');
+    });
+
+    test('should build bold with style attribute', () => {
+      const node: any = {
+        type: 'Bold',
+        children: [{ type: 'Text', content: 'Bold' }],
+        attributes: { color: 'red' },
+      };
+      const html = builder.build(node);
+      expect(html).toBe('<strong style="color: red">Bold</strong>');
+    });
+
+    test('should build table with ID', () => {
+      const node: any = {
+        type: 'Table',
+        rows: [],
+        attributes: { id: 'table-1' },
+      };
+      const html = builder.visitTable(node);
+      expect(html).toContain('<table id="table-1">');
+    });
+
+    test('should handle internal links with @ prefix', () => {
+      const node: LinkNode = {
+        type: 'Link',
+        href: '@target',
+        content: 'Link',
+      };
+      const html = builder.visitLink(node);
+      expect(html).toContain('href="#target"');
+    });
+  });
 });

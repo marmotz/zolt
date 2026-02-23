@@ -36,7 +36,20 @@ style ou de comportement entre accolades placées immédiatement après l'élém
 élément{id=mon-id class=ma-classe style=valeur}
 ```
 
-### 1.2 Attributs sur le Texte Inline
+Tout élément (titre, image, lien, paragraphe, liste, bloc, texte) peut accepter des propriétés.
+
+### 1.2 Attributs sur les Éléments de Bloc
+
+| Élément          | Exemple de syntaxe                       | Rendu HTML (approximatif)                      |
+|------------------|------------------------------------------|------------------------------------------------|
+| **Paragraphe**   | `Ceci est un paragraphe.{#para-1}`       | `<p id="para-1">...</p>`                       | 
+| **Liste**        | `- Item 1\n- Item 2\n{#ma-liste}`        | `<ul id="ma-liste">...</ul>`                   |
+| **Blockquote**   | `> Citation\n{#citation-1}`              | `<blockquote id="citation-1">...</blockquote>` |
+| **Tableau**      | `[[table id=stats]]` ou après le tableau | `<table id="stats">...</table>`                |
+| **Code Block**   | `\```js {#code-js}\n...\n\``` `          | `<pre id="code-js">...</pre>`                  |
+| **Triple Colon** | `:::info {#note}\n...\n:::`              | `<div id="note" class="info">...</div>`        |
+
+### 1.3 Attributs sur le Texte Inline
 
 | Syntaxe                  | Description        | Exemple                             |
 |--------------------------|--------------------|-------------------------------------|
@@ -46,6 +59,13 @@ style ou de comportement entre accolades placées immédiatement après l'élém
 | `{.ma-classe-css}`       | Classes CSS        | `Texte stylé{.ma-classe-css}`       |
 | `{background=soft-blue}` | Couleur de fond    | `Texte surligné{background=yellow}` |
 | `{font-weight=bold}`     | Poids de police    | `Important{font-weight=bold}`       |
+
+Tout élément inline supporte les attributs :
+
+- `**gras**{#id}`
+- `//italique//{.class}`
+- `__souligné__{style="color: blue"}`
+- `||groupe de mots||{#ancre}`
 
 ### 1.3 Attributs sur les Titres
 
@@ -368,7 +388,7 @@ Le symbole `@` fait référence aux IDs des titres ou éléments.
 ```
 Aller à la [section sur les listes](#listes).
 
-[Retour en haut](){#top}
+[Retour en haut](@top)
 ```
 
 #### Liens avec Variables

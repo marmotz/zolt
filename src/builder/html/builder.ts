@@ -287,6 +287,8 @@ export class HTMLBuilder implements Builder {
         return this.visitHorizontalRule(node as HorizontalRuleNode);
       case 'Indentation':
         return this.visitIndentation(node as IndentationNode);
+      case 'Attributes':
+        return '';
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
       case 'LinkReferenceDefinition':
@@ -301,7 +303,8 @@ export class HTMLBuilder implements Builder {
   }
 
   visitTable(node: TableNode): string {
-    let html = '<table>\n';
+    const attrs = this.renderAllAttributes(node.attributes);
+    let html = `<table${attrs}>\n`;
 
     if (node.header) {
       html += '  <thead>\n';
@@ -894,6 +897,9 @@ ${childrenHtml}
   }
 
   private transformHref(href: string): string {
+    if (href.startsWith('@')) {
+      return '#' + href.substring(1);
+    }
     if (href.endsWith('.zlt')) {
       return href.replace(/\.zlt$/, '.html');
     }

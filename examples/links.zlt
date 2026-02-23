@@ -25,17 +25,28 @@ Check out [Zolt][zolt] documentation and [GitHub][github] repository.
 ## Internal Links (Cross-references)
 
 Links to document sections using `@` symbol:
-
-See the [Introduction](@intro) for more details.
-Go to [Advanced Features](@advanced).
-[Back to top](){#top}
+- See the [Introduction](@intro) for more details.
+- Go to [Advanced Features](@advanced).
+- [Back to top](@top)
 
 ## Link Anchors
 
 Direct anchor links:
+- Jump to [Lists section](#lists)
+- [Return to summary](@summary)
 
-Jump to [Lists section](#lists)
-[Return to summary](){#summary}
+### Anchors on Various Elements
+
+This is a paragraph with an anchor.{#important-para}
+- Item with its own ID{#item-1}
+- Another item
+{#my-list}
+
+You can also have **Bold Text**{#bold-anchor} with an anchor or ||a whole group of words||{#group-anchor}.
+
+[Link to Paragraph](@important-para)
+[Link to List](@my-list)
+[Link to Bold Text](@bold-anchor)
 
 ## Links with Variables
 

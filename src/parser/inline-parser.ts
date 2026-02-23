@@ -343,9 +343,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^\*\*(.+?)\*\*/);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Bold', children: this.parse(match[1]) } as BoldNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Bold', children: this.parse(content), attributes } as BoldNode,
+      remaining,
     };
   }
 
@@ -353,9 +365,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^\/\/(.+?)\/\//);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Italic', children: this.parse(match[1]) } as ItalicNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Italic', children: this.parse(content), attributes } as ItalicNode,
+      remaining,
     };
   }
 
@@ -363,9 +387,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^__(.+?)__/);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Underline', children: this.parse(match[1]) } as UnderlineNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Underline', children: this.parse(content), attributes } as UnderlineNode,
+      remaining,
     };
   }
 
@@ -373,9 +409,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^~~(.+?)~~/);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Strikethrough', children: this.parse(match[1]) } as StrikethroughNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Strikethrough', children: this.parse(content), attributes } as StrikethroughNode,
+      remaining,
     };
   }
 
@@ -383,9 +431,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^==(.+?)==/);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Highlight', children: this.parse(match[1]) } as HighlightNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Highlight', children: this.parse(content), attributes } as HighlightNode,
+      remaining,
     };
   }
 
@@ -393,9 +453,21 @@ export class InlineParser {
     const match = this.matchPattern(text, /^`([^`]+)`/);
     if (!match) return null;
 
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Code', content: match[1] } as CodeNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'Code', content, attributes } as CodeNode,
+      remaining,
     };
   }
 
@@ -405,9 +477,20 @@ export class InlineParser {
     const content = this.extractBalancedBraces(text, 2);
     if (content === null) return null;
 
+    let remaining = text.slice(2 + content.length + 1);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Superscript', children: this.parse(content) } as SuperscriptNode,
-      remaining: text.slice(2 + content.length + 1),
+      node: { type: 'Superscript', children: this.parse(content), attributes } as SuperscriptNode,
+      remaining,
     };
   }
 
@@ -417,9 +500,20 @@ export class InlineParser {
     const content = this.extractBalancedBraces(text, 2);
     if (content === null) return null;
 
+    let remaining = text.slice(2 + content.length + 1);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
     return {
-      node: { type: 'Subscript', children: this.parse(content) } as SubscriptNode,
-      remaining: text.slice(2 + content.length + 1),
+      node: { type: 'Subscript', children: this.parse(content), attributes } as SubscriptNode,
+      remaining,
     };
   }
 

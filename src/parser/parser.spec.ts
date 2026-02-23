@@ -344,4 +344,70 @@ describe('Parser', () => {
     expect((ast.children[0] as any).ref).toBe('zolt');
     expect((ast.children[0] as any).url).toBe('https://zolt.example.com');
   });
+
+  describe('Universal Attributes', () => {
+    test('should parse paragraph with ID', () => {
+      const lexer = new Lexer('Paragraph {#my-id}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      expect(ast.children[0].type).toBe('Paragraph');
+      expect((ast.children[0] as any).attributes.id).toBe('my-id');
+    });
+
+    test('should parse list with ID on new line', () => {
+      const lexer = new Lexer('- item\n{#list-id}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      expect(ast.children[0].type).toBe('List');
+      expect((ast.children[0] as any).attributes.id).toBe('list-id');
+    });
+
+    test('should parse bold text with ID', () => {
+      const lexer = new Lexer('**bold**{#bold-id}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      const para = ast.children[0] as any;
+      const bold = para.children[0];
+      expect(bold.type).toBe('Bold');
+      expect(bold.attributes.id).toBe('bold-id');
+    });
+
+    test('should parse italic text with class', () => {
+      const lexer = new Lexer('//italic//{.my-class}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      const para = ast.children[0] as any;
+      const italic = para.children[0];
+      expect(italic.type).toBe('Italic');
+      expect(italic.attributes.class).toBe('my-class');
+    });
+
+    test('should apply ID to blockquote on next line', () => {
+      const lexer = new Lexer('> Quote\n{#quote-id}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      expect(ast.children[0].type).toBe('Blockquote');
+      expect((ast.children[0] as any).attributes.id).toBe('quote-id');
+    });
+
+    test('should parse heading with ID without space', () => {
+      const lexer = new Lexer('## Heading{#head-id}');
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+
+      expect(ast.children[0].type).toBe('Heading');
+      expect((ast.children[0] as any).attributes.id).toBe('head-id');
+    });
+  });
 });

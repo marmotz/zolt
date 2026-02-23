@@ -164,6 +164,11 @@ export interface AnchorNode {
   id: string;
 }
 
+export interface AttributesNode {
+  type: 'Attributes';
+  attributes: Attributes;
+}
+
 export interface ParagraphNode {
   type: 'Paragraph';
   children: ASTNode[];
@@ -302,6 +307,7 @@ export type ASTNode =
   | LinkReferenceDefinitionNode
   | CommentInlineNode
   | AnchorNode
+  | AttributesNode
   | ParagraphNode
   | HeadingNode
   | BlockquoteNode

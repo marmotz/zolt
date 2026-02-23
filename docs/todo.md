@@ -24,19 +24,28 @@
 
 ## 2. Universal Attribute System `{}`
 
+### Attributes on All Elements
+
+- [x] Support `{#id}` and other attributes on ALL elements
+- [x] Attributes on Paragraphs
+- [x] Attributes on Lists and List Items
+- [x] Attributes on Blockquotes
+- [x] Attributes on All Inline Elements (Bold, Italic, etc.)
+- [x] `||text||{attributes}` - Apply styles to groups of words (Styled Inline Groups)
+
 ### Attributes on Text Inline
 
-- [ ] `{color=value}` - Text color
-- [ ] `{size=value}` - Font size
-- [ ] `{#id}` - Unique identifier
-- [ ] `{.class}` - CSS classes
-- [ ] `{background=value}` - Background color
-- [ ] `{font-weight=value}` - Font weight
+- [x] `{color=value}` - Text color
+- [x] `{size=value}` - Font size
+- [x] `{#id}` - Unique identifier
+- [x] `{.class}` - CSS classes
+- [x] `{background=value}` - Background color
+- [x] `{font-weight=value}` - Font weight
 
 ### Attributes on Headings
 
-- [ ] `{#id}` - Heading ID for cross-references
-- [ ] `{.class}` - CSS classes
+- [x] `{#id}` - Heading ID for cross-references
+- [x] `{.class}` - CSS classes
 - [ ] `{numbered}` - Enable numbering
 - [ ] `{numbered=false}` - Disable numbering
 
@@ -103,8 +112,8 @@
 - [x] External links `[text](url)`
 - [x] Links with attributes `[text](url){attributes}`
 - [x] Automatic reference links `[text][ref]` with `[ref]: url`
-- [ ] Internal links/cross-references `[text](@id)`
-- [ ] Anchor links `[text](#anchor)`
+- [x] Internal links/cross-references `[text](@id)`
+- [x] Anchor links `[text](#anchor)`
 - [x] Links with variables `[text]({$var})`
 
 ### Link Attributes

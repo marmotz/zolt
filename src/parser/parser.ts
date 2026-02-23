@@ -150,8 +150,19 @@ export class Parser {
 
       const block = this.parseBlock();
       if (block) {
-        children.push(block);
+        if (block.type === 'Attributes' && children.length > 0) {
+          const lastChild = children[children.length - 1] as any;
+          if (lastChild && lastChild.type !== 'Text') {
+            lastChild.attributes = { ...(lastChild.attributes || {}), ...(block.attributes || {}) };
+          }
+        } else {
+          children.push(block);
+        }
       }
+
+      // If we just parsed a block and the next thing (after potential newlines) is an Attribute block,
+      // we might want to stay in the loop and pick it up in the next iteration.
+      // skipNewlines() at the start of loop handles this.
 
       if (this.pos === startPos) {
         this.error(`Parser stuck at token ${this.currentToken.type}`, 'PARSER_STUCK');
@@ -212,6 +223,25 @@ export class Parser {
     }
 
     if (this.isTableStart()) return this.parseTable();
+
+    // Check if current token is JUST an attribute block.
+    // If we are here, it means no preceding block consumed it.
+    // We should consume it anyway to avoid PARSER_STUCK,
+    // and maybe in the future we could try to attach it to the previous sibling node.
+    if (this.match(TokenType.TEXT)) {
+      const value = this.currentToken.value.trim();
+      const attrMatch = value.match(/^\{([^}]+)}$/);
+      if (attrMatch) {
+        const attrContent = attrMatch[1];
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+          this.advance();
+          return {
+            type: 'Attributes',
+            attributes: InlineParser.parseAttributes(attrContent),
+          } as any;
+        }
+      }
+    }
 
     return this.parseParagraph();
   }
@@ -314,13 +344,29 @@ export class Parser {
     // Extract attributes at the end of content
     // IMPORTANT: Do NOT treat {$...} (variable references) or {{...}} (expressions) as attributes
     let attributes: Attributes | undefined;
-    const attrMatch = content.match(/\s+\{([^}]+)}$/);
-    if (attrMatch) {
-      const attrContent = attrMatch[1];
+    const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
+    if (attrMatchWithSpace) {
+      const attrContent = attrMatchWithSpace[1];
       // Skip if this looks like a variable reference {$...} or expression {{...}}
       if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
         attributes = InlineParser.parseAttributes(attrContent);
-        content = content.slice(0, -attrMatch[0].length).trim();
+        content = content.slice(0, -attrMatchWithSpace[0].length).trim();
+      }
+    } else {
+      // If no space, only match if it doesn't follow an inline element delimiter
+      const attrMatchNoSpace = content.match(/(\{([^}]+)})$/);
+      if (attrMatchNoSpace) {
+        const fullMatch = attrMatchNoSpace[1];
+        const attrContent = attrMatchNoSpace[2];
+        const beforeIndex = content.length - fullMatch.length - 1;
+        const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
+
+        const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
+
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
+          attributes = InlineParser.parseAttributes(attrContent);
+          content = content.slice(0, -fullMatch.length).trim();
+        }
       }
     }
 
@@ -340,10 +386,24 @@ export class Parser {
     };
   }
 
-  private parseParagraph(requireSpaceBeforeAttrs: boolean = true): ParagraphNode {
+  private parseParagraph(): ParagraphNode {
     let content = '';
 
-    while (!this.match(TokenType.EOF) && !this.match(TokenType.NEWLINE) && !this.isNewBlockStart()) {
+    while (!this.match(TokenType.EOF)) {
+      if (this.match(TokenType.NEWLINE)) {
+        const next = this.peek(1);
+        if (next.type === TokenType.NEWLINE || this.isNewBlockStart(1)) {
+          break;
+        }
+        this.advance(); // consume newline
+        content += ' ';
+        continue;
+      }
+
+      if (this.isNewBlockStart()) {
+        break;
+      }
+
       content += this.advance().value;
     }
 
@@ -355,19 +415,44 @@ export class Parser {
 
     // Extract attributes at the end of content
     // In blockquotes, allow attributes without preceding space
-    // In regular paragraphs, require space to avoid stealing attributes from inline elements
+    // In regular paragraphs, allow attributes without preceding space if they are on a "new line" (now joined with space)
     // IMPORTANT: Do NOT treat {$...} (variable references) or {{...}} (expressions) as attributes
     // Also skip if this is a variable definition
     let attributes: Attributes | undefined;
     if (!isVariableDef) {
-      const pattern = requireSpaceBeforeAttrs ? /\s+\{([^}]+)}$/ : /\s*\{([^}]+)}$/;
-      const attrMatch = content.match(pattern);
-      if (attrMatch) {
-        const attrContent = attrMatch[1];
-        // Skip if this looks like a variable reference {$...} or expression {{...}}
+      // First try matching with a space (standard block attribute or next-line attribute)
+      const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
+      if (attrMatchWithSpace) {
+        const attrContent = attrMatchWithSpace[1];
         if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
           attributes = InlineParser.parseAttributes(attrContent);
-          content = content.slice(0, -attrMatch[0].length).trim();
+          content = content.slice(0, -attrMatchWithSpace[0].length).trim();
+        }
+      } else {
+        // If no space, only match if it doesn't follow an inline element delimiter
+        const attrMatchNoSpace = content.match(/(\{([^}]+)})$/);
+        if (attrMatchNoSpace) {
+          const fullMatch = attrMatchNoSpace[1];
+          const attrContent = attrMatchNoSpace[2];
+          const beforeIndex = content.length - fullMatch.length - 1;
+          const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
+
+          // Delimiters that usually end an inline element:
+          // ) for links/images
+          // * for bold (Zolt uses **...**)
+          // / for italic (Zolt uses //...//)
+          // _ for underline (__...__)
+          // ~ for strikethrough (~~...~~)
+          // } for superscript/subscript ( ^{...} / _{...} )
+          // | for inline styles ( ||...|| )
+          // = for highlight ( ==...== )
+          // ` for code
+          const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
+
+          if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
+            attributes = InlineParser.parseAttributes(attrContent);
+            content = content.slice(0, -fullMatch.length).trim();
+          }
         }
       }
     }
@@ -443,7 +528,7 @@ export class Parser {
       return this.parseBlockquoteList();
     }
 
-    return this.parseParagraph(false);
+    return this.parseParagraph();
   }
 
   private parseBlockquoteList(): ListNode {
@@ -568,13 +653,29 @@ export class Parser {
 
     // Extract attributes at the end of content
     let attributes: Attributes | undefined;
-    const attrMatch = content.match(/\s+\{([^}]+)}$/);
-    if (attrMatch) {
-      const attrContent = attrMatch[1];
+    const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
+    if (attrMatchWithSpace) {
+      const attrContent = attrMatchWithSpace[1];
       // Skip if this looks like a variable reference {$...} or expression {{...}}
       if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
         attributes = InlineParser.parseAttributes(attrContent);
-        content = content.slice(0, -attrMatch[0].length).trim();
+        content = content.slice(0, -attrMatchWithSpace[0].length).trim();
+      }
+    } else {
+      // If no space, only match if it doesn't follow an inline element delimiter
+      const attrMatchNoSpace = content.match(/(\{([^}]+)})$/);
+      if (attrMatchNoSpace) {
+        const fullMatch = attrMatchNoSpace[1];
+        const attrContent = attrMatchNoSpace[2];
+        const beforeIndex = content.length - fullMatch.length - 1;
+        const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
+
+        const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
+
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
+          attributes = InlineParser.parseAttributes(attrContent);
+          content = content.slice(0, -fullMatch.length).trim();
+        }
       }
     }
 
@@ -861,7 +962,7 @@ export class Parser {
       return this.parseIndentationList();
     }
 
-    return this.parseParagraph(false);
+    return this.parseParagraph();
   }
 
   private parseIndentationList(): ListNode {
@@ -917,8 +1018,23 @@ export class Parser {
     };
   }
 
-  private isNewBlockStart(): boolean {
-    const type = this.currentToken.type;
+  private isNewBlockStart(offset: number = 0): boolean {
+    const token = this.peek(offset);
+    const type = token.type;
+
+    // A text token that is JUST an attribute block should also be considered a block start
+    // (meaning the paragraph should stop before it)
+    if (type === TokenType.TEXT) {
+      const trimmed = token.value.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}') && !trimmed.startsWith('{$') && !trimmed.startsWith('{{')) {
+        // Double check it's not just some text with braces
+        const match = trimmed.match(/^\{([^}]+)}$/);
+        if (match) {
+          return true;
+        }
+      }
+    }
+
     return (
       type === TokenType.HEADING ||
       type === TokenType.CODE_BLOCK ||
