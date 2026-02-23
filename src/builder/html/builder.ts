@@ -234,6 +234,37 @@ const DEFAULT_CSS = `
   .zolt-tab-panel.active {
     display: block;
   }
+  .zolt-toc {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+  }
+  .zolt-toc ul {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin: 0.25rem 0;
+  }
+  .zolt-toc > ul {
+    padding-left: 0;
+  }
+  .zolt-toc li {
+    margin: 0.25rem 0;
+  }
+  .zolt-toc a {
+    color: #333;
+    text-decoration: none;
+  }
+  .zolt-toc a:hover {
+    color: #0066cc;
+    text-decoration: underline;
+  }
+  .zolt-toc-number {
+    margin-right: 0.5rem;
+    color: #666;
+    font-size: 0.9em;
+  }
   :target {
     scroll-margin-top: 2rem;
     animation: zolt-anchor-highlight 3s ease-out;
@@ -254,6 +285,7 @@ export class HTMLBuilder implements Builder {
   private hasTabs: boolean = false;
   private evaluator: ExpressionEvaluator;
   private contentProcessor: ContentProcessor;
+  private currentHeadings: HeadingNode[] = [];
 
   constructor(initialVariables?: InitialVariables) {
     this.evaluator = new ExpressionEvaluator();
@@ -355,6 +387,7 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.tabsCounter = 0;
     this.hasTabs = false;
+    this.currentHeadings = this.findAllHeadings(node.children);
 
     const childrenHtml = node.children
       .map((child) => this.build(child))
@@ -422,20 +455,54 @@ ${anchorScript}
   }
 
   visitDocument(node: DocumentNode): string {
+    this.currentHeadings = this.findAllHeadings(node.children);
     return node.children
       .map((child) => this.build(child))
       .filter((h) => h !== '')
       .join('\n');
   }
 
+  private findAllHeadings(nodes: ASTNode[]): HeadingNode[] {
+    const headings: HeadingNode[] = [];
+    for (const node of nodes) {
+      if (node.type === 'Heading') {
+        headings.push(node as HeadingNode);
+      } else if ('children' in node && Array.isArray(node.children)) {
+        headings.push(...this.findAllHeadings(node.children as ASTNode[]));
+      }
+    }
+    return headings;
+  }
+
   visitHeading(node: HeadingNode): string {
     const level = Math.min(Math.max(node.level, 1), 6);
-    const attrs = this.renderAllAttributes(node.attributes);
     const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
-    if (!trimmed) return '';
-    return `<h${level}${attrs}>${trimmed}</h${level}>`;
+    const renderedContent = (inlineHtml + childrenHtml).trim();
+
+    if (!renderedContent) return '';
+
+    if (!node.attributes) {
+      node.attributes = {};
+    }
+
+    if (!node.attributes.id) {
+      const textContent = renderedContent.replace(/<[^>]+>/g, '').trim();
+      node.attributes.id = this.slugify(textContent);
+    }
+
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<h${level}${attrs}>${renderedContent}</h${level}>`;
+  }
+
+  private slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   visitParagraph(node: ParagraphNode): string {
@@ -633,8 +700,104 @@ ${childrenHtml}
   }
 
   visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {
+    if (node.blockType === 'toc') {
+      return this.visitToc(node);
+    }
     const attrs = this.renderAllAttributes(node.attributes);
     return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
+  }
+
+  private visitToc(node: DoubleBracketBlockNode): string {
+    const fromAttr = node.attributes?.from;
+    const toAttr = node.attributes?.to;
+    const depthAttr = node.attributes?.depth;
+    const numbered = node.attributes?.numbered === 'true';
+    const customClass = node.attributes?.class || '';
+
+    const from = parseInt(fromAttr || '1');
+    const to = parseInt(toAttr || '6');
+    const depth = parseInt(depthAttr || '3');
+
+    const filteredHeadings = this.currentHeadings.filter((h) => {
+      const level = h.level;
+      if (level < from) return false;
+
+      let maxLevel: number;
+      if (toAttr && depthAttr) {
+        maxLevel = Math.min(to, depth);
+      } else if (toAttr) {
+        maxLevel = to;
+      } else if (depthAttr) {
+        maxLevel = depth;
+      } else {
+        maxLevel = 3; // default depth
+      }
+
+      return level <= maxLevel;
+    });
+
+    if (filteredHeadings.length === 0) return '';
+
+    const tocHtml = this.buildTocTree(filteredHeadings, from, numbered);
+    const classAttr = ` class="zolt-toc${customClass ? ' ' + customClass : ''}"`;
+
+    // Filter out internal attributes
+    const cleanAttrs: Attributes = { ...node.attributes };
+    delete cleanAttrs.from;
+    delete cleanAttrs.to;
+    delete cleanAttrs.depth;
+    delete cleanAttrs.numbered;
+    delete cleanAttrs.class;
+
+    const attrs = this.renderAllAttributes(cleanAttrs);
+
+    return `<nav${attrs}${classAttr}>\n${tocHtml}\n</nav>`;
+  }
+
+  private buildTocTree(headings: HeadingNode[], from: number, numbered: boolean): string {
+    let html = '<ul>\n';
+    const counters: number[] = new Array(7).fill(0);
+    let currentDepth = 0;
+
+    for (const h of headings) {
+      const level = h.level;
+      const depth = level - from;
+
+      // Handle nesting: open new sub-lists
+      while (currentDepth < depth) {
+        html += '  <ul>\n';
+        currentDepth++;
+      }
+      // Handle nesting: close sub-lists
+      while (currentDepth > depth) {
+        html += '  </ul>\n';
+        currentDepth--;
+      }
+
+      // Update counters for numbering
+      counters[level]++;
+      for (let i = level + 1; i <= 6; i++) counters[i] = 0;
+
+      const numberParts = counters.slice(from, level + 1);
+      const numberStr = numbered ? `<span class="zolt-toc-number">${numberParts.join('.')}</span>` : '';
+
+      const inlineHtml = this.processInlineContent((h as any).content);
+      const childrenHtml = this.joinChildren(h.children);
+      const renderedContent = (inlineHtml + childrenHtml).trim();
+      const textContent = renderedContent.replace(/<[^>]+>/g, '').trim();
+      const id = h.attributes?.id || this.slugify(textContent);
+
+      html += `  <li class="toc-level-${level}">${numberStr}<a href="#${id}">${renderedContent}</a></li>\n`;
+    }
+
+    // Close all remaining sub-lists
+    while (currentDepth > 0) {
+      html += '  </ul>\n';
+      currentDepth--;
+    }
+
+    html += '</ul>';
+    return html;
   }
 
   visitHorizontalRule(node: HorizontalRuleNode): string {

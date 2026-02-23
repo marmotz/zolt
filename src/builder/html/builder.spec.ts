@@ -26,7 +26,7 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitHeading(node);
-    expect(html).toBe('<h1>Hello World</h1>');
+    expect(html).toBe('<h1 id="hello-world">Hello World</h1>');
   });
 
   test('should build heading with level 6', () => {
@@ -37,7 +37,7 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitHeading(node);
-    expect(html).toBe('<h6>Test</h6>');
+    expect(html).toBe('<h6 id="test">Test</h6>');
   });
 
   test('should build paragraph', () => {
@@ -307,7 +307,7 @@ describe('HTMLBuilder', () => {
     };
 
     const html = builder.visitHeading(node);
-    expect(html).toBe('<h2>Section</h2>');
+    expect(html).toBe('<h2 id="section">Section</h2>');
   });
 
   test('should build list item with content', () => {

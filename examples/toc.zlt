@@ -1,3 +1,8 @@
+---
+numbering: true
+numbering_style: decimal
+---
+
 # Table of Contents (TOC) Examples in Zolt
 
 ## Basic TOC
@@ -22,7 +27,7 @@ Include section numbers:
 
 Specify start and end levels:
 
-[[toc {from=2 to=4}]]
+[[toc {from=3 to=4}]]
 
 ## TOC with Multiple Options
 
@@ -198,6 +203,7 @@ toc_numbered: true
 toc_class: "custom-toc"
 ---
 ```
+$toc_title="Contents"
 
 ## {$toc_title}
 
@@ -213,6 +219,7 @@ toc_depth: 2
 numbering: true
 ---
 ```
+$title="Comprehensive Guide"
 
 # {$title}
 

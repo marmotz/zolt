@@ -11,6 +11,7 @@ import {
   DefinitionDescriptionNode,
   DefinitionTermNode,
   DocumentNode,
+  DoubleBracketBlockNode,
   FrontmatterNode,
   HeadingNode,
   HorizontalRuleNode,
@@ -845,12 +846,28 @@ export class Parser {
   }
 
   private parseDoubleBracketBlock(): ASTNode {
-    this.expect(TokenType.DOUBLE_BRACKET_START);
+    const token = this.expect(TokenType.DOUBLE_BRACKET_START);
+    const value = token.value;
+
+    const firstSpaceIndex = value.indexOf(' ');
+    let blockType = value;
+    let attributes: Attributes | undefined;
+
+    if (firstSpaceIndex !== -1) {
+      blockType = value.substring(0, firstSpaceIndex);
+      const attrStr = value.substring(firstSpaceIndex + 1).trim();
+      const attrMatch = attrStr.match(/^\{([^}]+)}$/);
+      if (attrMatch) {
+        attributes = InlineParser.parseAttributes(attrMatch[1]);
+      }
+    }
+
     return {
       type: 'DoubleBracketBlock',
-      blockType: 'toc',
+      blockType,
       content: '',
-    } as ASTNode;
+      attributes,
+    } as DoubleBracketBlockNode;
   }
 
   private parseHorizontalRule(): HorizontalRuleNode {

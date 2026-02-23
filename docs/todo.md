@@ -278,8 +278,8 @@
 
 ### Table of Contents
 
-- [ ] Basic TOC `[[toc]]`
-- [ ] TOC with attributes `{depth=N}`, `{from=N}`, `{to=N}`, `{numbered=true}`, `{class=value}`
+- [x] Basic TOC `[[toc]]`
+- [x] TOC with attributes `{depth=N}`, `{from=N}`, `{to=N}`, `{numbered=true}`, `{class=value}`
 
 ### Loops
 
@@ -350,9 +350,9 @@
 
 ### Automatic Features
 
-- [ ] Generate automatic heading IDs for headings without explicit `{#id}`
+- [x] Generate automatic heading IDs for headings without explicit `{#id}`
 - [ ] Process `:::foreach` loops with automatic variables
-- [ ] Generate Table of Contents at `[[toc]]` locations
+- [x] Generate Table of Contents at `[[toc]]` locations
 - [ ] Resolve cross-references `@ref`
 - [ ] Generate footnotes
 
