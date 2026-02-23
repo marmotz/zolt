@@ -17,7 +17,11 @@ describe('Parser', () => {
           if (c.type === 'Strikethrough') return `~~${getFlatContent(c)}~~`;
           if (c.type === 'Highlight') return `==${getFlatContent(c)}==`;
           if (c.type === 'InlineStyle') {
-            const attrs = c.attributes ? `{${Object.entries(c.attributes).map(([k, v]) => `${k}=${v}`).join(' ')}}` : '';
+            const attrs = c.attributes
+              ? `{${Object.entries(c.attributes)
+                  .map(([k, v]) => `${k}=${v}`)
+                  .join(' ')}}`
+              : '';
             return `||${getFlatContent(c)}||${attrs}`;
           }
           return getFlatContent(c);
@@ -408,6 +412,87 @@ describe('Parser', () => {
 
       expect(ast.children[0].type).toBe('Heading');
       expect((ast.children[0] as any).attributes.id).toBe('head-id');
+    });
+
+    describe('Table Alignment', () => {
+      test('should parse table with left alignment', () => {
+        const lexer = new Lexer('| Left | Right |\n| :--- | --- |\n| A | B |');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('Table');
+        expect((ast.children[0] as any).header.cells[0].alignment).toBe('left');
+        expect((ast.children[0] as any).header.cells[1].alignment).toBeUndefined();
+      });
+
+      test('should parse table with center alignment', () => {
+        const lexer = new Lexer('| Center |\n| :---: |\n| A |');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('Table');
+        expect((ast.children[0] as any).header.cells[0].alignment).toBe('center');
+      });
+
+      test('should parse table with right alignment', () => {
+        const lexer = new Lexer('| Right |\n| ---: |\n| A |');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('Table');
+        expect((ast.children[0] as any).header.cells[0].alignment).toBe('right');
+      });
+
+      test('should apply alignment to all rows', () => {
+        const lexer = new Lexer('| Col |\n| :---: |\n| A |\n| B |');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        const table = ast.children[0] as any;
+        expect(table.header.cells[0].alignment).toBe('center');
+        expect(table.rows[0].cells[0].alignment).toBe('center');
+        expect(table.rows[1].cells[0].alignment).toBe('center');
+      });
+    });
+
+    describe('Double Bracket Block', () => {
+      test('should parse double bracket block with type', () => {
+        const lexer = new Lexer('[[toc]]');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('DoubleBracketBlock');
+        expect((ast.children[0] as any).blockType).toBe('toc');
+      });
+
+      test('should parse double bracket block with attributes', () => {
+        const lexer = new Lexer('[[toc {id=toc-root class=nav}]]');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('DoubleBracketBlock');
+        expect((ast.children[0] as any).blockType).toBe('toc');
+        expect((ast.children[0] as any).attributes.id).toBe('toc-root');
+        expect((ast.children[0] as any).attributes.class).toBe('nav');
+      });
+    });
+
+    describe('Link Reference in content', () => {
+      test('should use link reference in link', () => {
+        const lexer = new Lexer('[zolt]: https://zolt.example.com\n\n[Zolt][zolt]');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('LinkReferenceDefinition');
+        expect(ast.children[1].type).toBe('Paragraph');
+      });
     });
   });
 });

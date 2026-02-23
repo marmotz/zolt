@@ -81,9 +81,9 @@ export class Lexer {
     if (this.matchDoubleBracket()) return this.readDoubleBracket();
     if (this.matchBlockquote()) return this.readBlockquote();
     if (this.matchTechnicalIndentation()) return this.readTechnicalIndentation();
-    if (this.matchList()) return this.readList();
-    if (this.matchHorizontalRule()) return this.readHorizontalRule();
     if (this.matchFrontmatter()) return this.readFrontmatter();
+    if (this.matchHorizontalRule()) return this.readHorizontalRule();
+    if (this.matchList()) return this.readList();
     if (this.matchGlobalAbbreviationDef()) return this.readGlobalAbbreviationDef();
     if (this.matchAbbreviationDef()) return this.readAbbreviationDef();
     if (this.matchLinkRefDef()) return this.readLinkRefDef();

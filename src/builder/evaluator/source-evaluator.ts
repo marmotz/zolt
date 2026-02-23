@@ -16,9 +16,39 @@ export class SourceEvaluator {
     let i = 0;
     let inCodeBlock = false;
 
+    let firstNonEmptyLineIndex = -1;
+    for (let j = 0; j < lines.length; j++) {
+      if (lines[j].trim() !== '') {
+        firstNonEmptyLineIndex = j;
+        break;
+      }
+    }
+
+    let frontmatterProcessed = false;
+
     while (i < lines.length) {
       const line = lines[i];
       const trimmed = line.trim();
+
+      // Skip frontmatter at the very beginning
+      if (!frontmatterProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
+        result.push(line);
+        i++;
+        while (i < lines.length && lines[i].trim() !== '---') {
+          result.push(lines[i]);
+          i++;
+        }
+        if (i < lines.length) {
+          result.push(lines[i]);
+          i++;
+        }
+        frontmatterProcessed = true;
+        continue;
+      }
+
+      if (trimmed !== '') {
+        frontmatterProcessed = true;
+      }
 
       if (trimmed.startsWith('```')) {
         inCodeBlock = !inCodeBlock;

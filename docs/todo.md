@@ -5,13 +5,13 @@
 ### Phase 0: Escaping & Comments
 
 - [ ] Implement escape character handling (`\`)
-- [ ] Implement `:::comment` blocks
+- [x] Implement `:::comment` blocks
 - [x] Implement inline comments `%% ... %%`
 
 ### Phase 0.5: Frontmatter
 
-- [ ] Parse YAML frontmatter at start of file
-- [ ] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
+- [x] Parse YAML frontmatter at start of file
+- [x] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
       `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 
 ### Phase 1: Variables
@@ -21,6 +21,7 @@
 - [x] Implement automatic date variables (`{$created}`, `{$modified}`)
 - [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `mm`, `ss`)
 - [ ] Support timezone configuration (`$timezone = "Europe/Paris"`)
+- [x] Implement SourceEvaluator for processing `:::foreach`, `:::if`, and `:::comment` blocks
 
 ## 2. Universal Attribute System `{}`
 
@@ -46,8 +47,8 @@
 
 - [x] `{#id}` - Heading ID for cross-references
 - [x] `{.class}` - CSS classes
-- [ ] `{numbered}` - Enable numbering
-- [ ] `{numbered=false}` - Disable numbering
+- [x] `{numbered}` - Enable numbering
+- [x] `{numbered=false}` - Disable numbering
 
 ### Attributes on Images
 
@@ -116,6 +117,7 @@
 - [x] Anchor links `[text](#anchor)`
 - [x] Highlight target element on anchor navigation
 - [x] Links with variables `[text]({$var})`
+- [x] Link reference definitions `[ref]: url`
 
 ### Link Attributes
 
@@ -163,13 +165,13 @@
 
 ### Grid Tables
 
-- [ ] Basic tables with `|` syntax
-- [ ] `[[table]]` and `[[/table]]` wrapper
+- [x] Basic tables with `|` syntax
+- [x] `[[table]]` and `[[/table]]` wrapper
 - [ ] Header marker `[h]`
 - [ ] Column merge `[colspan=N]`
 - [ ] Row merge `[rowspan=N]`
-- [ ] Alignment markers `:---`, `:---:`, `---:`
-- [ ] Table attributes `{id=value}`
+- [x] Alignment markers `:---`, `:---:`, `---:`
+- [x] Table attributes `{id=value}`
 
 ### Tabs
 
@@ -280,6 +282,7 @@
 
 - [x] Basic TOC `[[toc]]`
 - [x] TOC with attributes `{depth=N}`, `{from=N}`, `{to=N}`, `{numbered=true}`, `{class=value}`
+- [x] Double bracket blocks with attributes `[[toc {id=toc}]]`
 
 ### Loops
 
@@ -330,21 +333,21 @@
 
 ### Global Numbering
 
-- [ ] `$numbering = true` - Enable global numbering
-- [ ] `$numbering_style = "style"` - Set numbering style
+- [x] `$numbering = true` - Enable global numbering
+- [x] `$numbering_style = "style"` - Set numbering style
 
 ### Local Numbering
 
-- [ ] `{numbered}` attribute on headings
-- [ ] `{numbered=false}` to disable specific sections
+- [x] `{numbered}` attribute on headings
+- [x] `{numbered=false}` to disable specific sections
 
 ### Numbering Styles
 
-- [ ] `decimal` - 1, 1.1, 1.1.1
-- [ ] `roman-lower` - i, ii, iii
-- [ ] `roman-upper` - I, II, III
-- [ ] `alpha-lower` - a, b, c
-- [ ] `alpha-upper` - A, B, C
+- [x] `decimal` - 1, 1.1, 1.1.1
+- [x] `roman-lower` - i, ii, iii
+- [x] `roman-upper` - I, II, III
+- [x] `alpha-lower` - a, b, c
+- [x] `alpha-upper` - A, B, C
 
 ## 15. Post-Processing
 
@@ -383,10 +386,11 @@
 
 - [x] Unit tests for each inline formatting feature
 - [ ] Unit tests for each block type
-- [ ] Unit tests for attributes
-- [ ] Unit tests for variables
+- [x] Unit tests for attributes
+- [x] Unit tests for variables
+- [x] Unit tests for SourceEvaluator (:::foreach, :::if, :::comment blocks)
 - [ ] Unit tests for calculations and namespaces
-- [ ] Unit tests for loops
+- [x] Unit tests for loops
 - [ ] Unit tests for file inclusion
 - [ ] Integration tests for complete documents
 - [ ] Regression tests for Markdown compatibility

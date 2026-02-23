@@ -779,20 +779,20 @@ npm install zolt-parser
 const zolt = require('zolt-parser');
 const html = zolt.parse('# Hello Zolt');
 
-```
+\```
 
 :::
 
 :::tab [Configuration]
 
-```
+\```
 
 {
 "theme": "dark",
 "numbering": true
 }
 
-```
+\```
 
 :::
 :::
@@ -838,7 +838,7 @@ Barre latérale (30% de la largeur).
 #### Attributs Disponibles
 
 | Élément      | Attribut    | Description            |
-| ------------ | ----------- | ---------------------- |
+|--------------|-------------|------------------------|
 | `:::columns` | `cols=N`    | Nombre de colonnes     |
 | `:::column`  | `width=N%`  | Largeur de la colonne  |
 | `:::column`  | `width=Npx` | Largeur fixe en pixels |
@@ -893,7 +893,7 @@ Le Zolt utilise un système de préfixes pour que le parseur sache immédiatemen
 ### 4.1 Tableau des Préfixes
 
 | Préfixe | Type    | Balise HTML générée | Usage                                     |
-| ------- | ------- | ------------------- | ----------------------------------------- |
+|---------|---------|---------------------|-------------------------------------------|
 | `!`     | Image   | `<img>`             | Images statiques (jpg, png, gif, svg)     |
 | `!!`    | Vidéo   | `<video>`           | Fichiers vidéo (mp4, webm, ogg)           |
 | `??`    | Audio   | `<audio>`           | Fichiers audio (mp3, wav, ogg)            |
@@ -992,7 +992,7 @@ $$site_name = "Mon Site"
 #### Hiérarchie des Variables
 
 | Préfixe | Portée  | Usage                            |
-| ------- | ------- | -------------------------------- |
+|---------|---------|----------------------------------|
 | `$var`  | Locale  | Variable propre au fichier       |
 | `$$var` | Globale | Variable partagée dans le projet |
 
@@ -1216,7 +1216,7 @@ title: 'Titre du Document'
 author: 'Jean Dupont'
 date: 2026-02-18
 version: 1.0
-tags: [zolt, markdown, documentation]
+tags: [ zolt, markdown, documentation ]
 description: 'Description courte du document'
 ---
 ```

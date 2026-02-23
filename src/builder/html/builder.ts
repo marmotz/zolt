@@ -286,6 +286,7 @@ export class HTMLBuilder implements Builder {
   private evaluator: ExpressionEvaluator;
   private contentProcessor: ContentProcessor;
   private currentHeadings: HeadingNode[] = [];
+  private headingCounters: number[] = new Array(7).fill(0);
 
   constructor(initialVariables?: InitialVariables) {
     this.evaluator = new ExpressionEvaluator();
@@ -335,6 +336,8 @@ export class HTMLBuilder implements Builder {
         return '';
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+      case 'Frontmatter':
+        return this.visitFrontmatter(node as any);
       case 'LinkReferenceDefinition':
         return '';
       case 'Table':
@@ -387,10 +390,26 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.tabsCounter = 0;
     this.hasTabs = false;
+    this.headingCounters.fill(0);
     this.currentHeadings = this.findAllHeadings(node.children);
 
-    const childrenHtml = node.children
-      .map((child) => this.build(child))
+    // Ensure frontmatter is processed first
+    if (node.frontmatter) {
+      this.visitFrontmatter(node.frontmatter);
+    }
+
+    const children = [...node.children];
+    if (this.evaluator.getVariable('toc') === true) {
+      children.unshift({
+        type: 'DoubleBracketBlock',
+        blockType: 'toc',
+        content: '',
+        attributes: {},
+      } as any);
+    }
+
+    const childrenHtml = children
+      .map((child) => (child.type === 'Frontmatter' ? '' : this.build(child)))
       .filter((h) => h !== '')
       .join('\n');
 
@@ -436,12 +455,15 @@ export class HTMLBuilder implements Builder {
     });
   </script>`;
 
+    const lang = node.frontmatter?.data?.lang || 'en';
+    const title = node.frontmatter?.data?.title || 'Document';
+
     return `<!DOCTYPE html>
-<html lang="">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>${title}</title>
   <style>
 ${DEFAULT_CSS}
   </style>
@@ -456,8 +478,24 @@ ${anchorScript}
 
   visitDocument(node: DocumentNode): string {
     this.currentHeadings = this.findAllHeadings(node.children);
-    return node.children
-      .map((child) => this.build(child))
+
+    // Ensure frontmatter is processed first
+    if (node.frontmatter) {
+      this.visitFrontmatter(node.frontmatter);
+    }
+
+    const children = [...node.children];
+    if (this.evaluator.getVariable('toc') === true) {
+      children.unshift({
+        type: 'DoubleBracketBlock',
+        blockType: 'toc',
+        content: '',
+        attributes: {},
+      } as any);
+    }
+
+    return children
+      .map((child) => (child.type === 'Frontmatter' ? '' : this.build(child)))
       .filter((h) => h !== '')
       .join('\n');
   }
@@ -486,13 +524,75 @@ ${anchorScript}
       node.attributes = {};
     }
 
+    // Handle numbering
+    const isGlobalNumbering = this.evaluator.getVariable('numbering') === true;
+    const isLocalNumbering = node.attributes.numbered === 'true';
+    const isNumberingDisabled = node.attributes.numbered === 'false';
+
+    let numberStr = '';
+    if ((isGlobalNumbering && !isNumberingDisabled) || isLocalNumbering) {
+      this.headingCounters[level]++;
+      for (let i = level + 1; i <= 6; i++) this.headingCounters[i] = 0;
+
+      const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
+      const parts = this.headingCounters.slice(1, level + 1);
+
+      if (numberingStyle === 'decimal') {
+        numberStr = `<span class="zolt-heading-number">${parts.join('.')} </span>`;
+      } else if (numberingStyle === 'roman-lower') {
+        numberStr = `<span class="zolt-heading-number">${parts.map((p) => this.toRoman(p).toLowerCase()).join('.')} </span>`;
+      } else if (numberingStyle === 'roman-upper') {
+        numberStr = `<span class="zolt-heading-number">${parts.map((p) => this.toRoman(p).toUpperCase()).join('.')} </span>`;
+      } else if (numberingStyle === 'alpha-lower') {
+        numberStr = `<span class="zolt-heading-number">${parts.map((p) => this.toAlpha(p).toLowerCase()).join('.')} </span>`;
+      } else if (numberingStyle === 'alpha-upper') {
+        numberStr = `<span class="zolt-heading-number">${parts.map((p) => this.toAlpha(p).toUpperCase()).join('.')} </span>`;
+      }
+    }
+
     if (!node.attributes.id) {
       const textContent = renderedContent.replace(/<[^>]+>/g, '').trim();
       node.attributes.id = this.slugify(textContent);
     }
 
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<h${level}${attrs}>${renderedContent}</h${level}>`;
+    return `<h${level}${attrs}>${numberStr}${renderedContent}</h${level}>`;
+  }
+
+  private toRoman(num: number): string {
+    const lookup: { [key: string]: number } = {
+      M: 1000,
+      CM: 900,
+      D: 500,
+      CD: 400,
+      C: 100,
+      XC: 90,
+      L: 50,
+      XL: 40,
+      X: 10,
+      IX: 9,
+      V: 5,
+      IV: 4,
+      I: 1,
+    };
+    let roman = '';
+    for (const i in lookup) {
+      while (num >= lookup[i]) {
+        roman += i;
+        num -= lookup[i];
+      }
+    }
+    return roman;
+  }
+
+  private toAlpha(num: number): string {
+    let alpha = '';
+    while (num > 0) {
+      const mod = (num - 1) % 26;
+      alpha = String.fromCharCode(65 + mod) + alpha;
+      num = Math.floor((num - mod) / 26);
+    }
+    return alpha || 'A';
   }
 
   private slugify(text: string): string {
@@ -774,12 +874,29 @@ ${childrenHtml}
         currentDepth--;
       }
 
-      // Update counters for numbering
-      counters[level]++;
-      for (let i = level + 1; i <= 6; i++) counters[i] = 0;
-
-      const numberParts = counters.slice(from, level + 1);
-      const numberStr = numbered ? `<span class="zolt-toc-number">${numberParts.join('.')}</span>` : '';
+            // Update counters for numbering
+            counters[level]++;
+            for (let i = level + 1; i <= 6; i++) counters[i] = 0;
+      
+            const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
+            const numberParts = counters.slice(from, level + 1);
+            let numberStr = '';
+      
+            if (numbered) {
+              let formattedParts: string[] = [];
+              if (numberingStyle === 'decimal') {
+                formattedParts = numberParts.map((p) => p.toString());
+              } else if (numberingStyle === 'roman-lower') {
+                formattedParts = numberParts.map((p) => this.toRoman(p).toLowerCase());
+              } else if (numberingStyle === 'roman-upper') {
+                formattedParts = numberParts.map((p) => this.toRoman(p).toUpperCase());
+              } else if (numberingStyle === 'alpha-lower') {
+                formattedParts = numberParts.map((p) => this.toAlpha(p).toLowerCase());
+              } else if (numberingStyle === 'alpha-upper') {
+                formattedParts = numberParts.map((p) => this.toAlpha(p).toUpperCase());
+              }
+              numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
+            }
 
       const inlineHtml = this.processInlineContent((h as any).content);
       const childrenHtml = this.joinChildren(h.children);
@@ -1182,6 +1299,15 @@ ${childrenHtml}
       Parser.globalAbbreviations.set(node.abbreviation, node.definition);
     } else {
       this.abbreviationDefinitions.set(node.abbreviation, node.definition);
+    }
+    return '';
+  }
+
+  visitFrontmatter(node: { data: Record<string, any> }): string {
+    if (node.data) {
+      for (const [key, value] of Object.entries(node.data)) {
+        this.evaluator.setVariable(key, value);
+      }
     }
     return '';
   }

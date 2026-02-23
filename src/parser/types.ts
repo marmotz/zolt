@@ -277,6 +277,7 @@ export interface IndentationNode {
 export interface DocumentNode {
   type: 'Document';
   children: ASTNode[];
+  frontmatter?: FrontmatterNode;
   sourceFile: string;
 }
 

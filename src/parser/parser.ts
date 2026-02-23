@@ -64,9 +64,12 @@ export class Parser {
 
     // Pass 2: Full parse
     const children = this.parseDocument();
+    const frontmatter = children.find((child) => child.type === 'Frontmatter') as FrontmatterNode | undefined;
+
     return {
       type: 'Document',
       children,
+      frontmatter,
       sourceFile: this.filePath,
     };
   }
@@ -1027,12 +1030,52 @@ export class Parser {
   }
 
   private parseFrontmatter(): FrontmatterNode {
-    this.expect(TokenType.FRONTMATTER);
+    const token = this.expect(TokenType.FRONTMATTER);
+    const content = token.value;
+    const data: Record<string, any> = {};
+
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === '---') continue;
+
+      const match = trimmed.match(/^([a-zA-Z0-9_-]+)\s*:\s*(.*)$/);
+      if (match) {
+        const key = match[1];
+        const rawValue = match[2].trim();
+        data[key] = this.parseYamlValue(rawValue);
+      }
+    }
 
     return {
       type: 'Frontmatter',
-      data: {},
+      data,
     };
+  }
+
+  private parseYamlValue(value: string): any {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    if (value === 'null') return null;
+
+    // Quoted strings
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      return value.slice(1, -1);
+    }
+
+    // Arrays: [a, b, c]
+    if (value.startsWith('[') && value.endsWith(']')) {
+      const inner = value.slice(1, -1).trim();
+      if (!inner) return [];
+      return inner.split(',').map((v) => this.parseYamlValue(v.trim()));
+    }
+
+    // Numbers
+    if (!isNaN(Number(value)) && value !== '') {
+      return Number(value);
+    }
+
+    return value;
   }
 
   private isNewBlockStart(offset: number = 0): boolean {

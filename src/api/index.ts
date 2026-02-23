@@ -72,10 +72,17 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const parser = new Parser(tokens);
   const ast = parser.parse();
 
+  // If there is frontmatter in the AST, we should merge it with initial variables
+  // so the builder knows about it (e.g. for numbering)
+  const mergedVariables = { ...initialVariables };
+  if (ast.frontmatter) {
+    Object.assign(mergedVariables, ast.frontmatter.data);
+  }
+
   let builder: Builder;
 
   if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder(initialVariables);
+    builder = new HTMLBuilder(mergedVariables);
   } else {
     throw new Error(`Unsupported output type: ${options.type}`);
   }
