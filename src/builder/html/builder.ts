@@ -50,6 +50,9 @@ const DEFAULT_CSS = `
   * {
     box-sizing: border-box;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     font-size: 16px;
@@ -231,6 +234,15 @@ const DEFAULT_CSS = `
   .zolt-tab-panel.active {
     display: block;
   }
+  :target {
+    scroll-margin-top: 2rem;
+    animation: zolt-anchor-highlight 3s ease-out;
+  }
+  @keyframes zolt-anchor-highlight {
+    0% { background-color: #fffdba; }
+    80% { background-color: #fffdba; }
+    100% { background-color: transparent; }
+  }
 `.trim();
 
 type InitialVariables = Record<string, number | string | boolean | null | undefined>;
@@ -379,6 +391,18 @@ export class HTMLBuilder implements Builder {
   </script>`
       : '';
 
+    const anchorScript = `
+  <script>
+    window.addEventListener('hashchange', function() {
+      var target = document.querySelector(':target');
+      if (target) {
+        target.style.animation = 'none';
+        target.offsetHeight; // trigger reflow
+        target.style.animation = '';
+      }
+    });
+  </script>`;
+
     return `<!DOCTYPE html>
 <html lang="">
 <head>
@@ -392,6 +416,7 @@ ${DEFAULT_CSS}
 <body>
 ${childrenHtml}
 ${tabsScript}
+${anchorScript}
 </body>
 </html>`;
   }

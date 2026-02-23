@@ -44,9 +44,9 @@ This is a paragraph with an anchor.{#important-para}
 
 You can also have **Bold Text**{#bold-anchor} with an anchor or ||a whole group of words||{#group-anchor}.
 
-[Link to Paragraph](@important-para)
-[Link to List](@my-list)
-[Link to Bold Text](@bold-anchor)
+- [Link to Paragraph](@important-para)
+- [Link to List](@my-list)
+- [Link to Bold Text](@bold-anchor)
 
 ## Links with Variables
 
@@ -78,22 +78,5 @@ Check the [documentation]({$doc_url}).
 [docs]: https://docs.zlt.example.com
 [api]: https://api.zlt.example.com
 [forum]: https://forum.zlt.example.com
-
-### Download Section
-
-**Downloads:**
-
-- [PDF Version](guide.pdf){download=true}
-- [ePub Version](guide.epub){download=true}
-- [Source Code][github]{target=_blank rel=noopener}
-
-[github]: https://github.com/marmotz/zolt/archive/main.zip
-
-### Styling Example
-
-[Primary Button](#){btn=primary}
-[Secondary Button](#){btn=secondary}
-[Success Button](#){btn=success}
-[Danger Button](#){btn=danger color=red}
 
 [← Back to Examples Index](index.zlt)

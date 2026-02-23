@@ -114,6 +114,7 @@
 - [x] Automatic reference links `[text][ref]` with `[ref]: url`
 - [x] Internal links/cross-references `[text](@id)`
 - [x] Anchor links `[text](#anchor)`
+- [x] Highlight target element on anchor navigation
 - [x] Links with variables `[text]({$var})`
 
 ### Link Attributes
