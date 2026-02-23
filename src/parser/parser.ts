@@ -151,7 +151,12 @@ export class Parser {
       this.advance();
       return {
         type: 'Paragraph',
-        content: ':::',
+        children: [
+          {
+            type: 'Text',
+            content: ':::',
+          },
+        ],
       };
     }
     if (this.match(TokenType.DOUBLE_BRACKET_START)) return this.parseDoubleBracketBlock();
@@ -181,7 +186,7 @@ export class Parser {
       const token = this.advance();
       return {
         type: 'Paragraph',
-        content: token.value,
+        children: [{ type: 'Text', content: token.value }],
       };
     }
 
@@ -200,15 +205,16 @@ export class Parser {
   private parseTable(): TableNode {
     const rows: TableRowNode[] = [];
     let header: TableRowNode | undefined;
+    let alignments: ('left' | 'center' | 'right' | undefined)[] = [];
 
     while (this.isTableStart()) {
-      const row = this.parseTableRow();
+      const { row, rawCells } = this.parseTableRow();
 
       // Check if this is a separator row (e.g., |---|---|)
-      if (this.isSeparatorRow(row)) {
+      if (this.isSeparatorRow(rawCells)) {
         if (rows.length > 0 && !header) {
           header = rows.pop();
-          // We don't add the separator row to rows
+          alignments = this.parseAlignments(rawCells);
         }
       } else {
         rows.push(row);
@@ -218,6 +224,20 @@ export class Parser {
       if (this.isEof()) break;
     }
 
+    // Apply alignments to header and all rows
+    if (alignments.length > 0) {
+      if (header) {
+        header.cells.forEach((cell, i) => {
+          if (alignments[i]) cell.alignment = alignments[i];
+        });
+      }
+      for (const row of rows) {
+        row.cells.forEach((cell, i) => {
+          if (alignments[i]) cell.alignment = alignments[i];
+        });
+      }
+    }
+
     return {
       type: 'Table',
       header,
@@ -225,27 +245,44 @@ export class Parser {
     };
   }
 
-  private parseTableRow(): TableRowNode {
+  private parseTableRow(): { row: TableRowNode; rawCells: string[] } {
     const token = this.expect(TokenType.TEXT);
     const line = token.value.trim();
 
     // Remove leading and trailing pipes
     const content = line.replace(/^\|/, '').replace(/\|$/, '');
     const cellContents = content.split('|');
+    const rawCells = cellContents.map((c) => c.trim());
 
-    const cells: TableCellNode[] = cellContents.map((cell) => ({
+    const cells: TableCellNode[] = rawCells.map((cell) => ({
       type: 'TableCell',
-      children: this.inlineParser.parse(cell.trim()),
+      children: this.inlineParser.parse(cell),
     }));
 
     return {
-      type: 'TableRow',
-      cells,
+      row: {
+        type: 'TableRow',
+        cells,
+      },
+      rawCells,
     };
   }
 
-  private isSeparatorRow(row: TableRowNode): boolean {
-    return row.cells.every((cell) => /^[ \t]*:?-+:?[ \t]*$/.test(cell.content));
+  private isSeparatorRow(rawCells: string[]): boolean {
+    return rawCells.length > 0 && rawCells.every((cell) => /^[ \t]*:?-+:?[ \t]*$/.test(cell));
+  }
+
+  private parseAlignments(rawCells: string[]): ('left' | 'center' | 'right' | undefined)[] {
+    return rawCells.map((cell) => {
+      const trimmed = cell.trim();
+      const startsWithColon = trimmed.startsWith(':');
+      const endsWithColon = trimmed.endsWith(':');
+
+      if (startsWithColon && endsWithColon) return 'center';
+      if (endsWithColon) return 'right';
+      if (startsWithColon) return 'left';
+      return undefined;
+    });
   }
 
   private parseHeading(): HeadingNode {
@@ -619,14 +656,15 @@ export class Parser {
       const attrContent = attrMatch[1];
       // Skip if this looks like a variable reference {$...}, expression {{...}}, or foreach/if condition
       const isSpecialBlock = value.trim().startsWith('if ') || value.trim().startsWith('foreach ');
-      let shouldSkip = attrContent.startsWith('$') || 
-                       attrContent.startsWith('{') || 
-                       attrContent.includes(' as $') || 
-                       attrContent.startsWith('!') ||
-                       attrContent.startsWith('(');
-      
+      let shouldSkip =
+        attrContent.startsWith('$') ||
+        attrContent.startsWith('{') ||
+        attrContent.includes(' as $') ||
+        attrContent.startsWith('!') ||
+        attrContent.startsWith('(');
+
       if (isSpecialBlock && !shouldSkip) {
-        // If it's a special block and we haven't decided to skip yet, 
+        // If it's a special block and we haven't decided to skip yet,
         // check if there are other braces before these attributes.
         // If not, these braces likely contain the condition/loop info.
         const beforeAttrs = value.substring(0, value.length - attrMatch[0].length);
@@ -643,7 +681,11 @@ export class Parser {
 
     // Extract title [Title]
     let title: string | undefined;
-    const isSpecialBlock = remaining.match(/^(if|foreach)(\s|{|$)/) || remaining === 'if true' || remaining === 'if false' || remaining === 'if null';
+    const isSpecialBlock =
+      remaining.match(/^(if|foreach)(\s|{|$)/) ||
+      remaining === 'if true' ||
+      remaining === 'if false' ||
+      remaining === 'if null';
     const titleMatch = !isSpecialBlock ? remaining.match(/\s+\[([^\]]+)]$/) : null;
     let blockType = remaining;
     if (titleMatch) {

@@ -5,6 +5,8 @@ import { Lexer } from '../lexer/lexer';
 import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
+import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
+import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
@@ -40,13 +42,7 @@ export interface LintWarning {
 }
 
 export async function buildString(content: string, options?: BuildOptions): Promise<string> {
-  const lexer = new Lexer(content);
-  const tokens = lexer.tokenize();
-
-  const parser = new Parser(tokens);
-  const ast = parser.parse();
-
-  const initialVariables: Record<string, string> = {};
+  const initialVariables: Record<string, any> = { ...options?.variables };
 
   if (options?.filePath) {
     try {
@@ -61,6 +57,20 @@ export async function buildString(content: string, options?: BuildOptions): Prom
       // File stats unavailable, leave variables empty
     }
   }
+
+  const evaluator = new ExpressionEvaluator();
+  for (const [key, value] of Object.entries(initialVariables)) {
+    evaluator.setVariable(key, value);
+  }
+
+  const sourceEvaluator = new SourceEvaluator(evaluator);
+  const evaluatedContent = sourceEvaluator.evaluate(content);
+
+  const lexer = new Lexer(evaluatedContent);
+  const tokens = lexer.tokenize();
+
+  const parser = new Parser(tokens);
+  const ast = parser.parse();
 
   let builder: Builder;
 

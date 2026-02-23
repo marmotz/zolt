@@ -246,6 +246,7 @@ export interface TableCellNode {
   type: 'TableCell';
   children: ASTNode[];
   isHeader?: boolean;
+  alignment?: 'left' | 'center' | 'right';
 }
 
 export interface DoubleBracketBlockNode {

@@ -331,15 +331,15 @@ export class HTMLBuilder implements Builder {
   visitTableCell(node: TableCellNode, isHeader: boolean): string {
     const tag = isHeader ? 'th' : 'td';
     const childrenHtml = this.joinChildren(node.children);
-    return `<${tag}>${childrenHtml}</${tag}>`;
+    const alignStyle = node.alignment ? ` style="text-align: ${node.alignment};"` : '';
+    return `<${tag}${alignStyle}>${childrenHtml}</${tag}>`;
   }
 
   buildDocument(node: DocumentNode): string {
     this.tabsCounter = 0;
     this.hasTabs = false;
 
-    const childrenHtmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
-    const childrenHtml = this.mergeAdjacentListHTML(childrenHtmlParts).join('\n');
+    const childrenHtml = node.children.map((child) => this.build(child)).filter((h) => h !== '').join('\n');
 
     const tabsScript = this.hasTabs
       ? `
@@ -389,8 +389,7 @@ ${tabsScript}
   }
 
   visitDocument(node: DocumentNode): string {
-    const htmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
-    return this.mergeAdjacentListHTML(htmlParts).join('\n');
+    return node.children.map((child) => this.build(child)).filter((h) => h !== '').join('\n');
   }
 
   visitHeading(node: HeadingNode): string {
@@ -486,21 +485,6 @@ ${tabsScript}
       return this.visitTabBlock(node);
     }
 
-    const foreachInfo = this.contentProcessor.parseForeach(node.blockType);
-    if (foreachInfo) {
-      return this.visitForeachBlock(node, foreachInfo.collection, foreachInfo.iterator);
-    }
-
-    const ifMatch = node.blockType.match(/^if\s+(.+)$/);
-    if (ifMatch) {
-      const condition = ifMatch[1];
-      if (!this.contentProcessor.evaluateCondition(condition)) {
-        return '';
-      }
-
-      return this.joinChildren(node.children);
-    }
-
     const childrenHtml = this.joinChildren(node.children);
 
     if (node.blockType === 'details') {
@@ -544,49 +528,6 @@ ${childrenHtml}
     }
     html += `${childrenHtml}\n</div>`;
     return html;
-  }
-
-  private visitForeachBlock(node: TripleColonBlockNode, collectionVar: string, iteratorName: string): string {
-    const collection = this.contentProcessor.getCollection(collectionVar);
-    if (collection.length === 0) return '';
-
-    const results: string[] = [];
-
-    for (let i = 0; i < collection.length; i++) {
-      const item = collection[i];
-
-      const childEvaluator = this.evaluator.createChildScope();
-      childEvaluator.setVariable(iteratorName, item);
-      childEvaluator.setVariable('foreach', {
-        index: i,
-        index1: i + 1,
-        first: i === 0,
-        last: i === collection.length - 1,
-        even: i % 2 === 0,
-        odd: i % 2 === 1,
-      });
-
-      const childBuilder = new HTMLBuilder();
-      childBuilder.evaluator = childEvaluator;
-      childBuilder.contentProcessor = new ContentProcessor(childEvaluator);
-      childBuilder.abbreviationDefinitions = this.abbreviationDefinitions;
-      childBuilder.tabsCounter = this.tabsCounter;
-      childBuilder.hasTabs = this.hasTabs;
-      childBuilder.inlineParser = this.inlineParser;
-
-      for (const child of node.children) {
-        const childClone = JSON.parse(JSON.stringify(child));
-        const childHtml = childBuilder.build(childClone);
-        if (childHtml) {
-          results.push(childHtml);
-        }
-      }
-
-      this.tabsCounter = childBuilder.tabsCounter;
-      this.hasTabs = childBuilder.hasTabs || this.hasTabs;
-    }
-
-    return this.mergeAdjacentListHTML(results).join('\n');
   }
 
   private visitTabsBlock(node: TripleColonBlockNode): string {
@@ -877,49 +818,6 @@ ${childrenHtml}
     return `${styleStr}${otherAttrs}`;
   }
 
-  private mergeAdjacentListHTML(htmlStrings: string[]): string[] {
-    if (htmlStrings.length <= 1) return htmlStrings;
-
-    const merged: string[] = [];
-    let current = htmlStrings[0];
-
-    for (let i = 1; i < htmlStrings.length; i++) {
-      const next = htmlStrings[i];
-      const mergedContent = this.tryMergeLists(current, next);
-
-      if (mergedContent) {
-        current = mergedContent;
-      } else {
-        merged.push(current);
-        current = next;
-      }
-    }
-    merged.push(current);
-    return merged;
-  }
-
-  private tryMergeLists(html1: string, html2: string): string | null {
-    const h1 = html1.trim();
-    const h2 = html2.trim();
-
-    const ulRegex = /^<(ul|ol|dl)([^>]*)>([\s\S]*)<\/\1>$/i;
-    const match1 = h1.match(ulRegex);
-    const match2 = h2.match(ulRegex);
-
-    if (match1 && match2 && match1[1].toLowerCase() === match2[1].toLowerCase()) {
-      const attrs1 = match1[2].trim();
-      const attrs2 = match2[2].trim();
-
-      if (attrs1 === attrs2) {
-        const content1 = match1[3].trim();
-        const content2 = match2[3].trim();
-        return `<${match1[1]}${match1[2]}>\n${content1}\n${content2}\n</${match1[1]}>`;
-      }
-    }
-
-    return null;
-  }
-
   private buildStyleAttribute(attrs?: Attributes): string {
     if (!attrs) return '';
 
@@ -1119,7 +1017,6 @@ ${childrenHtml}
 
   private joinChildren(nodes: ASTNode[]): string {
     if (!nodes) return '';
-    const htmlParts = nodes.map((child) => this.build(child)).filter((h) => h !== '');
-    return this.mergeAdjacentListHTML(htmlParts).join('');
+    return nodes.map((child) => this.build(child)).filter((h) => h !== '').join('');
   }
 }

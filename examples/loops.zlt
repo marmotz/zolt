@@ -301,7 +301,6 @@ $releases = [
 - {$change}
 :::
 :::
-:::
 
 ### Card Grid
 
@@ -314,7 +313,6 @@ $cards = [
 :::foreach {$cards as $card}
 :::details [{$card.icon} {$card.title}]
 {$card.description}
-:::
 :::
 :::
 
@@ -340,19 +338,18 @@ $catalog = {
 }
 
 :::foreach {$catalog as $category}
-## {$category.name}
+### {$category.name}
 
 :::foreach {$category.subcategories as $sub}
-### {$sub.name}
+#### {$sub.name}
 
 :::foreach {$sub.items as $item}
 - {$item}
 :::
 :::
 :::
-:::
 
-### Task Board
+#### Task Board
 
 $statuses = ["To Do", "In Progress", "Done"]
 
@@ -363,27 +360,23 @@ $tasks = {
 }
 
 :::foreach {$statuses as $status}
-## {$status}
+##### {$status}
 
 :::foreach {$tasks[$status] as $task}
 - [ ] {$task}
 :::
 :::
-:::
 
-### Weekly Schedule
+## Weekly Schedule
 
 $week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 $hours = ["9:00 AM", "10:00 AM", "11:00 AM"]
-
-## Weekly Schedule
 
 :::foreach {$week as $day}
 ### {$day}
 
 :::foreach {$hours as $hour}
 - {$hour}: Meeting
-:::
 :::
 :::
 
@@ -403,12 +396,13 @@ $hours = ["9:00 AM", "10:00 AM", "11:00 AM"]
 
 ### Check for Empty Arrays
 
+```zolt
 :::if {List.length($items) > 0}
 :::foreach {$items as $item}
 - {$item}
 :::
 :::
-:::
+```
 
 ### Limit Nested Loops
 
@@ -418,11 +412,13 @@ Too many nested loops can be hard to read. Consider restructuring.
 
 Filter and transform data as needed:
 
+```
 :::foreach {$items as $item}
 :::if {$item.active}
 - **{$item.name}**
 :::
 :::
 :::
+```
 
 [← Back to Examples Index](index.zlt)
