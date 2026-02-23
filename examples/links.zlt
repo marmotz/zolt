@@ -3,26 +3,15 @@
 ## Basic Links
 
 Simple link syntax:
-[Zolt Documentation](https://zolt.example.com)
-[Example Website](https://example.com)
+- [Zolt Documentation](https://zolt.marmotz.dev)
+- [Example Website](https://zolt.marmotz.dev)
 
 ## Links with Attributes
 
 Styled links:
-
-[External link](https://example.com){target=_blank rel=noopener}
-[Important link](page.html){color=blue font-weight=bold}
-[Download PDF](document.pdf){download=true}
-[Button link](action.html){btn=primary}
-
-## Link Attributes Reference
-
-| Attribute | Description |
-|-----------|-------------|
-| `target=_blank` | Opens in new tab |
-| `rel=noopener` | Security for target=_blank |
-| `download` | Force download |
-| `title=...` | Tooltip text |
+- [External link](https://zolt.marmotz.dev){target=_blank rel=noopener}
+- [Important link](https://zolt.marmotz.dev/page.html){color=blue font-weight=bold}
+- [Download PDF](https://zolt.marmotz.dev/document.pdf){download=true}
 
 ## Automatic References
 
@@ -30,7 +19,7 @@ Reference-style links to avoid repeating URLs:
 
 Check out [Zolt][zolt] documentation and [GitHub][github] repository.
 
-[zolt]: https://zolt.example.com
+[zolt]: https://zolt.marmotz.dev
 [github]: https://github.com/marmotz/zolt
 
 ## Internal Links (Cross-references)
@@ -52,7 +41,7 @@ Jump to [Lists section](#lists)
 
 Using variables in links:
 
-$site_url = "https://example.com"
+$site_url = "https://zolt.marmotz.dev"
 $doc_url = "https://docs.example.com"
 
 Visit [our website]({$site_url}) for more information.

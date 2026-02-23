@@ -148,6 +148,12 @@ export interface AbbreviationDefinitionNode {
   isGlobal: boolean;
 }
 
+export interface LinkReferenceDefinitionNode {
+  type: 'LinkReferenceDefinition';
+  ref: string;
+  url: string;
+}
+
 export interface CommentInlineNode {
   type: 'CommentInline';
   content: string;
@@ -293,6 +299,7 @@ export type ASTNode =
   | FootnoteDefinitionNode
   | AbbreviationNode
   | AbbreviationDefinitionNode
+  | LinkReferenceDefinitionNode
   | CommentInlineNode
   | AnchorNode
   | ParagraphNode

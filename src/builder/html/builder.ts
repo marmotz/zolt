@@ -289,6 +289,8 @@ export class HTMLBuilder implements Builder {
         return this.visitIndentation(node as IndentationNode);
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+      case 'LinkReferenceDefinition':
+        return '';
       case 'Table':
         return this.visitTable(node as TableNode);
       case 'CommentInline':
@@ -339,7 +341,10 @@ export class HTMLBuilder implements Builder {
     this.tabsCounter = 0;
     this.hasTabs = false;
 
-    const childrenHtml = node.children.map((child) => this.build(child)).filter((h) => h !== '').join('\n');
+    const childrenHtml = node.children
+      .map((child) => this.build(child))
+      .filter((h) => h !== '')
+      .join('\n');
 
     const tabsScript = this.hasTabs
       ? `
@@ -389,7 +394,10 @@ ${tabsScript}
   }
 
   visitDocument(node: DocumentNode): string {
-    return node.children.map((child) => this.build(child)).filter((h) => h !== '').join('\n');
+    return node.children
+      .map((child) => this.build(child))
+      .filter((h) => h !== '')
+      .join('\n');
   }
 
   visitHeading(node: HeadingNode): string {
@@ -1017,6 +1025,9 @@ ${childrenHtml}
 
   private joinChildren(nodes: ASTNode[]): string {
     if (!nodes) return '';
-    return nodes.map((child) => this.build(child)).filter((h) => h !== '').join('');
+    return nodes
+      .map((child) => this.build(child))
+      .filter((h) => h !== '')
+      .join('');
   }
 }

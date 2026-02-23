@@ -25,9 +25,14 @@ import {
 
 export class InlineParser {
   private globalAbbreviations: Map<string, string> = new Map();
+  private linkReferences: Map<string, string> = new Map();
 
   setGlobalAbbreviations(abbreviations: Map<string, string>): void {
     this.globalAbbreviations = abbreviations;
+  }
+
+  setLinkReferences(references: Map<string, string>): void {
+    this.linkReferences = references;
   }
 
   parse(text: string): ASTNode[] {
@@ -111,7 +116,11 @@ export class InlineParser {
     if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/)) return this.parseEmbed(text);
     if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/)) return this.parseFile(text);
     if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/)) return this.parseImage(text);
-    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/)) return this.parseLink(text);
+    if (
+      this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/) ||
+      this.matchPattern(text, /^\[([^\]]+)]\[([^\]]*)]/)
+    )
+      return this.parseLink(text);
     if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
     if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
     if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) return this.parseInlineStyle(text);
@@ -132,31 +141,62 @@ export class InlineParser {
   }
 
   private parseLink(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/);
-    if (!match) return null;
+    // Standard link [text](url)
+    const standardMatch = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/);
+    if (standardMatch) {
+      const content = standardMatch[1];
+      const href = standardMatch[2];
+      let remaining = text.slice(standardMatch[0].length);
+      let attributes: Attributes | undefined;
 
-    const content = match[1];
-    const href = match[2];
-    let remaining = text.slice(match[0].length);
-    let attributes: Attributes | undefined;
-
-    if (remaining.startsWith('{')) {
-      const attrContent = this.extractBalancedBraces(remaining, 1);
-      if (attrContent !== null) {
-        attributes = this.parseAttributes(attrContent);
-        remaining = remaining.slice(1 + attrContent.length + 1);
+      if (remaining.startsWith('{')) {
+        const attrContent = this.extractBalancedBraces(remaining, 1);
+        if (attrContent !== null) {
+          attributes = this.parseAttributes(attrContent);
+          remaining = remaining.slice(1 + attrContent.length + 1);
+        }
       }
+
+      return {
+        node: {
+          type: 'Link',
+          children: this.parse(content),
+          href,
+          attributes,
+        } as LinkNode,
+        remaining,
+      };
     }
 
-    return {
-      node: {
-        type: 'Link',
-        children: this.parse(content),
-        href,
-        attributes,
-      } as LinkNode,
-      remaining,
-    };
+    // Reference-style link [text][ref] or [ref][]
+    const refMatch = this.matchPattern(text, /^\[([^\]]+)]\[([^\]]*)]/);
+    if (refMatch) {
+      const content = refMatch[1];
+      const ref = refMatch[2] || content;
+      const href = this.linkReferences.get(ref.toLowerCase()) || '';
+      let remaining = text.slice(refMatch[0].length);
+      let attributes: Attributes | undefined;
+
+      if (remaining.startsWith('{')) {
+        const attrContent = this.extractBalancedBraces(remaining, 1);
+        if (attrContent !== null) {
+          attributes = this.parseAttributes(attrContent);
+          remaining = remaining.slice(1 + attrContent.length + 1);
+        }
+      }
+
+      return {
+        node: {
+          type: 'Link',
+          children: this.parse(content),
+          href,
+          attributes,
+        } as LinkNode,
+        remaining,
+      };
+    }
+
+    return null;
   }
 
   private parseImage(text: string): { node: ASTNode; remaining: string } | null {

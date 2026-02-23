@@ -222,4 +222,12 @@ describe('Lexer', () => {
     expect(defTokens[0].value).toBe(': Term');
     expect(defTokens[1].value).toBe(':   Definition');
   });
+
+  test('should tokenize link reference definition', () => {
+    const lexer = new Lexer('[ref]: https://example.com');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.LINK_REF_DEF);
+    expect(tokens[0].value).toBe('ref:https://example.com');
+  });
 });

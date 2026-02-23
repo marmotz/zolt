@@ -332,24 +332,17 @@ Le Zolt propose une syntaxe riche pour les liens, avec attributs et références
 #### Liens Externes
 
 ```
-[Zolt](https://example.com)
-[Texte du lien](https://example.com/page)
+[Zolt](https://zolt.marmotz.dev)
+[Texte du lien](https://zolt.marmotz.dev/page)
 ```
 
 #### Liens avec Attributs
 
 ```
-[Lien externe](https://example.com){target=_blank rel=noopener}
+[Lien externe](https://zolt.marmotz.dev){target=_blank rel=noopener}
 [Télécharger PDF](document.pdf){download=true}
 [Lien important](page.html){color=blue font-weight=bold}
 ```
-
-| Attribut        | Description                  |
-|-----------------|------------------------------|
-| `target=_blank` | Ouvre dans un nouvel onglet  |
-| `rel=noopener`  | Sécurité pour target=\_blank |
-| `download`      | Force le téléchargement      |
-| `title=...`     | Infobulle au survol          |
 
 #### Références Automatiques
 
@@ -358,7 +351,7 @@ Pour éviter de répéter les URLs longues :
 ```
 [Zolt][zolt] est un langage de balisage. Consultez la [documentation][zolt].
 
-[zolt]: https://zolt.example.com
+[zolt]: https://zolt.marmotz.dev
 ```
 
 #### Liens Internes (Références Croisées)
@@ -381,7 +374,7 @@ Aller à la [section sur les listes](#listes).
 #### Liens avec Variables
 
 ```
-$site_web = "https://example.com"
+$site_web = "https://zolt.marmotz.dev"
 
 Visitez [notre site]({$site_web}) pour plus d'informations.
 ```
@@ -1885,27 +1878,27 @@ Zolt respecte les conventions standards de Markdown pour le formatage des paragr
 
 - **Sauts de ligne simples** : Les lignes séparées par un seul saut de ligne sont jointes en un seul paragraphe
 
-  ```
+```
   Ligne 1
   Ligne 2
   → <p>Ligne 1 Ligne 2</p>
-  ```
+```
 
 - **Sauts de ligne multiples** : Les lignes vides séparent les paragraphes
 
-  ```
+```
   Paragraphe 1
 
   Paragraphe 2
   → <p>Paragraphe 1</p><p>Paragraphe 2</p>
-  ```
+```
 
 Cette compatibilité garantit que les fichiers `.md` existants fonctionnent correctement dans Zolt.
 
 ### 8.2 Tableau Comparatif des Fonctionnalités
 
-| Fonctionnalité | Markdown Classique | Zolt |
-| ------------------------ | -------------------- | -------------------------------------- | --- | ----- | --- | ------- |
+| Fonctionnalité           | Markdown Classique   | Zolt                                   |
+|--------------------------|----------------------|----------------------------------------| 
 | **Couleur texte**        | `<span style="...">` | `Texte{color=red}`                     |
 | **Gras**                 | `**texte**`          | `**texte**` (identique)                |
 | **Italique**             | `*texte*`            | `//texte//` (évite conflits listes)    |
@@ -1913,39 +1906,39 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 | **Exposant**             | `<sup>...</sup>`     | `^{texte}` (natif, imbrication)        |
 | **Indice**               | `<sub>...</sub>`     | `_{texte}` (natif, imbrication)        |
 | **Surligné**             | `<mark>...</mark>`   | `==texte==` (natif)                    |
-| **Taille image**         | Non supporté | `![..](..){w=100}`                     |
-| **Alignement image**     | HTML requis | `![..](..){align=right}`               |
+| **Taille image**         | Non supporté         | `![..](..){w=100}`                     |
+| **Alignement image**     | HTML requis          | `![..](..){align=right}`               |
 | **Alertes/Callouts**     | `> [!NOTE]` (hack)   | `:::note` (natif)                      |
-| **Ancre ID**             | HTML manuel | `## Titre{#id}` (natif)                |
-| **Tableaux avancés**     | Limité | `[[table]]` avec colspan/rowspan |
-| **Vidéo**                | HTML requis | `!![alt](url)` (natif)                 |
-| **Audio**                | HTML requis | `??[alt](url)` (natif)                 |
-| **Embed**                | HTML requis | `@@[alt](url)` (natif)                 |
-| **Variables**            | Non supporté | `$var = "val"` + `{$var}`              |
-| **Calculs**              | Non supporté | `{{ 10 + 5 }}`                         |
-| **Mathématiques**        | Extension requise | `$...$` (natif)                        |
-| **Diagrammes**           | Extension requise | `:::mermaid` (natif)                   |
-| **Graphiques**           | Non supporté | `:::chart` (natif)                     |
-| **Numérotation titres**  | Non supporté | `$numbering=true` + `{numbered}`       |
+| **Ancre ID**             | HTML manuel          | `## Titre{#id}` (natif)                |
+| **Tableaux avancés**     | Limité               | `[[table]]` avec colspan/rowspan       |
+| **Vidéo**                | HTML requis          | `!![alt](url)` (natif)                 |
+| **Audio**                | HTML requis          | `??[alt](url)` (natif)                 |
+| **Embed**                | HTML requis          | `@@[alt](url)` (natif)                 |
+| **Variables**            | Non supporté         | `$var = "val"` + `{$var}`              |
+| **Calculs**              | Non supporté         | `{{ 10 + 5 }}`                         |
+| **Mathématiques**        | Extension requise    | `$...$` (natif)                        |
+| **Diagrammes**           | Extension requise    | `:::mermaid` (natif)                   |
+| **Graphiques**           | Non supporté         | `:::chart` (natif)                     |
+| **Numérotation titres**  | Non supporté         | `$numbering=true` + `{numbered}`       |
 | **Commentaires**         | `<!-- -->`           | `:::comment` et `%% %%` (natif)        |
-| **Listes de définition** | Non supporté | `: terme` / `: définition`             |
-| **Liens avancés**        | Basique | `[text](url){target=_blank}`           |
-| **Références liens**     | Non supporté | `[text][ref]` + `[ref]: url`           |
-| **Citations stylées**    | Basique | `> texte{color=red}`                   |
-| **Indentation tech**     | Non supporté | `& texte` (vs `>` citation)            |
-| **Séparateurs stylés**   | Limité | `--- {color=red style=dashed}`         |
-| **Inline stylé**         | Non supporté | `                                      |     | texte |     | {attr}` |
-| **Notes de bas de page** | Extension | `[^1]` natif + définitions |
-| **Frontmatter**          | Non supporté | YAML natif avec variables auto |
-| **Dates auto**           | Non supporté | `{$created}`, `{$modified}`            |
-| **Abréviations**         | Non supporté | `{abbr="..."}`                         |
-| **TOC dynamique**        | Extension | `[[toc {from=2 to=4}]]`                |
-| **Calculs avancés**      | Non supporté | `Math.*`, `List.*`, `String.*`         |
-| **Boucles**              | Non supporté | `:::foreach` avec `$foreach.*`         |
-| **Accordéons**           | Non supporté | `:::details [Titre]`                   |
-| **Onglets**              | Non supporté | `:::tabs` / `:::tab`                   |
-| **Colonnes**             | Non supporté | `:::columns` / `:::column`             |
-| **Échappement**          | Backslash limité | `\` universel pour tous les opérateurs |
+| **Listes de définition** | Non supporté         | `: terme` / `: définition`             |
+| **Liens avancés**        | Basique              | `[text](url){target=_blank}`           |
+| **Références liens**     | Non supporté         | `[text][ref]` + `[ref]: url`           |
+| **Citations stylées**    | Basique              | `> texte{color=red}`                   |
+| **Indentation tech**     | Non supporté         | `& texte` (vs `>` citation)            |
+| **Séparateurs stylés**   | Limité               | `--- {color=red style=dashed}`         |
+| **Inline stylé**         | Non supporté         | `**texte**{attr}`                      |
+| **Notes de bas de page** | Extension            | `[^1]` natif + définitions             |
+| **FrontMatter**          | Non supporté         | YAML natif avec variables auto         |
+| **Dates auto**           | Non supporté         | `{$created}`, `{$modified}`            |
+| **Abréviations**         | Non supporté         | `{abbr="..."}`                         |
+| **TOC dynamique**        | Extension            | `[[toc {from=2 to=4}]]`                |
+| **Calculs avancés**      | Non supporté         | `Math.*`, `List.*`, `String.*`         |
+| **Boucles**              | Non supporté         | `:::foreach` avec `$foreach.*`         |
+| **Accordéons**           | Non supporté         | `:::details [Titre]`                   |
+| **Onglets**              | Non supporté         | `:::tabs` / `:::tab`                   |
+| **Colonnes**             | Non supporté         | `:::columns` / `:::column`             |
+| **Échappement**          | Backslash limité     | `\` universel pour tous les opérateurs |
 
 ---
 

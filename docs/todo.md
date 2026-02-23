@@ -102,7 +102,7 @@
 
 - [x] External links `[text](url)`
 - [x] Links with attributes `[text](url){attributes}`
-- [ ] Automatic reference links `[text][ref]` with `[ref]: url`
+- [x] Automatic reference links `[text][ref]` with `[ref]: url`
 - [ ] Internal links/cross-references `[text](@id)`
 - [ ] Anchor links `[text](#anchor)`
 - [x] Links with variables `[text]({$var})`

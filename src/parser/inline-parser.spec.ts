@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { InlineParser } from './inline-parser';
-import { BoldNode, HighlightNode, ItalicNode, StrikethroughNode, TextNode, UnderlineNode } from './types';
+import { BoldNode, HighlightNode, ItalicNode, LinkNode, StrikethroughNode, TextNode, UnderlineNode } from './types';
 
 describe('InlineParser', () => {
   const parser = new InlineParser();
@@ -322,6 +322,42 @@ describe('InlineParser', () => {
       expect((nodes[1] as any).content).toBe(' and ');
       expect(nodes[2].type).toBe('Highlight');
       expect(getFlatContent(nodes[2])).toBe('b');
+    });
+  });
+
+  describe('Links', () => {
+    test('should parse standard links', () => {
+      const nodes = parser.parse('[Zolt](https://zolt.example.com)');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Link');
+      expect((nodes[0] as LinkNode).href).toBe('https://zolt.example.com');
+      expect(getFlatContent(nodes[0])).toBe('Zolt');
+    });
+
+    test('should parse reference-style links', () => {
+      parser.setLinkReferences(new Map([['zolt', 'https://zolt.example.com']]));
+      const nodes = parser.parse('[Zolt][zolt]');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Link');
+      expect((nodes[0] as LinkNode).href).toBe('https://zolt.example.com');
+      expect(getFlatContent(nodes[0])).toBe('Zolt');
+    });
+
+    test('should parse collapsed reference-style links', () => {
+      parser.setLinkReferences(new Map([['zolt', 'https://zolt.example.com']]));
+      const nodes = parser.parse('[Zolt][]');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Link');
+      expect((nodes[0] as LinkNode).href).toBe('https://zolt.example.com');
+      expect(getFlatContent(nodes[0])).toBe('Zolt');
+    });
+
+    test('should handle case-insensitive references', () => {
+      parser.setLinkReferences(new Map([['zolt', 'https://zolt.example.com']]));
+      const nodes = parser.parse('[Zolt][ZOLT]');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Link');
+      expect((nodes[0] as LinkNode).href).toBe('https://zolt.example.com');
     });
   });
 });

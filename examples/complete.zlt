@@ -104,7 +104,7 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 
 ### Links
 
-- [Documentation](https://zolt.example.com){target=_blank}
+- [Documentation](https://zolt.marmotz.dev){target=_blank}
 - [GitHub Repository](https://github.com/marmotz/zolt)
 - [Getting Started](@introduction)
 
@@ -112,8 +112,8 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 
 Check out our [main guide][guide] and [API docs][api].
 
-[guide]: https://zolt.example.com/guide
-[api]: https://zolt.example.com/api
+[guide]: https://zolt.marmotz.dev/guide
+[api]: https://zolt.marmotz.dev/api
 
 ---
 
@@ -446,7 +446,7 @@ Common Zolt editor shortcuts:
 - [Community Forum][forum]
 - [GitHub Issues][github]
 
-[docs]: https://zolt.example.com/docs
+[docs]: https://zolt.marmotz.dev/docs
 [forum]: https://forum.zlt.example.com
 [github]: https://github.com/marmotz/zolt/issues
 

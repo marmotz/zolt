@@ -86,6 +86,7 @@ export class Lexer {
     if (this.matchFrontmatter()) return this.readFrontmatter();
     if (this.matchGlobalAbbreviationDef()) return this.readGlobalAbbreviationDef();
     if (this.matchAbbreviationDef()) return this.readAbbreviationDef();
+    if (this.matchLinkRefDef()) return this.readLinkRefDef();
     if (this.matchInlineComment()) return this.readInlineComment();
 
     return this.readText();
@@ -520,6 +521,47 @@ export class Lexer {
     return {
       type: TokenType.ABBREVIATION_DEF,
       value: `${abbreviation}:${definition.trim()}`,
+      line,
+      column,
+      length: this.pos - start,
+    };
+  }
+
+  private matchLinkRefDef(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^\[([^\]]+)]:\s+/.test(remaining);
+  }
+
+  private readLinkRefDef(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar(); // [
+
+    let ref = '';
+    while (!this.isEof() && this.peekChar() !== ']') {
+      ref += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar(); // ]
+    }
+
+    if (!this.isEof() && this.peekChar() === ':') {
+      this.advanceChar(); // :
+    }
+
+    this.skipWhitespace();
+
+    let url = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      url += this.advanceChar();
+    }
+
+    return {
+      type: TokenType.LINK_REF_DEF,
+      value: `${ref}:${url.trim()}`,
       line,
       column,
       length: this.pos - start,

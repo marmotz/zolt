@@ -15,6 +15,7 @@ import {
   HeadingNode,
   HorizontalRuleNode,
   IndentationNode,
+  LinkReferenceDefinitionNode,
   ListItemNode,
   ListNode,
   ParagraphNode,
@@ -29,6 +30,7 @@ export class Parser {
   private currentToken: Token;
   private filePath: string;
   private abbreviationDefinitions: Map<string, string>;
+  private linkReferences: Map<string, string>;
   public static globalAbbreviations: Map<string, string> = new Map();
   private inlineParser: InlineParser;
 
@@ -38,6 +40,7 @@ export class Parser {
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
     this.abbreviationDefinitions = new Map();
+    this.linkReferences = new Map();
     this.inlineParser = new InlineParser();
   }
 
@@ -46,8 +49,8 @@ export class Parser {
   }
 
   parse(): DocumentNode {
-    // Pass 1: Collect abbreviations
-    this.collectAbbreviations();
+    // Pass 1: Collect abbreviations and link references
+    this.collectDefinitions();
     this.pos = 0;
     this.currentToken = this.tokens[0];
 
@@ -56,6 +59,7 @@ export class Parser {
       ...this.abbreviationDefinitions.entries(),
     ]);
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
+    this.inlineParser.setLinkReferences(this.linkReferences);
 
     // Pass 2: Full parse
     const children = this.parseDocument();
@@ -66,7 +70,7 @@ export class Parser {
     };
   }
 
-  private collectAbbreviations(): void {
+  private collectDefinitions(): void {
     const savedPos = this.pos;
     const savedToken = this.currentToken;
 
@@ -80,9 +84,25 @@ export class Parser {
           const definition = value.substring(colonIndex + 1);
 
           if (token.type === TokenType.ABBREVIATION_DEF_GLOBAL) {
-            Parser.globalAbbreviations.set(abbreviation, definition);
+            if (!Parser.globalAbbreviations.has(abbreviation)) {
+              Parser.globalAbbreviations.set(abbreviation, definition);
+            }
           } else {
-            this.abbreviationDefinitions.set(abbreviation, definition);
+            if (!this.abbreviationDefinitions.has(abbreviation)) {
+              this.abbreviationDefinitions.set(abbreviation, definition);
+            }
+          }
+        }
+        this.advance();
+      } else if (this.match(TokenType.LINK_REF_DEF)) {
+        const token = this.currentToken;
+        const value = token.value;
+        const colonIndex = value.indexOf(':');
+        if (colonIndex !== -1) {
+          const ref = value.substring(0, colonIndex);
+          const url = value.substring(colonIndex + 1);
+          if (!this.linkReferences.has(ref.toLowerCase())) {
+            this.linkReferences.set(ref.toLowerCase(), url);
           }
         }
         this.advance();
@@ -180,6 +200,7 @@ export class Parser {
     if (this.match(TokenType.INDENTATION)) return this.parseIndentation();
     if (this.match(TokenType.ABBREVIATION_DEF)) return this.parseAbbreviationDef();
     if (this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.parseAbbreviationDef();
+    if (this.match(TokenType.LINK_REF_DEF)) return this.parseLinkReferenceDef();
     if (this.match(TokenType.COMMENT_INLINE)) return this.parseCommentInline();
 
     if (this.match(TokenType.CODE_BLOCK, TokenType.CODE_BLOCK_END)) {
@@ -939,13 +960,27 @@ export class Parser {
     const definition = value.substring(colonIndex + 1);
 
     const isGlobal = token.type === TokenType.ABBREVIATION_DEF_GLOBAL;
-    this.abbreviationDefinitions.set(abbreviation, definition);
 
     return {
       type: 'AbbreviationDefinition',
       abbreviation,
       definition,
       isGlobal,
+    };
+  }
+
+  private parseLinkReferenceDef(): LinkReferenceDefinitionNode {
+    const token = this.expect(TokenType.LINK_REF_DEF);
+    const value = token.value;
+
+    const colonIndex = value.indexOf(':');
+    const ref = value.substring(0, colonIndex);
+    const url = value.substring(colonIndex + 1);
+
+    return {
+      type: 'LinkReferenceDefinition',
+      ref,
+      url,
     };
   }
 

@@ -333,4 +333,15 @@ describe('Parser', () => {
     expect((ast.children[0] as any).children[1].type).toBe('DefinitionDescription');
     expect(getFlatContent((ast.children[0] as any).children[1])).toBe('Definition');
   });
+
+  test('should parse link reference definition', () => {
+    const lexer = new Lexer('[zolt]: https://zolt.example.com');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('LinkReferenceDefinition');
+    expect((ast.children[0] as any).ref).toBe('zolt');
+    expect((ast.children[0] as any).url).toBe('https://zolt.example.com');
+  });
 });

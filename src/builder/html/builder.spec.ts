@@ -357,12 +357,12 @@ describe('HTMLBuilder', () => {
   test('should not transform external links', () => {
     const node: LinkNode = {
       type: 'Link',
-      href: 'https://example.com',
+      href: 'https://zolt.marmotz.dev',
       content: 'External',
     };
 
     const html = builder.visitLink(node);
-    expect(html).toContain('href="https://example.com"');
+    expect(html).toContain('href="https://zolt.marmotz.dev"');
   });
 
   test('should build image', () => {

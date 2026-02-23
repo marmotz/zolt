@@ -14,12 +14,12 @@ $alt = "Description"
 
   test('should replace variables in link href and title', async () => {
     const zolt = `
-$url = "https://example.com"
+$url = "https://zolt.marmotz.dev"
 $title = "Go to Example"
 [Link]({$url}){title={$title}}
     `;
     const html = await buildString(zolt);
-    expect(html).toContain('<a href="https://example.com" title="Go to Example">Link</a>');
+    expect(html).toContain('<a href="https://zolt.marmotz.dev" title="Go to Example">Link</a>');
   });
 
   test('should replace variables in attributes', async () => {

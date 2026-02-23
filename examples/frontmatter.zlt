@@ -207,8 +207,8 @@ title: "SEO-Optimized Title"
 description: "Compelling description for search engines"
 keywords: [zolt, markdown, documentation, technical-writing]
 author: "Jane Doe"
-image: https://example.com/og-image.jpg
-url: https://example.com/article
+image: https://zolt.marmotz.dev/og-image.jpg
+url: https://zolt.marmotz.dev/article
 ---
 ```
 
