@@ -232,8 +232,6 @@ $menu_items = [
 [{$item.title}]({$item.url})
 :::
 :::
-:::
-:::
 
 ### Progress Tracker
 
@@ -245,15 +243,12 @@ $milestones = [
   {name: "Deployment", completed: false}
 ]
 
-## Project Progress
-
 :::foreach {$milestones as $milestone}
 :::if {$milestone.completed}
 ✅ **{$milestone.name}** - Complete
 :::
 :::if {!$milestone.completed}
 ⏳ **{$milestone.name}** - In Progress
-:::
 :::
 :::
 
@@ -274,7 +269,6 @@ $gallery = [
 ---
 :::
 :::
-:::
 
 ### Data Table
 
@@ -288,7 +282,6 @@ $data_rows = [
 |:-----|:-----|:------|
 :::foreach {$data_rows as $row}
 | {$row.rank} | {$row.name} | {$row.score} |
-:::
 :::
 
 ### Changelog Generator

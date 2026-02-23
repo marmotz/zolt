@@ -7,6 +7,7 @@ import {
   CodeNode,
   CommentInlineNode,
   EmbedNode,
+  ExpressionNode,
   FileNode,
   HighlightNode,
   ImageNode,
@@ -18,6 +19,7 @@ import {
   SuperscriptNode,
   TextNode,
   UnderlineNode,
+  VariableNode,
   VideoNode,
 } from './types';
 
@@ -29,6 +31,7 @@ export class InlineParser {
   }
 
   parse(text: string): ASTNode[] {
+    if (!text) return [];
     const nodes: ASTNode[] = [];
     let remaining = text;
 
@@ -99,16 +102,19 @@ export class InlineParser {
   }
 
   private parseInlineElement(text: string): { node: ASTNode; remaining: string } | null {
+    if (this.matchPattern(text, /^\{\{(.+?)}}/)) return this.parseExpression(text);
+    if (this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/))
+      return this.parseVariable(text);
     if (this.matchPattern(text, /^%%/)) return this.parseCommentInline(text);
-    if (this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseVideo(text);
-    if (this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseAudio(text);
-    if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseEmbed(text);
-    if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseFile(text);
-    if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseImage(text);
-    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)(\{[^}]+})?/)) return this.parseLink(text);
+    if (this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)/)) return this.parseVideo(text);
+    if (this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)/)) return this.parseAudio(text);
+    if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/)) return this.parseEmbed(text);
+    if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/)) return this.parseFile(text);
+    if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/)) return this.parseImage(text);
+    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/)) return this.parseLink(text);
     if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
     if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
-    if (this.matchPattern(text, /^\|\|([^|]+)\|\|(\{[^}]+})?/)) return this.parseInlineStyle(text);
+    if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) return this.parseInlineStyle(text);
     if (this.matchPattern(text, /^\*\*(.+?)\*\*/)) return this.parseBold(text);
     if (this.matchPattern(text, /^\/\/(.+?)\/\//)) return this.parseItalic(text);
     if (this.matchPattern(text, /^__(.+?)__/)) return this.parseUnderline(text);
@@ -126,33 +132,49 @@ export class InlineParser {
   }
 
   private parseLink(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/);
     if (!match) return null;
 
     const content = match[1];
     const href = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
         type: 'Link',
-        content,
+        children: this.parse(content),
         href,
         attributes,
       } as LinkNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
   private parseImage(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/);
     if (!match) return null;
 
     const alt = match[1];
     const src = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
@@ -161,18 +183,26 @@ export class InlineParser {
         alt,
         attributes,
       } as ImageNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
   private parseVideo(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)/);
     if (!match) return null;
 
     const alt = match[1];
     const src = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
@@ -181,18 +211,26 @@ export class InlineParser {
         alt,
         attributes,
       } as VideoNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
   private parseAudio(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)/);
     if (!match) return null;
 
     const alt = match[1];
     const src = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
@@ -201,18 +239,26 @@ export class InlineParser {
         alt,
         attributes,
       } as AudioNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
   private parseEmbed(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/);
     if (!match) return null;
 
     const title = match[1];
     const src = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
@@ -221,18 +267,26 @@ export class InlineParser {
         title,
         attributes,
       } as EmbedNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
   private parseFile(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/);
     if (!match) return null;
 
     const title = match[1];
     const src = match[2];
-    const attributesStr = match[3];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
@@ -241,7 +295,7 @@ export class InlineParser {
         title,
         attributes,
       } as FileNode,
-      remaining: text.slice(match[0].length),
+      remaining,
     };
   }
 
@@ -250,7 +304,7 @@ export class InlineParser {
     if (!match) return null;
 
     return {
-      node: { type: 'Bold', content: match[1] } as BoldNode,
+      node: { type: 'Bold', children: this.parse(match[1]) } as BoldNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -260,7 +314,7 @@ export class InlineParser {
     if (!match) return null;
 
     return {
-      node: { type: 'Italic', content: match[1] } as ItalicNode,
+      node: { type: 'Italic', children: this.parse(match[1]) } as ItalicNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -270,7 +324,7 @@ export class InlineParser {
     if (!match) return null;
 
     return {
-      node: { type: 'Underline', content: match[1] } as UnderlineNode,
+      node: { type: 'Underline', children: this.parse(match[1]) } as UnderlineNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -280,7 +334,7 @@ export class InlineParser {
     if (!match) return null;
 
     return {
-      node: { type: 'Strikethrough', content: match[1] } as StrikethroughNode,
+      node: { type: 'Strikethrough', children: this.parse(match[1]) } as StrikethroughNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -290,7 +344,7 @@ export class InlineParser {
     if (!match) return null;
 
     return {
-      node: { type: 'Highlight', content: match[1] } as HighlightNode,
+      node: { type: 'Highlight', children: this.parse(match[1]) } as HighlightNode,
       remaining: text.slice(match[0].length),
     };
   }
@@ -312,7 +366,7 @@ export class InlineParser {
     if (content === null) return null;
 
     return {
-      node: { type: 'Superscript', content } as SuperscriptNode,
+      node: { type: 'Superscript', children: this.parse(content) } as SuperscriptNode,
       remaining: text.slice(2 + content.length + 1),
     };
   }
@@ -324,7 +378,7 @@ export class InlineParser {
     if (content === null) return null;
 
     return {
-      node: { type: 'Subscript', content } as SubscriptNode,
+      node: { type: 'Subscript', children: this.parse(content) } as SubscriptNode,
       remaining: text.slice(2 + content.length + 1),
     };
   }
@@ -351,16 +405,24 @@ export class InlineParser {
   }
 
   private parseInlineStyle(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\|\|([^|]+)\|\|(\{[^}]+})?/);
+    const match = this.matchPattern(text, /^\|\|([^|]+)\|\|/);
     if (!match) return null;
 
     const content = match[1];
-    const attributesStr = match[2];
-    const attributes = this.parseAttributes(attributesStr);
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
-      node: { type: 'InlineStyle', content, attributes } as InlineStyleNode,
-      remaining: text.slice(match[0].length),
+      node: { type: 'InlineStyle', children: this.parse(content), attributes } as InlineStyleNode,
+      remaining,
     };
   }
 
@@ -523,6 +585,26 @@ export class InlineParser {
     }
 
     return Object.keys(attrs).length > 0 ? attrs : undefined;
+  }
+
+  private parseExpression(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\{\{(.+?)}}/);
+    if (!match) return null;
+
+    return {
+      node: { type: 'Expression', expression: match[1] } as ExpressionNode,
+      remaining: text.slice(match[0].length),
+    };
+  }
+
+  private parseVariable(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/);
+    if (!match) return null;
+
+    return {
+      node: { type: 'Variable', name: match[1], isGlobal: true } as VariableNode,
+      remaining: text.slice(match[0].length),
+    };
   }
 
   private createTextNode(content: string): TextNode {

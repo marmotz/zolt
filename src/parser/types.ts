@@ -11,25 +11,25 @@ export interface TextNode {
 
 export interface BoldNode {
   type: 'Bold';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface ItalicNode {
   type: 'Italic';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface UnderlineNode {
   type: 'Underline';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface StrikethroughNode {
   type: 'Strikethrough';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
@@ -41,31 +41,31 @@ export interface CodeNode {
 
 export interface SuperscriptNode {
   type: 'Superscript';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface SubscriptNode {
   type: 'Subscript';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface HighlightNode {
   type: 'Highlight';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface InlineStyleNode {
   type: 'InlineStyle';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface LinkNode {
   type: 'Link';
-  content: string;
+  children: ASTNode[];
   href: string;
   title?: string;
   attributes?: Attributes;
@@ -160,14 +160,14 @@ export interface AnchorNode {
 
 export interface ParagraphNode {
   type: 'Paragraph';
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface HeadingNode {
   type: 'Heading';
   level: number;
-  content: string;
+  children: ASTNode[];
   attributes?: Attributes;
 }
 
@@ -180,14 +180,12 @@ export interface BlockquoteNode {
 
 export interface DefinitionTermNode {
   type: 'DefinitionTerm';
-  content: string;
   children: ASTNode[];
   attributes?: Attributes;
 }
 
 export interface DefinitionDescriptionNode {
   type: 'DefinitionDescription';
-  content: string;
   children: ASTNode[];
   attributes?: Attributes;
 }
@@ -201,7 +199,6 @@ export interface ListNode {
 
 export interface ListItemNode {
   type: 'ListItem';
-  content: string;
   checked?: boolean;
   children: ASTNode[];
   attributes?: Attributes;
@@ -247,7 +244,7 @@ export interface TableRowNode {
 
 export interface TableCellNode {
   type: 'TableCell';
-  content: string;
+  children: ASTNode[];
   isHeader?: boolean;
 }
 

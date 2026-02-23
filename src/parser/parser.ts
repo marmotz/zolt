@@ -29,6 +29,8 @@ export class Parser {
   private currentToken: Token;
   private filePath: string;
   private abbreviationDefinitions: Map<string, string>;
+  public static globalAbbreviations: Map<string, string> = new Map();
+  private inlineParser: InlineParser;
 
   constructor(tokens: Token[], filePath?: string) {
     this.tokens = tokens;
@@ -36,15 +38,81 @@ export class Parser {
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
     this.abbreviationDefinitions = new Map();
+    this.inlineParser = new InlineParser();
+  }
+
+  static clearGlobalAbbreviations(): void {
+    this.globalAbbreviations.clear();
   }
 
   parse(): DocumentNode {
+    // Pass 1: Collect abbreviations
+    this.collectAbbreviations();
+    this.pos = 0;
+    this.currentToken = this.tokens[0];
+
+    const allAbbreviations = new Map<string, string>([
+      ...Parser.globalAbbreviations.entries(),
+      ...this.abbreviationDefinitions.entries(),
+    ]);
+    this.inlineParser.setGlobalAbbreviations(allAbbreviations);
+
+    // Pass 2: Full parse
     const children = this.parseDocument();
     return {
       type: 'Document',
       children,
       sourceFile: this.filePath,
     };
+  }
+
+  private collectAbbreviations(): void {
+    const savedPos = this.pos;
+    const savedToken = this.currentToken;
+
+    while (!this.match(TokenType.EOF)) {
+      if (this.match(TokenType.ABBREVIATION_DEF, TokenType.ABBREVIATION_DEF_GLOBAL)) {
+        const token = this.currentToken;
+        const value = token.value;
+        const colonIndex = value.indexOf(':');
+        if (colonIndex !== -1) {
+          const abbreviation = value.substring(0, colonIndex);
+          const definition = value.substring(colonIndex + 1);
+
+          if (token.type === TokenType.ABBREVIATION_DEF_GLOBAL) {
+            Parser.globalAbbreviations.set(abbreviation, definition);
+          } else {
+            this.abbreviationDefinitions.set(abbreviation, definition);
+          }
+        }
+        this.advance();
+      } else {
+        const token = this.currentToken;
+        if (
+          token.type === TokenType.TEXT ||
+          token.type === TokenType.HEADING ||
+          token.type === TokenType.BULLET_LIST ||
+          token.type === TokenType.ORDERED_LIST ||
+          token.type === TokenType.TASK_LIST ||
+          token.type === TokenType.DEFINITION
+        ) {
+          const value = token.value;
+          const regex = /([A-Za-z0-9μ]+)\{abbr="([^"]+)"[^}]*}/g;
+          let match;
+          while ((match = regex.exec(value)) !== null) {
+            const abbreviation = match[1];
+            const definition = match[2];
+            if (!this.abbreviationDefinitions.has(abbreviation)) {
+              this.abbreviationDefinitions.set(abbreviation, definition);
+            }
+          }
+        }
+        this.advance();
+      }
+    }
+
+    this.pos = savedPos;
+    this.currentToken = savedToken;
   }
 
   private parseDocument(): ASTNode[] {
@@ -167,7 +235,7 @@ export class Parser {
 
     const cells: TableCellNode[] = cellContents.map((cell) => ({
       type: 'TableCell',
-      content: cell.trim(),
+      children: this.inlineParser.parse(cell.trim()),
     }));
 
     return {
@@ -201,7 +269,7 @@ export class Parser {
     return {
       type: 'Heading',
       level,
-      content,
+      children: this.inlineParser.parse(content),
       attributes,
     };
   }
@@ -248,7 +316,7 @@ export class Parser {
 
     return {
       type: 'Paragraph',
-      content,
+      children: this.inlineParser.parse(content),
       attributes,
     };
   }
@@ -473,15 +541,13 @@ export class Parser {
       if (isDescription) {
         return {
           type: 'DefinitionDescription',
-          content,
-          children,
+          children: [...this.inlineParser.parse(content), ...children],
           attributes,
         };
       } else {
         return {
           type: 'DefinitionTerm',
-          content,
-          children,
+          children: [...this.inlineParser.parse(content), ...children],
           attributes,
         };
       }
@@ -489,9 +555,8 @@ export class Parser {
 
     return {
       type: 'ListItem',
-      content: content.trim(),
       checked,
-      children,
+      children: [...this.inlineParser.parse(content.trim()), ...children],
       attributes,
     };
   }
@@ -641,7 +706,9 @@ export class Parser {
 
     let attributes: Attributes | undefined;
     if (attrsStr) {
-      const attrMatch = attrsStr.match(/^\{([^}]+)}$/);
+      // Remove leading colon if present
+      const cleanAttrs = attrsStr.startsWith(':') ? attrsStr.substring(1) : attrsStr;
+      const attrMatch = cleanAttrs.match(/^\{([^}]+)}$/);
       if (attrMatch) {
         const attrContent = attrMatch[1];
         // Skip if this looks like a variable reference {$...} or expression {{...}}

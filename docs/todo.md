@@ -105,7 +105,7 @@
 - [ ] Automatic reference links `[text][ref]` with `[ref]: url`
 - [ ] Internal links/cross-references `[text](@id)`
 - [ ] Anchor links `[text](#anchor)`
-- [ ] Links with variables `[text]({$var})`
+- [x] Links with variables `[text]({$var})`
 
 ### Link Attributes
 
@@ -276,7 +276,7 @@
 - [x] `:::foreach {$array as $item}`
 - [x] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
       `{$foreach.odd}`
-- [ ] Nested loops
+- [x] Nested loops
 - [x] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles
 

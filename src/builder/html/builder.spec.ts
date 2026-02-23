@@ -612,9 +612,10 @@ describe('HTMLBuilder', () => {
   });
 
   test('should process italic with date format containing slashes', () => {
+    (builder as any).evaluator.setVariable('modified', '2023-05-20');
     const html = builder.processInline('//Date: {{ Date.format($modified, "DD/MM/YYYY") }}//');
     expect(html).toContain('<em>');
-    expect(html).toContain('DD/MM/YYYY');
+    expect(html).toContain('20/05/2023');
     expect(html).toContain('</em>');
   });
 

@@ -375,7 +375,7 @@ export class Lexer {
 
   private matchHorizontalRule(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^[-*_]{3,}(\s|$)/.test(remaining);
+    return /^[-*_]{3,}(\s|:|$)/.test(remaining);
   }
 
   private readHorizontalRule(): Token {

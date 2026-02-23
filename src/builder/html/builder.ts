@@ -1,4 +1,5 @@
 import { InlineParser } from '../../parser/inline-parser';
+import { Parser } from '../../parser/parser';
 import {
   AbbreviationDefinitionNode,
   AbbreviationNode,
@@ -35,6 +36,7 @@ import {
   TableCellNode,
   TableNode,
   TableRowNode,
+  TextNode,
   TripleColonBlockNode,
   UnderlineNode,
   VariableNode,
@@ -236,7 +238,6 @@ type InitialVariables = Record<string, number | string | boolean | null | undefi
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
-  private static globalAbbreviations: Map<string, string> = new Map();
   private tabsCounter: number = 0;
   private hasTabs: boolean = false;
   private evaluator: ExpressionEvaluator;
@@ -255,7 +256,7 @@ export class HTMLBuilder implements Builder {
   }
 
   static clearGlobalAbbreviations(): void {
-    this.globalAbbreviations.clear();
+    Parser.clearGlobalAbbreviations();
   }
 
   build(node: ASTNode): string {
@@ -293,7 +294,7 @@ export class HTMLBuilder implements Builder {
       case 'CommentInline':
         return '';
       default:
-        return '';
+        return this.buildInlineNode(node);
     }
   }
 
@@ -329,23 +330,13 @@ export class HTMLBuilder implements Builder {
 
   visitTableCell(node: TableCellNode, isHeader: boolean): string {
     const tag = isHeader ? 'th' : 'td';
-    const content = this.processInlineContent(node.content);
-    return `<${tag}>${content}</${tag}>`;
+    const childrenHtml = this.joinChildren(node.children);
+    return `<${tag}>${childrenHtml}</${tag}>`;
   }
 
   buildDocument(node: DocumentNode): string {
-    this.abbreviationDefinitions.clear();
     this.tabsCounter = 0;
     this.hasTabs = false;
-
-    this.collectAbbreviations(node);
-
-    const allAbbreviations = new Map<string, string>([
-      ...HTMLBuilder.globalAbbreviations.entries(),
-      ...this.abbreviationDefinitions.entries(),
-    ]);
-
-    this.inlineParser.setGlobalAbbreviations(allAbbreviations);
 
     const childrenHtmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
     const childrenHtml = this.mergeAdjacentListHTML(childrenHtmlParts).join('\n');
@@ -397,53 +388,6 @@ ${tabsScript}
 </html>`;
   }
 
-  private collectAbbreviations(node: ASTNode): void {
-    if (node.type === 'AbbreviationDefinition') {
-      this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
-    } else if (
-      node.type === 'Paragraph' ||
-      node.type === 'Heading' ||
-      node.type === 'ListItem' ||
-      node.type === 'DefinitionTerm' ||
-      node.type === 'DefinitionDescription' ||
-      node.type === 'TableCell'
-    ) {
-      const content = (node as any).content;
-      if (typeof content === 'string') {
-        const regex = /([A-Za-z0-9μ]+)\{abbr="([^"]+)"[^}]*}/g;
-        let match;
-        while ((match = regex.exec(content)) !== null) {
-          const abbreviation = match[1];
-          const definition = match[2];
-          if (!this.abbreviationDefinitions.has(abbreviation)) {
-            this.abbreviationDefinitions.set(abbreviation, definition);
-          }
-        }
-      }
-    }
-
-    if ('children' in node && Array.isArray(node.children)) {
-      for (const child of node.children) {
-        this.collectAbbreviations(child);
-      }
-    }
-
-    if (node.type === 'Table') {
-      const table = node as TableNode;
-      if (table.header) {
-        this.collectAbbreviations(table.header);
-      }
-      for (const row of table.rows) {
-        this.collectAbbreviations(row);
-      }
-    } else if (node.type === 'TableRow') {
-      const row = node as TableRowNode;
-      for (const cell of row.cells) {
-        this.collectAbbreviations(cell);
-      }
-    }
-  }
-
   visitDocument(node: DocumentNode): string {
     const htmlParts = node.children.map((child) => this.build(child)).filter((h) => h !== '');
     return this.mergeAdjacentListHTML(htmlParts).join('\n');
@@ -452,22 +396,24 @@ ${tabsScript}
   visitHeading(node: HeadingNode): string {
     const level = Math.min(Math.max(node.level, 1), 6);
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInlineContent(node.content);
-    const trimmed = content.replace(/\s+/g, ' ').trim();
+    const inlineHtml = this.processInlineContent((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
     if (!trimmed) return '';
     return `<h${level}${attrs}>${trimmed}</h${level}>`;
   }
 
   visitParagraph(node: ParagraphNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInlineContent(node.content);
-    const trimmed = content.replace(/\s+/g, ' ').trim();
+    const inlineHtml = this.processInlineContent((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
     if (!trimmed) return '';
     return `<p${attrs}>${trimmed}</p>`;
   }
 
   visitBlockquote(node: BlockquoteNode): string {
-    const childrenHtml = node.children.map((child) => this.build(child)).join('');
+    const childrenHtml = this.joinChildren(node.children);
 
     const attrs = this.renderAllAttributes(node.attributes);
     return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
@@ -481,7 +427,7 @@ ${tabsScript}
       tag = 'dl';
     }
 
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
+    const childrenHtml = this.joinChildren(node.children);
 
     const attrs = this.renderAllAttributes(node.attributes);
     return `<${tag}${attrs}>\n${childrenHtml}\n</${tag}>`;
@@ -492,30 +438,27 @@ ${tabsScript}
       node.checked !== undefined
         ? `<input type="checkbox" ${node.checked ? 'checked' : ''} onclick="return false;">`
         : '';
-    const inlineContent = this.processInlineContent(node.content);
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-    const trimmed = content.replace(/\s+/g, ' ').trim();
+    const inlineHtml = this.processInlineContent((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
     return `<li${attrs}>${checkbox}${trimmed}</li>`;
   }
 
   visitDefinitionTerm(node: DefinitionTermNode): string {
-    const inlineContent = this.processInlineContent(node.content);
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-    const trimmed = content.replace(/\s+/g, ' ').trim();
+    const inlineHtml = this.processInlineContent((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
     return `<dt${attrs}>${trimmed}</dt>`;
   }
 
   visitDefinitionDescription(node: DefinitionDescriptionNode): string {
-    const inlineContent = this.processInlineContent(node.content);
-    const childrenHtml = node.children.map((child) => this.build(child)).join('\n');
-    const content = (inlineContent + (childrenHtml ? '\n' + childrenHtml : '')).trim();
-    const trimmed = content.replace(/\s+/g, ' ').trim();
+    const inlineHtml = this.processInlineContent((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
     return `<dd${attrs}>${trimmed}</dd>`;
@@ -563,7 +506,7 @@ ${tabsScript}
     if (node.blockType === 'details') {
       const open = node.attributes?.open === 'true' ? ' open' : '';
       const attrs = this.renderAllAttributes(node.attributes);
-      const title = node.title ? this.processInlineContent(node.title) : 'Details';
+      const title = node.title ? this.joinChildren(this.inlineParser.parse(node.title)) : 'Details';
       return `<details${attrs}${open} class="triple-colon-block details" data-type="details">
   <summary>${title}</summary>
   <div class="details-content">
@@ -596,7 +539,7 @@ ${childrenHtml}
 
     let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
     if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
-      const title = this.processInlineContent(node.title);
+      const title = this.joinChildren(this.inlineParser.parse(node.title));
       html += `<div class="block-title">${title}</div>\n`;
     }
     html += `${childrenHtml}\n</div>`;
@@ -681,7 +624,7 @@ ${childrenHtml}
       const title = tab.title || `Tab ${index + 1}`;
 
       buttons.push(
-        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.processInlineContent(title)}</button>`
+        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.joinChildren(this.inlineParser.parse(title))}</button>`
       );
 
       const tabContent = tab.children.map((child) => this.build(child)).join('\n');
@@ -778,79 +721,15 @@ ${childrenHtml}
     return `<div${attrs} class="indented" style="margin-left: 2em">${childrenHtml}</div>`;
   }
 
-  processInline(text: string): string {
+  public processInline(text: string): string {
     const nodes = this.inlineParser.parse(text);
     return nodes.map((node) => this.buildInlineNode(node)).join('');
   }
 
-  processInlineContent(text: string): string {
+  public processInlineContent(text: string): string {
     if (!text) return '';
-
     const processed = this.contentProcessor.processContent(text);
-
-    return this.processInlineWithExpressions(processed);
-  }
-
-  private processInlineWithExpressions(text: string): string {
-    if (!text) return '';
-
-    const parts: { type: 'text' | 'expr' | 'var'; content: string }[] = [];
-    let remaining = text;
-
-    while (remaining.length > 0) {
-      const exprMatch = remaining.match(/\{\{(.+?)}}/);
-      const varMatch = remaining.match(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/);
-      const codeMatch = remaining.match(/`[^`]*`/);
-
-      let firstMatch: { type: 'expr' | 'var' | 'code'; index: number; length: number; content: string } | null = null;
-
-      if (exprMatch && exprMatch.index !== undefined) {
-        firstMatch = { type: 'expr', index: exprMatch.index, length: exprMatch[0].length, content: exprMatch[1] };
-      }
-
-      if (varMatch && varMatch.index !== undefined) {
-        if (!firstMatch || varMatch.index < firstMatch.index) {
-          firstMatch = { type: 'var', index: varMatch.index, length: varMatch[0].length, content: varMatch[1] };
-        }
-      }
-
-      if (codeMatch && codeMatch.index !== undefined) {
-        if (!firstMatch || codeMatch.index < firstMatch.index) {
-          firstMatch = { type: 'code', index: codeMatch.index, length: codeMatch[0].length, content: codeMatch[0] };
-        }
-      }
-
-      if (firstMatch) {
-        if (firstMatch.index > 0) {
-          parts.push({ type: 'text', content: remaining.slice(0, firstMatch.index) });
-        }
-
-        if (firstMatch.type === 'expr') {
-          const value = this.evaluator.evaluate(firstMatch.content);
-          parts.push({ type: 'text', content: this.formatValue(value) });
-        } else if (firstMatch.type === 'var') {
-          const value = this.evaluator.evaluate('$' + firstMatch.content);
-          if (value === null || value === undefined) {
-            parts.push({
-              type: 'text',
-              content: remaining.slice(firstMatch.index, firstMatch.index + firstMatch.length),
-            });
-          } else {
-            parts.push({ type: 'text', content: this.formatValue(value) });
-          }
-        } else {
-          parts.push({ type: 'text', content: firstMatch.content });
-        }
-
-        remaining = remaining.slice(firstMatch.index + firstMatch.length);
-      } else {
-        parts.push({ type: 'text', content: remaining });
-        break;
-      }
-    }
-
-    const textOnly = parts.map((p) => p.content).join('');
-    return this.processInline(textOnly);
+    return this.processInline(processed);
   }
 
   private formatValue(value: any): string {
@@ -879,7 +758,7 @@ ${childrenHtml}
   private buildInlineNode(node: ASTNode): string {
     switch (node.type) {
       case 'Text':
-        return (node as any).content;
+        return this.visitText(node as TextNode);
       case 'Bold':
         return this.visitBold(node as BoldNode);
       case 'Italic':
@@ -910,6 +789,10 @@ ${childrenHtml}
         return this.visitEmbed(node as EmbedNode);
       case 'File':
         return this.visitFile(node as FileNode);
+      case 'Variable':
+        return this.visitVariable(node as VariableNode);
+      case 'Expression':
+        return this.visitExpression(node as ExpressionNode);
       case 'Abbreviation':
         return this.visitAbbreviation(node as AbbreviationNode);
       case 'CommentInline':
@@ -919,28 +802,36 @@ ${childrenHtml}
     }
   }
 
+  visitText(node: TextNode): string {
+    return this.contentProcessor.processContent(node.content);
+  }
+
   visitBold(node: BoldNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<strong${attrs}>${content}</strong>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<strong${attrs}>${inlineHtml}${childrenHtml}</strong>`;
   }
 
   visitItalic(node: ItalicNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<em${attrs}>${content}</em>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<em${attrs}>${inlineHtml}${childrenHtml}</em>`;
   }
 
   visitUnderline(node: UnderlineNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<u${attrs}>${content}</u>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<u${attrs}>${inlineHtml}${childrenHtml}</u>`;
   }
 
   visitStrikethrough(node: StrikethroughNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<del${attrs}>${content}</del>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<del${attrs}>${inlineHtml}${childrenHtml}</del>`;
   }
 
   visitCode(node: CodeNode): string {
@@ -950,26 +841,30 @@ ${childrenHtml}
 
   visitSuperscript(node: SuperscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<sup${attrs}>${content}</sup>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<sup${attrs}>${inlineHtml}${childrenHtml}</sup>`;
   }
 
   visitSubscript(node: SubscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<sub${attrs}>${content}</sub>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<sub${attrs}>${inlineHtml}${childrenHtml}</sub>`;
   }
 
   visitHighlight(node: HighlightNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<mark${attrs}>${content}</mark>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<mark${attrs}>${inlineHtml}${childrenHtml}</mark>`;
   }
 
   visitInlineStyle(node: InlineStyleNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const content = this.processInline(node.content);
-    return `<span${attrs}>${content}</span>`;
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<span${attrs}>${inlineHtml}${childrenHtml}</span>`;
   }
 
   private renderAllAttributes(attrs?: Attributes): string {
@@ -1053,7 +948,8 @@ ${childrenHtml}
 
     for (const [key, value] of Object.entries(attrs)) {
       if (value !== undefined && cssPropertyMap[key]) {
-        cssProps.push(`${cssPropertyMap[key]}: ${value}`);
+        const processedValue = this.contentProcessor.processContent(String(value));
+        cssProps.push(`${cssPropertyMap[key]}: ${processedValue}`);
       }
     }
 
@@ -1100,44 +996,72 @@ ${childrenHtml}
 
   visitLink(node: LinkNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const title = node.title ? ` title="${node.title}"` : '';
-    const href = this.transformHref(node.href);
-    return `<a href="${href}"${title}${attrs}>${node.content}</a>`;
+    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
+    const href = this.transformHref(this.contentProcessor.processContent(node.href));
+    const childrenHtml =
+      node.children && node.children.length > 0
+        ? this.joinChildren(node.children)
+        : this.processInlineContent((node as any).content);
+    return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
   }
 
   visitImage(node: ImageNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<img src="${node.src}" alt="${node.alt}"${attrs}>`;
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt);
+    return `<img src="${src}" alt="${alt}"${attrs}>`;
   }
 
   visitVideo(node: VideoNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<video src="${node.src}"${attrs}>${node.alt}</video>`;
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    return `<video src="${src}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<audio src="${node.src}"${attrs}>${node.alt}</audio>`;
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    return `<audio src="${src}"${attrs}>${alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const title = node.title ? ` title="${node.title}"` : '';
-    return `<iframe src="${node.src}"${title}${attrs}></iframe>`;
+    const src = this.contentProcessor.processContent(node.src);
+    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
+    return `<iframe src="${src}"${title}${attrs}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = this.transformHref(node.src);
-    return `<a href="${src}"${attrs}>${node.title || node.src}</a>`;
+    const src = this.transformHref(this.contentProcessor.processContent(node.src));
+    const title = node.title ? this.contentProcessor.processContent(node.title) : null;
+    return `<a href="${src}"${attrs}>${title || src}</a>`;
   }
 
   visitVariable(node: VariableNode): string {
-    return node.isGlobal ? `$${node.name}` : `\$var`;
+    try {
+      const value = this.evaluator.evaluate('$' + node.name);
+      if (value === null || value === undefined) {
+        return `{$${node.name}}`;
+      }
+      return this.formatValue(value);
+    } catch {
+      return `{$${node.name}}`;
+    }
   }
 
   visitExpression(node: ExpressionNode): string {
-    return `{{${node.expression}}}`;
+    try {
+      const value = this.evaluator.evaluate(node.expression);
+      if (value === null || value === undefined) {
+        return `{{${node.expression}}}`;
+      }
+      return this.formatValue(value);
+    } catch {
+      return `{{${node.expression}}}`;
+    }
   }
 
   visitFootnote(node: FootnoteNode): string {
@@ -1155,7 +1079,7 @@ ${childrenHtml}
 
   visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {
     if (node.isGlobal) {
-      HTMLBuilder.globalAbbreviations.set(node.abbreviation, node.definition);
+      Parser.globalAbbreviations.set(node.abbreviation, node.definition);
     } else {
       this.abbreviationDefinitions.set(node.abbreviation, node.definition);
     }
@@ -1170,15 +1094,22 @@ ${childrenHtml}
     if (!attrs) return '';
 
     const parts: string[] = [];
-    if (attrs.id) parts.push(`id="${attrs.id}"`);
-    if (attrs.class) parts.push(`class="${attrs.class}"`);
+    if (attrs.id) {
+      const processedId = this.contentProcessor.processContent(String(attrs.id));
+      parts.push(`id="${processedId}"`);
+    }
+    if (attrs.class) {
+      const processedClass = this.contentProcessor.processContent(String(attrs.class));
+      parts.push(`class="${processedClass}"`);
+    }
 
     for (const [key, value] of Object.entries(attrs)) {
       if (key !== 'id' && key !== 'class' && value !== undefined) {
         if (value === '') {
           parts.push(key);
         } else {
-          parts.push(`${key}="${value}"`);
+          const processedValue = this.contentProcessor.processContent(String(value));
+          parts.push(`${key}="${processedValue}"`);
         }
       }
     }
@@ -1187,7 +1118,8 @@ ${childrenHtml}
   }
 
   private joinChildren(nodes: ASTNode[]): string {
+    if (!nodes) return '';
     const htmlParts = nodes.map((child) => this.build(child)).filter((h) => h !== '');
-    return this.mergeAdjacentListHTML(htmlParts).join('\n');
+    return this.mergeAdjacentListHTML(htmlParts).join('');
   }
 }
