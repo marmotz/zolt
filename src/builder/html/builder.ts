@@ -535,7 +535,6 @@ ${tabsScript}
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
-    console.log(`VISIT TRIPLE COLON: type="${node.blockType}"`);
     if (node.blockType === 'tabs') {
       return this.visitTabsBlock(node);
     }
@@ -922,22 +921,26 @@ ${childrenHtml}
 
   visitBold(node: BoldNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<strong${attrs}>${node.content}</strong>`;
+    const content = this.processInline(node.content);
+    return `<strong${attrs}>${content}</strong>`;
   }
 
   visitItalic(node: ItalicNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<em${attrs}>${node.content}</em>`;
+    const content = this.processInline(node.content);
+    return `<em${attrs}>${content}</em>`;
   }
 
   visitUnderline(node: UnderlineNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<u${attrs}>${node.content}</u>`;
+    const content = this.processInline(node.content);
+    return `<u${attrs}>${content}</u>`;
   }
 
   visitStrikethrough(node: StrikethroughNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<del${attrs}>${node.content}</del>`;
+    const content = this.processInline(node.content);
+    return `<del${attrs}>${content}</del>`;
   }
 
   visitCode(node: CodeNode): string {
@@ -959,12 +962,14 @@ ${childrenHtml}
 
   visitHighlight(node: HighlightNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<mark${attrs}>${node.content}</mark>`;
+    const content = this.processInline(node.content);
+    return `<mark${attrs}>${content}</mark>`;
   }
 
   visitInlineStyle(node: InlineStyleNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    return `<span${attrs}>${node.content}</span>`;
+    const content = this.processInline(node.content);
+    return `<span${attrs}>${content}</span>`;
   }
 
   private renderAllAttributes(attrs?: Attributes): string {

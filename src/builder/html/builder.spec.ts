@@ -606,6 +606,53 @@ describe('HTMLBuilder', () => {
     expect(html).toBe('H<sub><em>italic</em></sub>');
   });
 
+  test('should process italic with forward slashes in content', () => {
+    const html = builder.processInline('//Last updated: DD/MM/YYYY//');
+    expect(html).toBe('<em>Last updated: DD/MM/YYYY</em>');
+  });
+
+  test('should process italic with date format containing slashes', () => {
+    const html = builder.processInline('//Date: {{ Date.format($modified, "DD/MM/YYYY") }}//');
+    expect(html).toContain('<em>');
+    expect(html).toContain('DD/MM/YYYY');
+    expect(html).toContain('</em>');
+  });
+
+  test('should process bold with asterisks in content', () => {
+    const html = builder.processInline('**Score: 5 * 3 = 15**');
+    expect(html).toBe('<strong>Score: 5 * 3 = 15</strong>');
+  });
+
+  test('should process underline with underscores in content', () => {
+    const html = builder.processInline('__variable_name_here__');
+    expect(html).toBe('<u>variable_name_here</u>');
+  });
+
+  test('should process strikethrough with tildes in content', () => {
+    const html = builder.processInline('~~deleted ~ text~~');
+    expect(html).toBe('<del>deleted ~ text</del>');
+  });
+
+  test('should process highlight with equals signs in content', () => {
+    const html = builder.processInline('==formula: a = b + c==');
+    expect(html).toBe('<mark>formula: a = b + c</mark>');
+  });
+
+  test('should process nested bold with italic', () => {
+    const html = builder.processInline('**bold with //italic// inside**');
+    expect(html).toBe('<strong>bold with <em>italic</em> inside</strong>');
+  });
+
+  test('should process deeply nested inline elements', () => {
+    const html = builder.processInline('//**__~~==text==~~__**//');
+    expect(html).toBe('<em><strong><u><del><mark>text</mark></del></u></strong></em>');
+  });
+
+  test('should process multiple nested inline formats', () => {
+    const html = builder.processInline('//**bold** and __underline__//');
+    expect(html).toBe('<em><strong>bold</strong> and <u>underline</u></em>');
+  });
+
   test('should not replace variables inside code spans in processInlineContent', () => {
     const localBuilder = new HTMLBuilder();
     (localBuilder as any).evaluator.setVariable('var', 'REPLACED');

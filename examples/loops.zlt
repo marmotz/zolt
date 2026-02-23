@@ -167,15 +167,13 @@ $users = [
 :::
 :::
 
-### Price List
+### Current Stock
 
 $inventory = [
   {item: "Widget A", qty: 50, price: 19.99},
   {item: "Widget B", qty: 30, price: 29.99},
   {item: "Widget C", qty: 100, price: 9.99}
 ]
-
-### Current Stock
 
 :::foreach {$inventory as $product}
 **{$product.item}**
@@ -185,7 +183,6 @@ $inventory = [
 
 :::if {$product.qty < 40}
 ⚠️ Low stock!
-:::
 :::
 :::
 
@@ -217,7 +214,6 @@ $faq_categories = [
 {$item.a}
 :::
 :::
-:::
 
 ### Navigation Menu
 
@@ -230,7 +226,7 @@ $menu_items = [
 
 :::foreach {$menu_items as $item}
 :::if {$item.active}
-[**{$item.title}**]({$item.url}) {.active}
+**[{$item.title}]({$item.url})** {.active}
 :::
 :::if {!$item.active}
 [{$item.title}]({$item.url})

@@ -64,13 +64,13 @@
 
 ### Basic Formatting
 
-- [ ] `**text**` → Bold
-- [ ] `//text//` → Italic
-- [ ] `__text__` → Underline
-- [ ] `~~text~~` → Strikethrough
+- [x] `**text**` → Bold
+- [x] `//text//` → Italic
+- [x] `__text__` → Underline
+- [x] `~~text~~` → Strikethrough
 - [x] `^{text}` → Superscript (with nesting support)
 - [x] `_{text}` → Subscript (with nesting support)
-- [ ] `==text==` → Highlight/Mark
+- [x] `==text==` → Highlight/Mark
 
 ### Styled Inline Groups
 
@@ -371,7 +371,7 @@
 
 ### Test Coverage
 
-- [ ] Unit tests for each inline formatting feature
+- [x] Unit tests for each inline formatting feature
 - [ ] Unit tests for each block type
 - [ ] Unit tests for attributes
 - [ ] Unit tests for variables
