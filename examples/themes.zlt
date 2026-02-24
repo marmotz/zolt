@@ -1,0 +1,22 @@
+# Zolt Themes Index
+
+Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement à vos préférences de couleur (Light/Dark mode). Vous pouvez également forcer un mode spécifique via le frontmatter.
+
+## Thèmes Standard
+
+Chaque thème ci-dessous utilise `color-scheme: auto` par défaut.
+
+- [Thème Default](themes/default.zlt) — Moderne, propre et équilibré.
+- [Thème Professional](themes/professional.zlt) — Élégant avec titres serif (Georgia/Times).
+- [Thème Technical](themes/technical.zlt) — Orienté code avec titres monospace.
+- [Thème Playful](themes/playful.zlt) — Coloré, arrondi et dynamique.
+
+## Contrôle du Mode de Couleur (Light/Dark)
+
+Exemples de documents forçant un mode spécifique :
+
+- [Professional (Forcé en Sombre)](themes/professional-dark.zlt) — `color-scheme: dark`
+- [Default (Forcé en Clair)](themes/default-light.zlt) — `color-scheme: light`
+
+---
+[← Retour à l'Index des Exemples](index.zlt)

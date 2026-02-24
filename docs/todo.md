@@ -13,6 +13,9 @@
 - [x] Parse YAML frontmatter at start of file
 - [x] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
       `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
+- [x] Implement theme system (`default`, `professional`, `technical`, `playful`)
+- [x] Support `color-scheme` (`auto`, `light`, `dark`) with automatic system preference detection
+- [x] Generate HTML `<meta>` and Open Graph tags from frontmatter (with strict TS typing)
 
 ### Phase 1: Variables
 

@@ -41,18 +41,51 @@ export class DocumentRenderer {
 
     const lang = node.frontmatter?.data?.lang || 'en';
     const title = node.frontmatter?.data?.title || 'Document';
+    const description = node.frontmatter?.data?.description || '';
+    const author = node.frontmatter?.data?.author || '';
+    
+    let keywords = '';
+    const rawKeywords = node.frontmatter?.data?.keywords;
+    const rawTags = node.frontmatter?.data?.tags;
+
+    if (Array.isArray(rawKeywords)) {
+      keywords = rawKeywords.join(', ');
+    } else if (typeof rawKeywords === 'string') {
+      keywords = rawKeywords;
+    } else if (Array.isArray(rawTags)) {
+      keywords = rawTags.join(', ');
+    }
+
+    const robots = node.frontmatter?.data?.robots || '';
+    const ogImage = node.frontmatter?.data?.image || '';
+
+    const theme = this.evaluator.getVariable('theme') || 'default';
+    const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
+    const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
+
+    let metaTags = '';
+    if (description) metaTags += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
+    if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
+    if (keywords) metaTags += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
+    if (robots) metaTags += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
+    
+    // Open Graph
+    metaTags += `  <meta property="og:title" content="${this.escapeHtml(String(title))}">\n`;
+    if (description) metaTags += `  <meta property="og:description" content="${this.escapeHtml(String(description))}">\n`;
+    if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
+    metaTags += `  <meta property="og:type" content="website">\n`;
 
     return `<!DOCTYPE html>
 <html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+${metaTags}  <title>${title}</title>
   <style>
 ${DEFAULT_CSS}
   </style>
 </head>
-<body>
+<body class="${bodyClasses}">
 ${childrenHtml}
 ${tabsScript}
 ${anchorScript}
@@ -60,6 +93,17 @@ ${chartScript}
 ${mermaidScript}
 </body>
 </html>`;
+  }
+
+  private escapeHtml(text: string): string {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return String(text).replace(/[&<>"']/g, (m) => map[m]);
   }
 
   public renderDocumentContent(

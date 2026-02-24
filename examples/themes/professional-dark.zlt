@@ -1,0 +1,15 @@
+---
+title: "Zolt Theme: Professional (Forced Dark)"
+theme: "professional"
+color-scheme: "dark"
+---
+
+# {$title}
+
+Ce document utilise le thème **Professional** mais force le mode **Sombre**, indépendamment des préférences système de l'utilisateur.
+
+:::info
+Utile pour présenter un document dans une ambiance spécifique ou garantir le contraste sur certains écrans.
+:::
+
+[← Retour à l'index des thèmes](../themes.zlt)

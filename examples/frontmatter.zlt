@@ -14,6 +14,7 @@ Ce fichier sert d'index pour tester les différentes fonctionnalités du Frontma
 
 ## Logique et Conditions
 - [Sélection de Thème](frontmatter/conditional-theme.zlt) — Changement de style basé sur une variable.
+- [Thèmes et Couleurs](themes.zlt) — Index complet des thèmes intégrés et des modes Light/Dark.
 - [Feature Flags](frontmatter/conditional-features.zlt) — Affichage conditionnel de sections (commentaires, recherche, etc.).
 
 ## Gestion de Contenu Avancée

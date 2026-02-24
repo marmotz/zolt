@@ -1245,7 +1245,33 @@ Version : v{$version}
 | `description` | string        | Description courte              |
 | `lang`        | string        | Code langue (fr, en, etc.)      |
 | `toc`         | boolean       | Afficher la TOC automatiquement |
-| `theme`       | string        | Thème de rendu                  |
+| `theme`       | string        | Thème de rendu (voir ci-dessous)|
+| `color-scheme`| string        | `auto`, `light`, `dark`         |
+
+#### Thèmes Disponibles
+
+Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement aux préférences de l'utilisateur (Light/Dark mode) :
+
+- **`default`** (par défaut) : Moderne, propre et équilibré.
+- **`professional`** : Typographie serif pour les titres, couleurs sobres, idéal pour les rapports.
+- **`technical`** : Inspiré des documentations techniques, polices monospace, contrastes élevés.
+- **`playful`** : Bordures arrondies, couleurs vives, typographie plus informelle.
+
+#### Schéma de Couleur (Light/Dark Mode)
+
+La métadonnée `color-scheme` permet de contrôler l'apparence du document :
+
+- **`auto`** (par défaut) : Utilise la préférence système de l'utilisateur.
+- **`light`** : Force le mode clair.
+- **`dark`** : Force le mode sombre.
+
+```yaml
+---
+title: "Mon Rapport Dark"
+theme: "professional"
+color-scheme: "dark"
+---
+```
 
 #### Exemple Complet
 

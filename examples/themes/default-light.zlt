@@ -1,0 +1,11 @@
+---
+title: "Zolt Theme: Default (Forced Light)"
+theme: "default"
+color-scheme: "light"
+---
+
+# {$title}
+
+Ce document utilise le thème **Default** mais force le mode **Clair**. Même si votre système est en mode sombre, ce document restera sur fond blanc.
+
+[← Retour à l'index des thèmes](../themes.zlt)

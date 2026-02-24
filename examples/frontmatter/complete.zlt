@@ -15,10 +15,24 @@ theme: professional
 All commonly used metadata fields.
 
 **Title:** {$title}
+
 **Author:** {$author}
+
 **Date:** {$date}
+
 **Version:** v{$version}
+
 **Description:** {$description}
+
 **Tags:** {{ String.join($tags, ", ") }}
+
+**Language:** {{ $lang }}
+
+**Table of Contents:** {{ $toc }}
+
+**Numbering:** {{ $numbering }}
+
+**Theme:** {{ $theme }}
+
 
 [← Retour à l'index](../frontmatter.zlt)

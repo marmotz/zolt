@@ -1,0 +1,32 @@
+---
+title: "Zolt Theme: Technical"
+theme: "technical"
+color-scheme: "auto"
+---
+
+# {$title}
+
+Le thème **Technical** est conçu pour les documentations de code, les spécifications techniques et les guides de développeur.
+
+## Identité visuelle
+
+- **Titres Monospace** : Pour une apparence rappelant les terminaux et les éditeurs de code.
+- **Bordures Bleues** : Les blocs de code et les conteneurs utilisent des accents bleus prononcés.
+- **Contraste Élevé** : Facilite la lecture des petits caractères et des symboles.
+
+:::note [Configuration]
+Ce thème utilise abondamment la police monospace pour les en-têtes et les éléments structuraux.
+:::
+
+### Exemple de Code
+
+```typescript
+function hello(name: string): void {
+  console.log(`Hello, ${name}!`);
+}
+```
+
+& $ bun run build
+& Built successfully in 45ms.
+
+[← Retour à l'index des thèmes](../themes.zlt)
