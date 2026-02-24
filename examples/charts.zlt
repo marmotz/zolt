@@ -12,7 +12,6 @@ Mar: 150
 Apr: 180
 :::
 :::
-:::
 
 ## Multiple Charts in Container
 
@@ -33,7 +32,6 @@ Several graphs sharing the same space:
 2023: 45000
 :::
 :::
-:::
 
 ## Chart Types
 
@@ -48,7 +46,6 @@ Apr: 75
 May: 100
 :::
 :::
-:::
 
 ### Bar Chart
 
@@ -58,7 +55,6 @@ Widget A: 150
 Widget B: 200
 Widget C: 175
 Widget D: 220
-:::
 :::
 :::
 
@@ -73,7 +69,6 @@ Company D: 15%
 Others: 5%
 :::
 :::
-:::
 
 ### Area Chart
 
@@ -83,7 +78,6 @@ Morning: 120
 Afternoon: 200
 Evening: 180
 Night: 50
-:::
 :::
 :::
 
@@ -104,7 +98,6 @@ Feb: 20
 Mar: 30
 :::
 :::
-:::
 
 ### Chart with Legend
 
@@ -116,7 +109,6 @@ East: 280
 West: 390
 :::
 :::
-:::
 
 ### Chart with Grid
 
@@ -125,7 +117,6 @@ West: 390
 Jan: 100
 Feb: 150
 Mar: 200
-:::
 :::
 :::
 
@@ -155,7 +146,6 @@ Clothing: $800,000
 Home & Garden: $650,000
 :::
 :::
-:::
 
 ### Website Analytics
 
@@ -175,7 +165,6 @@ Social: 20%
 Referral: 10%
 :::
 :::
-:::
 
 ### Survey Results
 
@@ -192,7 +181,6 @@ Very Dissatisfied: 2%
 Positive: 75%
 Neutral: 15%
 Negative: 10%
-:::
 :::
 :::
 
@@ -215,7 +203,6 @@ Pending: 20
 Blocked: 10
 :::
 :::
-:::
 
 ### Sales Dashboard
 
@@ -232,7 +219,6 @@ Electronics: 35%
 Clothing: 25%
 Home: 20%
 Other: 20%
-:::
 :::
 :::
 
@@ -256,7 +242,6 @@ Low: 25%
 Info: 56%
 :::
 :::
-:::
 
 ### Comparison Charts
 
@@ -264,7 +249,6 @@ Info: 56%
 :::chart-bar {title="Year Over Year" legend=true}
 2023: 100
 2024: 120
-:::
 :::
 :::
 
@@ -287,7 +271,6 @@ Product C: 130
 Product C: 180
 :::
 :::
-:::
 
 ### Stacked Bar Chart
 
@@ -296,7 +279,6 @@ Product C: 180
 Team A:
 Team B:
 Team C:
-:::
 :::
 :::
 
@@ -312,7 +294,6 @@ Team C:
 9 PM: 20
 :::
 :::
-:::
 
 ### Target vs Actual
 
@@ -325,7 +306,6 @@ Target: 100
 Actual: 85
 Actual: 95
 Actual: 110
-:::
 :::
 :::
 
@@ -348,7 +328,6 @@ Flexibility: 15
 Rest: 10
 :::
 :::
-:::
 
 ### Budget Breakdown
 
@@ -360,7 +339,6 @@ Transport: 15%
 Utilities: 10%
 Entertainment: 10%
 Savings: 10%
-:::
 :::
 :::
 
@@ -377,7 +355,6 @@ Twitter: 3000
 Twitter: 4500
 :::
 :::
-:::
 
 ### Learning Progress
 
@@ -387,7 +364,6 @@ Week 1: 10
 Week 2: 25
 Week 3: 45
 Week 4: 70
-:::
 :::
 :::
 
@@ -406,7 +382,6 @@ B: 35%
 C: 25%
 :::
 :::
-:::
 
 :::column {width=50%}
 ### 2026 Results
@@ -416,7 +391,6 @@ C: 25%
 A: 45%
 B: 30%
 C: 25%
-:::
 :::
 :::
 :::
@@ -436,7 +410,6 @@ Q3: 200
 Q4: 250
 :::
 :::
-:::
 
 :::column {width=33%}
 ### Breakdown
@@ -447,7 +420,6 @@ North: 35%
 South: 30%
 East: 20%
 West: 15%
-:::
 :::
 :::
 :::
@@ -483,7 +455,6 @@ Paid Users: 200
 Paid Users: 350
 :::
 :::
-:::
 
 ### Grid Display
 
@@ -494,7 +465,6 @@ Add grids for easier reading:
 Metric A: 85
 Metric B: 92
 Metric C: 78
-:::
 :::
 :::
 

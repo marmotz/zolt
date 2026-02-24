@@ -283,6 +283,8 @@ export class HTMLBuilder implements Builder {
   private abbreviationDefinitions: Map<string, string> = new Map();
   private tabsCounter: number = 0;
   private hasTabs: boolean = false;
+  private hasCharts: boolean = false;
+  private hasMermaid: boolean = false;
   private evaluator: ExpressionEvaluator;
   private contentProcessor: ContentProcessor;
   private currentHeadings: HeadingNode[] = [];
@@ -344,6 +346,10 @@ export class HTMLBuilder implements Builder {
         return this.visitTable(node as TableNode);
       case 'CommentInline':
         return '';
+      case 'Chart':
+        return this.visitChart(node as any);
+      case 'Mermaid':
+        return this.visitMermaid(node as any);
       default:
         return this.buildInlineNode(node);
     }
@@ -390,6 +396,8 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.tabsCounter = 0;
     this.hasTabs = false;
+    this.hasCharts = false;
+    this.hasMermaid = false;
     this.headingCounters.fill(0);
     this.currentHeadings = this.findAllHeadings(node.children);
 
@@ -455,6 +463,78 @@ export class HTMLBuilder implements Builder {
     });
   </script>`;
 
+    const chartScript = this.hasCharts
+      ? `
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.zolt-chart').forEach(function(chartContainer) {
+        var seriesElements = chartContainer.querySelectorAll('.zolt-chart-series');
+        if (seriesElements.length === 0) return;
+
+        var chartType = seriesElements[0].getAttribute('data-chart-type') || 'line';
+        var chartTitle = seriesElements[0].getAttribute('data-title') || '';
+        var datasets = [];
+        var labels = null;
+
+        seriesElements.forEach(function(seriesEl) {
+          var dataAttr = seriesEl.getAttribute('data-data');
+          if (!dataAttr) return;
+          var data = JSON.parse(dataAttr);
+          
+          if (!labels) {
+            labels = data.map(function(d) { return d.label; });
+          }
+          
+          var label = seriesEl.getAttribute('data-label') || 'Dataset ' + (datasets.length + 1);
+          var color = seriesEl.getAttribute('data-color') || 'rgba(54, 162, 235, 1)';
+          
+          datasets.push({
+            label: label,
+            data: data.map(function(d) { return d.value; }),
+            backgroundColor: color,
+            borderColor: color,
+            fill: chartType === 'area'
+          });
+        });
+
+        var canvas = document.createElement('canvas');
+        chartContainer.insertBefore(canvas, chartContainer.firstChild);
+        
+        new Chart(canvas, {
+          type: chartType,
+          data: {
+            labels: labels,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: !!chartTitle,
+                text: chartTitle
+              },
+              legend: {
+                display: datasets.length > 1
+              }
+            }
+          }
+        });
+      });
+    });
+  </script>`
+      : '';
+
+    const mermaidScript = this.hasMermaid
+      ? `
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      mermaid.initialize({ startOnLoad: true });
+    });
+  </script>`
+      : '';
+
     const lang = node.frontmatter?.data?.lang || 'en';
     const title = node.frontmatter?.data?.title || 'Document';
 
@@ -472,6 +552,8 @@ ${DEFAULT_CSS}
 ${childrenHtml}
 ${tabsScript}
 ${anchorScript}
+${chartScript}
+${mermaidScript}
 </body>
 </html>`;
   }
@@ -874,29 +956,29 @@ ${childrenHtml}
         currentDepth--;
       }
 
-            // Update counters for numbering
-            counters[level]++;
-            for (let i = level + 1; i <= 6; i++) counters[i] = 0;
-      
-            const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
-            const numberParts = counters.slice(from, level + 1);
-            let numberStr = '';
-      
-            if (numbered) {
-              let formattedParts: string[] = [];
-              if (numberingStyle === 'decimal') {
-                formattedParts = numberParts.map((p) => p.toString());
-              } else if (numberingStyle === 'roman-lower') {
-                formattedParts = numberParts.map((p) => this.toRoman(p).toLowerCase());
-              } else if (numberingStyle === 'roman-upper') {
-                formattedParts = numberParts.map((p) => this.toRoman(p).toUpperCase());
-              } else if (numberingStyle === 'alpha-lower') {
-                formattedParts = numberParts.map((p) => this.toAlpha(p).toLowerCase());
-              } else if (numberingStyle === 'alpha-upper') {
-                formattedParts = numberParts.map((p) => this.toAlpha(p).toUpperCase());
-              }
-              numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
-            }
+      // Update counters for numbering
+      counters[level]++;
+      for (let i = level + 1; i <= 6; i++) counters[i] = 0;
+
+      const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
+      const numberParts = counters.slice(from, level + 1);
+      let numberStr = '';
+
+      if (numbered) {
+        let formattedParts: string[] = [];
+        if (numberingStyle === 'decimal') {
+          formattedParts = numberParts.map((p) => p.toString());
+        } else if (numberingStyle === 'roman-lower') {
+          formattedParts = numberParts.map((p) => this.toRoman(p).toLowerCase());
+        } else if (numberingStyle === 'roman-upper') {
+          formattedParts = numberParts.map((p) => this.toRoman(p).toUpperCase());
+        } else if (numberingStyle === 'alpha-lower') {
+          formattedParts = numberParts.map((p) => this.toAlpha(p).toLowerCase());
+        } else if (numberingStyle === 'alpha-upper') {
+          formattedParts = numberParts.map((p) => this.toAlpha(p).toUpperCase());
+        }
+        numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
+      }
 
       const inlineHtml = this.processInlineContent((h as any).content);
       const childrenHtml = this.joinChildren(h.children);
@@ -1341,6 +1423,67 @@ ${childrenHtml}
     }
 
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+
+  visitChart(node: any): string {
+    this.hasCharts = true;
+    const attrs = this.renderAllAttributes(node.attributes);
+    const layoutAttr = node.layout ? ` data-layout="${node.layout}"` : '';
+
+    const seriesHtml = node.children.map((series: any) => this.visitChartSeries(series)).join('\n');
+
+    return `<div${attrs}${layoutAttr} class="zolt-chart">
+${seriesHtml}
+</div>`;
+  }
+
+  visitChartSeries(series: any): string {
+    // Filter out chart-specific attributes that should be data-attributes only
+    const filteredAttrs: Attributes = {};
+    if (series.attributes) {
+      for (const [key, value] of Object.entries(series.attributes)) {
+        // Skip chart-specific attributes - they will be added as data-attributes
+        if (key !== 'title' && key !== 'color-scheme' && key !== 'legend' && key !== 'grid') {
+          filteredAttrs[key] = value;
+        }
+      }
+    }
+    const attrs = this.renderAllAttributes(Object.keys(filteredAttrs).length > 0 ? filteredAttrs : undefined);
+
+    // Title can come from either series.title or series.attributes.title
+    const seriesTitle = series.title || series.attributes?.title;
+    const titleAttr = seriesTitle ? ` data-title="${this.escapeHtml(String(seriesTitle))}"` : '';
+    const schemeAttr = series.attributes?.['color-scheme']
+      ? ` data-scheme="${this.escapeHtml(String(series.attributes['color-scheme'] as string))}"`
+      : '';
+    const legendAttr = series.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
+    const gridAttr = series.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
+
+    const dataJson = JSON.stringify(series.data);
+
+    return `  <div${attrs}${titleAttr}${schemeAttr}${legendAttr}${gridAttr}
+       class="zolt-chart-series"
+       data-chart-type="${series.chartType}"
+       data-data='${this.escapeHtml(dataJson)}'>
+  </div>`;
+  }
+
+  visitMermaid(node: any): string {
+    this.hasMermaid = true;
+    return `<div class="zolt-mermaid">
+  <pre class="mermaid">${this.escapeHtml(node.content)}</pre>
+</div>`;
+  }
+
+  private escapeHtml(text: string): string {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
   }
 
   private joinChildren(nodes: ASTNode[]): string {

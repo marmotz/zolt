@@ -325,7 +325,12 @@ export type ASTNode =
   | TableCellNode
   | DoubleBracketBlockNode
   | IndentationNode
-  | DocumentNode;
+  | DocumentNode
+  | IfNode
+  | ForeachNode
+  | ChartNode
+  | ChartSeriesNode
+  | MermaidNode;
 
 export interface IfNode {
   type: 'If';
@@ -339,4 +344,30 @@ export interface ForeachNode {
   iterator: string;
   collection: string;
   body: ASTNode[];
+}
+
+export interface ChartNode {
+  type: 'Chart';
+  children: ChartSeriesNode[];
+  attributes?: Attributes;
+  layout?: 'horizontal' | 'vertical';
+}
+
+export interface ChartSeriesNode {
+  type: 'ChartSeries';
+  chartType: 'line' | 'bar' | 'pie' | 'area';
+  title?: string;
+  data: ChartDataPoint[];
+  attributes?: Attributes;
+}
+
+export interface ChartDataPoint {
+  label: string;
+  value: string | number;
+  dataset?: string;
+}
+
+export interface MermaidNode {
+  type: 'Mermaid';
+  content: string;
 }

@@ -1,12 +1,12 @@
 import { readFile, stat, writeFile } from 'fs/promises';
 import { Builder } from '../builder/builder';
+import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
+import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
-import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
-import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';

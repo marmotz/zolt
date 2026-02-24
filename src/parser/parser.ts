@@ -819,6 +819,16 @@ export class Parser {
       blockType = remaining.replace(/\s+\[([^\]]+)]$/, '').trim();
     }
 
+    // Handle Mermaid blocks
+    if (blockType === 'mermaid') {
+      return this.parseMermaidBlock();
+    }
+
+    // Handle Chart blocks
+    if (blockType === 'chart' || blockType.startsWith('chart-')) {
+      return this.parseChartBlock(blockType, title, attributes);
+    }
+
     const children: ASTNode[] = [];
     this.skipNewlines();
 
@@ -846,6 +856,271 @@ export class Parser {
       children,
       attributes,
     } as any;
+  }
+
+  private parseMermaidBlock(): MermaidNode {
+    const content: string[] = [];
+    this.skipNewlines();
+
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      if (this.match(TokenType.NEWLINE)) {
+        content.push('\n');
+        this.advance();
+      } else {
+        const token = this.currentToken;
+        content.push(token.value);
+        this.advance();
+      }
+    }
+
+    if (this.match(TokenType.TRIPLE_COLON_END)) {
+      this.advance();
+    }
+
+    return {
+      type: 'Mermaid',
+      content: content.join('').trim(),
+    };
+  }
+
+  private parseChartBlock(blockType: string, title: string | undefined, attributes?: Attributes): ChartNode {
+    // If this is a chart-* type directly (not wrapped in a chart container), wrap it
+    const isDirectChartType = blockType.startsWith('chart-');
+
+    if (isDirectChartType) {
+      // Direct chart type without container - create a single-series chart
+      const chartType = blockType.replace('chart-', '') as ChartSeriesNode['chartType'];
+      const data = this.parseChartDataDirect();
+
+      // Consume the closing TRIPLE_COLON_END
+      if (this.match(TokenType.TRIPLE_COLON_END)) {
+        this.advance();
+      }
+
+      const series: ChartSeriesNode = {
+        type: 'ChartSeries',
+        chartType,
+        title,
+        data,
+        attributes,
+      };
+
+      return {
+        type: 'Chart',
+        children: [series],
+        attributes: {},
+        layout: undefined,
+      };
+    }
+
+    // Chart container with multiple series - read the raw content and parse nested chart-* blocks
+    const series: ChartSeriesNode[] = [];
+    this.skipNewlines();
+
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      // Check if this is a chart-* block start
+      if (this.match(TokenType.TRIPLE_COLON_START)) {
+        const chartStartToken = this.expect(TokenType.TRIPLE_COLON_START);
+        const chartValue = chartStartToken.value;
+
+        // Extract chart type and attributes
+        let chartAttributes: Attributes | undefined;
+        const chartAttrMatch = chartValue.match(/\s+\{([^}]+)}$/);
+        let chartRemaining = chartValue;
+        if (chartAttrMatch) {
+          chartAttributes = InlineParser.parseAttributes(chartAttrMatch[1]);
+          chartRemaining = chartValue.replace(/\s+\{([^}]+)}$/, '').trim();
+        }
+
+        // Extract title
+        let chartTitle: string | undefined;
+        const chartTitleMatch = chartRemaining.match(/\s+\[([^\]]+)]$/);
+        let chartBlockType = chartRemaining;
+        if (chartTitleMatch) {
+          chartTitle = chartTitleMatch[1];
+          chartBlockType = chartRemaining.replace(/\s+\[([^\]]+)]$/, '').trim();
+        }
+
+        // Check if this is a chart-* block
+        if (chartBlockType.startsWith('chart-')) {
+          const chartType = chartBlockType.replace('chart-', '') as ChartSeriesNode['chartType'];
+          const data = this.parseChartDataDirect();
+
+          // Consume the closing TRIPLE_COLON_END
+          if (this.match(TokenType.TRIPLE_COLON_END)) {
+            this.advance();
+          }
+
+          series.push({
+            type: 'ChartSeries',
+            chartType,
+            title: chartTitle,
+            data,
+            attributes: chartAttributes,
+          });
+
+          this.skipNewlines();
+          continue;
+        }
+      }
+
+      // Not a chart-* block, advance to avoid infinite loop
+      if (this.match(TokenType.TRIPLE_COLON_START)) {
+        // Skip this entire block
+        this.skipTripleColonBlock();
+      } else {
+        this.advance();
+      }
+
+      this.skipNewlines();
+    }
+
+    if (this.match(TokenType.TRIPLE_COLON_END)) {
+      this.advance();
+    }
+
+    return {
+      type: 'Chart',
+      children: series,
+      attributes,
+      layout: attributes?.layout as 'horizontal' | 'vertical' | undefined,
+    };
+  }
+
+  private skipTripleColonBlock(): void {
+    // Skip past a triple colon block without parsing it deeply
+    let depth = 1;
+    while (depth > 0 && !this.match(TokenType.EOF)) {
+      if (this.match(TokenType.TRIPLE_COLON_START)) {
+        depth++;
+        this.advance();
+      } else if (this.match(TokenType.TRIPLE_COLON_END)) {
+        depth--;
+        this.advance();
+      } else {
+        this.advance();
+      }
+    }
+  }
+
+  private parseChartDataDirect(): ChartDataPoint[] {
+    const data: ChartDataPoint[] = [];
+    this.skipNewlines();
+
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      if (this.match(TokenType.NEWLINE)) {
+        this.advance();
+        continue;
+      }
+
+      // Read the line directly as text
+      const lineText = this.readUntilNewline();
+      if (lineText.trim()) {
+        const dataPoint = this.parseChartDataLine(lineText.trim());
+        if (dataPoint) {
+          data.push(dataPoint);
+        }
+      }
+
+      if (this.match(TokenType.NEWLINE)) {
+        this.advance();
+      }
+    }
+
+    return data;
+  }
+
+  private readUntilNewline(): string {
+    let text = '';
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.NEWLINE) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      text += this.currentToken.value;
+      this.advance();
+    }
+    return text;
+  }
+
+  private parseChartData(): ChartDataPoint[] {
+    const data: ChartDataPoint[] = [];
+    this.skipNewlines();
+
+    while (!this.match(TokenType.EOF) && !this.match(TokenType.TRIPLE_COLON_END)) {
+      if (this.match(TokenType.NEWLINE)) {
+        this.advance();
+        continue;
+      }
+
+      const block = this.parseBlock();
+      if (block && block.type === 'Paragraph') {
+        const text = this.extractTextFromParagraph(block as any);
+        const dataPoint = this.parseChartDataLine(text);
+        if (dataPoint) {
+          data.push(dataPoint);
+        }
+      }
+
+      if (this.match(TokenType.TRIPLE_COLON_END)) {
+        break;
+      }
+    }
+
+    return data;
+  }
+
+  private parseChartDataFromChildren(children: ASTNode[]): ChartDataPoint[] {
+    const data: ChartDataPoint[] = [];
+
+    for (const child of children) {
+      if (child.type === 'Paragraph') {
+        const text = this.extractTextFromParagraph(child as any);
+        const dataPoint = this.parseChartDataLine(text);
+        if (dataPoint) {
+          data.push(dataPoint);
+        }
+      }
+    }
+
+    return data;
+  }
+
+  private extractTextFromParagraph(paragraph: any): string {
+    let text = '';
+    for (const child of paragraph.children) {
+      if (child.type === 'Text') {
+        text += child.content;
+      } else if (child.content) {
+        text += child.content;
+      }
+    }
+    return text.trim();
+  }
+
+  private parseChartDataLine(line: string): ChartDataPoint | null {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+
+    // Match pattern: "Label: Value" or "Label:Value"
+    const match = trimmed.match(/^([^:]+):\s*(.+)$/);
+    if (!match) return null;
+
+    const [, label, rawValue] = match;
+    const value = this.parseChartValue(rawValue.trim());
+
+    return { label: label.trim(), value };
+  }
+
+  private parseChartValue(rawValue: string): string | number {
+    // Try to parse as a number first
+    const numMatch = rawValue.match(/^[\d,.]+$/);
+    if (numMatch) {
+      const cleaned = rawValue.replace(/,/g, '');
+      const num = parseFloat(cleaned);
+      if (!isNaN(num)) {
+        return num;
+      }
+    }
+
+    // Keep as string if it contains %, $, or other non-numeric characters
+    return rawValue;
   }
 
   private parseDoubleBracketBlock(): ASTNode {

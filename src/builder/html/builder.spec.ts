@@ -267,14 +267,15 @@ describe('HTMLBuilder', () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [
-        { type: 'Heading', level: 1, content: 'Title' },
-        { type: 'Paragraph', content: 'Content' },
+        { type: 'Heading', level: 1, content: 'Title', sourceFile: '' },
+        { type: 'Paragraph', content: 'Content', sourceFile: '' },
       ],
+      sourceFile: '',
     };
 
     const html = builder.buildDocument(node);
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('<html lang="">');
+    expect(html).toContain('<html lang="en">');
     expect(html).toContain('<head>');
     expect(html).toContain('<body>');
     expect(html).toContain('Title');

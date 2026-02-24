@@ -316,18 +316,18 @@
 
 ### Diagrams
 
-- [ ] `:::mermaid` blocks
+- [x] `:::mermaid` blocks
 
 ### Charts
 
-- [ ] `:::chart` container
-- [ ] `:::chart-line` - Line charts
-- [ ] `:::chart-bar` - Bar charts
-- [ ] `:::chart-pie` - Pie charts
-- [ ] `:::chart-area` - Area charts
-- [ ] Chart container attributes: `{width}`, `{height}`, `{layout}`
-- [ ] Chart attributes: `{title}`, `{color-scheme}`, `{legend}`, `{grid}`
-- [ ] Multi-chart support with horizontal/vertical layout
+- [x] `:::chart` container
+- [x] `:::chart-line` - Line charts
+- [x] `:::chart-bar` - Bar charts
+- [x] `:::chart-pie` - Pie charts
+- [x] `:::chart-area` - Area charts
+- [x] Chart container attributes: `{width}`, `{height}`, `{layout}`
+- [x] Chart attributes: `{title}`, `{color-scheme}`, `{legend}`, `{grid}`
+- [x] Multi-chart support with horizontal/vertical layout
 
 ## 14. Heading Numbering
 
@@ -392,7 +392,7 @@
 - [ ] Unit tests for calculations and namespaces
 - [x] Unit tests for loops
 - [ ] Unit tests for file inclusion
-- [ ] Integration tests for complete documents
+- [x] Integration tests for complete documents (charts, mermaid)
 - [ ] Regression tests for Markdown compatibility
 
 ### Test Files

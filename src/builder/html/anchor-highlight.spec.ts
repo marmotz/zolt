@@ -9,6 +9,7 @@ describe('HTMLBuilder Anchor Highlight', () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
+      sourceFile: '',
     };
 
     const html = builder.buildDocument(node);
@@ -23,11 +24,12 @@ describe('HTMLBuilder Anchor Highlight', () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
+      sourceFile: '',
     };
 
     const html = builder.buildDocument(node);
     expect(html).toContain("window.addEventListener('hashchange', function() {");
     expect(html).toContain("target.style.animation = 'none';");
-    expect(html).toContain("target.offsetHeight; // trigger reflow");
+    expect(html).toContain('target.offsetHeight; // trigger reflow');
   });
 });
