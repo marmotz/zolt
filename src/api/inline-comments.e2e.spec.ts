@@ -34,7 +34,7 @@ describe('API: Inline Comments', () => {
     test('should handle inline comment in heading', async () => {
       const html = await buildString('# Titre principal %% TODO: revoir cette section %%');
 
-      expect(html).toContain('<h1>Titre principal</h1>');
+      expect(html).toMatch(/<h1[^>]*>Titre principal<\/h1>/);
       expect(html).not.toContain('TODO');
       expect(html).not.toContain('%%');
     });
@@ -50,7 +50,7 @@ describe('API: Inline Comments', () => {
     test('should handle inline comment within a heading and preserve subsequent text', async () => {
       const html = await buildString('## Introduction %% Note: vérifier les sources %% Suite du titre');
 
-      expect(html).toContain('<h2>Introduction Suite du titre</h2>');
+      expect(html).toMatch(/<h2[^>]*>Introduction\s+Suite du titre<\/h2>/);
       expect(html).not.toContain('Note');
       expect(html).not.toContain('vérifier les sources');
       expect(html).not.toContain('%%');

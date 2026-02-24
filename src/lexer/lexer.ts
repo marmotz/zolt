@@ -410,7 +410,11 @@ export class Lexer {
   }
 
   private matchFrontmatter(): boolean {
-    return this.pos === 0 && this.source.slice(this.pos).startsWith('---');
+    if (this.pos !== 0 || !this.source.slice(this.pos).startsWith('---')) {
+      return false;
+    }
+    const afterFirstDash = this.source.slice(this.pos + 3);
+    return afterFirstDash.includes('---');
   }
 
   private readFrontmatter(): Token {
