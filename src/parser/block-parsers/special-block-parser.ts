@@ -1,0 +1,75 @@
+import { TokenType, Token } from '../../lexer/token-types';
+import { Attributes } from '../types';
+import { InlineParser } from '../inline-parser';
+
+export class SpecialBlockParser {
+  public parseDoubleBracketBlock(expect: (type: TokenType) => Token): any {
+    const token = expect(TokenType.DOUBLE_BRACKET_START);
+    const value = token.value;
+    const firstSpaceIndex = value.indexOf(' ');
+    let blockType = value;
+    let attributes: Attributes | undefined;
+
+    if (firstSpaceIndex !== -1) {
+      blockType = value.substring(0, firstSpaceIndex);
+      const attrStr = value.substring(firstSpaceIndex + 1).trim();
+      const attrMatch = attrStr.match(/^\{([^}]+)}$/);
+      if (attrMatch) attributes = InlineParser.parseAttributes(attrMatch[1]);
+    }
+    return { type: 'DoubleBracketBlock', blockType, content: '', attributes };
+  }
+
+  public parseHorizontalRule(expect: (type: TokenType) => Token): any {
+    const token = expect(TokenType.HORIZONTAL_RULE);
+    const value = token.value;
+    const colonIndex = value.indexOf(':');
+    const styleChar = colonIndex !== -1 ? value.substring(0, colonIndex) : value;
+    const attrsStr = colonIndex !== -1 ? value.substring(colonIndex + 1) : '';
+
+    let style: 'solid' | 'thick' | 'thin' = 'solid';
+    if (styleChar.includes('*')) style = 'thick';
+    else if (styleChar.includes('_')) style = 'thin';
+
+    let attributes: Attributes | undefined;
+    if (attrsStr) {
+      const cleanAttrs = attrsStr.startsWith(':') ? attrsStr.substring(1) : attrsStr;
+      const attrMatch = cleanAttrs.match(/^\{([^}]+)}$/);
+      if (attrMatch && !attrMatch[1].startsWith('$') && !attrMatch[1].startsWith('{')) {
+        attributes = InlineParser.parseAttributes(attrMatch[1]);
+      }
+    }
+    return { type: 'HorizontalRule', style, attributes };
+  }
+
+  public parseAbbreviationDef(expect: (type: TokenType) => Token, match: (...types: TokenType[]) => boolean): any {
+    const type = match(TokenType.ABBREVIATION_DEF_GLOBAL) ? TokenType.ABBREVIATION_DEF_GLOBAL : TokenType.ABBREVIATION_DEF;
+    const token = expect(type);
+    const value = token.value;
+    const colonIndex = value.indexOf(':');
+    return {
+      type: 'AbbreviationDefinition',
+      abbreviation: value.substring(0, colonIndex),
+      definition: value.substring(colonIndex + 1),
+      isGlobal: type === TokenType.ABBREVIATION_DEF_GLOBAL
+    };
+  }
+
+  public parseLinkReferenceDef(expect: (type: TokenType) => Token): any {
+    const token = expect(TokenType.LINK_REF_DEF);
+    const value = token.value;
+    const colonIndex = value.indexOf(':');
+    return {
+      type: 'LinkReferenceDefinition',
+      ref: value.substring(0, colonIndex),
+      url: value.substring(colonIndex + 1)
+    };
+  }
+
+  public parseCommentInline(expect: (type: TokenType) => Token): any {
+    const token = expect(TokenType.COMMENT_INLINE);
+    return {
+      type: 'CommentInline',
+      content: token.value,
+    };
+  }
+}

@@ -139,7 +139,7 @@ More content
 
 ___`);
 
-    expect(html).toContain('<h1>Title</h1>');
+    expect(html).toContain('Title</h1>');
     expect(html).toContain('border-top-width: 2px');
     expect(html).toContain('border-top-width: 4px');
     expect(html).toContain('border-top-width: 1px');

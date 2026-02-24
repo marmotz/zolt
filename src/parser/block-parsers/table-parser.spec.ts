@@ -1,0 +1,35 @@
+import { describe, expect, test } from 'bun:test';
+import { Lexer } from '../../lexer/lexer';
+import { Parser } from '../parser';
+
+describe('TableParser', () => {
+  test('should parse simple table', () => {
+    const input = `| Col 1 | Col 2 |
+| --- | --- |
+| A | B |`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Table');
+    const table = ast.children[0] as any;
+    expect(table.header.cells.length).toBe(2);
+    expect(table.rows.length).toBe(1);
+  });
+
+  test('should parse table with alignments', () => {
+    const input = `| Left | Center | Right |
+| :--- | :---: | ---: |
+| A | B | C |`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    const table = ast.children[0] as any;
+    expect(table.header.cells[0].alignment).toBe('left');
+    expect(table.header.cells[1].alignment).toBe('center');
+    expect(table.header.cells[2].alignment).toBe('right');
+  });
+});

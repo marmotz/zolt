@@ -1,0 +1,236 @@
+import { 
+  TextNode, 
+  BoldNode, 
+  ItalicNode, 
+  UnderlineNode, 
+  StrikethroughNode, 
+  CodeNode, 
+  SuperscriptNode, 
+  SubscriptNode, 
+  HighlightNode, 
+  InlineStyleNode, 
+  LinkNode, 
+  ImageNode, 
+  VideoNode, 
+  AudioNode, 
+  EmbedNode, 
+  FileNode, 
+  VariableNode, 
+  ExpressionNode, 
+  AbbreviationNode,
+  ASTNode 
+} from '../../../parser/types';
+import { formatValue, transformHref } from '../utils/string-utils';
+
+export class InlineVisitor {
+  constructor(
+    private joinChildren: (nodes: ASTNode[]) => string,
+    private renderAllAttributes: (attrs?: any) => string,
+    private processInline: (text: string) => string,
+    private contentProcessor: any,
+    private evaluator: any
+  ) {}
+
+  public visit(node: ASTNode): string {
+    switch (node.type) {
+      case 'Text':
+        return this.visitText(node as any);
+      case 'Bold':
+        return this.visitBold(node as any);
+      case 'Italic':
+        return this.visitItalic(node as any);
+      case 'Underline':
+        return this.visitUnderline(node as any);
+      case 'Strikethrough':
+        return this.visitStrikethrough(node as any);
+      case 'Code':
+        return this.visitCode(node as any);
+      case 'Superscript':
+        return this.visitSuperscript(node as any);
+      case 'Subscript':
+        return this.visitSubscript(node as any);
+      case 'Highlight':
+        return this.visitHighlight(node as any);
+      case 'InlineStyle':
+        return this.visitInlineStyle(node as any);
+      case 'Link':
+        return this.visitLink(node as any);
+      case 'Image':
+        return this.visitImage(node as any);
+      case 'Video':
+        return this.visitVideo(node as any);
+      case 'Audio':
+        return this.visitAudio(node as any);
+      case 'Embed':
+        return this.visitEmbed(node as any);
+      case 'File':
+        return this.visitFile(node as any);
+      case 'Variable':
+        return this.visitVariable(node as any);
+      case 'Expression':
+        return this.visitExpression(node as any);
+      case 'Abbreviation':
+        return this.visitAbbreviation(node as any);
+      case 'CommentInline':
+        return '';
+      default:
+        return (node as any).content || '';
+    }
+  }
+
+  visitText(node: TextNode): string {
+    return this.contentProcessor.processContent(node.content);
+  }
+
+  visitBold(node: BoldNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<strong${attrs}>${inlineHtml}${childrenHtml}</strong>`;
+  }
+
+  visitItalic(node: ItalicNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<em${attrs}>${inlineHtml}${childrenHtml}</em>`;
+  }
+
+  visitUnderline(node: UnderlineNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<u${attrs}>${inlineHtml}${childrenHtml}</u>`;
+  }
+
+  visitStrikethrough(node: StrikethroughNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<del${attrs}>${inlineHtml}${childrenHtml}</del>`;
+  }
+
+  visitCode(node: CodeNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    return `<code${attrs}>${node.content}</code>`;
+  }
+
+  visitSuperscript(node: SuperscriptNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<sup${attrs}>${inlineHtml}${childrenHtml}</sup>`;
+  }
+
+  visitSubscript(node: SubscriptNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<sub${attrs}>${inlineHtml}${childrenHtml}</sub>`;
+  }
+
+  visitHighlight(node: HighlightNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<mark${attrs}>${inlineHtml}${childrenHtml}</mark>`;
+  }
+
+  visitInlineStyle(node: InlineStyleNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const inlineHtml = this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+    return `<span${attrs}>${inlineHtml}${childrenHtml}</span>`;
+  }
+
+  visitLink(node: LinkNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
+    const href = transformHref(this.contentProcessor.processContent(node.href));
+    const childrenHtml =
+      node.children && node.children.length > 0
+        ? this.joinChildren(node.children)
+        : this.processInline(this.contentProcessor.processContent((node as any).content));
+    return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
+  }
+
+  visitImage(node: ImageNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt);
+    return `<img src="${src}" alt="${alt}"${attrs}>`;
+  }
+
+  visitVideo(node: VideoNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    return `<video src="${src}"${attrs}>${alt}</video>`;
+  }
+
+  visitAudio(node: AudioNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const src = this.contentProcessor.processContent(node.src);
+    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    return `<audio src="${src}"${attrs}>${alt}</audio>`;
+  }
+
+  visitEmbed(node: EmbedNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const src = this.contentProcessor.processContent(node.src);
+    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
+    return `<iframe src="${src}"${title}${attrs}></iframe>`;
+  }
+
+  visitFile(node: FileNode): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    const src = transformHref(this.contentProcessor.processContent(node.src));
+    const title = node.title ? this.contentProcessor.processContent(node.title) : null;
+    return `<a href="${src}"${attrs}>${title || src}</a>`;
+  }
+
+  visitVariable(node: VariableNode): string {
+    try {
+      const value = this.evaluator.evaluate('$' + node.name);
+      if (value === null || value === undefined) {
+        return `{$${node.name}}`;
+      }
+      return formatValue(value);
+    } catch {
+      return `{$${node.name}}`;
+    }
+  }
+
+  visitExpression(node: ExpressionNode): string {
+    try {
+      const value = this.evaluator.evaluate(node.expression);
+      if (value === null || value === undefined) {
+        return `{{${node.expression}}}`;
+      }
+      return formatValue(value);
+    } catch {
+      return `{{${node.expression}}}`;
+    }
+  }
+
+  visitAbbreviation(node: AbbreviationNode): string {
+    const attrs = this.buildAttributes(node.attributes);
+    return `<abbr title="${node.definition}"${attrs}>${node.abbreviation}</abbr>`;
+  }
+
+  private buildAttributes(attrs?: any): string {
+    if (!attrs) return '';
+    const parts: string[] = [];
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value !== undefined) {
+        if (value === '') {
+          parts.push(key);
+        } else {
+          const processedValue = this.contentProcessor.processContent(String(value));
+          parts.push(`${key}="${processedValue}"`);
+        }
+      }
+    }
+    return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+}

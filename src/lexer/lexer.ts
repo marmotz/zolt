@@ -448,12 +448,12 @@ export class Lexer {
 
   private matchAbbreviationDef(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^\*\[([A-Z0-9μ]+)]:\s+/.test(remaining);
+    return /^\*\[([A-Za-z0-9μ]+)]:\s+/.test(remaining);
   }
 
   private matchGlobalAbbreviationDef(): boolean {
     const remaining = this.source.slice(this.pos);
-    return /^\*\*\[([A-Z0-9μ]+)]:\s+/.test(remaining);
+    return /^\*\*\[([A-Za-z0-9μ]+)]:\s+/.test(remaining);
   }
 
   private readGlobalAbbreviationDef(): Token {
