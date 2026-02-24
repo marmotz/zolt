@@ -1,0 +1,17 @@
+---
+title: "Variable Usage"
+author: "John Doe"
+date: 2026-02-18
+version: 2.0
+---
+# Using Frontmatter Variables
+
+Reference frontmatter values in your content.
+
+# {$title}
+
+**Author:** {$author}
+**Date:** {$date}
+**Version:** v{$version}
+
+[← Retour à l'index](../frontmatter.zlt)

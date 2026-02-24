@@ -1,0 +1,16 @@
+---
+title: "Configured Document"
+toc: true
+toc_depth: 3
+numbering: true
+numbering_style: decimal
+code_highlight: true
+math_rendering: true
+---
+# Document Configuration
+
+**TOC Enabled:** {$toc ? "Yes" : "No"}
+**TOC Depth:** {$toc_depth}
+**Numbering Style:** {$numbering_style}
+
+[← Retour à l'index](../frontmatter.zlt)

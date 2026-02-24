@@ -1,0 +1,20 @@
+---
+show_comments: true
+enable_search: true
+allow_downloads: false
+---
+# Feature Flags
+
+:::if {$show_comments}
+Comments are enabled for this document.
+:::
+
+:::if {$enable_search}
+Search functionality is available.
+:::
+
+:::if {!$allow_downloads}
+Downloads are disabled.
+:::
+
+[← Retour à l'index](../frontmatter.zlt)

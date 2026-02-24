@@ -1,0 +1,23 @@
+---
+title: "Custom Frontmatter"
+difficulty: intermediate
+duration_minutes: 45
+prerequisites:
+  - "Basic Zolt knowledge"
+  - "Text editor experience"
+learning_objectives:
+  - "Master frontmatter syntax"
+  - "Understand YAML basics"
+---
+# Custom Fields
+
+**Difficulty:** {$difficulty}
+**Duration:** {$duration_minutes} minutes
+**Prerequisites:** {{ String.join($prerequisites, ", ") }}
+
+## Objectives
+:::foreach {$learning_objectives as $obj}
+- {$obj}
+:::
+
+[← Retour à l'index](../frontmatter.zlt)

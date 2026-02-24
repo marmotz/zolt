@@ -1,0 +1,30 @@
+---
+title: "Software Documentation"
+version: 1.5.0
+release_date: 2026-02-18
+changelog:
+  - version: "1.5.0"
+    date: 2026-02-18
+    changes:
+      - "Added new export format"
+      - "Fixed parsing bugs"
+  - version: "1.4.0"
+    date: 2026-02-01
+    changes:
+      - "Improved performance"
+      - "Updated documentation"
+---
+# Version Management
+
+# Version {$version}
+
+## Recent Changes
+
+:::foreach {$changelog as $release}
+### v{$release.version} ({$release.date})
+:::foreach {$release.changes as $change}
+- {$change}
+:::
+:::
+
+[← Retour à l'index](../frontmatter.zlt)

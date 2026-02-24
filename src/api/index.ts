@@ -146,17 +146,6 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
       case 'File':
         checkHref(node.src || node.href);
         break;
-      case 'Paragraph':
-      case 'Heading':
-      case 'ListItem':
-      case 'DefinitionTerm':
-      case 'DefinitionDescription':
-      case 'TableCell':
-        if (node.content && typeof node.content === 'string') {
-          const inlineNodes = inlineParser.parse(node.content);
-          inlineNodes.forEach(visit);
-        }
-        break;
     }
 
     if (node.children && Array.isArray(node.children)) {

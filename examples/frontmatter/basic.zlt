@@ -1,0 +1,16 @@
+---
+title: "My Basic Document"
+author: "John Doe"
+date: 2026-02-18
+---
+# Basic Frontmatter
+
+Simple YAML frontmatter at the top of the file.
+
+**Title:** {$title}
+
+**Author:** {$author}
+
+**Date:** {Date.format($date, "DD/MM/YYYY")}
+
+[← Retour à l'index](../frontmatter.zlt)

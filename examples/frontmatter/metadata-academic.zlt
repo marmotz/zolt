@@ -1,0 +1,17 @@
+---
+title: "The Impact of Markup Languages on Technical Documentation"
+author: "Dr. Sarah Johnson"
+institution: "MIT Technology Review"
+date: 2026-02-18
+type: "academic-paper"
+keywords: [markup, documentation, usability]
+abstract: "This paper examines..."
+---
+# Academic Paper Metadata
+
+**Title:** {$title}
+**Author:** {$author} ({$institution})
+**Type:** {$type}
+**Keywords:** {{ String.join($keywords, ", ") }}
+
+[← Retour à l'index](../frontmatter.zlt)

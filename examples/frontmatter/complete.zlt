@@ -1,0 +1,24 @@
+---
+title: "Complete Guide to Zolt"
+author: "Marie Dupont"
+date: 2026-02-18
+version: 2.0
+tags: [documentation, tutorial, zolt]
+description: "A comprehensive guide to the Zolt markup language"
+lang: en
+toc: true
+numbering: true
+theme: professional
+---
+# Complete Frontmatter Example
+
+All commonly used metadata fields.
+
+**Title:** {$title}
+**Author:** {$author}
+**Date:** {$date}
+**Version:** v{$version}
+**Description:** {$description}
+**Tags:** {{ String.join($tags, ", ") }}
+
+[← Retour à l'index](../frontmatter.zlt)

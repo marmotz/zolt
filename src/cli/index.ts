@@ -13,6 +13,7 @@ async function buildFileWithDeps(
   outputDir: string,
   type: 'html' | 'pdf',
   visited: Set<string>,
+  baseInputDir: string,
   customOutputFile?: string
 ): Promise<Set<string>> {
   const absoluteInput = resolve(inputFile);
@@ -28,7 +29,11 @@ async function buildFileWithDeps(
   if (customOutputFile) {
     outputFile = customOutputFile;
   } else {
-    const baseName = basename(absoluteInput).replace(/\.zlt$/, '.html');
+    const relativePath = inputFile.startsWith(baseInputDir)
+      ? inputFile.slice(baseInputDir.length).replace(/^[/\\]+/, '')
+      : basename(inputFile);
+    
+    const baseName = relativePath.replace(/\.zlt$/, '.html');
     outputFile = join(outputDir, baseName);
   }
 
@@ -42,7 +47,13 @@ async function buildFileWithDeps(
   const assets = await getAssetFiles(absoluteInput);
   for (const asset of assets) {
     const fullAssetPath = resolve(inputDir, asset);
-    const destAssetPath = join(outputDir, asset);
+    
+    // Calculate where the asset should go relative to the outputDir
+    // We want it to be in the same relative position as the inputFile
+    const inputRelativeDir = dirname(absoluteInput).startsWith(baseInputDir)
+      ? dirname(absoluteInput).slice(baseInputDir.length).replace(/^[/\\]+/, '')
+      : '';
+    const destAssetPath = join(outputDir, inputRelativeDir, asset);
 
     try {
       const assetStat = await stat(fullAssetPath);
@@ -66,7 +77,7 @@ async function buildFileWithDeps(
     try {
       const linkedStat = await stat(fullLinkedPath);
       if (linkedStat.isFile()) {
-        const subDeps = await buildFileWithDeps(fullLinkedPath, outputDir, type, visited);
+        const subDeps = await buildFileWithDeps(fullLinkedPath, outputDir, type, visited, baseInputDir);
         for (const dep of subDeps) {
           touchedFiles.add(dep);
         }
@@ -252,14 +263,36 @@ async function performBuild(files: string[], output: string | undefined, type: '
   const allTouchedFiles = new Set<string>();
   const visited = new Set<string>();
 
+  // Determine the base input directory to preserve structure
+  let baseInputDir = '';
+  if (files.length > 0) {
+    const absoluteFiles = files.map((f) => resolve(f));
+    baseInputDir = dirname(absoluteFiles[0]);
+
+    // Find common parent directory
+    for (let i = 1; i < absoluteFiles.length; i++) {
+      while (!absoluteFiles[i].startsWith(baseInputDir) && baseInputDir !== '/') {
+        baseInputDir = dirname(baseInputDir);
+      }
+    }
+  }
+
   if (files.length === 1) {
     const inputFile = files[0];
     let outputFile = output;
 
     if (output) {
+      // If output has no extension, assume it's a directory
+      if (!output.endsWith('.html') && !output.endsWith('.pdf')) {
+        await mkdir(output, { recursive: true });
+        const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
+        for (const f of touched) allTouchedFiles.add(f);
+        return allTouchedFiles;
+      }
+
       const outputStat = await stat(output).catch(() => null);
       if (outputStat?.isDirectory()) {
-        const touched = await buildFileWithDeps(inputFile, output, type, visited);
+        const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
         for (const f of touched) allTouchedFiles.add(f);
         return allTouchedFiles;
       } else {
@@ -269,21 +302,30 @@ async function performBuild(files: string[], output: string | undefined, type: '
       outputFile = inputFile.replace(/\.zlt$/, '.html');
     }
 
-    const outputDir = dirname(resolve(outputFile));
-    const touched = await buildFileWithDeps(inputFile, outputDir, type, visited, outputFile);
+    const resolvedOutputFile = resolve(outputFile);
+    const outputDir = dirname(resolvedOutputFile);
+    const touched = await buildFileWithDeps(
+      resolve(inputFile),
+      outputDir,
+      type,
+      visited,
+      baseInputDir,
+      resolvedOutputFile
+    );
     for (const f of touched) allTouchedFiles.add(f);
   } else {
     if (!output) {
       throw new Error('Output directory required for multiple files');
     }
 
+    await mkdir(output, { recursive: true });
     const outputStat = await stat(output).catch(() => null);
     if (!outputStat?.isDirectory()) {
       throw new Error('Output must be a directory for multiple files');
     }
 
     for (const inputFile of files) {
-      const touched = await buildFileWithDeps(inputFile, output, type, visited);
+      const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
       for (const f of touched) allTouchedFiles.add(f);
     }
   }
