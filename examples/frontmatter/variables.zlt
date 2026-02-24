@@ -11,7 +11,9 @@ Reference frontmatter values in your content.
 # {$title}
 
 **Author:** {$author}
+
 **Date:** {$date}
+
 **Version:** v{$version}
 
 [← Retour à l'index](../frontmatter.zlt)

@@ -20,6 +20,7 @@ export class Parser {
   private currentToken: Token;
   private filePath: string;
   private inlineParser: InlineParser;
+  public warnings: { line: number; column: number; message: string; code: string }[] = [];
 
   private definitionCollector: DefinitionCollector;
   private tableParser: TableParser;
@@ -183,7 +184,11 @@ export class Parser {
     const children: ASTNode[] = [];
 
     if (this.match(TokenType.FRONTMATTER)) {
-      children.push(this.frontmatterParser.parseFrontmatter(this.expect.bind(this)));
+      children.push(
+        this.frontmatterParser.parseFrontmatter(this.expect.bind(this), (message, line, column, code) => {
+          this.warnings.push({ line, column, message, code });
+        })
+      );
     }
 
     while (!this.match(TokenType.EOF)) {

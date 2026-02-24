@@ -230,7 +230,7 @@ export interface HorizontalRuleNode {
 
 export interface FrontmatterNode {
   type: 'Frontmatter';
-  data: Record<string, unknown>;
+  data: Record<string, any>;
 }
 
 export interface TripleColonBlockNode {

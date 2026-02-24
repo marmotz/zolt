@@ -367,6 +367,7 @@
 ### Error Resilience
 
 - [ ] Continue parsing on syntax errors (partial - throws errors)
+- [x] Emit warnings for unknown metadata in frontmatter
 - [ ] Emit warnings for syntax errors
 - [ ] Validate attribute syntax
 - [ ] File not found errors for includes

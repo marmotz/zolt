@@ -1235,22 +1235,26 @@ Version : v{$version}
 
 #### Métadonnées Supportées
 
-| Champ         | Type          | Description                     |
-|---------------|---------------|---------------------------------|
-| `title`       | string        | Titre du document               |
-| `author`      | string        | Auteur                          |
-| `date`        | date          | Date de création                |
-| `version`     | string/number | Version du document             |
-| `tags`        | array         | Liste de tags                   |
-| `description` | string        | Description courte              |
-| `lang`        | string        | Code langue (fr, en, etc.)      |
-| `toc`         | boolean       | Afficher la TOC automatiquement |
-| `theme`       | string        | Thème de rendu (voir ci-dessous)|
-| `color-scheme`| string        | `auto`, `light`, `dark`         |
+| Champ          | Type          | Description                         |
+|----------------|---------------|-------------------------------------|
+| `title`        | string        | Titre du document                   |
+| `author`       | string        | Auteur                              |
+| `date`         | date          | Date de création                    |
+| `version`      | string/number | Version du document                 |
+| `tags`         | array         | Liste de tags                       |
+| `description`  | string        | Description courte                  |
+| `keywords`     | array/string  | Mots-clés pour le SEO               |
+| `robots`       | string        | Instructions robots (ex: "noindex") |
+| `image`        | string        | Image de partage (Open Graph)       |
+| `lang`         | string        | Code langue (fr, en, etc.)          |
+| `toc`          | boolean       | Afficher la TOC automatiquement     |
+| `theme`        | string        | Thème de rendu (voir ci-dessous)    |
+| `color-scheme` | string        | `auto`, `light`, `dark`             |
 
 #### Thèmes Disponibles
 
-Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement aux préférences de l'utilisateur (Light/Dark mode) :
+Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement aux préférences de l'utilisateur (Light/Dark
+mode) :
 
 - **`default`** (par défaut) : Moderne, propre et équilibré.
 - **`professional`** : Typographie serif pour les titres, couleurs sobres, idéal pour les rapports.

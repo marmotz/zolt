@@ -3,14 +3,12 @@ import { Builder } from '../builder/builder';
 import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
-import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
-import { FrontmatterUtils } from '../utils/frontmatter';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
-  variables?: Record<string, unknown>;
+  variables?: Record<string, any>;
   frontMatter?: boolean;
   filePath?: string;
 }
@@ -69,7 +67,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const parser = new Parser(tokens, options?.filePath);
   const ast = parser.parse();
 
-  // The parser now extracts the frontmatter. We should ensure the evaluator 
+  // The parser now extracts the frontmatter. We should ensure the evaluator
   // has those variables before the builder starts.
   if (ast.frontmatter) {
     for (const [key, value] of Object.entries(ast.frontmatter.data)) {
@@ -112,7 +110,6 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
 
   const zltLinks: string[] = [];
   const otherAssets: string[] = [];
-  const inlineParser = new InlineParser();
 
   const visit = (node: any) => {
     if (!node) return;
@@ -201,6 +198,11 @@ export async function lint(filePath: string): Promise<LintResult> {
 
     const parser = new Parser(tokens, filePath);
     parser.parse();
+
+    // Collect warnings from parser
+    for (const w of parser.warnings) {
+      warnings.push(w);
+    }
 
     return {
       valid: errors.length === 0,

@@ -1,35 +1,34 @@
 # Frontmatter Examples in Zolt
 
-Ce fichier sert d'index pour tester les différentes fonctionnalités du Frontmatter (métadonnées YAML) dans Zolt. Cliquez sur les liens ci-dessous pour tester chaque scénario individuellement.
+This file serves as an index to test various Frontmatter features (YAML metadata) in Zolt. Click the links below to test each scenario individually.
 
-## Exemples de Base
-- [Configuration de base](frontmatter/basic.zlt) — Titre, auteur et date simples.
-- [Exemple complet](frontmatter/complete.zlt) — Utilisation de tous les champs standards (tags, description, version, etc.).
-- [Utilisation des variables](frontmatter/variables.zlt) — Comment injecter les valeurs du frontmatter dans le contenu.
+## Basic Examples
+- [Basic Configuration](frontmatter/basic.zlt) — Simple title, author, and date.
+- [Complete Example](frontmatter/complete.zlt) — Using all standard fields (tags, description, version, etc.).
+- [Variable Usage](frontmatter/variables.zlt) — How to inject frontmatter values into the content.
 
-## Métadonnées Spécifiques
-- [Papier Académique](frontmatter/metadata-academic.zlt) — Institution, type de document, mots-clés et abstract.
-- [Article de Blog](frontmatter/metadata-blog.zlt) — Catégories, images de couverture et statut "featured".
-- [Projet Open Source](frontmatter/project.zlt) — Dépôt GitHub, licence et contributeurs.
+## Specific Metadata
+- [Blog Post](frontmatter/metadata-blog.zlt) — Categories, cover images, and "featured" status.
+- [Open Source Project](frontmatter/project.zlt) — GitHub repository, license, and contributors.
 
-## Logique et Conditions
-- [Sélection de Thème](frontmatter/conditional-theme.zlt) — Changement de style basé sur une variable.
-- [Thèmes et Couleurs](themes.zlt) — Index complet des thèmes intégrés et des modes Light/Dark.
-- [Feature Flags](frontmatter/conditional-features.zlt) — Affichage conditionnel de sections (commentaires, recherche, etc.).
+## Logic and Conditions
+- [Theme Selection](frontmatter/conditional-theme.zlt) — Style change based on a variable.
+- [Themes and Colors](themes.zlt) — Complete index of built-in themes and Light/Dark modes.
+- [Feature Flags](frontmatter/conditional-features.zlt) — Conditional display of sections (comments, search, etc.).
 
-## Gestion de Contenu Avancée
-- [Auteurs Multiples](frontmatter/authors.zlt) — Itération sur une liste d'auteurs avec rôles et emails.
-- [Gestion de Version](frontmatter/versioning.zlt) — Historique des changements (changelog) structuré en YAML.
-- [Localisation](frontmatter/localization.zlt) — Langue, locale et direction du texte.
-- [Multilingue](frontmatter/advanced-multi-lang.zlt) — Liste de fichiers par langue.
-- [Séries de Documents](frontmatter/advanced-series.zlt) — Navigation entre les parties d'un tutoriel.
-- [Champs Personnalisés](frontmatter/custom-fields.zlt) — Définition de métadonnées propres à vos besoins (difficulté, durée, etc.).
+## Advanced Content Management
+- [Multiple Authors](frontmatter/authors.zlt) — Iterating over a list of authors with roles and emails.
+- [Version Management](frontmatter/versioning.zlt) — Change history (changelog) structured in YAML.
+- [Localization](frontmatter/localization.zlt) — Language, locale, and text direction.
+- [Multi-language](frontmatter/advanced-multi-lang.zlt) — List of files by language.
+- [Document Series](frontmatter/advanced-series.zlt) — Navigation between tutorial parts.
+- [Custom Fields](frontmatter/custom-fields.zlt) — Defining metadata specific to your needs (difficulty, duration, etc.).
 
-## Modèles Courants (Patterns)
-- [Documentation API](frontmatter/patterns-api.zlt) — Configuration type pour une API (base URL, auth, etc.).
+## Common Patterns
+- [API Documentation](frontmatter/patterns-api.zlt) — Typical configuration for an API (base URL, auth, etc.).
 
-## Configuration du Document
-- [Paramètres de Rendu](frontmatter/config.zlt) — Contrôle du TOC, de la numérotation et du highlighting.
+## Document Configuration
+- [Rendering Parameters](frontmatter/config.zlt) — Control over TOC, numbering, and highlighting.
 
 ---
-[← Retour à l'Index des Exemples](index.zlt)
+[← Back to Examples Index](index.zlt)
