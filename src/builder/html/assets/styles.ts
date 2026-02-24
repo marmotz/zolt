@@ -217,6 +217,21 @@ export const DEFAULT_CSS = `
     color: #666;
     font-size: 0.9em;
   }
+  .zolt-chart {
+    margin: 2rem 0;
+    width: 100%;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  .zolt-chart-series {
+    display: none;
+  }
+  .zolt-chart canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
   :target {
     scroll-margin-top: 2rem;
     animation: zolt-anchor-highlight 3s ease-out;

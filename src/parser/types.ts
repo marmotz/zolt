@@ -355,7 +355,7 @@ export interface ChartNode {
 
 export interface ChartSeriesNode {
   type: 'ChartSeries';
-  chartType: 'line' | 'bar' | 'pie' | 'area';
+  chartType: 'line' | 'bar' | 'pie' | 'area' | 'doughnut';
   title?: string;
   data: ChartDataPoint[];
   attributes?: Attributes;

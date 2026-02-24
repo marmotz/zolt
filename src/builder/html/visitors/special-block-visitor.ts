@@ -252,19 +252,32 @@ export class SpecialBlockVisitor {
 
   visitChart(node: any): string {
     this.hasCharts = true;
-    const attrs = this.renderAllAttributes(node.attributes);
+    
+    const filteredAttrs: Attributes = {};
+    if (node.attributes) {
+      for (const [key, value] of Object.entries(node.attributes)) {
+        if (key !== 'legend' && key !== 'grid' && key !== 'stacked') {
+          filteredAttrs[key] = value;
+        }
+      }
+    }
+    
+    const attrs = this.renderAllAttributes(Object.keys(filteredAttrs).length > 0 ? filteredAttrs : undefined);
     const layoutAttr = node.layout ? ` data-layout="${node.layout}"` : '';
+    const legendAttr = node.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
+    const gridAttr = node.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
+    const stackedAttr = node.attributes?.['stacked'] === 'true' ? ' data-stacked="true"' : '';
 
     const seriesHtml = node.children.map((series: any) => this.visitChartSeries(series)).join('\n');
 
-    return `<div${attrs}${layoutAttr} class="zolt-chart">\n${seriesHtml}\n</div>`;
+    return `<div${attrs}${layoutAttr}${legendAttr}${gridAttr}${stackedAttr} class="zolt-chart">\n${seriesHtml}\n</div>`;
   }
 
   private visitChartSeries(series: any): string {
     const filteredAttrs: Attributes = {};
     if (series.attributes) {
       for (const [key, value] of Object.entries(series.attributes)) {
-        if (key !== 'title' && key !== 'color-scheme' && key !== 'legend' && key !== 'grid') {
+        if (key !== 'title' && key !== 'color-scheme' && key !== 'legend' && key !== 'grid' && key !== 'stacked') {
           filteredAttrs[key] = value;
         }
       }
@@ -278,10 +291,11 @@ export class SpecialBlockVisitor {
       : '';
     const legendAttr = series.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
     const gridAttr = series.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
+    const stackedAttr = series.attributes?.['stacked'] === 'true' ? ' data-stacked="true"' : '';
 
     const dataJson = JSON.stringify(series.data);
 
-    return `  <div${attrs}${titleAttr}${schemeAttr}${legendAttr}${gridAttr}\n       class="zolt-chart-series"\n       data-chart-type="${series.chartType}"\n       data-data='${this.escapeHtml(dataJson)}'>\n  </div>`;
+    return `  <div${attrs}${titleAttr}${schemeAttr}${legendAttr}${gridAttr}${stackedAttr}\n       class="zolt-chart-series"\n       data-chart-type="${series.chartType}"\n       data-data='${this.escapeHtml(dataJson)}'>\n  </div>`;
   }
 
   visitMermaid(node: any): string {
