@@ -12,7 +12,7 @@ robots: "index, follow"
 ---
 # Content`;
     const html = await buildString(content);
-    
+
     expect(html).toContain('<meta name="description" content="A cool document about Zolt">');
     expect(html).toContain('<meta name="author" content="Zolt Developer">');
     expect(html).toContain('<meta name="keywords" content="zolt, markup, parser">');
@@ -27,7 +27,7 @@ image: "https://example.com/cover.jpg"
 ---
 # Content`;
     const html = await buildString(content);
-    
+
     expect(html).toContain('<meta property="og:title" content="Social Media Test">');
     expect(html).toContain('<meta property="og:description" content="Share me on Twitter">');
     expect(html).toContain('<meta property="og:image" content="https://example.com/cover.jpg">');

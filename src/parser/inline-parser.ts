@@ -36,7 +36,9 @@ export class InlineParser {
   }
 
   parse(text: string): ASTNode[] {
-    if (!text) return [];
+    if (!text) {
+      return [];
+    }
     const nodes: ASTNode[] = [];
     let remaining = text;
 
@@ -61,7 +63,9 @@ export class InlineParser {
   }
 
   private applyAutoAbbreviations(nodes: ASTNode[]): ASTNode[] {
-    if (this.globalAbbreviations.size === 0) return nodes;
+    if (this.globalAbbreviations.size === 0) {
+      return nodes;
+    }
 
     const result: ASTNode[] = [];
     const abbrs = Array.from(this.globalAbbreviations.keys());
@@ -107,31 +111,66 @@ export class InlineParser {
   }
 
   private parseInlineElement(text: string): { node: ASTNode; remaining: string } | null {
-    if (this.matchPattern(text, /^\{\{(.+?)}}/)) return this.parseExpression(text);
-    if (this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/))
+    if (this.matchPattern(text, /^\{\{(.+?)}}/)) {
+      return this.parseExpression(text);
+    }
+    if (this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/)) {
       return this.parseVariable(text);
-    if (this.matchPattern(text, /^%%/)) return this.parseCommentInline(text);
-    if (this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)/)) return this.parseVideo(text);
-    if (this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)/)) return this.parseAudio(text);
-    if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/)) return this.parseEmbed(text);
-    if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/)) return this.parseFile(text);
-    if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/)) return this.parseImage(text);
-    if (
-      this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/) ||
-      this.matchPattern(text, /^\[([^\]]+)]\[([^\]]*)]/)
-    )
+    }
+    if (this.matchPattern(text, /^%%/)) {
+      return this.parseCommentInline(text);
+    }
+    if (this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)/)) {
+      return this.parseVideo(text);
+    }
+    if (this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)/)) {
+      return this.parseAudio(text);
+    }
+    if (this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/)) {
+      return this.parseEmbed(text);
+    }
+    if (this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/)) {
+      return this.parseFile(text);
+    }
+    if (this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/)) {
+      return this.parseImage(text);
+    }
+    if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/) || this.matchPattern(text, /^\[([^\]]+)]\[([^\]]*)]/)) {
       return this.parseLink(text);
-    if (this.matchPattern(text, /^\^\{([^}]+)}/)) return this.parseSuperscript(text);
-    if (this.matchPattern(text, /^_\{([^}]+)}/)) return this.parseSubscript(text);
-    if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) return this.parseInlineStyle(text);
-    if (this.matchPattern(text, /^\*\*(.+?)\*\*/)) return this.parseBold(text);
-    if (this.matchPattern(text, /^\/\/(.+?)\/\//)) return this.parseItalic(text);
-    if (this.matchPattern(text, /^__(.+?)__/)) return this.parseUnderline(text);
-    if (this.matchPattern(text, /^~~(.+?)~~/)) return this.parseStrikethrough(text);
-    if (this.matchPattern(text, /^==(.+?)==/)) return this.parseHighlight(text);
-    if (this.matchPattern(text, /^`([^`]+)`/)) return this.parseCode(text);
-    if (this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i)) return this.parseInclude(text);
-    if (this.matchPattern(text, /^([A-Za-z0-9μ]+)\{abbr="([^"]+)"([^}]*)}/)) return this.parseAbbreviation(text);
+    }
+    if (this.matchPattern(text, /^\^\{([^}]+)}/)) {
+      return this.parseSuperscript(text);
+    }
+    if (this.matchPattern(text, /^_\{([^}]+)}/)) {
+      return this.parseSubscript(text);
+    }
+    if (this.matchPattern(text, /^\|\|([^|]+)\|\|/)) {
+      return this.parseInlineStyle(text);
+    }
+    if (this.matchPattern(text, /^\*\*(.+?)\*\*/)) {
+      return this.parseBold(text);
+    }
+    if (this.matchPattern(text, /^\/\/(.+?)\/\//)) {
+      return this.parseItalic(text);
+    }
+    if (this.matchPattern(text, /^__(.+?)__/)) {
+      return this.parseUnderline(text);
+    }
+    if (this.matchPattern(text, /^~~(.+?)~~/)) {
+      return this.parseStrikethrough(text);
+    }
+    if (this.matchPattern(text, /^==(.+?)==/)) {
+      return this.parseHighlight(text);
+    }
+    if (this.matchPattern(text, /^`([^`]+)`/)) {
+      return this.parseCode(text);
+    }
+    if (this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i)) {
+      return this.parseInclude(text);
+    }
+    if (this.matchPattern(text, /^([A-Za-z0-9μ]+)\{abbr="([^"]+)"([^}]*)}/)) {
+      return this.parseAbbreviation(text);
+    }
 
     return null;
   }
@@ -201,7 +240,9 @@ export class InlineParser {
 
   private parseImage(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^!\[([^\]]*)]\(([^)]+)\)/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const alt = match[1];
     const src = match[2];
@@ -229,7 +270,9 @@ export class InlineParser {
 
   private parseVideo(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^!!\[([^\]]*)]\(([^)]+)\)/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const alt = match[1];
     const src = match[2];
@@ -257,7 +300,9 @@ export class InlineParser {
 
   private parseAudio(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\?\?\[([^\]]*)]\(([^)]+)\)/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const alt = match[1];
     const src = match[2];
@@ -285,7 +330,9 @@ export class InlineParser {
 
   private parseEmbed(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^@@\[([^\]]*)]\(([^)]+)\)/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const title = match[1];
     const src = match[2];
@@ -313,7 +360,9 @@ export class InlineParser {
 
   private parseFile(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^&&\[([^\]]*)]\(([^)]+)\)/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const title = match[1];
     const src = match[2];
@@ -341,7 +390,9 @@ export class InlineParser {
 
   private parseBold(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\*\*(.+?)\*\*/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -363,7 +414,9 @@ export class InlineParser {
 
   private parseItalic(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\/\/(.+?)\/\//);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -385,7 +438,9 @@ export class InlineParser {
 
   private parseUnderline(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^__(.+?)__/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -407,7 +462,9 @@ export class InlineParser {
 
   private parseStrikethrough(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^~~(.+?)~~/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -429,7 +486,9 @@ export class InlineParser {
 
   private parseHighlight(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^==(.+?)==/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -451,7 +510,9 @@ export class InlineParser {
 
   private parseCode(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^`([^`]+)`/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -472,10 +533,14 @@ export class InlineParser {
   }
 
   private parseSuperscript(text: string): { node: ASTNode; remaining: string } | null {
-    if (!text.startsWith('^{')) return null;
+    if (!text.startsWith('^{')) {
+      return null;
+    }
 
     const content = this.extractBalancedBraces(text, 2);
-    if (content === null) return null;
+    if (content === null) {
+      return null;
+    }
 
     let remaining = text.slice(2 + content.length + 1);
     let attributes: Attributes | undefined;
@@ -495,10 +560,14 @@ export class InlineParser {
   }
 
   private parseSubscript(text: string): { node: ASTNode; remaining: string } | null {
-    if (!text.startsWith('_{')) return null;
+    if (!text.startsWith('_{')) {
+      return null;
+    }
 
     const content = this.extractBalancedBraces(text, 2);
-    if (content === null) return null;
+    if (content === null) {
+      return null;
+    }
 
     let remaining = text.slice(2 + content.length + 1);
     let attributes: Attributes | undefined;
@@ -518,7 +587,9 @@ export class InlineParser {
   }
 
   private extractBalancedBraces(text: string, startIndex: number): string | null {
-    if (startIndex >= text.length || text[startIndex - 1] !== '{') return null;
+    if (startIndex >= text.length || text[startIndex - 1] !== '{') {
+      return null;
+    }
 
     let depth = 1;
     let i = startIndex;
@@ -533,14 +604,18 @@ export class InlineParser {
       i++;
     }
 
-    if (depth !== 0) return null;
+    if (depth !== 0) {
+      return null;
+    }
 
     return text.slice(startIndex, i - 1);
   }
 
   private parseInlineStyle(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\|\|([^|]+)\|\|/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const content = match[1];
     let remaining = text.slice(match[0].length);
@@ -561,7 +636,9 @@ export class InlineParser {
   }
 
   public static parseAttributes(attrStr?: string): Attributes | undefined {
-    if (!attrStr) return undefined;
+    if (!attrStr) {
+      return undefined;
+    }
 
     const attrs: Attributes = {};
     let remaining = attrStr.startsWith('{') && attrStr.endsWith('}') ? attrStr.slice(1, -1) : attrStr;
@@ -645,7 +722,9 @@ export class InlineParser {
 
   private parseInclude(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     return {
       node: { type: 'Include', path: match[1] } as any,
@@ -655,7 +734,9 @@ export class InlineParser {
 
   private parseAbbreviation(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^([A-Za-z0-9μ]+)\{abbr="([^"]+)"([^}]*)}/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const abbreviation = match[1];
     const definition = match[2];
@@ -723,7 +804,9 @@ export class InlineParser {
 
   private parseExpression(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\{\{(.+?)}}/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     return {
       node: { type: 'Expression', expression: match[1] } as ExpressionNode,
@@ -733,7 +816,9 @@ export class InlineParser {
 
   private parseVariable(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     return {
       node: { type: 'Variable', name: match[1], isGlobal: true } as VariableNode,
@@ -747,7 +832,9 @@ export class InlineParser {
 
   private parseCommentInline(text: string): { node: ASTNode; remaining: string } | null {
     const match = this.matchPattern(text, /^%%/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     let content = '';
     let i = 2;

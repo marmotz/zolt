@@ -1,13 +1,16 @@
-import { TokenType, Token } from '../../lexer/token-types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { TableNode, TableRowNode, TableCellNode } from '../types';
+import { TableCellNode, TableNode, TableRowNode } from '../types';
 
 export class TableParser {
   constructor(private inlineParser: InlineParser) {}
 
   public isTableStart(token: Token): boolean {
-    if (token.type !== TokenType.TEXT) return false;
+    if (token.type !== TokenType.TEXT) {
+      return false;
+    }
     const value = token.value.trim();
+
     return value.startsWith('|') && !value.startsWith('||');
   }
 
@@ -92,9 +95,16 @@ export class TableParser {
       const startsWithColon = trimmed.startsWith(':');
       const endsWithColon = trimmed.endsWith(':');
 
-      if (startsWithColon && endsWithColon) return 'center';
-      if (endsWithColon) return 'right';
-      if (startsWithColon) return 'left';
+      if (startsWithColon && endsWithColon) {
+        return 'center';
+      }
+      if (endsWithColon) {
+        return 'right';
+      }
+      if (startsWithColon) {
+        return 'left';
+      }
+
       return undefined;
     });
   }

@@ -1,6 +1,6 @@
-import { TokenType, Token } from '../../lexer/token-types';
-import { Attributes, ParagraphNode } from '../types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
+import { Attributes, ParagraphNode } from '../types';
 
 export class ParagraphParser {
   constructor(private inlineParser: InlineParser) {}
@@ -13,6 +13,7 @@ export class ParagraphParser {
     isNewBlockStart: (offset?: number) => boolean
   ): ParagraphNode {
     let content = '';
+    let isFirstLine = true;
 
     while (!isEof()) {
       if (match(TokenType.NEWLINE)) {
@@ -25,37 +26,36 @@ export class ParagraphParser {
         continue;
       }
 
-      if (isNewBlockStart()) {
+      if (!isFirstLine && isNewBlockStart()) {
         break;
       }
 
       content += advance().value;
+      isFirstLine = false;
     }
 
     content = content.trim();
-    const isVariableDef = /^\$+\w+\s*=/.test(content);
-    let attributes: Attributes | undefined;
-    if (!isVariableDef) {
-      const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
-      if (attrMatchWithSpace) {
-        const attrContent = attrMatchWithSpace[1];
-        if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
-          attributes = InlineParser.parseAttributes(attrContent);
-          content = content.slice(0, -attrMatchWithSpace[0].length).trim();
-        }
-      } else {
-        const attrMatchNoSpace = content.match(/(\{([^}]+)})$/);
-        if (attrMatchNoSpace) {
-          const fullMatch = attrMatchNoSpace[1];
-          const attrContent = attrMatchNoSpace[2];
-          const beforeIndex = content.length - fullMatch.length - 1;
-          const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
-          const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
 
-          if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
-            attributes = InlineParser.parseAttributes(attrContent);
-            content = content.slice(0, -fullMatch.length).trim();
-          }
+    let attributes: Attributes | undefined;
+    const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
+    if (attrMatchWithSpace) {
+      const attrContent = attrMatchWithSpace[1];
+      if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+        attributes = InlineParser.parseAttributes(attrContent);
+        content = content.slice(0, -attrMatchWithSpace[0].length).trim();
+      }
+    } else {
+      const attrMatchNoSpace = content.match(/(\{([^}]+)})$/);
+      if (attrMatchNoSpace) {
+        const fullMatch = attrMatchNoSpace[1];
+        const attrContent = attrMatchNoSpace[2];
+        const beforeIndex = content.length - fullMatch.length - 1;
+        const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
+        const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
+
+        if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
+          attributes = InlineParser.parseAttributes(attrContent);
+          content = content.slice(0, -fullMatch.length).trim();
         }
       }
     }

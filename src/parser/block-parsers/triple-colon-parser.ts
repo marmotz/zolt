@@ -1,27 +1,23 @@
 import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { 
-  ASTNode, 
-  Attributes, 
-  MermaidNode, 
-  ChartNode, 
-  ChartSeriesNode, 
+import {
+  ASTNode,
+  Attributes,
   ChartDataPoint,
-  TripleColonBlockNode
+  ChartNode,
+  ChartSeriesNode,
+  MermaidNode,
+  TripleColonBlockNode,
 } from '../types';
 
 export class TripleColonParser {
-  constructor(private inlineParser: InlineParser) {}
-
   public parseTripleColonBlock(
-    tokens: Token[],
     advance: () => Token,
     expect: (type: TokenType) => Token,
     match: (...types: TokenType[]) => boolean,
     skipNewlines: () => void,
     isEof: () => boolean,
-    parseBlock: () => ASTNode | null,
-    error: (message: string, code: string) => never
+    parseBlock: () => ASTNode | null
   ): ASTNode {
     const startToken = expect(TokenType.TRIPLE_COLON_START);
     const value = startToken.value;
@@ -74,7 +70,7 @@ export class TripleColonParser {
 
     // Handle Chart blocks
     if (blockType === 'chart' || blockType.startsWith('chart-')) {
-      return this.parseChartBlock(blockType, title, attributes, advance, expect, match, skipNewlines, isEof);
+      return this.parseChartBlock(blockType, title, attributes, advance, match, skipNewlines, isEof);
     }
 
     const children: ASTNode[] = [];
@@ -107,7 +103,7 @@ export class TripleColonParser {
     isEof: () => boolean
   ): MermaidNode {
     const content: string[] = [];
-    
+
     while (!isEof() && !match(TokenType.TRIPLE_COLON_END)) {
       const token = advance();
       content.push(token.value);
@@ -128,7 +124,6 @@ export class TripleColonParser {
     title: string | undefined,
     attributes: Attributes | undefined,
     advance: () => Token,
-    expect: (type: TokenType) => Token,
     match: (...types: TokenType[]) => boolean,
     skipNewlines: () => void,
     isEof: () => boolean
@@ -202,7 +197,7 @@ export class TripleColonParser {
           skipNewlines();
           continue;
         } else {
-           this.skipTripleColonBlock(advance, match, isEof);
+          this.skipTripleColonBlock(advance, match, isEof);
         }
       } else {
         advance();
@@ -247,7 +242,7 @@ export class TripleColonParser {
     isEof: () => boolean
   ): ChartDataPoint[] {
     const data: ChartDataPoint[] = [];
-    this.skipNewlinesWithAdvance(advance, match, isEof);
+    this.skipNewlinesWithAdvance(advance, match);
 
     while (!isEof() && !match(TokenType.TRIPLE_COLON_END)) {
       if (match(TokenType.NEWLINE)) {
@@ -280,14 +275,11 @@ export class TripleColonParser {
     while (!isEof() && !match(TokenType.NEWLINE) && !match(TokenType.TRIPLE_COLON_END)) {
       text += advance().value;
     }
+
     return text;
   }
 
-  private skipNewlinesWithAdvance(
-    advance: () => Token,
-    match: (...types: TokenType[]) => boolean,
-    isEof: () => boolean
-  ): void {
+  private skipNewlinesWithAdvance(advance: () => Token, match: (...types: TokenType[]) => boolean): void {
     while (match(TokenType.NEWLINE)) {
       advance();
     }
@@ -295,10 +287,14 @@ export class TripleColonParser {
 
   private parseChartDataLine(line: string): ChartDataPoint | null {
     const trimmed = line.trim();
-    if (!trimmed) return null;
+    if (!trimmed) {
+      return null;
+    }
 
     const match = trimmed.match(/^([^:]+):\s*(.+)$/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const [, label, rawValue] = match;
     const value = this.parseChartValue(rawValue.trim());
@@ -315,6 +311,7 @@ export class TripleColonParser {
         return num;
       }
     }
+
     return rawValue;
   }
 }

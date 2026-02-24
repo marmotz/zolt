@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test';
+import { expect, test } from 'bun:test';
 import { ContentProcessor } from './content-processor';
 import { ExpressionEvaluator } from './expression-evaluator';
 
@@ -6,12 +6,7 @@ test('should handle multi-line object variables', () => {
   const evaluator = new ExpressionEvaluator();
   const processor = new ContentProcessor(evaluator);
 
-  const content = [
-    '$obj = {',
-    '  key: "value",',
-    '  num: 42',
-    '}'
-  ].join('\n');
+  const content = ['$obj = {', '  key: "value",', '  num: 42', '}'].join('\n');
 
   processor.processContent(content);
 
@@ -33,7 +28,7 @@ test('should handle nested multi-line objects and arrays', () => {
     '    {name: "Lamp", price: 49},',
     '    {name: "Chair", price: 149}',
     '  ]',
-    '}'
+    '}',
   ].join('\n');
 
   processor.processContent(content);

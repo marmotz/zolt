@@ -162,7 +162,8 @@ describe('Lexer', () => {
     const tokens = lexer.tokenize();
 
     expect(tokens[0].line).toBe(1);
-    expect(tokens[1].line).toBe(2);
+    expect(tokens[1].line).toBe(1); // NEWLINE after line 1
+    expect(tokens[2].line).toBe(2); // Line 2
   });
 
   test('should tokenize heading with correct level', () => {

@@ -1,4 +1,4 @@
-import { TokenType, Token } from '../../lexer/token-types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { ASTNode, IndentationNode, ParagraphNode } from '../types';
 import { ListParser } from './list-parser';
 import { TripleColonParser } from './triple-colon-parser';
@@ -11,6 +11,7 @@ export class IndentationParser {
 
   public parseIndentation(expect: (type: TokenType) => Token): any {
     const token = expect(TokenType.INDENTATION);
+
     return { type: 'Indentation', level: token.value.length / 2, children: [] };
   }
 
@@ -35,8 +36,19 @@ export class IndentationParser {
     const children: ASTNode[] = [];
 
     const firstLineContent = this.parseIndentationLineContent(
-      tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-      parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
+      tokens,
+      pos,
+      currentToken,
+      advance,
+      expect,
+      match,
+      skipNewlines,
+      isEof,
+      parseBlock,
+      parseHeading,
+      parseCodeBlock,
+      parseHorizontalRule,
+      parseParagraph
     );
     if (firstLineContent) children.push(firstLineContent);
 
@@ -45,16 +57,41 @@ export class IndentationParser {
         const nextLevel = currentToken().level || 1;
         if (nextLevel < baseLevel) break;
         if (nextLevel > baseLevel) {
-          children.push(this.parseTechnicalIndentation(
-            tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-            parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
-          ));
+          children.push(
+            this.parseTechnicalIndentation(
+              tokens,
+              pos,
+              currentToken,
+              advance,
+              expect,
+              match,
+              skipNewlines,
+              isEof,
+              parseBlock,
+              parseHeading,
+              parseCodeBlock,
+              parseHorizontalRule,
+              parseParagraph,
+              error
+            )
+          );
           continue;
         }
         advance();
         const lineContent = this.parseIndentationLineContent(
-          tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-          parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
+          tokens,
+          pos,
+          currentToken,
+          advance,
+          expect,
+          match,
+          skipNewlines,
+          isEof,
+          parseBlock,
+          parseHeading,
+          parseCodeBlock,
+          parseHorizontalRule,
+          parseParagraph
         );
         if (lineContent) children.push(lineContent);
         continue;
@@ -63,6 +100,7 @@ export class IndentationParser {
       advance();
       if (match(TokenType.NEWLINE)) break;
     }
+
     return { type: 'Indentation', level: baseLevel, children };
   }
 
@@ -79,31 +117,27 @@ export class IndentationParser {
     parseHeading: () => ASTNode,
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
-    parseParagraph: () => ParagraphNode,
-    error: (message: string, code: string) => never
+    parseParagraph: () => ParagraphNode
   ): ASTNode | null {
-    if (match(TokenType.TECHNICAL_INDENT, TokenType.NEWLINE, TokenType.EOF)) return null;
-    if (match(TokenType.HEADING)) return parseHeading();
-    if (match(TokenType.CODE_BLOCK_START)) return parseCodeBlock();
-    if (match(TokenType.HORIZONTAL_RULE)) return parseHorizontalRule();
+    if (match(TokenType.TECHNICAL_INDENT, TokenType.NEWLINE, TokenType.EOF)) {
+      return null;
+    }
+    if (match(TokenType.HEADING)) {
+      return parseHeading();
+    }
+    if (match(TokenType.CODE_BLOCK_START)) {
+      return parseCodeBlock();
+    }
+    if (match(TokenType.HORIZONTAL_RULE)) {
+      return parseHorizontalRule();
+    }
     if (match(TokenType.TRIPLE_COLON_START)) {
-      const { node, newPos } = this.tripleColonParser.parseTripleColonBlock(
-        tokens,
-        pos.current,
-        advance,
-        expect,
-        match,
-        skipNewlines,
-        isEof,
-        parseBlock,
-        error
-      );
-      pos.current = newPos;
-      return node;
+      return this.tripleColonParser.parseTripleColonBlock(advance, expect, match, skipNewlines, isEof, parseBlock);
     }
     if (match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
       return this.parseIndentationList(tokens, pos, currentToken, advance, match, skipNewlines, isEof, parseBlock);
     }
+
     return parseParagraph();
   }
 
@@ -145,6 +179,7 @@ export class IndentationParser {
         advance();
       }
     }
+
     return { type: 'List', kind, children };
   }
 }

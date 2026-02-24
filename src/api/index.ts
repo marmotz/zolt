@@ -99,6 +99,7 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
+
   return buildString(content, { ...options, filePath });
 }
 
@@ -112,10 +113,14 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
   const otherAssets: string[] = [];
 
   const visit = (node: any) => {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     const checkHref = (href: string) => {
-      if (!href) return;
+      if (!href) {
+        return;
+      }
       if (
         href.startsWith('http://') ||
         href.startsWith('https://') ||
@@ -177,12 +182,14 @@ export function extractZltLinks(content: string): string[] {
 export async function getLinkedFiles(inputPath: string): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { zltLinks } = extractAllAssets(content);
+
   return zltLinks;
 }
 
 export async function getAssetFiles(inputPath: string): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { otherAssets } = extractAllAssets(content);
+
   return otherAssets;
 }
 

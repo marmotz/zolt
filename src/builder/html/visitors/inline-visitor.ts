@@ -1,24 +1,24 @@
-import { 
-  TextNode, 
-  BoldNode, 
-  ItalicNode, 
-  UnderlineNode, 
-  StrikethroughNode, 
-  CodeNode, 
-  SuperscriptNode, 
-  SubscriptNode, 
-  HighlightNode, 
-  InlineStyleNode, 
-  LinkNode, 
-  ImageNode, 
-  VideoNode, 
-  AudioNode, 
-  EmbedNode, 
-  FileNode, 
-  VariableNode, 
-  ExpressionNode, 
+import {
   AbbreviationNode,
-  ASTNode 
+  ASTNode,
+  AudioNode,
+  BoldNode,
+  CodeNode,
+  EmbedNode,
+  ExpressionNode,
+  FileNode,
+  HighlightNode,
+  ImageNode,
+  InlineStyleNode,
+  ItalicNode,
+  LinkNode,
+  StrikethroughNode,
+  SubscriptNode,
+  SuperscriptNode,
+  TextNode,
+  UnderlineNode,
+  VariableNode,
+  VideoNode,
 } from '../../../parser/types';
 import { formatValue, transformHref } from '../utils/string-utils';
 
@@ -83,73 +83,72 @@ export class InlineVisitor {
 
   visitBold(node: BoldNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<strong${attrs}>${inlineHtml}${childrenHtml}</strong>`;
+
+    return `<strong${attrs}>${childrenHtml}</strong>`;
   }
 
   visitItalic(node: ItalicNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<em${attrs}>${inlineHtml}${childrenHtml}</em>`;
+
+    return `<em${attrs}>${childrenHtml}</em>`;
   }
 
   visitUnderline(node: UnderlineNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<u${attrs}>${inlineHtml}${childrenHtml}</u>`;
+
+    return `<u${attrs}>${childrenHtml}</u>`;
   }
 
   visitStrikethrough(node: StrikethroughNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<del${attrs}>${inlineHtml}${childrenHtml}</del>`;
+
+    return `<del${attrs}>${childrenHtml}</del>`;
   }
 
   visitCode(node: CodeNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<code${attrs}>${node.content}</code>`;
   }
 
   visitSuperscript(node: SuperscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<sup${attrs}>${inlineHtml}${childrenHtml}</sup>`;
+
+    return `<sup${attrs}>${childrenHtml}</sup>`;
   }
 
   visitSubscript(node: SubscriptNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<sub${attrs}>${inlineHtml}${childrenHtml}</sub>`;
+
+    return `<sub${attrs}>${childrenHtml}</sub>`;
   }
 
   visitHighlight(node: HighlightNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<mark${attrs}>${inlineHtml}${childrenHtml}</mark>`;
+
+    return `<mark${attrs}>${childrenHtml}</mark>`;
   }
 
   visitInlineStyle(node: InlineStyleNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInline((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    return `<span${attrs}>${inlineHtml}${childrenHtml}</span>`;
+
+    return `<span${attrs}>${childrenHtml}</span>`;
   }
 
   visitLink(node: LinkNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
     const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
     const href = transformHref(this.evaluateString(node.href));
-    const childrenHtml =
-      node.children && node.children.length > 0
-        ? this.joinChildren(node.children)
-        : this.processInline((node as any).content);
+    const childrenHtml = this.joinChildren(node.children);
+
     return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
   }
 
@@ -157,6 +156,7 @@ export class InlineVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt);
+
     return `<img src="${src}" alt="${alt}"${attrs}>`;
   }
 
@@ -164,6 +164,7 @@ export class InlineVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
+
     return `<video src="${src}"${attrs}>${alt}</video>`;
   }
 
@@ -171,6 +172,7 @@ export class InlineVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
+
     return `<audio src="${src}"${attrs}>${alt}</audio>`;
   }
 
@@ -178,6 +180,7 @@ export class InlineVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
     const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
+
     return `<iframe src="${src}"${title}${attrs}></iframe>`;
   }
 
@@ -185,6 +188,7 @@ export class InlineVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
     const src = transformHref(this.evaluateString(node.src));
     const title = node.title ? this.evaluateString(node.title) : null;
+
     return `<a href="${src}"${attrs}>${title || src}</a>`;
   }
 
@@ -194,6 +198,7 @@ export class InlineVisitor {
       if (value === null || value === undefined) {
         return `{$${node.name}}`;
       }
+
       return formatValue(value);
     } catch {
       return `{$${node.name}}`;
@@ -206,6 +211,7 @@ export class InlineVisitor {
       if (value === null || value === undefined) {
         return `{{${node.expression}}}`;
       }
+
       return formatValue(value);
     } catch {
       return `{{${node.expression}}}`;
@@ -214,11 +220,14 @@ export class InlineVisitor {
 
   visitAbbreviation(node: AbbreviationNode): string {
     const attrs = this.buildAttributes(node.attributes);
+
     return `<abbr title="${node.definition}"${attrs}>${node.abbreviation}</abbr>`;
   }
 
   private buildAttributes(attrs?: any): string {
-    if (!attrs) return '';
+    if (!attrs) {
+      return '';
+    }
     const parts: string[] = [];
     for (const [key, value] of Object.entries(attrs)) {
       if (value !== undefined) {
@@ -230,14 +239,16 @@ export class InlineVisitor {
         }
       }
     }
+
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
   }
 
   private evaluateString(text: string): string {
     // Basic evaluation for string attributes that might contain variables
-    return text.replace(/\{\$([a-zA-Z_]\w*)}/g, (_, name) => {
+    return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g, (_, name) => {
       try {
         const val = this.evaluator.evaluate('$' + name);
+
         return formatValue(val);
       } catch {
         return `{$${name}}`;

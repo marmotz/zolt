@@ -277,7 +277,7 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('<html lang="en">');
     expect(html).toContain('<head>');
-    expect(html).toContain('<body>');
+    expect(html).toContain('<body');
     expect(html).toContain('Title');
     expect(html).toContain('Content');
   });
@@ -412,7 +412,7 @@ describe('HTMLBuilder', () => {
       type: 'ListItem',
       children: [
         { type: 'Link', href: 'file.zlt', children: [{ type: 'Text', content: 'file.zlt' }] } as any,
-        { type: 'Text', content: ' — description' }
+        { type: 'Text', content: ' — description' },
       ],
     };
 

@@ -9,7 +9,7 @@ describe('BlockVisitor', () => {
     const node: HeadingNode = {
       type: 'Heading',
       level: 1,
-      content: 'Hello World',
+      children: [{ type: 'Text', content: 'Hello World' }],
     };
 
     const html = builder.build(node);
@@ -19,7 +19,7 @@ describe('BlockVisitor', () => {
   test('should build paragraph', () => {
     const node: ParagraphNode = {
       type: 'Paragraph',
-      content: 'This is a paragraph',
+      children: [{ type: 'Text', content: 'This is a paragraph' }],
     };
 
     const html = builder.build(node);

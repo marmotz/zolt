@@ -6,17 +6,27 @@ describe('InlineParser', () => {
   const parser = new InlineParser();
 
   const getFlatContent = (node: any): string => {
-    if (node.content !== undefined) return node.content;
+    if (node.content !== undefined) {
+      return node.content;
+    }
     if (node.children) {
       return node.children
         .map((c: any) => {
-          if (c.type === 'Text') return c.content;
-          if (c.type === 'Expression') return `{{ ${c.expression} }}`;
-          if (c.type === 'Variable') return `{$${c.name}}`;
+          if (c.type === 'Text') {
+            return c.content;
+          }
+          if (c.type === 'Expression') {
+            return `{{ ${c.expression} }}`;
+          }
+          if (c.type === 'Variable') {
+            return `{$${c.name}}`;
+          }
+
           return getFlatContent(c);
         })
         .join('');
     }
+
     return '';
   };
 

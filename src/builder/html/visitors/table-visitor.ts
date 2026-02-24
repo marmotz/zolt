@@ -1,7 +1,11 @@
-import { TableNode, TableRowNode, TableCellNode, ASTNode } from '../../parser/types';
+import { ASTNode, TableCellNode, TableNode, TableRowNode } from '../../parser/types';
 
 export class TableVisitor {
-  constructor(private build: (node: ASTNode) => string, private joinChildren: (nodes: ASTNode[]) => string, private renderAllAttributes: (attrs?: any) => string) {}
+  constructor(
+    private build: (node: ASTNode) => string,
+    private joinChildren: (nodes: ASTNode[]) => string,
+    private renderAllAttributes: (attrs?: any) => string
+  ) {}
 
   visitTable(node: TableNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
@@ -22,6 +26,7 @@ export class TableVisitor {
     }
 
     html += '</table>';
+
     return html;
   }
 
@@ -31,6 +36,7 @@ export class TableVisitor {
       html += this.visitTableCell(cell, isHeader);
     }
     html += '</tr>';
+
     return html;
   }
 
@@ -38,6 +44,7 @@ export class TableVisitor {
     const tag = isHeader ? 'th' : 'td';
     const childrenHtml = this.joinChildren(node.children);
     const alignStyle = node.alignment ? ` style="text-align: ${node.alignment};"` : '';
+
     return `<${tag}${alignStyle}>${childrenHtml}</${tag}>`;
   }
 }

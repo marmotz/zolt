@@ -9,6 +9,7 @@ async function buildString(input: string): Promise<string> {
   const parser = new Parser(tokens);
   const ast = parser.parse();
   const builder = new HTMLBuilder();
+
   return builder.visitDocument(ast);
 }
 

@@ -31,6 +31,7 @@ export function toRoman(num: number): string {
       num -= lookup[i];
     }
   }
+
   return roman;
 }
 
@@ -41,6 +42,7 @@ export function toAlpha(num: number): string {
     alpha = String.fromCharCode(65 + mod) + alpha;
     num = Math.floor((num - mod) / 26);
   }
+
   return alpha || 'A';
 }
 
@@ -56,6 +58,7 @@ export function formatValue(value: any): string {
       return value.toString();
     }
     const formatted = value.toFixed(10);
+
     return parseFloat(formatted).toString();
   }
   if (Array.isArray(value)) {
@@ -64,6 +67,7 @@ export function formatValue(value: any): string {
   if (typeof value === 'object') {
     return JSON.stringify(value);
   }
+
   return String(value);
 }
 
@@ -74,5 +78,6 @@ export function transformHref(href: string): string {
   if (href.endsWith('.zlt')) {
     return href.replace(/\.zlt$/, '.html');
   }
+
   return href;
 }

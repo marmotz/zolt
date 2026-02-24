@@ -1,6 +1,6 @@
-import { TokenType, Token } from '../../lexer/token-types';
-import { Attributes } from '../types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
+import { Attributes } from '../types';
 
 export class SpecialBlockParser {
   public parseDoubleBracketBlock(expect: (type: TokenType) => Token): any {
@@ -16,6 +16,7 @@ export class SpecialBlockParser {
       const attrMatch = attrStr.match(/^\{([^}]+)}$/);
       if (attrMatch) attributes = InlineParser.parseAttributes(attrMatch[1]);
     }
+
     return { type: 'DoubleBracketBlock', blockType, content: '', attributes };
   }
 
@@ -38,19 +39,23 @@ export class SpecialBlockParser {
         attributes = InlineParser.parseAttributes(attrMatch[1]);
       }
     }
+
     return { type: 'HorizontalRule', style, attributes };
   }
 
   public parseAbbreviationDef(expect: (type: TokenType) => Token, match: (...types: TokenType[]) => boolean): any {
-    const type = match(TokenType.ABBREVIATION_DEF_GLOBAL) ? TokenType.ABBREVIATION_DEF_GLOBAL : TokenType.ABBREVIATION_DEF;
+    const type = match(TokenType.ABBREVIATION_DEF_GLOBAL)
+      ? TokenType.ABBREVIATION_DEF_GLOBAL
+      : TokenType.ABBREVIATION_DEF;
     const token = expect(type);
     const value = token.value;
     const colonIndex = value.indexOf(':');
+
     return {
       type: 'AbbreviationDefinition',
       abbreviation: value.substring(0, colonIndex),
       definition: value.substring(colonIndex + 1),
-      isGlobal: type === TokenType.ABBREVIATION_DEF_GLOBAL
+      isGlobal: type === TokenType.ABBREVIATION_DEF_GLOBAL,
     };
   }
 
@@ -58,15 +63,17 @@ export class SpecialBlockParser {
     const token = expect(TokenType.LINK_REF_DEF);
     const value = token.value;
     const colonIndex = value.indexOf(':');
+
     return {
       type: 'LinkReferenceDefinition',
       ref: value.substring(0, colonIndex),
-      url: value.substring(colonIndex + 1)
+      url: value.substring(colonIndex + 1),
     };
   }
 
   public parseCommentInline(expect: (type: TokenType) => Token): any {
     const token = expect(TokenType.COMMENT_INLINE);
+
     return {
       type: 'CommentInline',
       content: token.value,

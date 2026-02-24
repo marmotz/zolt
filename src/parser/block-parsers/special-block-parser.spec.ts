@@ -1,16 +1,18 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
+import { Token, TokenType } from '../../lexer/token-types';
 import { SpecialBlockParser } from './special-block-parser';
-import { TokenType, Token } from '../../lexer/token-types';
 
 describe('SpecialBlockParser', () => {
   const parser = new SpecialBlockParser();
 
   const mockExpect = (tokens: Token[]) => {
     let pos = 0;
+
     return (type: TokenType) => {
       const token = tokens[pos++];
       if (token.type !== type) throw new Error(`Expected ${type}`);
+
       return token;
     };
   };

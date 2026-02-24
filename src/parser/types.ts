@@ -241,6 +241,13 @@ export interface TripleColonBlockNode {
   attributes?: Attributes;
 }
 
+export interface VariableDefinitionNode {
+  type: 'VariableDefinition';
+  name: string;
+  value: any;
+  isGlobal: boolean;
+}
+
 export interface TableNode {
   type: 'Table';
   header?: TableRowNode;
@@ -320,6 +327,7 @@ export type ASTNode =
   | HorizontalRuleNode
   | FrontmatterNode
   | TripleColonBlockNode
+  | VariableDefinitionNode
   | TableNode
   | TableRowNode
   | TableCellNode

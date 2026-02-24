@@ -5,11 +5,14 @@ export function visitBlockquote(node: BlockquoteNode, builder: HTMLBuilder): str
   const childrenHtml = node.children.map((child) => builder.build(child)).join('');
 
   const attrs = buildAttributes(node.attributes);
+
   return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
 }
 
 function buildAttributes(attrs?: Attributes): string {
-  if (!attrs) return '';
+  if (!attrs) {
+    return '';
+  }
 
   const parts: string[] = [];
   if (attrs.id) parts.push(`id="${attrs.id}"`);

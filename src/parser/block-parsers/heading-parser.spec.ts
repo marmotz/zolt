@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
-import { HeadingParser } from './heading-parser';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { TokenType, Token } from '../../lexer/token-types';
+import { HeadingParser } from './heading-parser';
 
 describe('HeadingParser', () => {
   const inlineParser = new InlineParser();
@@ -10,9 +10,11 @@ describe('HeadingParser', () => {
 
   const mockExpect = (tokens: Token[]) => {
     let pos = 0;
+
     return (type: TokenType) => {
       const token = tokens[pos++];
       if (token.type !== type) throw new Error(`Expected ${type}`);
+
       return token;
     };
   };

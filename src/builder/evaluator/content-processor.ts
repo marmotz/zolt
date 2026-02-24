@@ -12,7 +12,9 @@ export class ContentProcessor {
   }
 
   processContent(content: string): string {
-    if (!content && !this.pendingDefinition) return '';
+    if (!content && !this.pendingDefinition) {
+      return '';
+    }
 
     const lines = content.split('\n');
     const resultLines: string[] = [];
@@ -77,7 +79,9 @@ export class ContentProcessor {
 
   private isCompleteValue(value: string): boolean {
     const trimmed = value.trim();
-    if (!trimmed) return true;
+    if (!trimmed) {
+      return true;
+    }
 
     if (trimmed.startsWith('[')) {
       return this.isBalanced(trimmed, '[', ']');
@@ -119,24 +123,39 @@ export class ContentProcessor {
   private isExpression(value: string): boolean {
     const trimmed = value.trim();
 
-    if (trimmed.startsWith('$')) return true;
+    if (trimmed.startsWith('$')) {
+      return true;
+    }
 
     if (/[+\-*/%^]/.test(trimmed)) {
       const numOnly = /^-?\d+(?:\.\d+)?$/.test(trimmed);
-      if (!numOnly) return true;
+      if (!numOnly) {
+        return true;
+      }
     }
 
-    if (/^Math\.\w+\(/.test(trimmed)) return true;
-    if (/^List\.\w+\(/.test(trimmed)) return true;
-    if (/^String\.\w+\(/.test(trimmed)) return true;
-    if (/^Date\.\w+\(/.test(trimmed)) return true;
+    if (/^Math\.\w+\(/.test(trimmed)) {
+      return true;
+    }
+    if (/^List\.\w+\(/.test(trimmed)) {
+      return true;
+    }
+    if (/^String\.\w+\(/.test(trimmed)) {
+      return true;
+    }
+    if (/^Date\.\w+\(/.test(trimmed)) {
+      return true;
+    }
 
     return false;
   }
 
   private looksLikeObject(str: string): boolean {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return true; // Empty object {} or just {
+    if (inner === '') {
+      return true;
+    } // Empty object {} or just {
+
     return /^[a-zA-Z_]\w*\s*:/.test(inner) || /^['"]/.test(inner);
   }
 
@@ -164,7 +183,9 @@ export class ContentProcessor {
       if (char === open) depth++;
       else if (char === close) {
         depth--;
-        if (depth === 0) return i === str.length - 1;
+        if (depth === 0) {
+          return i === str.length - 1;
+        }
       }
     }
 
@@ -180,6 +201,7 @@ export class ContentProcessor {
       }
       try {
         const value = this.evaluator.evaluate(expression);
+
         return this.formatValue(value);
       } catch {
         return match;
@@ -199,6 +221,7 @@ export class ContentProcessor {
         if (value === null || value === undefined) {
           return match;
         }
+
         return this.formatValue(value);
       } catch {
         return match;
@@ -218,6 +241,7 @@ export class ContentProcessor {
         return value.toString();
       }
       const formatted = value.toFixed(10);
+
       return parseFloat(formatted).toString();
     }
     if (Array.isArray(value)) {
@@ -226,6 +250,7 @@ export class ContentProcessor {
     if (typeof value === 'object') {
       return JSON.stringify(value);
     }
+
     return String(value);
   }
 
@@ -254,6 +279,7 @@ export class ContentProcessor {
     expr = expr.replace(/\{\{\s*(.+?)\s*}}/g, (_, expr) => {
       try {
         const value = this.evaluator.evaluate(expr);
+
         return this.formatValue(value);
       } catch {
         return 'false';
@@ -263,6 +289,7 @@ export class ContentProcessor {
     expr = expr.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g, (_, varPath) => {
       try {
         const value = this.evaluator.evaluate('$' + varPath);
+
         return this.formatValue(value);
       } catch {
         return 'null';
@@ -271,6 +298,7 @@ export class ContentProcessor {
 
     try {
       const result = this.evaluator.evaluate(expr);
+
       return this.evaluator.isTruthy(result);
     } catch {
       return false;
@@ -285,7 +313,9 @@ export class ContentProcessor {
     const match = blockType.match(
       /^foreach\s+\{\s*\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)\s+as\s+\$([a-zA-Z_][a-zA-Z0-9_]*)\s*}$/
     );
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     return {
       collection: '$' + match[1],
@@ -296,6 +326,7 @@ export class ContentProcessor {
   getCollection(varPath: string): Value[] {
     try {
       const value = this.evaluator.evaluate(varPath);
+
       return Array.isArray(value) ? value : [];
     } catch {
       return [];

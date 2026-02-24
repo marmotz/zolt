@@ -1,6 +1,6 @@
-import { TokenType, Token } from '../../lexer/token-types';
-import { Attributes, CodeBlockNode } from '../types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
+import { Attributes, CodeBlockNode } from '../types';
 
 export class CodeBlockParser {
   public parseCodeBlock(

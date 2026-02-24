@@ -117,10 +117,14 @@ export class SourceEvaluator {
 
   private evaluateForeach(blockType: string, blockContent: string): string {
     const foreachInfo = this.contentProcessor.parseForeach(blockType);
-    if (!foreachInfo) return '';
+    if (!foreachInfo) {
+      return '';
+    }
 
     const collection = this.contentProcessor.getCollection(foreachInfo.collection);
-    if (!collection || collection.length === 0) return '';
+    if (!collection || collection.length === 0) {
+      return '';
+    }
 
     const results: string[] = [];
 

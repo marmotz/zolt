@@ -1,11 +1,22 @@
 import { Token, TokenType } from '../../lexer/token-types';
-import { FrontmatterNode } from '../types';
 import { FrontmatterUtils } from '../../utils/frontmatter';
+import { FrontmatterNode } from '../types';
 
 export class FrontmatterParser {
   private static readonly KNOWN_KEYS = new Set([
-    'title', 'author', 'date', 'version', 'tags', 'description', 
-    'keywords', 'robots', 'image', 'lang', 'toc', 'theme', 'color-scheme'
+    'title',
+    'author',
+    'date',
+    'version',
+    'tags',
+    'description',
+    'keywords',
+    'robots',
+    'image',
+    'lang',
+    'toc',
+    'theme',
+    'color-scheme',
   ]);
 
   public parseFrontmatter(
@@ -22,12 +33,7 @@ export class FrontmatterParser {
       if (match) {
         const key = match[1];
         if (!FrontmatterParser.KNOWN_KEYS.has(key)) {
-          reportWarning(
-            `Unknown metadata field: "${key}"`,
-            token.line + i,
-            1,
-            'UNKNOWN_METADATA'
-          );
+          reportWarning(`Unknown metadata field: "${key}"`, token.line + i, 1, 'UNKNOWN_METADATA');
         }
       }
     }

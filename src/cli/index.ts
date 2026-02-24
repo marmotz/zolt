@@ -29,10 +29,10 @@ async function buildFileWithDeps(
   if (customOutputFile) {
     outputFile = customOutputFile;
   } else {
-    const relativePath = inputFile.startsWith(baseInputDir)
-      ? inputFile.slice(baseInputDir.length).replace(/^[/\\]+/, '')
-      : basename(inputFile);
-    
+    const relativePath = absoluteInput.startsWith(baseInputDir)
+      ? absoluteInput.slice(baseInputDir.length).replace(/^[/\\]+/, '')
+      : basename(absoluteInput);
+
     const baseName = relativePath.replace(/\.zlt$/, '.html');
     outputFile = join(outputDir, baseName);
   }
@@ -47,11 +47,13 @@ async function buildFileWithDeps(
   const assets = await getAssetFiles(absoluteInput);
   for (const asset of assets) {
     const fullAssetPath = resolve(inputDir, asset);
-    
+
     // Calculate where the asset should go relative to the outputDir
     // We want it to be in the same relative position as the inputFile
-    const inputRelativeDir = dirname(absoluteInput).startsWith(baseInputDir)
-      ? dirname(absoluteInput).slice(baseInputDir.length).replace(/^[/\\]+/, '')
+    const inputRelativeDir = absoluteInput.startsWith(baseInputDir)
+      ? dirname(absoluteInput)
+          .slice(baseInputDir.length)
+          .replace(/^[/\\]+/, '')
       : '';
     const destAssetPath = join(outputDir, inputRelativeDir, asset);
 
@@ -287,6 +289,7 @@ async function performBuild(files: string[], output: string | undefined, type: '
         await mkdir(output, { recursive: true });
         const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
         for (const f of touched) allTouchedFiles.add(f);
+
         return allTouchedFiles;
       }
 
@@ -294,6 +297,7 @@ async function performBuild(files: string[], output: string | undefined, type: '
       if (outputStat?.isDirectory()) {
         const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
         for (const f of touched) allTouchedFiles.add(f);
+
         return allTouchedFiles;
       } else {
         outputFile = output;
@@ -356,7 +360,9 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
           const watcher = watchFile(filePath, () => {
             if (buildTimeout) clearTimeout(buildTimeout);
             buildTimeout = setTimeout(async () => {
-              if (isBuilding) return;
+              if (isBuilding) {
+                return;
+              }
               isBuilding = true;
               console.log(`\n${pc.yellow('Change detected, rebuilding...')}`);
               try {
@@ -434,6 +440,7 @@ async function handleBuild(args: string[]) {
 
   if (watch) {
     await handleWatch(files, output, type);
+
     return;
   }
 

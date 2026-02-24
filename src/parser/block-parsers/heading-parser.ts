@@ -1,6 +1,6 @@
-import { TokenType, Token } from '../../lexer/token-types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { HeadingNode, Attributes } from '../types';
+import { Attributes, HeadingNode } from '../types';
 
 export class HeadingParser {
   constructor(private inlineParser: InlineParser) {}

@@ -30,15 +30,22 @@ export class ExpressionEvaluator {
     if (this.parentEvaluator) {
       return this.parentEvaluator.getVariable(name);
     }
+
     return null;
   }
 
   parseValue(valueStr: string): Value {
     const trimmed = valueStr.trim();
 
-    if (trimmed === 'true') return true;
-    if (trimmed === 'false') return false;
-    if (trimmed === 'null') return null;
+    if (trimmed === 'true') {
+      return true;
+    }
+    if (trimmed === 'false') {
+      return false;
+    }
+    if (trimmed === 'null') {
+      return null;
+    }
 
     if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
       return trimmed.slice(1, -1);
@@ -58,21 +65,28 @@ export class ExpressionEvaluator {
     }
 
     const num = parseFloat(trimmed);
-    if (!isNaN(num)) return num;
+    if (!isNaN(num)) {
+      return num;
+    }
 
     return trimmed;
   }
 
   private looksLikeObject(str: string): boolean {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return true; // Empty object {}
+    if (inner === '') {
+      return true;
+    } // Empty object {}
     // Check if it looks like key: value or "key": value
+
     return /^[a-zA-Z_]\w*\s*:/.test(inner) || /^['"]/.test(inner);
   }
 
   private parseArray(str: string): Value[] {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return [];
+    if (inner === '') {
+      return [];
+    }
 
     const elements: string[] = [];
     let current = '';
@@ -121,7 +135,9 @@ export class ExpressionEvaluator {
 
   private parseObject(str: string): { [key: string]: Value } {
     const inner = str.slice(1, -1).trim();
-    if (inner === '') return {};
+    if (inner === '') {
+      return {};
+    }
 
     const result: { [key: string]: Value } = {};
     const pairs: string[] = [];
@@ -185,11 +201,19 @@ export class ExpressionEvaluator {
   evaluate(expression: string): Value {
     let trimmed = expression.trim();
 
-    if (!trimmed) return null;
+    if (!trimmed) {
+      return null;
+    }
 
-    if (trimmed === 'true') return true;
-    if (trimmed === 'false') return false;
-    if (trimmed === 'null') return null;
+    if (trimmed === 'true') {
+      return true;
+    }
+    if (trimmed === 'false') {
+      return false;
+    }
+    if (trimmed === 'null') {
+      return null;
+    }
 
     // Handle logical AND (&& or and)
     if (trimmed.includes(' && ') || trimmed.toLowerCase().includes(' and ')) {
@@ -200,6 +224,7 @@ export class ExpressionEvaluator {
           return false;
         }
       }
+
       return true;
     }
 
@@ -212,12 +237,14 @@ export class ExpressionEvaluator {
           return true;
         }
       }
+
       return false;
     }
 
     // Handle negation !
     if (trimmed.startsWith('!')) {
       const operand = this.evaluate(trimmed.slice(1));
+
       return !this.isTruthy(operand);
     }
 
@@ -226,6 +253,7 @@ export class ExpressionEvaluator {
       const left = this.evaluate(conditionalMatch[1]);
       const op = conditionalMatch[2];
       const right = this.evaluate(conditionalMatch[3]);
+
       return this.compare(left, op, right);
     }
 
@@ -290,7 +318,9 @@ export class ExpressionEvaluator {
 
   private tryNamespaceFunction(expr: string): Value | null {
     const match = expr.match(/^(Math|List|String|Date)\.(\w+)\((.*)\)$/);
-    if (!match) return null;
+    if (!match) {
+      return null;
+    }
 
     const namespace = match[1];
     const func = match[2];
@@ -313,7 +343,9 @@ export class ExpressionEvaluator {
   }
 
   private parseArguments(argsStr: string): Value[] {
-    if (!argsStr.trim()) return [];
+    if (!argsStr.trim()) {
+      return [];
+    }
 
     const args: Value[] = [];
     let current = '';
@@ -387,7 +419,9 @@ export class ExpressionEvaluator {
 
   private evaluateListFunction(func: string, args: Value[]): Value {
     const list = args[0];
-    if (!Array.isArray(list)) return null;
+    if (!Array.isArray(list)) {
+      return null;
+    }
 
     switch (func) {
       case 'length':
@@ -400,25 +434,30 @@ export class ExpressionEvaluator {
       case 'sum':
         return list.reduce((sum: number, item) => {
           const num = typeof item === 'number' ? item : parseFloat(String(item));
+
           return sum + (isNaN(num) ? 0 : num);
         }, 0);
       case 'avg': {
         const sum = list.reduce((s: number, item) => {
           const num = typeof item === 'number' ? item : parseFloat(String(item));
+
           return s + (isNaN(num) ? 0 : num);
         }, 0);
+
         return list.length > 0 ? sum / list.length : 0;
       }
       case 'min': {
         const nums = list
           .map((item) => (typeof item === 'number' ? item : parseFloat(String(item))))
           .filter((n) => !isNaN(n));
+
         return nums.length > 0 ? Math.min(...nums) : null;
       }
       case 'max': {
         const nums = list
           .map((item) => (typeof item === 'number' ? item : parseFloat(String(item))))
           .filter((n) => !isNaN(n));
+
         return nums.length > 0 ? Math.max(...nums) : null;
       }
       default:
@@ -441,10 +480,12 @@ export class ExpressionEvaluator {
       case 'replace': {
         const search = String(args[1] ?? '');
         const replacement = String(args[2] ?? '');
+
         return str.replace(new RegExp(this.escapeRegex(search), 'g'), replacement);
       }
       case 'split': {
         const separator = String(args[1] ?? '');
+
         return str.split(separator);
       }
       case 'join': {
@@ -453,6 +494,7 @@ export class ExpressionEvaluator {
         if (Array.isArray(arr)) {
           return arr.join(sep);
         }
+
         return str;
       }
       default:
@@ -471,9 +513,7 @@ export class ExpressionEvaluator {
         }
 
         let date: Date;
-        if (dateValue instanceof Date) {
-          date = dateValue;
-        } else if (typeof dateValue === 'number') {
+        if (typeof dateValue === 'number') {
           date = new Date(dateValue);
         } else if (typeof dateValue === 'string') {
           // Try to handle ISO date strings or other common formats
@@ -522,6 +562,7 @@ export class ExpressionEvaluator {
     return this.tryBinaryOp(expr, /[+-]/, (left, op, right) => {
       const l = typeof left === 'number' ? left : parseFloat(String(left));
       const r = typeof right === 'number' ? right : parseFloat(String(right));
+
       return op === '+' ? l + r : l - r;
     });
   }
@@ -530,15 +571,22 @@ export class ExpressionEvaluator {
     return this.tryBinaryOp(expr, /[*\/%]/, (left, op, right) => {
       const l = typeof left === 'number' ? left : parseFloat(String(left));
       const r = typeof right === 'number' ? right : parseFloat(String(right));
-      if (op === '*') return l * r;
-      if (op === '/') return r !== 0 ? l / r : 0;
+      if (op === '*') {
+        return l * r;
+      }
+      if (op === '/') {
+        return r !== 0 ? l / r : 0;
+      }
+
       return l % r;
     });
   }
 
   private tryPower(expr: string): Value | null {
     const tokens = this.tokenizePower(expr);
-    if (tokens.length < 3) return null;
+    if (tokens.length < 3) {
+      return null;
+    }
 
     let result = this.evaluate(tokens[tokens.length - 1]);
     for (let i = tokens.length - 2; i >= 0; i -= 2) {
@@ -637,6 +685,7 @@ export class ExpressionEvaluator {
           if (left && right && !this.isInsideIdentifier(expr, i)) {
             const leftVal = this.evaluate(left);
             const rightVal = this.evaluate(right);
+
             return evaluate(leftVal, op, rightVal);
           }
         }
@@ -702,7 +751,9 @@ export class ExpressionEvaluator {
 
     if (current) parts.push(current);
 
-    if (parts.length === 0) return null;
+    if (parts.length === 0) {
+      return null;
+    }
 
     let value = this.getVariable(String(parts[0]));
 
@@ -732,23 +783,42 @@ export class ExpressionEvaluator {
       if (str[i] === '(') depth++;
       else if (str[i] === ')') {
         depth--;
-        if (depth === 0) return i;
+        if (depth === 0) {
+          return i;
+        }
       }
     }
+
     return -1;
   }
 
   isTruthy(value: Value): boolean {
-    if (value === null || value === undefined) return false;
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'number') return value !== 0;
+    if (value === null || value === undefined) {
+      return false;
+    }
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
     if (typeof value === 'string') {
-      if (value.toLowerCase() === 'false') return false;
-      if (value.toLowerCase() === 'null') return false;
+      if (value.toLowerCase() === 'false') {
+        return false;
+      }
+      if (value.toLowerCase() === 'null') {
+        return false;
+      }
+
       return value.length > 0;
     }
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'object') return Object.keys(value).length > 0;
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    if (typeof value === 'object') {
+      return Object.keys(value).length > 0;
+    }
+
     return true;
   }
 }

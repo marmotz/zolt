@@ -81,7 +81,7 @@ describe('CLI Watch', () => {
     const linkedFile = join(testDir, 'linked.zlt');
     const outputDir = join(testDir, 'dist');
     await mkdir(outputDir, { recursive: true });
-    
+
     await writeFile(indexFile, '# Main\n[Linked](linked.zlt)');
     await writeFile(linkedFile, '# Linked Initial');
 
@@ -143,7 +143,7 @@ describe('CLI Watch', () => {
     const includedFile = join(testDir, 'header.zlt');
     const outputDir = join(testDir, 'dist-include');
     await mkdir(outputDir, { recursive: true });
-    
+
     await writeFile(indexFile, '# Main\nSee [header](header.zlt)');
     await writeFile(includedFile, '# Header Initial');
 
@@ -218,7 +218,7 @@ describe('CLI Watch', () => {
     const indexFile = join(testDir, 'index.zlt');
     const newDepFile = join(testDir, 'new.zlt');
     const newDepOutputFile = join(testDir, 'new.html');
-    
+
     await writeFile(indexFile, '# Initial');
 
     const proc = spawn('bun', ['run', CLI_SRC, 'build', indexFile, '-o', testDir, '--watch'], {

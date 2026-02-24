@@ -21,8 +21,10 @@ export class Lexer {
   tokenize(): Token[] {
     while (!this.isEof()) {
       if (this.peekChar() === '\n') {
+        const line = this.line;
+        const column = this.column;
         this.advanceChar();
-        this.tokens.push({ type: TokenType.NEWLINE, value: '\n', line: this.line, column: this.column, length: 1 });
+        this.tokens.push({ type: TokenType.NEWLINE, value: '\n', line, column, length: 1 });
         continue;
       }
 
@@ -44,6 +46,7 @@ export class Lexer {
       }
     }
     this.tokens.push({ type: TokenType.EOF, value: '', line: this.line, column: this.column, length: 0 });
+
     return this.tokens;
   }
 
@@ -75,25 +78,52 @@ export class Lexer {
       return this.readCodeBlockContent();
     }
 
-    if (this.matchHeading()) return this.readHeading();
-    if (this.matchCodeBlock()) return this.readCodeBlock();
-    if (this.matchTripleColon()) return this.readTripleColon();
-    if (this.matchDoubleBracket()) return this.readDoubleBracket();
-    if (this.matchBlockquote()) return this.readBlockquote();
-    if (this.matchTechnicalIndentation()) return this.readTechnicalIndentation();
-    if (this.matchFrontmatter()) return this.readFrontmatter();
-    if (this.matchHorizontalRule()) return this.readHorizontalRule();
-    if (this.matchList()) return this.readList();
-    if (this.matchGlobalAbbreviationDef()) return this.readGlobalAbbreviationDef();
-    if (this.matchAbbreviationDef()) return this.readAbbreviationDef();
-    if (this.matchLinkRefDef()) return this.readLinkRefDef();
-    if (this.matchInlineComment()) return this.readInlineComment();
+    if (this.matchHeading()) {
+      return this.readHeading();
+    }
+    if (this.matchCodeBlock()) {
+      return this.readCodeBlock();
+    }
+    if (this.matchTripleColon()) {
+      return this.readTripleColon();
+    }
+    if (this.matchDoubleBracket()) {
+      return this.readDoubleBracket();
+    }
+    if (this.matchBlockquote()) {
+      return this.readBlockquote();
+    }
+    if (this.matchTechnicalIndentation()) {
+      return this.readTechnicalIndentation();
+    }
+    if (this.matchFrontmatter()) {
+      return this.readFrontmatter();
+    }
+    if (this.matchHorizontalRule()) {
+      return this.readHorizontalRule();
+    }
+    if (this.matchList()) {
+      return this.readList();
+    }
+    if (this.matchGlobalAbbreviationDef()) {
+      return this.readGlobalAbbreviationDef();
+    }
+    if (this.matchAbbreviationDef()) {
+      return this.readAbbreviationDef();
+    }
+    if (this.matchLinkRefDef()) {
+      return this.readLinkRefDef();
+    }
+    if (this.matchInlineComment()) {
+      return this.readInlineComment();
+    }
 
     return this.readText();
   }
 
   private matchHeading(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^#{1,6}\s/.test(remaining);
   }
 
@@ -161,6 +191,7 @@ export class Lexer {
   private readCodeBlockContent(): Token {
     if (this.source.slice(this.pos).startsWith('```')) {
       this.state.exitCodeBlock();
+
       return this.readCodeBlockEnd();
     }
 
@@ -270,6 +301,7 @@ export class Lexer {
 
   private matchTechnicalIndentation(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^&+\s/.test(remaining);
   }
 
@@ -300,6 +332,7 @@ export class Lexer {
 
   private matchBlockquote(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^(>\s?)+/.test(remaining);
   }
 
@@ -330,6 +363,7 @@ export class Lexer {
 
   private matchList(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return (
       /^[-*]\s+\[[ x]]\s/.test(remaining) ||
       /^[-*]\s/.test(remaining) ||
@@ -376,6 +410,7 @@ export class Lexer {
 
   private matchHorizontalRule(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^[-*_]{3,}(\s|:|$)/.test(remaining);
   }
 
@@ -414,6 +449,7 @@ export class Lexer {
       return false;
     }
     const afterFirstDash = this.source.slice(this.pos + 3);
+
     return afterFirstDash.includes('---');
   }
 
@@ -448,11 +484,13 @@ export class Lexer {
 
   private matchAbbreviationDef(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^\*\[([A-Za-z0-9μ]+)]:\s+/.test(remaining);
   }
 
   private matchGlobalAbbreviationDef(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^\*\*\[([A-Za-z0-9μ]+)]:\s+/.test(remaining);
   }
 
@@ -533,6 +571,7 @@ export class Lexer {
 
   private matchLinkRefDef(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^\[([^\]]+)]:\s+/.test(remaining);
   }
 
@@ -610,11 +649,13 @@ export class Lexer {
       this.column++;
     }
     this.pos++;
+
     return char;
   }
 
   private matchInlineComment(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^%%/.test(remaining);
   }
 
@@ -633,6 +674,7 @@ export class Lexer {
         const content = this.source.slice(commentStart, this.pos);
         this.advanceChar(); // %
         this.advanceChar(); // %
+
         return {
           type: TokenType.COMMENT_INLINE,
           value: content.trim(),
@@ -645,6 +687,7 @@ export class Lexer {
     }
 
     const content = this.source.slice(commentStart, this.pos);
+
     return {
       type: TokenType.COMMENT_INLINE,
       value: content.trim(),

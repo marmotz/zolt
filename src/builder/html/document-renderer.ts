@@ -1,7 +1,7 @@
-import { DocumentNode, ASTNode, HeadingNode } from '../../parser/types';
+import { ASTNode, DocumentNode, HeadingNode } from '../../parser/types';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
+import { ANCHOR_SCRIPT, CHART_SCRIPT, MERMAID_SCRIPT, TABS_SCRIPT } from './assets/scripts';
 import { DEFAULT_CSS } from './assets/styles';
-import { TABS_SCRIPT, ANCHOR_SCRIPT, CHART_SCRIPT, MERMAID_SCRIPT } from './assets/scripts';
 
 export interface DocumentRendererOptions {
   hasTabs: boolean;
@@ -43,7 +43,7 @@ export class DocumentRenderer {
     const title = node.frontmatter?.data?.title || 'Document';
     const description = node.frontmatter?.data?.description || '';
     const author = node.frontmatter?.data?.author || '';
-    
+
     let keywords = '';
     const rawKeywords = node.frontmatter?.data?.keywords;
     const rawTags = node.frontmatter?.data?.tags;
@@ -68,10 +68,11 @@ export class DocumentRenderer {
     if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
     if (keywords) metaTags += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
     if (robots) metaTags += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
-    
+
     // Open Graph
     metaTags += `  <meta property="og:title" content="${this.escapeHtml(String(title))}">\n`;
-    if (description) metaTags += `  <meta property="og:description" content="${this.escapeHtml(String(description))}">\n`;
+    if (description)
+      metaTags += `  <meta property="og:description" content="${this.escapeHtml(String(description))}">\n`;
     if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
     metaTags += `  <meta property="og:type" content="website">\n`;
 
@@ -103,6 +104,7 @@ ${mermaidScript}
       '"': '&quot;',
       "'": '&#039;',
     };
+
     return String(text).replace(/[&<>"']/g, (m) => map[m]);
   }
 
@@ -137,6 +139,7 @@ ${mermaidScript}
         headings.push(...this.findAllHeadings(node.children as ASTNode[]));
       }
     }
+
     return headings;
   }
 }

@@ -1,12 +1,6 @@
-import { 
-  TripleColonBlockNode, 
-  DoubleBracketBlockNode, 
-  ASTNode, 
-  HeadingNode,
-  Attributes
-} from '../../../parser/types';
 import { InlineParser } from '../../../parser/inline-parser';
-import { slugify, toRoman, toAlpha } from '../utils/string-utils';
+import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
+import { slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class SpecialBlockVisitor {
   private tabsCounter: number = 0;
@@ -21,7 +15,8 @@ export class SpecialBlockVisitor {
     private inlineParser: InlineParser,
     private evaluator: any,
     private processInlineContent: (text: string) => string,
-    private currentHeadings: HeadingNode[]
+    private currentHeadings: HeadingNode[],
+    private mergeAdjacentLists: (results: string[]) => string
   ) {}
 
   public reset(): void {
@@ -53,7 +48,8 @@ export class SpecialBlockVisitor {
     if (node.blockType === 'details') {
       const open = node.attributes?.open === 'true' ? ' open' : '';
       const attrs = this.renderAllAttributes(node.attributes);
-      const title = node.title ? this.joinChildren(this.inlineParser.parse(node.title)) : 'Details';
+      const title = node.title ? this.processInlineContent(node.title) : 'Details';
+
       return `<details${attrs}${open} class="triple-colon-block details" data-type="details">\n  <summary>${title}</summary>\n  <div class="details-content">\n${childrenHtml}\n  </div>\n</details>`;
     }
 
@@ -81,15 +77,43 @@ export class SpecialBlockVisitor {
 
     let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
     if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
-      const title = this.joinChildren(this.inlineParser.parse(node.title));
+      const title = this.processInlineContent(node.title);
       html += `<div class="block-title">${title}</div>\n`;
     }
     html += `${childrenHtml}\n</div>`;
+
     return html;
   }
 
   private visitIfBlock(node: TripleColonBlockNode): string {
-    const condition = node.blockType.substring(3).trim();
+    let condition = node.blockType.substring(3).trim();
+
+    // Support multiple {{ }} or {$ } in the same condition string
+    condition = condition.replace(/\{\{\s*(.+?)\s*}}/g, (_, expr) => {
+      try {
+        const val = this.evaluator.evaluate(expr);
+
+        return String(val);
+      } catch {
+        return 'false';
+      }
+    });
+
+    condition = condition.replace(/\{\$([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*|\[[^\]]+])*)}/g, (_, varPath) => {
+      try {
+        const val = this.evaluator.evaluate('$' + varPath);
+
+        return String(val);
+      } catch {
+        return 'null';
+      }
+    });
+
+    // Strip outer braces if it's a single block: { condition }
+    if (condition.startsWith('{') && condition.endsWith('}')) {
+      condition = condition.slice(1, -1).trim();
+    }
+
     try {
       const result = this.evaluator.evaluate(condition);
       if (this.evaluator.isTruthy(result)) {
@@ -98,28 +122,33 @@ export class SpecialBlockVisitor {
     } catch (e) {
       console.warn(`Failed to evaluate condition: ${condition}`, e);
     }
+
     return '';
   }
 
   private visitForeachBlock(node: TripleColonBlockNode): string {
     const foreachExpr = node.blockType.substring(8).trim();
-    const match = foreachExpr.match(/^\{\s*\$([a-zA-Z_]\w*)\s+as\s+\$([a-zA-Z_]\w*)\s*}$/);
-    
+    // Support foreach {$item in $items} or foreach {$items as $item}
+    // and handle complex paths like $user.roles or $dict[$key]
+    const match = foreachExpr.match(/^\{\s*(\$?[a-zA-Z_][\w.$\[\]]*)\s+(?:as|in)\s+\$([a-zA-Z_]\w*)\s*}$/);
+
     if (!match) {
       console.warn(`Invalid foreach expression: ${foreachExpr}`);
+
       return '';
     }
 
-    const collectionName = `$${match[1]}`;
+    let collectionPath = match[1];
+    if (!collectionPath.startsWith('$')) collectionPath = '$' + collectionPath;
     const iteratorName = match[2];
 
     try {
-      const collection = this.evaluator.evaluate(collectionName);
+      const collection = this.evaluator.evaluate(collectionPath);
       if (!Array.isArray(collection)) {
         return '';
       }
 
-      let html = '';
+      const results: string[] = [];
       const originalIteratorValue = this.evaluator.getVariable(iteratorName);
       const originalForeachValue = this.evaluator.getVariable('foreach');
 
@@ -133,16 +162,17 @@ export class SpecialBlockVisitor {
           even: index % 2 === 0,
           odd: index % 2 === 1,
         });
-        html += this.joinChildren(node.children);
+        results.push(this.joinChildren(node.children));
       });
 
       // Restore original variables
       this.evaluator.setVariable(iteratorName, originalIteratorValue);
       this.evaluator.setVariable('foreach', originalForeachValue);
 
-      return html;
+      return this.mergeAdjacentLists(results);
     } catch (e) {
-      console.warn(`Failed to evaluate collection: ${collectionName}`, e);
+      console.warn(`Failed to evaluate collection: ${collectionPath}`, e);
+
       return '';
     }
   }
@@ -182,10 +212,10 @@ export class SpecialBlockVisitor {
       const title = tab.title || `Tab ${index + 1}`;
 
       buttons.push(
-        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.joinChildren(this.inlineParser.parse(title))}</button>`
+        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.processInlineContent(title)}</button>`
       );
 
-      const tabContent = tab.children.map((child) => this.build(child)).join('\n');
+      const tabContent = this.joinChildren(tab.children);
       panels.push(
         `  <div id="${panelId}" class="zolt-tab-panel${isActive ? ' active' : ''}" role="tabpanel" aria-labelledby="${buttonId}" data-tab-index="${index}">\n${tabContent}\n  </div>`
       );
@@ -209,6 +239,7 @@ export class SpecialBlockVisitor {
       return this.visitToc(node);
     }
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
   }
 
@@ -225,7 +256,9 @@ export class SpecialBlockVisitor {
 
     const filteredHeadings = this.currentHeadings.filter((h) => {
       const level = h.level;
-      if (level < from) return false;
+      if (level < from) {
+        return false;
+      }
 
       let maxLevel: number;
       if (toAttr && depthAttr) {
@@ -241,7 +274,9 @@ export class SpecialBlockVisitor {
       return level <= maxLevel;
     });
 
-    if (filteredHeadings.length === 0) return '';
+    if (filteredHeadings.length === 0) {
+      return '';
+    }
 
     const tocHtml = this.buildTocTree(filteredHeadings, from, numbered);
     const classAttr = ` class="zolt-toc${customClass ? ' ' + customClass : ''}"`;
@@ -299,9 +334,7 @@ export class SpecialBlockVisitor {
         numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
       }
 
-      const inlineHtml = this.processInlineContent((h as any).content);
-      const childrenHtml = this.joinChildren(h.children);
-      const renderedContent = (inlineHtml + childrenHtml).trim();
+      const renderedContent = this.joinChildren(h.children).trim();
       const textContent = renderedContent.replace(/<[^>]+>/g, '').trim();
       const id = h.attributes?.id || slugify(textContent);
 
@@ -314,12 +347,13 @@ export class SpecialBlockVisitor {
     }
 
     html += '</ul>';
+
     return html;
   }
 
   visitChart(node: any): string {
     this.hasCharts = true;
-    
+
     const filteredAttrs: Attributes = {};
     if (node.attributes) {
       for (const [key, value] of Object.entries(node.attributes)) {
@@ -328,7 +362,7 @@ export class SpecialBlockVisitor {
         }
       }
     }
-    
+
     const attrs = this.renderAllAttributes(Object.keys(filteredAttrs).length > 0 ? filteredAttrs : undefined);
     const layoutAttr = node.layout ? ` data-layout="${node.layout}"` : '';
     const legendAttr = node.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
@@ -367,6 +401,7 @@ export class SpecialBlockVisitor {
 
   visitMermaid(node: any): string {
     this.hasMermaid = true;
+
     return `<div class="zolt-mermaid">\n  <pre class="mermaid">${this.escapeHtml(node.content)}</pre>\n</div>`;
   }
 
@@ -378,6 +413,7 @@ export class SpecialBlockVisitor {
       '"': '&quot;',
       "'": '&#039;',
     };
+
     return text.replace(/[&<>"']/g, (m) => map[m]);
   }
 }

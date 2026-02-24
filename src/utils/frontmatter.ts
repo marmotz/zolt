@@ -19,9 +19,15 @@ export class FrontmatterUtils {
   }
 
   public static parseValue(value: string): any {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    if (value === 'null') return null;
+    if (value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
+    if (value === 'null') {
+      return null;
+    }
 
     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
       return value.slice(1, -1);
@@ -29,7 +35,10 @@ export class FrontmatterUtils {
 
     if (value.startsWith('[') && value.endsWith(']')) {
       const inner = value.slice(1, -1).trim();
-      if (!inner) return [];
+      if (!inner) {
+        return [];
+      }
+
       return inner.split(',').map((v) => this.parseValue(v.trim()));
     }
 
@@ -42,6 +51,7 @@ export class FrontmatterUtils {
 
   public static extractRaw(content: string): string | null {
     const match = content.match(/^---\n([\s\S]+?)\n---/);
+
     return match ? match[1] : null;
   }
 }

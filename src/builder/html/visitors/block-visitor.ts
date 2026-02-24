@@ -1,16 +1,16 @@
-import { 
-  HeadingNode, 
-  ParagraphNode, 
-  BlockquoteNode, 
-  ListNode, 
-  ListItemNode, 
-  DefinitionTermNode, 
-  DefinitionDescriptionNode, 
-  CodeBlockNode, 
-  IndentationNode, 
-  ASTNode 
+import {
+  ASTNode,
+  BlockquoteNode,
+  CodeBlockNode,
+  DefinitionDescriptionNode,
+  DefinitionTermNode,
+  HeadingNode,
+  IndentationNode,
+  ListItemNode,
+  ListNode,
+  ParagraphNode,
 } from '../../../parser/types';
-import { slugify, toRoman, toAlpha } from '../utils/string-utils';
+import { slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class BlockVisitor {
   public headingCounters: number[] = new Array(7).fill(0);
@@ -29,11 +29,12 @@ export class BlockVisitor {
 
   visitHeading(node: HeadingNode): string {
     const level = Math.min(Math.max(node.level, 1), 6);
-    const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const renderedContent = (inlineHtml + childrenHtml).trim();
+    const renderedContent = childrenHtml.trim();
 
-    if (!renderedContent) return '';
+    if (!renderedContent) {
+      return '';
+    }
 
     if (!node.attributes) {
       node.attributes = {};
@@ -70,21 +71,25 @@ export class BlockVisitor {
     }
 
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<h${level}${attrs}>${numberStr}${renderedContent}</h${level}>`;
   }
 
   visitParagraph(node: ParagraphNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
-    if (!trimmed) return '';
+    const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
+    if (!trimmed) {
+      return '';
+    }
+
     return `<p${attrs}>${trimmed}</p>`;
   }
 
   visitBlockquote(node: BlockquoteNode): string {
     const childrenHtml = this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
   }
 
@@ -98,6 +103,7 @@ export class BlockVisitor {
 
     const childrenHtml = this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<${tag}${attrs}>
 ${childrenHtml}
 </${tag}>`;
@@ -108,29 +114,29 @@ ${childrenHtml}
       node.checked !== undefined
         ? `<input type="checkbox" ${node.checked ? 'checked' : ''} onclick="return false;">`
         : '';
-    const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
+    const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<li${attrs}>${checkbox}${trimmed}</li>`;
   }
 
   visitDefinitionTerm(node: DefinitionTermNode): string {
-    const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
+    const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<dt${attrs}>${trimmed}</dt>`;
   }
 
   visitDefinitionDescription(node: DefinitionDescriptionNode): string {
-    const inlineHtml = this.processInlineContent((node as any).content);
     const childrenHtml = this.joinChildren(node.children);
-    const trimmed = (inlineHtml + childrenHtml).replace(/\s+/g, ' ').trim();
+    const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
+
     return `<dd${attrs}>${trimmed}</dd>`;
   }
 
@@ -149,7 +155,9 @@ ${childrenHtml}
 
   visitIndentation(node: IndentationNode): string {
     const childrenHtml = this.joinChildren(node.children);
-    if (!childrenHtml.trim()) return '';
+    if (!childrenHtml.trim()) {
+      return '';
+    }
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="indented" style="margin-left: 2em">${childrenHtml}</div>`;
@@ -205,6 +213,7 @@ ${childrenHtml}
 
     const styleStr = cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
     const otherAttrs = renderAllAttributes(attrs);
+
     return `<hr${styleStr}${otherAttrs}>`;
   }
 }

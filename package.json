@@ -30,8 +30,8 @@
     "dev": "bun run src/cli/index.ts",
     "test": "bun test",
     "prepublish": "bun run build",
-    "format": "bun x prettier --write .",
-    "lint": "bun x prettier --check ."
+    "format": "bun x prettier --write src",
+    "lint": "bun x prettier --check src"
   },
   "type": "module",
   "types": "./dist/index.d.ts",

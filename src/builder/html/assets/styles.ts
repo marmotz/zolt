@@ -160,6 +160,13 @@ export const BASE_CSS = `
   :target {
     scroll-margin-top: 2rem;
     background-color: var(--zlt-color-highlight-bg);
+    animation: zolt-anchor-highlight 3s ease-out;
+  }
+
+  @keyframes zolt-anchor-highlight {
+    0% { background-color: #fffdba; }
+    80% { background-color: #fffdba; }
+    100% { background-color: transparent; }
   }
 `;
 

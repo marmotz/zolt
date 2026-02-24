@@ -44,7 +44,7 @@ export class Parser {
     this.definitionCollector = new DefinitionCollector();
     this.tableParser = new TableParser(this.inlineParser);
     this.listParser = new ListParser(this.inlineParser);
-    this.tripleColonParser = new TripleColonParser(this.inlineParser);
+    this.tripleColonParser = new TripleColonParser();
     this.frontmatterParser = new FrontmatterParser();
     this.headingParser = new HeadingParser(this.inlineParser);
     this.codeBlockParser = new CodeBlockParser();
@@ -66,7 +66,7 @@ export class Parser {
     // Pass 1: Collect abbreviations and link references
     const { abbreviations, linkReferences, globalAbbreviations } = this.definitionCollector.collect(this.tokens);
 
-    const allAbbreviations = new Map<string, string>([ ...globalAbbreviations.entries(), ...abbreviations.entries() ]);
+    const allAbbreviations = new Map<string, string>([...globalAbbreviations.entries(), ...abbreviations.entries()]);
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
     this.inlineParser.setLinkReferences(linkReferences);
 
@@ -77,7 +77,10 @@ export class Parser {
     const frontmatter = children.find((child) => child.type === 'Frontmatter') as FrontmatterNode | undefined;
 
     return {
-      type: 'Document', children, frontmatter, sourceFile: this.filePath,
+      type: 'Document',
+      children,
+      frontmatter,
+      sourceFile: this.filePath,
     };
   }
 
@@ -87,8 +90,15 @@ export class Parser {
     if (this.pos < this.tokens.length) {
       this.currentToken = this.tokens[this.pos];
     } else {
-      this.currentToken = { type: TokenType.EOF, value: '', line: this.line, column: this.column, length: 0 };
+      this.currentToken = {
+        type: TokenType.EOF,
+        value: '',
+        line: token.line,
+        column: token.column + (token.length || 0),
+        length: 0,
+      };
     }
+
     return token;
   }
 
@@ -97,7 +107,10 @@ export class Parser {
   }
 
   private expect(type: TokenType): Token {
-    if (this.currentToken.type === type) return this.advance();
+    if (this.currentToken.type === type) {
+      return this.advance();
+    }
+
     return this.error(`Expected ${type} but got ${this.currentToken.type}`, 'EXPECTED_TOKEN');
   }
 
@@ -109,13 +122,97 @@ export class Parser {
     const token = this.peek(offset);
     if (token.type === TokenType.TEXT) {
       const trimmed = token.value.trim();
+      if (trimmed.startsWith('$')) {
+        return true;
+      }
+
       return /^\{([^}]+)}$/.test(trimmed) && !trimmed.startsWith('{$') && !trimmed.startsWith('{{');
     }
-    return [ TokenType.HEADING, TokenType.CODE_BLOCK, TokenType.CODE_BLOCK_START, TokenType.BLOCKQUOTE, TokenType.TECHNICAL_INDENT, TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION, TokenType.HORIZONTAL_RULE, TokenType.TRIPLE_COLON_START, TokenType.TRIPLE_COLON_END, TokenType.DOUBLE_BRACKET_START, TokenType.ABBREVIATION_DEF, TokenType.ABBREVIATION_DEF_GLOBAL, TokenType.COMMENT_INLINE, TokenType.FRONTMATTER ].includes(token.type);
+
+    return [
+      TokenType.HEADING,
+      TokenType.CODE_BLOCK,
+      TokenType.CODE_BLOCK_START,
+      TokenType.BLOCKQUOTE,
+      TokenType.TECHNICAL_INDENT,
+      TokenType.BULLET_LIST,
+      TokenType.ORDERED_LIST,
+      TokenType.TASK_LIST,
+      TokenType.DEFINITION,
+      TokenType.HORIZONTAL_RULE,
+      TokenType.TRIPLE_COLON_START,
+      TokenType.TRIPLE_COLON_END,
+      TokenType.DOUBLE_BRACKET_START,
+      TokenType.ABBREVIATION_DEF,
+      TokenType.ABBREVIATION_DEF_GLOBAL,
+      TokenType.COMMENT_INLINE,
+      TokenType.FRONTMATTER,
+    ].includes(token.type);
   }
 
   private match(...types: TokenType[]): boolean {
     return types.includes(this.currentToken.type);
+  }
+
+  private parseVariableDefinition(): VariableDefinitionNode {
+    const token = this.advance();
+    let content = token.value.trim();
+
+    // Check if the value is complete (balanced brackets/braces)
+    const isComplete = (val: string) => {
+      let depth = 0;
+      let inString = false;
+      let stringChar = '';
+      for (let i = 0; i < val.length; i++) {
+        const char = val[i];
+        if (inString) {
+          if (char === stringChar && (i === 0 || val[i - 1] !== '\\')) inString = false;
+          continue;
+        }
+        if (char === '"' || char === "'") {
+          inString = true;
+          stringChar = char;
+          continue;
+        }
+        if (char === '[' || char === '{' || char === '(') depth++;
+        else if (char === ']' || char === '}' || char === ')') depth--;
+      }
+
+      return depth <= 0;
+    };
+
+    while (!isComplete(content) && !this.isEof()) {
+      this.skipNewlines();
+      if (this.isEof()) break;
+      if (this.match(TokenType.INDENTATION)) this.advance();
+      if (this.match(TokenType.TEXT)) {
+        content += ' ' + this.advance().value.trim();
+      } else {
+        break;
+      }
+    }
+
+    const localVarMatch = content.match(/^\$([a-zA-Z_]\w*)\s*=\s*(.*)$/);
+    const globalVarMatch = content.match(/^\$\$([a-zA-Z_]\w*)\s*=\s*(.*)$/);
+
+    const isGlobal = !!globalVarMatch;
+    const match = isGlobal ? globalVarMatch : localVarMatch;
+
+    if (!match) {
+      return {
+        type: 'VariableDefinition',
+        name: 'error',
+        value: content,
+        isGlobal: false,
+      };
+    }
+
+    return {
+      type: 'VariableDefinition',
+      name: match[1],
+      value: match[2].trim(),
+      isGlobal,
+    };
   }
 
   private parseBlock(): ASTNode | null {
@@ -123,61 +220,183 @@ export class Parser {
       return this.headingParser.parseHeading(this.expect.bind(this));
     }
     if (this.match(TokenType.CODE_BLOCK_START)) {
-      return this.codeBlockParser.parseCodeBlock(this.expect.bind(this), this.match.bind(this), this.advance.bind(this), this.isEof.bind(this));
+      return this.codeBlockParser.parseCodeBlock(
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.advance.bind(this),
+        this.isEof.bind(this)
+      );
     }
     if (this.match(TokenType.BLOCKQUOTE)) {
-      return this.blockquoteParser.parseBlockquote(this.tokens, { current: this.pos }, () => this.currentToken, this.advance.bind(this), this.expect.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.parseBlock.bind(this), this.headingParser.parseHeading.bind(this.headingParser, this.expect.bind(this)), this.codeBlockParser.parseCodeBlock.bind(this.codeBlockParser, this.expect.bind(this), this.match.bind(this), this.advance.bind(this), this.isEof.bind(this)), this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)), this.paragraphParser.parseParagraph.bind(this.paragraphParser, this.match.bind(this), this.advance.bind(this), this.peek.bind(this), this.isEof.bind(this), this.isNewBlockStart.bind(this)), this.error.bind(this));
+      return this.blockquoteParser.parseBlockquote(
+        this.tokens,
+        { current: this.pos },
+        () => this.currentToken,
+        this.advance.bind(this),
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.parseBlock.bind(this),
+        this.headingParser.parseHeading.bind(this.headingParser, this.expect.bind(this)),
+        this.codeBlockParser.parseCodeBlock.bind(
+          this.codeBlockParser,
+          this.expect.bind(this),
+          this.match.bind(this),
+          this.advance.bind(this),
+          this.isEof.bind(this)
+        ),
+        this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
+        this.paragraphParser.parseParagraph.bind(
+          this.paragraphParser,
+          this.match.bind(this),
+          this.advance.bind(this),
+          this.peek.bind(this),
+          this.isEof.bind(this),
+          this.isNewBlockStart.bind(this)
+        ),
+        this.error.bind(this)
+      );
     }
     if (this.match(TokenType.TECHNICAL_INDENT)) {
-      return this.indentationParser.parseTechnicalIndentation(this.tokens, { current: this.pos }, () => this.currentToken, this.advance.bind(this), this.expect.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.parseBlock.bind(this), this.headingParser.parseHeading.bind(this.headingParser, this.expect.bind(this)), this.codeBlockParser.parseCodeBlock.bind(this.codeBlockParser, this.expect.bind(this), this.match.bind(this), this.advance.bind(this), this.isEof.bind(this)), this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)), this.paragraphParser.parseParagraph.bind(this.paragraphParser, this.match.bind(this), this.advance.bind(this), this.peek.bind(this), this.isEof.bind(this), this.isNewBlockStart.bind(this)), this.error.bind(this));
+      return this.indentationParser.parseTechnicalIndentation(
+        this.tokens,
+        { current: this.pos },
+        () => this.currentToken,
+        this.advance.bind(this),
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.parseBlock.bind(this),
+        this.headingParser.parseHeading.bind(this.headingParser, this.expect.bind(this)),
+        this.codeBlockParser.parseCodeBlock.bind(
+          this.codeBlockParser,
+          this.expect.bind(this),
+          this.match.bind(this),
+          this.advance.bind(this),
+          this.isEof.bind(this)
+        ),
+        this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
+        this.paragraphParser.parseParagraph.bind(
+          this.paragraphParser,
+          this.match.bind(this),
+          this.advance.bind(this),
+          this.peek.bind(this),
+          this.isEof.bind(this),
+          this.isNewBlockStart.bind(this)
+        ),
+        this.error.bind(this)
+      );
     }
     if (this.match(TokenType.TRIPLE_COLON_START)) {
-      return this.tripleColonParser.parseTripleColonBlock(this.tokens, this.advance.bind(this), this.expect.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.parseBlock.bind(this), this.error.bind(this));
+      return this.tripleColonParser.parseTripleColonBlock(
+        this.advance.bind(this),
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.parseBlock.bind(this)
+      );
     }
     if (this.match(TokenType.TRIPLE_COLON_END)) {
       this.advance();
+
       return {
-        type: 'Paragraph', children: [ { type: 'Text', content: ':::' } ],
+        type: 'Paragraph',
+        children: [{ type: 'Text', content: ':::' }],
       } as any;
     }
-    if (this.match(TokenType.DOUBLE_BRACKET_START)) return this.specialBlockParser.parseDoubleBracketBlock(this.expect.bind(this));
-    if (this.match(TokenType.HORIZONTAL_RULE)) return this.specialBlockParser.parseHorizontalRule(this.expect.bind(this));
+    if (this.match(TokenType.DOUBLE_BRACKET_START)) {
+      return this.specialBlockParser.parseDoubleBracketBlock(this.expect.bind(this));
+    }
+    if (this.match(TokenType.HORIZONTAL_RULE)) {
+      return this.specialBlockParser.parseHorizontalRule(this.expect.bind(this));
+    }
 
     if (this.match(TokenType.INDENTATION)) {
       const next = this.peek(1);
-      if (next.type === TokenType.BULLET_LIST || next.type === TokenType.ORDERED_LIST || next.type === TokenType.TASK_LIST || next.type === TokenType.DEFINITION) {
-        return this.listParser.parseList(this.advance.bind(this), this.peek.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.parseBlock.bind(this), this.currentToken.value);
+      if (
+        next.type === TokenType.BULLET_LIST ||
+        next.type === TokenType.ORDERED_LIST ||
+        next.type === TokenType.TASK_LIST ||
+        next.type === TokenType.DEFINITION
+      ) {
+        return this.listParser.parseList(
+          this.advance.bind(this),
+          this.peek.bind(this),
+          this.match.bind(this),
+          this.skipNewlines.bind(this),
+          this.isEof.bind(this),
+          this.parseBlock.bind(this),
+          this.currentToken.value
+        );
       }
     }
 
     if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION)) {
-      return this.listParser.parseList(this.advance.bind(this), this.peek.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.parseBlock.bind(this));
+      return this.listParser.parseList(
+        this.advance.bind(this),
+        this.peek.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.parseBlock.bind(this)
+      );
     }
 
-    if (this.match(TokenType.INDENTATION)) return this.indentationParser.parseIndentation(this.expect.bind(this));
-    if (this.match(TokenType.ABBREVIATION_DEF) || this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) return this.specialBlockParser.parseAbbreviationDef(this.expect.bind(this), this.match.bind(this));
-    if (this.match(TokenType.LINK_REF_DEF)) return this.specialBlockParser.parseLinkReferenceDef(this.expect.bind(this));
-    if (this.match(TokenType.COMMENT_INLINE)) return this.specialBlockParser.parseCommentInline(this.expect.bind(this));
+    if (this.match(TokenType.INDENTATION)) {
+      return this.indentationParser.parseIndentation(this.expect.bind(this));
+    }
+    if (this.match(TokenType.ABBREVIATION_DEF) || this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) {
+      return this.specialBlockParser.parseAbbreviationDef(this.expect.bind(this), this.match.bind(this));
+    }
+    if (this.match(TokenType.LINK_REF_DEF)) {
+      return this.specialBlockParser.parseLinkReferenceDef(this.expect.bind(this));
+    }
+    if (this.match(TokenType.COMMENT_INLINE)) {
+      return this.specialBlockParser.parseCommentInline(this.expect.bind(this));
+    }
 
     if (this.tableParser.isTableStart(this.currentToken)) {
-      return this.tableParser.parseTable(this.expect.bind(this), this.match.bind(this), this.skipNewlines.bind(this), this.isEof.bind(this), this.peek.bind(this));
+      return this.tableParser.parseTable(
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.peek.bind(this)
+      );
     }
 
     if (this.match(TokenType.TEXT)) {
       const value = this.currentToken.value.trim();
+
+      // Handle variable definitions
+      if (value.startsWith('$')) {
+        return this.parseVariableDefinition();
+      }
+
       const attrMatch = value.match(/^\{([^}]+)}$/);
       if (attrMatch) {
         const attrContent = attrMatch[1];
         if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
           this.advance();
+
           return {
-            type: 'Attributes', attributes: InlineParser.parseAttributes(attrContent),
+            type: 'Attributes',
+            attributes: InlineParser.parseAttributes(attrContent),
           } as any;
         }
       }
     }
 
-    return this.paragraphParser.parseParagraph(this.match.bind(this), this.advance.bind(this), this.peek.bind(this), this.isEof.bind(this), this.isNewBlockStart.bind(this));
+    return this.paragraphParser.parseParagraph(
+      this.match.bind(this),
+      this.advance.bind(this),
+      this.peek.bind(this),
+      this.isEof.bind(this),
+      this.isNewBlockStart.bind(this)
+    );
   }
 
   private parseDocument(): ASTNode[] {
@@ -219,6 +438,7 @@ export class Parser {
 
   private peek(offset: number = 0): Token {
     const idx = this.pos + offset;
+
     return this.tokens[idx] || { type: TokenType.EOF, value: '', line: 0, column: 0, length: 0 };
   }
 

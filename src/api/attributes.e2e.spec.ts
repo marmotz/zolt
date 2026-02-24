@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import { buildString } from './index';
 
 describe('API: Attributes and Anchors', () => {

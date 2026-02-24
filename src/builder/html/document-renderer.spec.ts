@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
-import { DocumentRenderer } from './document-renderer';
-import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentNode } from '../../parser/types';
+import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
+import { DocumentRenderer } from './document-renderer';
 
 describe('DocumentRenderer', () => {
   const evaluator = new ExpressionEvaluator();
@@ -11,9 +11,14 @@ describe('DocumentRenderer', () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
-      sourceFile: 'test.zlt'
+      sourceFile: 'test.zlt',
     };
-    const html = renderer.renderDocument(node, { hasTabs: false, hasCharts: false, hasMermaid: false }, () => '', () => '');
+    const html = renderer.renderDocument(
+      node,
+      { hasTabs: false, hasCharts: false, hasMermaid: false },
+      () => '',
+      () => ''
+    );
 
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('<html lang="en">');
@@ -24,9 +29,14 @@ describe('DocumentRenderer', () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
-      sourceFile: 'test.zlt'
+      sourceFile: 'test.zlt',
     };
-    const html = renderer.renderDocument(node, { hasTabs: true, hasCharts: true, hasMermaid: true }, () => '', () => '');
+    const html = renderer.renderDocument(
+      node,
+      { hasTabs: true, hasCharts: true, hasMermaid: true },
+      () => '',
+      () => ''
+    );
 
     expect(html).toContain('.zolt-tabs');
     expect(html).toContain('chart.js');

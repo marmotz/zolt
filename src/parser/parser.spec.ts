@@ -4,30 +4,51 @@ import { Parser } from './parser';
 
 describe('Parser', () => {
   const getFlatContent = (node: any): string => {
-    if (node.content !== undefined) return node.content;
+    if (node.content !== undefined) {
+      return node.content;
+    }
     if (node.children) {
       return node.children
         .map((c: any) => {
-          if (c.type === 'Text') return c.content;
-          if (c.type === 'Expression') return `{{ ${c.expression} }}`;
-          if (c.type === 'Variable') return `{$${c.name}}`;
-          if (c.type === 'Bold') return `**${getFlatContent(c)}**`;
-          if (c.type === 'Italic') return `//${getFlatContent(c)}//`;
-          if (c.type === 'Underline') return `__${getFlatContent(c)}__`;
-          if (c.type === 'Strikethrough') return `~~${getFlatContent(c)}~~`;
-          if (c.type === 'Highlight') return `==${getFlatContent(c)}==`;
+          if (c.type === 'Text') {
+            return c.content;
+          }
+          if (c.type === 'Expression') {
+            return `{{ ${c.expression} }}`;
+          }
+          if (c.type === 'Variable') {
+            return `{$${c.name}}`;
+          }
+          if (c.type === 'Bold') {
+            return `**${getFlatContent(c)}**`;
+          }
+          if (c.type === 'Italic') {
+            return `//${getFlatContent(c)}//`;
+          }
+          if (c.type === 'Underline') {
+            return `__${getFlatContent(c)}__`;
+          }
+          if (c.type === 'Strikethrough') {
+            return `~~${getFlatContent(c)}~~`;
+          }
+          if (c.type === 'Highlight') {
+            return `==${getFlatContent(c)}==`;
+          }
           if (c.type === 'InlineStyle') {
             const attrs = c.attributes
               ? `{${Object.entries(c.attributes)
                   .map(([k, v]) => `${k}=${v}`)
                   .join(' ')}}`
               : '';
+
             return `||${getFlatContent(c)}||${attrs}`;
           }
+
           return getFlatContent(c);
         })
         .join('');
     }
+
     return '';
   };
 

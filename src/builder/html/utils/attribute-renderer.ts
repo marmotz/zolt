@@ -5,7 +5,9 @@ export class AttributeRenderer {
   constructor(private evaluator: any) {}
 
   public renderAllAttributes(attrs?: Attributes): string {
-    if (!attrs) return '';
+    if (!attrs) {
+      return '';
+    }
 
     const htmlAttrs = this.filterCssProperties(attrs);
     const styleStr = this.buildStyleAttribute(attrs);
@@ -15,7 +17,9 @@ export class AttributeRenderer {
   }
 
   public buildStyleAttribute(attrs?: Attributes): string {
-    if (!attrs) return '';
+    if (!attrs) {
+      return '';
+    }
 
     const cssProps: string[] = [];
     const cssPropertyMap: Record<string, string> = {
@@ -78,11 +82,14 @@ export class AttributeRenderer {
         filtered[key] = value;
       }
     }
+
     return filtered;
   }
 
   public buildAttributes(attrs?: Attributes): string {
-    if (!attrs) return '';
+    if (!attrs) {
+      return '';
+    }
 
     const parts: string[] = [];
     if (attrs.id) {
@@ -112,6 +119,7 @@ export class AttributeRenderer {
     return text.replace(/\{\$([a-zA-Z_]\w*)}/g, (_, name) => {
       try {
         const val = this.evaluator.evaluate('$' + name);
+
         return formatValue(val);
       } catch {
         return `{$${name}}`;

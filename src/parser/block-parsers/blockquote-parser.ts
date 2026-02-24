@@ -1,4 +1,4 @@
-import { TokenType, Token } from '../../lexer/token-types';
+import { Token, TokenType } from '../../lexer/token-types';
 import { ASTNode, BlockquoteNode, ParagraphNode } from '../types';
 import { ListParser } from './list-parser';
 import { TripleColonParser } from './triple-colon-parser';
@@ -30,8 +30,19 @@ export class BlockquoteParser {
     const children: ASTNode[] = [];
 
     const firstLineContent = this.parseBlockquoteLineContent(
-      tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-      parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
+      tokens,
+      pos,
+      currentToken,
+      advance,
+      expect,
+      match,
+      skipNewlines,
+      isEof,
+      parseBlock,
+      parseHeading,
+      parseCodeBlock,
+      parseHorizontalRule,
+      parseParagraph
     );
     if (firstLineContent) children.push(firstLineContent);
 
@@ -40,16 +51,41 @@ export class BlockquoteParser {
         const nextLevel = currentToken().level || 1;
         if (nextLevel < baseLevel) break;
         if (nextLevel > baseLevel) {
-          children.push(this.parseBlockquote(
-            tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-            parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
-          ));
+          children.push(
+            this.parseBlockquote(
+              tokens,
+              pos,
+              currentToken,
+              advance,
+              expect,
+              match,
+              skipNewlines,
+              isEof,
+              parseBlock,
+              parseHeading,
+              parseCodeBlock,
+              parseHorizontalRule,
+              parseParagraph,
+              error
+            )
+          );
           continue;
         }
         advance();
         const lineContent = this.parseBlockquoteLineContent(
-          tokens, pos, currentToken, advance, expect, match, skipNewlines, isEof,
-          parseBlock, parseHeading, parseCodeBlock, parseHorizontalRule, parseParagraph, error
+          tokens,
+          pos,
+          currentToken,
+          advance,
+          expect,
+          match,
+          skipNewlines,
+          isEof,
+          parseBlock,
+          parseHeading,
+          parseCodeBlock,
+          parseHorizontalRule,
+          parseParagraph
         );
         if (lineContent) children.push(lineContent);
         continue;
@@ -75,31 +111,27 @@ export class BlockquoteParser {
     parseHeading: () => ASTNode,
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
-    parseParagraph: () => ParagraphNode,
-    error: (message: string, code: string) => never
+    parseParagraph: () => ParagraphNode
   ): ASTNode | null {
-    if (match(TokenType.BLOCKQUOTE, TokenType.NEWLINE, TokenType.EOF)) return null;
-    if (match(TokenType.HEADING)) return parseHeading();
-    if (match(TokenType.CODE_BLOCK_START)) return parseCodeBlock();
-    if (match(TokenType.HORIZONTAL_RULE)) return parseHorizontalRule();
+    if (match(TokenType.BLOCKQUOTE, TokenType.NEWLINE, TokenType.EOF)) {
+      return null;
+    }
+    if (match(TokenType.HEADING)) {
+      return parseHeading();
+    }
+    if (match(TokenType.CODE_BLOCK_START)) {
+      return parseCodeBlock();
+    }
+    if (match(TokenType.HORIZONTAL_RULE)) {
+      return parseHorizontalRule();
+    }
     if (match(TokenType.TRIPLE_COLON_START)) {
-      const { node, newPos } = this.tripleColonParser.parseTripleColonBlock(
-        tokens,
-        pos.current,
-        advance,
-        expect,
-        match,
-        skipNewlines,
-        isEof,
-        parseBlock,
-        error
-      );
-      pos.current = newPos;
-      return node;
+      return this.tripleColonParser.parseTripleColonBlock(advance, expect, match, skipNewlines, isEof, parseBlock);
     }
     if (match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
       return this.parseBlockquoteList(tokens, pos, currentToken, advance, match, skipNewlines, isEof, parseBlock);
     }
+
     return parseParagraph();
   }
 
@@ -130,11 +162,11 @@ export class BlockquoteParser {
         isEof,
         parseBlock
       );
-      // listParser.parseListItem returns newPos in some cases? 
+      // listParser.parseListItem returns newPos in some cases?
       // Actually list-parser.ts seems to take pos as a number but some parts of Parser use it differently.
       // Looking at list-parser.ts: parseListItem(kind, indent, tokens, pos, advance, peek, match, skipNewlines, isEof, parseBlock)
       // Wait, I should check list-parser.ts signature.
-      
+
       // I'll check list-parser.ts first.
       children.push(item);
       skipNewlines();
@@ -147,6 +179,7 @@ export class BlockquoteParser {
         advance();
       }
     }
+
     return { type: 'List', kind, children };
   }
 }

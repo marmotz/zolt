@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
-import { ParagraphParser } from './paragraph-parser';
+import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { TokenType, Token } from '../../lexer/token-types';
+import { ParagraphParser } from './paragraph-parser';
 
 describe('ParagraphParser', () => {
   const inlineParser = new InlineParser();
@@ -10,12 +10,13 @@ describe('ParagraphParser', () => {
 
   const mockContext = (tokens: Token[]) => {
     let pos = 0;
+
     return {
       match: (...types: TokenType[]) => types.includes(tokens[pos]?.type),
       advance: () => tokens[pos++],
       peek: (offset: number) => tokens[pos + offset] || { type: TokenType.EOF },
       isEof: () => pos >= tokens.length || tokens[pos].type === TokenType.EOF,
-      isNewBlockStart: () => false // Simplified for this test
+      isNewBlockStart: () => false, // Simplified for this test
     };
   };
 
