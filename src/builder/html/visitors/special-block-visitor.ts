@@ -32,6 +32,14 @@ export class SpecialBlockVisitor {
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
+    if (node.blockType.startsWith('if ')) {
+      return this.visitIfBlock(node);
+    }
+
+    if (node.blockType.startsWith('foreach ')) {
+      return this.visitForeachBlock(node);
+    }
+
     if (node.blockType === 'tabs') {
       return this.visitTabsBlock(node);
     }
@@ -78,6 +86,65 @@ export class SpecialBlockVisitor {
     }
     html += `${childrenHtml}\n</div>`;
     return html;
+  }
+
+  private visitIfBlock(node: TripleColonBlockNode): string {
+    const condition = node.blockType.substring(3).trim();
+    try {
+      const result = this.evaluator.evaluate(condition);
+      if (this.evaluator.isTruthy(result)) {
+        return this.joinChildren(node.children);
+      }
+    } catch (e) {
+      console.warn(`Failed to evaluate condition: ${condition}`, e);
+    }
+    return '';
+  }
+
+  private visitForeachBlock(node: TripleColonBlockNode): string {
+    const foreachExpr = node.blockType.substring(8).trim();
+    const match = foreachExpr.match(/^\{\s*\$([a-zA-Z_]\w*)\s+as\s+\$([a-zA-Z_]\w*)\s*}$/);
+    
+    if (!match) {
+      console.warn(`Invalid foreach expression: ${foreachExpr}`);
+      return '';
+    }
+
+    const collectionName = `$${match[1]}`;
+    const iteratorName = match[2];
+
+    try {
+      const collection = this.evaluator.evaluate(collectionName);
+      if (!Array.isArray(collection)) {
+        return '';
+      }
+
+      let html = '';
+      const originalIteratorValue = this.evaluator.getVariable(iteratorName);
+      const originalForeachValue = this.evaluator.getVariable('foreach');
+
+      collection.forEach((item, index) => {
+        this.evaluator.setVariable(iteratorName, item);
+        this.evaluator.setVariable('foreach', {
+          index,
+          index1: index + 1,
+          first: index === 0,
+          last: index === collection.length - 1,
+          even: index % 2 === 0,
+          odd: index % 2 === 1,
+        });
+        html += this.joinChildren(node.children);
+      });
+
+      // Restore original variables
+      this.evaluator.setVariable(iteratorName, originalIteratorValue);
+      this.evaluator.setVariable('foreach', originalForeachValue);
+
+      return html;
+    } catch (e) {
+      console.warn(`Failed to evaluate collection: ${collectionName}`, e);
+      return '';
+    }
   }
 
   private visitTabsBlock(node: TripleColonBlockNode): string {

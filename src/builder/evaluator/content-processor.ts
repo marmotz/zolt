@@ -129,6 +129,7 @@ export class ContentProcessor {
     if (/^Math\.\w+\(/.test(trimmed)) return true;
     if (/^List\.\w+\(/.test(trimmed)) return true;
     if (/^String\.\w+\(/.test(trimmed)) return true;
+    if (/^Date\.\w+\(/.test(trimmed)) return true;
 
     return false;
   }

@@ -1,7 +1,8 @@
 import { Attributes } from '../../../parser/types';
+import { formatValue } from './string-utils';
 
 export class AttributeRenderer {
-  constructor(private contentProcessor: any) {}
+  constructor(private evaluator: any) {}
 
   public renderAllAttributes(attrs?: Attributes): string {
     if (!attrs) return '';
@@ -41,7 +42,7 @@ export class AttributeRenderer {
 
     for (const [key, value] of Object.entries(attrs)) {
       if (value !== undefined && cssPropertyMap[key]) {
-        const processedValue = this.contentProcessor.processContent(String(value));
+        const processedValue = this.evaluateString(String(value));
         cssProps.push(`${cssPropertyMap[key]}: ${processedValue}`);
       }
     }
@@ -85,11 +86,11 @@ export class AttributeRenderer {
 
     const parts: string[] = [];
     if (attrs.id) {
-      const processedId = this.contentProcessor.processContent(String(attrs.id));
+      const processedId = this.evaluateString(String(attrs.id));
       parts.push(`id="${processedId}"`);
     }
     if (attrs.class) {
-      const processedClass = this.contentProcessor.processContent(String(attrs.class));
+      const processedClass = this.evaluateString(String(attrs.class));
       parts.push(`class="${processedClass}"`);
     }
 
@@ -98,12 +99,23 @@ export class AttributeRenderer {
         if (value === '') {
           parts.push(key);
         } else {
-          const processedValue = this.contentProcessor.processContent(String(value));
+          const processedValue = this.evaluateString(String(value));
           parts.push(`${key}="${processedValue}"`);
         }
       }
     }
 
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+
+  private evaluateString(text: string): string {
+    return text.replace(/\{\$([a-zA-Z_]\w*)}/g, (_, name) => {
+      try {
+        const val = this.evaluator.evaluate('$' + name);
+        return formatValue(val);
+      } catch {
+        return `{$${name}}`;
+      }
+    });
   }
 }

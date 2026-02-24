@@ -6,7 +6,6 @@ import {
   DocumentNode,
 } from '../../parser/types';
 import { Builder } from '../builder';
-import { ContentProcessor } from '../evaluator/content-processor';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { AttributeRenderer } from './utils/attribute-renderer';
 import { BlockVisitor } from './visitors/block-visitor';
@@ -21,7 +20,6 @@ export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
   private evaluator: ExpressionEvaluator;
-  private contentProcessor: ContentProcessor;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
 
@@ -40,8 +38,7 @@ export class HTMLBuilder implements Builder {
         }
       }
     }
-    this.contentProcessor = new ContentProcessor(this.evaluator);
-    this.attributeRenderer = new AttributeRenderer(this.contentProcessor);
+    this.attributeRenderer = new AttributeRenderer(this.evaluator);
     this.documentRenderer = new DocumentRenderer(this.evaluator);
 
     const buildBound = this.build.bind(this);
@@ -62,7 +59,6 @@ export class HTMLBuilder implements Builder {
       joinChildrenBound,
       renderAttrsBound,
       processInlineBound,
-      this.contentProcessor,
       this.evaluator
     );
 
@@ -168,8 +164,9 @@ export class HTMLBuilder implements Builder {
 
   public processInlineContent(text: string): string {
     if (!text) return '';
-    const processed = this.contentProcessor.processContent(text);
-    return this.processInline(processed);
+    // Variables and expressions are now separate AST nodes,
+    // so we don't need to process them as text here.
+    return this.processInline(text);
   }
 
   visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {

@@ -27,7 +27,6 @@ export class InlineVisitor {
     private joinChildren: (nodes: ASTNode[]) => string,
     private renderAllAttributes: (attrs?: any) => string,
     private processInline: (text: string) => string,
-    private contentProcessor: any,
     private evaluator: any
   ) {}
 
@@ -79,7 +78,7 @@ export class InlineVisitor {
   }
 
   visitText(node: TextNode): string {
-    return this.contentProcessor.processContent(node.content);
+    return node.content;
   }
 
   visitBold(node: BoldNode): string {
@@ -145,47 +144,47 @@ export class InlineVisitor {
 
   visitLink(node: LinkNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
-    const href = transformHref(this.contentProcessor.processContent(node.href));
+    const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
+    const href = transformHref(this.evaluateString(node.href));
     const childrenHtml =
       node.children && node.children.length > 0
         ? this.joinChildren(node.children)
-        : this.processInline(this.contentProcessor.processContent((node as any).content));
+        : this.processInline((node as any).content);
     return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
   }
 
   visitImage(node: ImageNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = this.contentProcessor.processContent(node.src);
-    const alt = this.contentProcessor.processContent(node.alt);
+    const src = this.evaluateString(node.src);
+    const alt = this.evaluateString(node.alt);
     return `<img src="${src}" alt="${alt}"${attrs}>`;
   }
 
   visitVideo(node: VideoNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = this.contentProcessor.processContent(node.src);
-    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    const src = this.evaluateString(node.src);
+    const alt = this.evaluateString(node.alt ?? '');
     return `<video src="${src}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = this.contentProcessor.processContent(node.src);
-    const alt = this.contentProcessor.processContent(node.alt ?? '');
+    const src = this.evaluateString(node.src);
+    const alt = this.evaluateString(node.alt ?? '');
     return `<audio src="${src}"${attrs}>${alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = this.contentProcessor.processContent(node.src);
-    const title = node.title ? ` title="${this.contentProcessor.processContent(node.title)}"` : '';
+    const src = this.evaluateString(node.src);
+    const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
     return `<iframe src="${src}"${title}${attrs}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = transformHref(this.contentProcessor.processContent(node.src));
-    const title = node.title ? this.contentProcessor.processContent(node.title) : null;
+    const src = transformHref(this.evaluateString(node.src));
+    const title = node.title ? this.evaluateString(node.title) : null;
     return `<a href="${src}"${attrs}>${title || src}</a>`;
   }
 
@@ -226,11 +225,23 @@ export class InlineVisitor {
         if (value === '') {
           parts.push(key);
         } else {
-          const processedValue = this.contentProcessor.processContent(String(value));
+          const processedValue = this.evaluateString(String(value));
           parts.push(`${key}="${processedValue}"`);
         }
       }
     }
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+
+  private evaluateString(text: string): string {
+    // Basic evaluation for string attributes that might contain variables
+    return text.replace(/\{\$([a-zA-Z_]\w*)}/g, (_, name) => {
+      try {
+        const val = this.evaluator.evaluate('$' + name);
+        return formatValue(val);
+      } catch {
+        return `{$${name}}`;
+      }
+    });
   }
 }

@@ -21,7 +21,7 @@
 - [x] Implement automatic date variables (`{$created}`, `{$modified}`)
 - [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `mm`, `ss`)
 - [ ] Support timezone configuration (`$timezone = "Europe/Paris"`)
-- [x] Implement SourceEvaluator for processing `:::foreach`, `:::if`, and `:::comment` blocks
+- [x] Implement AST-based evaluation for `:::foreach`, `:::if`, and expressions (replaces SourceEvaluator)
 
 ## 2. Universal Attribute System `{}`
 
@@ -354,7 +354,7 @@
 ### Automatic Features
 
 - [x] Generate automatic heading IDs for headings without explicit `{#id}`
-- [ ] Process `:::foreach` loops with automatic variables
+- [x] Process `:::foreach` loops with automatic variables (AST-based)
 - [x] Generate Table of Contents at `[[toc]]` locations
 - [ ] Resolve cross-references `@ref`
 - [ ] Generate footnotes

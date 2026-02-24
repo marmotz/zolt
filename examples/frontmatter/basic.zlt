@@ -11,6 +11,6 @@ Simple YAML frontmatter at the top of the file.
 
 **Author:** {$author}
 
-**Date:** {Date.format($date, "DD/MM/YYYY")}
+**Date:** {{Date.format($date, "DD/MM/YYYY")}}
 
 [← Retour à l'index](../frontmatter.zlt)

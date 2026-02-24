@@ -471,9 +471,12 @@ export class ExpressionEvaluator {
         }
 
         let date: Date;
-        if (typeof dateValue === 'number') {
+        if (dateValue instanceof Date) {
+          date = dateValue;
+        } else if (typeof dateValue === 'number') {
           date = new Date(dateValue);
         } else if (typeof dateValue === 'string') {
+          // Try to handle ISO date strings or other common formats
           date = new Date(dateValue);
         } else {
           return '';

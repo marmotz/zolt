@@ -1,12 +1,12 @@
 import { readFile, stat, writeFile } from 'fs/promises';
 import { Builder } from '../builder/builder';
 import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
-import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { InlineParser } from '../parser/inline-parser';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
+import { FrontmatterUtils } from '../utils/frontmatter';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
@@ -63,17 +63,20 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     evaluator.setVariable(key, value);
   }
 
-  const sourceEvaluator = new SourceEvaluator(evaluator);
-  const evaluatedContent = sourceEvaluator.evaluate(content);
-
-  const lexer = new Lexer(evaluatedContent);
+  const lexer = new Lexer(content);
   const tokens = lexer.tokenize();
 
-  const parser = new Parser(tokens);
+  const parser = new Parser(tokens, options?.filePath);
   const ast = parser.parse();
 
-  // If there is frontmatter in the AST, we should merge it with initial variables
-  // so the builder knows about it (e.g. for numbering)
+  // The parser now extracts the frontmatter. We should ensure the evaluator 
+  // has those variables before the builder starts.
+  if (ast.frontmatter) {
+    for (const [key, value] of Object.entries(ast.frontmatter.data)) {
+      evaluator.setVariable(key, value);
+    }
+  }
+
   const mergedVariables = { ...initialVariables };
   if (ast.frontmatter) {
     Object.assign(mergedVariables, ast.frontmatter.data);
