@@ -1022,11 +1022,21 @@ $$version = "1.0.0"
 Les variables sont appelées avec la syntaxe `{$nom_variable}`.
 
 ```
-
 Bienvenue chez {$client_name}, nous utilisons la version {$version}.
 
 Statut actuel : **{$statut}** (v{$version}).
+```
 
+#### Opérateur Ternaire
+
+Zolt supporte l'opérateur ternaire pour l'affichage conditionnel simple au sein des variables ou des expressions.
+
+**Syntaxe :** `{$condition ? valeur_si_vrai : valeur_si_faux}` ou `{{ condition ? valeur_si_vrai : valeur_si_faux }}`
+
+**Exemple :**
+```
+Featured: {$featured ? "Oui" : "Non"}
+Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}
 ```
 
 ### 5.4 Calculs (Optionnel)

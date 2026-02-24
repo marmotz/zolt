@@ -12,7 +12,7 @@
 
 - [x] Parse YAML frontmatter at start of file
 - [x] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
-      `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
+  `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 - [x] Implement theme system (`default`, `professional`, `technical`, `playful`)
 - [x] Support `color-scheme` (`auto`, `light`, `dark`) with automatic system preference detection
 - [x] Generate HTML `<meta>` and Open Graph tags from frontmatter (with strict TS typing)
@@ -210,6 +210,7 @@
 - [x] Division `{{ a / b }}`
 - [x] Modulo `{{ a % b }}`
 - [x] Power `{{ a ^ b }}`
+- [x] Ternary operator `{{ condition ? trueVal : falseVal }}`
 - [x] Operator precedence (parentheses, power, mult/div/mod, add/sub)
 
 ### Math Namespace
@@ -291,7 +292,7 @@
 
 - [x] `:::foreach {$array as $item}`
 - [x] Loop variables: `{$foreach.index}`, `{$foreach.index1}`, `{$foreach.first}`, `{$foreach.last}`, `{$foreach.even}`,
-      `{$foreach.odd}`
+  `{$foreach.odd}`
 - [x] Nested loops
 - [x] Conditional rendering in loops with `:::if`
 - [ ] Alternating row styles

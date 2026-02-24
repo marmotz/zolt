@@ -210,7 +210,7 @@ export class ContentProcessor {
   }
 
   private processVariableReferences(content: string): string {
-    const combinedRegex = /`[^`]*`|\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g;
+    const combinedRegex = /`[^`]*`|\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+]|[^}])*)}/g;
 
     return content.replace(combinedRegex, (match, varPath) => {
       if (match.startsWith('`')) {

@@ -60,3 +60,23 @@ test('should handle direct variable assignment', () => {
   const ref = evaluator.getVariable('ref');
   expect(ref).toBe(123);
 });
+
+test('should handle ternary operator in variable expansion', () => {
+  const evaluator = new ExpressionEvaluator({ featured: true });
+  const processor = new ContentProcessor(evaluator);
+
+  expect(processor.processContent('Featured: {$featured ? "Yes" : "No"}')).toBe('Featured: Yes');
+
+  evaluator.setVariable('featured', false);
+  expect(processor.processContent('Featured: {$featured ? "Yes" : "No"}')).toBe('Featured: No');
+});
+
+test('should handle ternary operator in expressions', () => {
+  const evaluator = new ExpressionEvaluator({ age: 20 });
+  const processor = new ContentProcessor(evaluator);
+
+  expect(processor.processContent('Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}')).toBe('Statut: Adulte');
+
+  evaluator.setVariable('age', 15);
+  expect(processor.processContent('Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}')).toBe('Statut: Mineur');
+});

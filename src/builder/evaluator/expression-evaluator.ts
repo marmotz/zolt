@@ -241,6 +241,12 @@ export class ExpressionEvaluator {
       return false;
     }
 
+    // Handle ternary operator ? :
+    const ternaryResult = this.tryTernary(trimmed);
+    if (ternaryResult !== undefined) {
+      return ternaryResult;
+    }
+
     // Handle negation !
     if (trimmed.startsWith('!')) {
       const operand = this.evaluate(trimmed.slice(1));
@@ -258,6 +264,107 @@ export class ExpressionEvaluator {
     }
 
     return this.evaluateExpression(trimmed);
+  }
+
+  private tryTernary(expr: string): Value | undefined {
+    let depth = 0;
+    let inString = false;
+    let stringChar = '';
+    let questionMarkIndex = -1;
+
+    // Find the first '?' at depth 0
+    for (let i = 0; i < expr.length; i++) {
+      const char = expr[i];
+
+      if (inString) {
+        if (char === stringChar && (i === 0 || expr[i - 1] !== '\\')) {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"' || char === "'") {
+        inString = true;
+        stringChar = char;
+        continue;
+      }
+
+      if (char === '(' || char === '[' || char === '{') {
+        depth++;
+      } else if (char === ')' || char === ']' || char === '}') {
+        depth--;
+      } else if (depth === 0 && char === '?') {
+        questionMarkIndex = i;
+        break;
+      }
+    }
+
+    if (questionMarkIndex === -1) {
+      return undefined;
+    }
+
+    // Find the corresponding ':' at depth 0
+    let colonIndex = -1;
+    depth = 0;
+    inString = false;
+
+    // We search from questionMarkIndex + 1
+    // BUT we must be careful with nested ternaries: a ? b ? c : d : e
+    // The ':' for the first '?' is the one that closes it.
+    // Actually, it's easier to search for the LAST ':' at depth 0 that corresponds to our first '?'
+    // Wait, no. If we have a ? b : c ? d : e
+    // first ? is at index for 'a ?'
+    // matching : is at index for 'b :'
+
+    let ternaryDepth = 0;
+    for (let i = questionMarkIndex + 1; i < expr.length; i++) {
+      const char = expr[i];
+
+      if (inString) {
+        if (char === stringChar && (i === 0 || expr[i - 1] !== '\\')) {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === '"' || char === "'") {
+        inString = true;
+        stringChar = char;
+        continue;
+      }
+
+      if (char === '(' || char === '[' || char === '{') {
+        depth++;
+      } else if (char === ')' || char === ']' || char === '}') {
+        depth--;
+      } else if (depth === 0) {
+        if (char === '?') {
+          ternaryDepth++;
+        } else if (char === ':') {
+          if (ternaryDepth === 0) {
+            colonIndex = i;
+            break;
+          } else {
+            ternaryDepth--;
+          }
+        }
+      }
+    }
+
+    if (colonIndex === -1) {
+      return undefined;
+    }
+
+    const conditionStr = expr.slice(0, questionMarkIndex).trim();
+    const trueExprStr = expr.slice(questionMarkIndex + 1, colonIndex).trim();
+    const falseExprStr = expr.slice(colonIndex + 1).trim();
+
+    const condition = this.evaluate(conditionStr);
+    if (this.isTruthy(condition)) {
+      return this.evaluate(trueExprStr);
+    } else {
+      return this.evaluate(falseExprStr);
+    }
   }
 
   private compare(left: Value, op: string, right: Value): boolean {

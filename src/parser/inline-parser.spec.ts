@@ -335,6 +335,22 @@ describe('InlineParser', () => {
     });
   });
 
+  describe('Variables with Ternary', () => {
+    test('should parse variable with ternary operator', () => {
+      const nodes = parser.parse('{$featured ? "Yes" : "No"}');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Variable');
+      expect((nodes[0] as any).name).toBe('featured ? "Yes" : "No"');
+    });
+
+    test('should parse complex variable with property access and ternary', () => {
+      const nodes = parser.parse('{$product.onSale ? "Sale!" : ""}');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Variable');
+      expect((nodes[0] as any).name).toBe('product.onSale ? "Sale!" : ""');
+    });
+  });
+
   describe('Links', () => {
     test('should parse standard links', () => {
       const nodes = parser.parse('[Zolt](https://zolt.example.com)');

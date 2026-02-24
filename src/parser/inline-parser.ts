@@ -114,7 +114,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^\{\{(.+?)}}/)) {
       return this.parseExpression(text);
     }
-    if (this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/)) {
+    if (this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/)) {
       return this.parseVariable(text);
     }
     if (this.matchPattern(text, /^%%/)) {
@@ -815,7 +815,7 @@ export class InlineParser {
   }
 
   private parseVariable(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/);
+    const match = this.matchPattern(text, /^\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/);
     if (!match) {
       return null;
     }

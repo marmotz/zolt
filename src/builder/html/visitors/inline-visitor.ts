@@ -245,7 +245,7 @@ export class InlineVisitor {
 
   private evaluateString(text: string): string {
     // Basic evaluation for string attributes that might contain variables
-    return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g, (_, name) => {
+    return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/g, (_, name) => {
       try {
         const val = this.evaluator.evaluate('$' + name);
 

@@ -10,9 +10,13 @@ image: /images/zolt-cover.jpg
 # Blog Post Metadata
 
 **Title:** {$title}
+
 **Published:** {$date}
+
 **Category:** {$category}
+
 **Tags:** {{ String.join($tags, ", ") }}
+
 **Featured:** {$featured ? "Yes" : "No"}
 
 [← Retour à l'index](../frontmatter.zlt)
