@@ -27,5 +27,8 @@ jobs:
       - name: Type Check
         run: bun run type-check
 
+      - name: Build Linux
+        run: bun run build:linux
+
       - name: Run Tests
         run: bun run test

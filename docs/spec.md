@@ -1343,12 +1343,30 @@ Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux names
 
 #### Fonctions Disponibles
 
-| Fonction                    | Description             | Exemple                               |
-|-----------------------------|-------------------------|---------------------------------------|
-| `Date.format(date, format)` | Formate une date        | `Date.format($created, "DD/MM/YYYY")` |
-| `Date.now()`                | Date et heure actuelles | `Date.now()`                          |
-| `Date.timestamp(date)`      | Timestamp en secondes   | `Date.timestamp($created)`            |
-| `Date.msTimestamp(date)`    | Timestamp en ms         | `Date.msTimestamp($created)`          |
+| Fonction                    | Description                             | Exemple                                                 |
+|-----------------------------|-----------------------------------------|---------------------------------------------------------|
+| `Date.format(date, format)` | Formate une date              | `Date.format($created, "DD/MM/YYYY")`                   |
+| `Date.parse(text, format)`  | Parse une chaîne en objet Date| `Date.parse("25/02/2026", "DD/MM/YYYY")`                |
+| `Date.calc(date, duration)` | Calcule une date (objet dur.) | `Date.calc($created, { days: 7, hours: 2 })`            |
+| `Date.diff(d1, d2, unit)`   | Différence entre deux dates   | `Date.diff($end, $start, "days")`                       |
+
+| `Date.now()`                | Timestamp actuel (ms)                   | `Date.now()`                                            |
+| `Date.timestamp(date)`      | Timestamp en secondes                   | `Date.timestamp($created)`                              |
+| `Date.msTimestamp(date) `   | Timestamp en millisecondes              | `Date.msTimestamp($created)`                            |
+
+#### Unités pour Date.calc et Date.diff
+
+La fonction `calc` accepte un objet de durée avec les clés suivantes :
+`years`, `months`, `weeks`, `days`, `hours`, `minutes`, `seconds`.
+Elle supporte également les valeurs négatives pour les soustractions.
+
+La fonction `diff` accepte l'unité en troisième argument.
+
+```
+{{ Date.calc($created, { months: 1, days: 5 }) }}
+{{ Date.calc($modified, { hours: -2 }) }}
+{{ Date.diff($modified, $created, "hours") }}
+```
 
 #### Format Tokens
 
@@ -1412,6 +1430,10 @@ Publié le : {{ Date.format($created, "YYYY-MM-DD") }}
 
 # Format américain
 Date : {{ Date.format($created, "MM/DD/YYYY") }}
+
+# Manipulation de dates
+Échéance (dans 7 jours) : {{ Date.format(Date.calc($created, { days: 7 }), "DD/MM/YYYY") }}
+Âge du document : {{ Date.diff(Date.now(), $created, "days") }} jours
 ```
 
 #### Combinaison avec d'autres Fonctions

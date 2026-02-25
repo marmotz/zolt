@@ -250,9 +250,9 @@
 - [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a, MMMM, MMM,
   dddd, ddd, m, s) and localization support.
 - [x] `Date.now()` - Get current timestamp
-- [ ] `Date.parse(text, format)` - Parse a date string
-- [ ] `Date.add(date, duration)` - Add duration to date
-- [ ] `Date.diff(date1, date2)` - Calculate difference between dates
+- [x] `Date.parse(text, format)` - Parse a date string
+- [x] `Date.calc(date, duration)` - Calculate a new date using a duration object
+- [x] `Date.diff(date1, date2)` - Calculate difference between dates
 
 ### Variables
 

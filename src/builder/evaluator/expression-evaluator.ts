@@ -1,4 +1,4 @@
-type Value = number | string | boolean | null | Value[] | { [key: string]: Value };
+type Value = number | string | boolean | null | Date | Value[] | { [key: string]: Value };
 
 interface Variables {
   [key: string]: Value;
@@ -622,6 +622,34 @@ export class ExpressionEvaluator {
 
         return this.formatDate(date, formatStr);
       }
+      case 'parse': {
+        const dateStr = String(args[0] ?? '');
+        const formatStr = args[1] ? String(args[1]) : null;
+
+        return this.parseDateWithFormat(dateStr, formatStr);
+      }
+      case 'calc': {
+        const dateValue = args[0];
+        const duration = args[1];
+
+        const date = this.parseDate(dateValue);
+        if (!date || typeof duration !== 'object' || duration === null || Array.isArray(duration)) {
+          return null;
+        }
+
+        return this.calculateDate(date, duration as Record<string, Value>);
+      }
+      case 'diff': {
+        const date1Value = args[0];
+        const date2Value = args[1];
+        const unit = String(args[2] ?? 'days').toLowerCase();
+
+        const date1 = this.parseDate(date1Value);
+        const date2 = this.parseDate(date2Value);
+        if (!date1 || !date2) return null;
+
+        return this.calculateDiff(date1, date2, unit);
+      }
       case 'now':
         return Date.now();
       case 'timestamp': {
@@ -641,9 +669,142 @@ export class ExpressionEvaluator {
     }
   }
 
+  private parseDateWithFormat(dateStr: string, format: string | null): Date | null {
+    if (!dateStr) return null;
+    if (!format) {
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Basic format parsing for YYYY, MM, DD, HH, mm, ss
+    const components: { [key: string]: number } = {
+      YYYY: new Date().getFullYear(),
+      MM: 1,
+      DD: 1,
+      HH: 0,
+      mm: 0,
+      ss: 0,
+    };
+
+    const tokens = ['YYYY', 'MM', 'DD', 'HH', 'mm', 'ss'];
+    let remainingFormat = format;
+    let remainingDate = dateStr;
+
+    // We need to match tokens in the format and extract values from the date string
+    // This is a simplified version
+    while (remainingFormat.length > 0) {
+      let matched = false;
+      for (const token of tokens) {
+        if (remainingFormat.startsWith(token)) {
+          const len = token.length;
+          const val = parseInt(remainingDate.slice(0, len));
+          if (!isNaN(val)) {
+            components[token] = val;
+          }
+          remainingFormat = remainingFormat.slice(len);
+          remainingDate = remainingDate.slice(len);
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        remainingFormat = remainingFormat.slice(1);
+        remainingDate = remainingDate.slice(1);
+      }
+    }
+
+    const date = new Date(
+      components.YYYY,
+      components.MM - 1,
+      components.DD,
+      components.HH,
+      components.mm,
+      components.ss
+    );
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  private calculateDate(date: Date, duration: Record<string, Value>): Date {
+    const d = new Date(date);
+    for (const [unit, val] of Object.entries(duration)) {
+      const amount = typeof val === 'number' ? val : parseFloat(String(val ?? '0'));
+      if (isNaN(amount)) continue;
+
+      switch (unit.toLowerCase()) {
+        case 'years':
+        case 'year':
+          d.setFullYear(d.getFullYear() + amount);
+          break;
+        case 'months':
+        case 'month':
+          d.setMonth(d.getMonth() + amount);
+          break;
+        case 'weeks':
+        case 'week':
+          d.setDate(d.getDate() + amount * 7);
+          break;
+        case 'days':
+        case 'day':
+          d.setDate(d.getDate() + amount);
+          break;
+        case 'hours':
+        case 'hour':
+          d.setHours(d.getHours() + amount);
+          break;
+        case 'minutes':
+        case 'minute':
+          d.setMinutes(d.getMinutes() + amount);
+          break;
+        case 'seconds':
+        case 'second':
+          d.setSeconds(d.getSeconds() + amount);
+          break;
+        case 'ms':
+        case 'milliseconds':
+          d.setTime(d.getTime() + amount);
+          break;
+      }
+    }
+    return d;
+  }
+
+  private calculateDiff(date1: Date, date2: Date, unit: string): number {
+    const diffMs = date1.getTime() - date2.getTime();
+    switch (unit) {
+      case 'years':
+      case 'year':
+        return date1.getFullYear() - date2.getFullYear();
+      case 'months':
+      case 'month':
+        return (date1.getFullYear() - date2.getFullYear()) * 12 + (date1.getMonth() - date2.getMonth());
+      case 'weeks':
+      case 'week':
+        return Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
+      case 'days':
+      case 'day':
+        return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      case 'hours':
+      case 'hour':
+        return Math.floor(diffMs / (1000 * 60 * 60));
+      case 'minutes':
+      case 'minute':
+        return Math.floor(diffMs / (1000 * 60));
+      case 'seconds':
+      case 'second':
+        return Math.floor(diffMs / 1000);
+      default:
+        return diffMs;
+    }
+  }
+
   private parseDate(value: Value): Date | null {
     if (value === null || value === undefined) {
       return null;
+    }
+
+    if (value instanceof Date) {
+      return value;
     }
 
     let date: Date;

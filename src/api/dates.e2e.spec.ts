@@ -109,4 +109,27 @@ describe('API: Date Namespace', () => {
       expect(html).toMatch(/TS: \d{10}/);
     });
   });
+
+  describe('Date Manipulation (parse, calc, diff)', () => {
+    test('Date.parse() should parse formatted dates', async () => {
+      const html = await buildString('{{ Date.format(Date.parse("25/02/2026", "DD/MM/YYYY"), "YYYY-MM-DD") }}');
+      expect(html).toContain('2026-02-25');
+    });
+
+    test('Date.calc() should add duration using object', async () => {
+      const html = await buildString('{{ Date.format(Date.calc("2026-02-25", { days: 7 }), "YYYY-MM-DD") }}');
+      expect(html).toContain('2026-03-04');
+    });
+
+    test('Date.calc() should support multiple units and negative values', async () => {
+      // 2026-02-25 + 1 day - 1 hour
+      const html = await buildString('{{ Date.format(Date.calc("2026-02-25T10:00:00", { days: 1, hours: -1 }), "YYYY-MM-DD HH:mm") }}');
+      expect(html).toContain('2026-02-26 09:00');
+    });
+
+    test('Date.diff() should calculate difference', async () => {
+      const html = await buildString('{{ Date.diff("2026-03-01", "2026-02-25", "days") }}');
+      expect(html).toContain('4');
+    });
+  });
 });
