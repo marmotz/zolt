@@ -28,8 +28,9 @@ describe('API: Images', () => {
   });
 
   test('should build video', async () => {
-    const html = await buildString('!![Video](video.mp4){autoplay}');
-    expect(html).toContain('<video src="video.mp4" autoplay>Video</video>');
+    const html = await buildString('!![Video](video.mp4){autoplay controls}');
+    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay>Video</video>');
+    expect(html).not.toContain('controls');
   });
 
   test('should automatically embed YouTube videos', async () => {
@@ -51,7 +52,8 @@ describe('API: Images', () => {
 
   test('should build audio', async () => {
     const html = await buildString('??[Audio](audio.mp3){controls}');
-    expect(html).toContain('<audio src="audio.mp3" controls>Audio</audio>');
+    expect(html).toContain('<audio src="audio.mp3">Audio</audio>');
+    expect(html).not.toContain('controls');
   });
 
   test('should build embed', async () => {
@@ -61,7 +63,7 @@ describe('API: Images', () => {
 
   test('should build downloadable file', async () => {
     const html = await buildString('&&[Download](doc.pdf){class=download-btn}');
-    expect(html).toContain('<a href="doc.pdf" class="download-btn">Download</a>');
+    expect(html).toContain('<a href="doc.pdf" class="download-btn" target="_blank">Download</a>');
   });
 
   test('should build link with attributes', async () => {

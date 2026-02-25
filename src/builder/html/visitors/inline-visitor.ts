@@ -222,13 +222,15 @@ export class InlineVisitor {
       return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
     }
 
-    const attrs = this.renderAllAttributes({ ...nodeAttrs, controls: true });
+    const { controls, ...nodeAttrsWithoutControls } = (nodeAttrs as any) ?? {};
+    const attrs = this.renderAllAttributes(nodeAttrsWithoutControls);
 
     return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
-    const attrs = this.renderAllAttributes({ ...node.attributes, controls: true });
+    const { controls, ...nodeAttrsWithoutControls } = (node.attributes as any) ?? {};
+    const attrs = this.renderAllAttributes(nodeAttrsWithoutControls);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
@@ -263,13 +265,18 @@ export class InlineVisitor {
 
   visitFile(node: FileNode): string {
     const attrs = this.renderAllAttributes({ ...node.attributes, target: '_blank' });
-    const src = this.evaluateString(node.src);
+    let src = this.evaluateString(node.src);
     const title = node.title ? this.evaluateString(node.title) : null;
 
     const isRemote = src.startsWith('http://') || src.startsWith('https://');
-    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    return `<a href="${resolvedSrc}"${attrs}>${title || resolvedSrc}</a>`;
+    if (!isRemote && this.assetResolver && !src.endsWith('.zlt')) {
+      src = this.assetResolver(src);
+    } else {
+      src = transformHref(src);
+    }
+
+    return `<a href="${src}"${attrs}>${title || src}</a>`;
   }
 
   visitVariable(node: VariableNode): string {

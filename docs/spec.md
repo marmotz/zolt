@@ -98,7 +98,7 @@ Génère automatiquement une ancre pour les références croisées.
 ### 1.5 Attributs sur les Vidéos
 
 ```
-!![Alt](video.mp4){autoplay loop muted controls}
+!![Alt](video.mp4){autoplay loop muted}
 ```
 
 | Attribut   | Description            |
@@ -106,7 +106,6 @@ Génère automatiquement une ancre pour les références croisées.
 | `autoplay` | Lecture automatique    |
 | `loop`     | Boucle                 |
 | `muted`    | Son désactivé          |
-| `controls` | Afficher les contrôles |
 
 ### 1.6 Autonumérotation des Titres
 
@@ -927,7 +926,7 @@ Le Zolt utilise un système de préfixes pour que le parseur sache immédiatemen
 
 # Vidéo
 
-!![Démo](video.mp4){autoplay loop muted controls}
+!![Démo](video.mp4){autoplay loop muted}
 
 # Audio
 
@@ -2207,7 +2206,7 @@ Le {$produit} est un drone de course professionnel vendu au prix de **{$prix}**.
 
 ![Vue du dessus](photo.jpg){w=600 align=center}
 
-!![Vol de démonstration](demo.mp4){loop controls}
+!![Vol de démonstration](demo.mp4){loop}
 
 :::warning [Attention]
 Ce drone n'est pas recommandé pour les débutants.

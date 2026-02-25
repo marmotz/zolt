@@ -393,6 +393,7 @@ describe('HTMLBuilder', () => {
 
     const html = builder.build(node);
     expect(html).toContain('href="document.html"');
+    expect(html).toContain('target="_blank"');
     expect(html).toContain('>Document</a>');
   });
 

@@ -79,7 +79,6 @@ Files use the `&&` prefix and generate an `a` tag.
 | `shadow` | Adds a box-shadow (`true` uses theme variable) | `{shadow=true}` |
 | `align` | Alignment (`left`, `center`, `right`) | `{align=center}` |
 | `float` | CSS float (`left`, `right`) | `{float=right}` |
-| `controls` | Show media controls (Video/Audio) | `{controls}` |
 | `autoplay` | Start playing automatically | `{autoplay}` |
 | `muted` | Mute the audio | `{muted}` |
 | `loop` | Restart when finished | `{loop}` |

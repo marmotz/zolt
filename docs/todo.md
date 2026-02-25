@@ -70,8 +70,8 @@
 
 - [x] `{autoplay}` - Autoplay (tested in images.e2e.spec.ts)
 - [ ] `{loop}` - Loop (missing E2E test)
-- [ ] `{muted}` - Muted (missing E2E test)
-- [ ] `{controls}` - Show controls (missing E2E test)
+- [ ] `{muted}` - Son désactivé (missing E2E test)
+
 
 ## 3. Typography & Inline Formatting
 
