@@ -4,7 +4,7 @@
 
 ### Phase 0: Escaping & Comments
 
-- [ ] Implement escape character handling (`\`)
+- [x] Implement escape character handling (`\`) (tested in escaping.e2e.spec.ts)
 - [x] Implement `:::comment` blocks
 - [x] Implement inline comments `%% ... %%`
 
@@ -68,10 +68,10 @@
 
 ### Attributes on Videos
 
-- [ ] `{autoplay}` - Autoplay
-- [ ] `{loop}` - Loop
-- [ ] `{muted}` - Muted
-- [ ] `{controls}` - Show controls
+- [x] `{autoplay}` - Autoplay (tested in images.e2e.spec.ts)
+- [ ] `{loop}` - Loop (missing E2E test)
+- [ ] `{muted}` - Muted (missing E2E test)
+- [ ] `{controls}` - Show controls (missing E2E test)
 
 ## 3. Typography & Inline Formatting
 
@@ -91,8 +91,8 @@
 
 ### Character Escaping
 
-- [ ] Escape special characters with backslash
-- [ ] Support double backslash for literal backslash
+- [x] Escape special characters with backslash (tested in escaping.e2e.spec.ts)
+- [x] Support double backslash for literal backslash (tested in escaping.e2e.spec.ts)
 
 ## 4. Lists
 
@@ -125,10 +125,10 @@
 
 ### Link Attributes
 
-- [ ] `{target=_blank}` - Open in new tab
-- [ ] `{rel=noopener}` - Security for target=\_blank
-- [ ] `{download}` - Force download
-- [ ] `{title=value}` - Tooltip
+- [x] `{target=_blank}` - Open in new tab (tested in images.e2e.spec.ts)
+- [ ] `{rel=noopener}` - Security for target=\_blank (missing E2E test)
+- [ ] `{download}` - Force download (missing E2E test)
+- [ ] `{title=value}` - Tooltip (missing E2E test)
 
 ## 6. Blockquotes & Citations
 
@@ -272,9 +272,9 @@
 
 ### Footnotes
 
-- [ ] Footnote references `[^n]`
-- [ ] Footnote definitions `[^n]: content`
-- [ ] Multiple references to same footnote
+- [ ] Footnote references `[^n]` (missing E2E test)
+- [ ] Footnote definitions `[^n]: content` (missing E2E test)
+- [ ] Multiple references to same footnote (missing E2E test)
 - [ ] Footnotes with attributes
 
 ### Abbreviations
@@ -296,7 +296,7 @@
   `{$foreach.odd}`
 - [x] Nested loops
 - [x] Conditional rendering in loops with `:::if`
-- [ ] Alternating row styles
+- [ ] Alternating row styles (pattern tested in calculations.e2e.spec.ts)
 
 ### File Inclusion
 
@@ -361,8 +361,8 @@
 - [x] Generate automatic heading IDs for headings without explicit `{#id}`
 - [x] Process `:::foreach` loops with automatic variables (AST-based)
 - [x] Generate Table of Contents at `[[toc]]` locations
-- [ ] Resolve cross-references `@ref`
-- [ ] Generate footnotes
+- [x] Resolve cross-references `@ref` (tested in attributes.e2e.spec.ts)
+- [ ] Generate footnotes (missing E2E test)
 
 ## 16. Error Handling
 
@@ -410,11 +410,11 @@
 
 ### Developer Documentation
 
-- [ ] Update README with usage instructions
-- [ ] Document parser phases
-- [ ] Document attribute system
-- [ ] Document all syntax features
-- [ ] Create migration guide from Markdown
+- [x] Update README with usage instructions
+- [x] Document parser phases (done in ARCHITECTURE.md)
+- [x] Document attribute system (done in spec.md and README.md)
+- [x] Document all syntax features (done in spec.md)
+- [x] Create migration guide from Markdown (done in README.md)
 
 ## 20. Performance & Optimization
 

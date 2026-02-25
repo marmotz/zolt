@@ -39,8 +39,12 @@ export class ParagraphParser {
     let attributes: Attributes | undefined;
     const attrMatchWithSpace = content.match(/\s+\{([^}]+)}$/);
     if (attrMatchWithSpace) {
+      const fullMatch = attrMatchWithSpace[0];
+      const braceIndex = content.length - fullMatch.trimStart().length - 1;
+      const charBeforeBrace = braceIndex >= 0 ? content[braceIndex] : '';
+
       const attrContent = attrMatchWithSpace[1];
-      if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
+      if (charBeforeBrace !== '\\' && !attrContent.startsWith('$') && !attrContent.startsWith('{')) {
         attributes = InlineParser.parseAttributes(attrContent);
         content = content.slice(0, -attrMatchWithSpace[0].length).trim();
       }
@@ -53,7 +57,12 @@ export class ParagraphParser {
         const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
         const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
 
-        if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
+        if (
+          charBefore !== '\\' &&
+          !attrContent.startsWith('$') &&
+          !attrContent.startsWith('{') &&
+          !inlineDelimiters.includes(charBefore)
+        ) {
           attributes = InlineParser.parseAttributes(attrContent);
           content = content.slice(0, -fullMatch.length).trim();
         }
