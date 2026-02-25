@@ -15,7 +15,7 @@ describe('DocumentRenderer', () => {
     };
     const html = renderer.renderDocument(
       node,
-      { hasTabs: false, hasCharts: false, hasMermaid: false },
+      { hasTabs: false, hasCharts: false, hasMermaid: false, hasMath: false },
       () => '',
       () => ''
     );
@@ -33,7 +33,7 @@ describe('DocumentRenderer', () => {
     };
     const html = renderer.renderDocument(
       node,
-      { hasTabs: true, hasCharts: true, hasMermaid: true },
+      { hasTabs: true, hasCharts: true, hasMermaid: true, hasMath: true },
       () => '',
       () => ''
     );

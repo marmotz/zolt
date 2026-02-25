@@ -125,6 +125,8 @@ export class HTMLBuilder implements Builder {
         return this.specialBlockVisitor.visitTripleColonBlock(node as any);
       case 'DoubleBracketBlock':
         return this.specialBlockVisitor.visitDoubleBracketBlock(node as any);
+      case 'Math':
+        return this.inlineVisitor.visitMath(node as any);
       case 'HorizontalRule':
         return this.blockVisitor.visitHorizontalRule(
           node as any,
@@ -180,10 +182,17 @@ export class HTMLBuilder implements Builder {
 
     const footnotesHtml = this.renderFootnotes();
 
+    const options = {
+      hasTabs: this.hasNodeType(node.children, 'TripleColonBlock', (n: any) => n.blockType === 'tabs'),
+      hasCharts: this.hasNodeType(node.children, 'Chart'),
+      hasMermaid: this.hasNodeType(node.children, 'Mermaid'),
+      hasMath: this.hasNodeType(node.children, 'Math'),
+    };
+
     return this.documentRenderer.renderDocumentWithContent(
       node,
       contentHtml + footnotesHtml,
-      this.specialBlockVisitor,
+      options,
       this.visitFrontmatter.bind(this)
     );
   }
@@ -443,5 +452,42 @@ export class HTMLBuilder implements Builder {
     mergedResults.push(lastResult);
 
     return mergedResults.join('');
+  }
+
+  private hasNodeType(nodes: ASTNode[], type: string, extraCheck?: (node: ASTNode) => boolean): boolean {
+    for (const node of nodes) {
+      if (node.type === type) {
+        if (!extraCheck || extraCheck(node)) {
+          return true;
+        }
+      }
+
+      // Cas spécial pour les mathématiques inline qui ne sont pas encore parsées dans l'AST
+      if (type === 'Math' && node.type === 'Text') {
+        if (/\$[^$]+\$/.test((node as any).content)) {
+          return true;
+        }
+      }
+
+      // Recheche récursive dans les enfants (Paragraph, List, etc.)
+      if ('children' in node && Array.isArray((node as any).children)) {
+        if (this.hasNodeType((node as any).children, type, extraCheck)) {
+          return true;
+        }
+      }
+      // Recherche dans les lignes de tableaux
+      if (node.type === 'Table') {
+        if (node.header && this.hasNodeType([node.header], type, extraCheck)) return true;
+        if (node.rows && this.hasNodeType(node.rows, type, extraCheck)) return true;
+      }
+      if (node.type === 'TableRow') {
+        if (node.cells && this.hasNodeType(node.cells, type, extraCheck)) return true;
+      }
+      if (node.type === 'TableCell') {
+        if (node.children && this.hasNodeType(node.children, type, extraCheck)) return true;
+      }
+    }
+
+    return false;
   }
 }

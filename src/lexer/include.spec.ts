@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'bun:test';
 import { Lexer } from './lexer';
 import { TokenType } from './token-types';
 

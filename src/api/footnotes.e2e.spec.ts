@@ -19,7 +19,7 @@ describe('API: Footnotes', () => {
 
     expect(html).toContain('First<sup><a href="#fn:1" id="fnref:1">[1]</a></sup>');
     expect(html).toContain('second<sup><a href="#fn:1" id="fnref:1:1">[1]</a></sup>');
-    
+
     expect(html).toContain('<li id="fn:1">');
     // It should have two back-references
     expect(html).toContain('href="#fnref:1"');

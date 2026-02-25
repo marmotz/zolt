@@ -1,3 +1,4 @@
+import katex from 'katex';
 import {
   AbbreviationNode,
   ASTNode,
@@ -76,6 +77,8 @@ export class InlineVisitor {
         return this.visitAbbreviation(node as any);
       case 'Footnote':
         return this.visitFootnote(node as any);
+      case 'Math':
+        return this.visitMath(node as any);
       case 'CommentInline':
         return '';
       default:
@@ -151,6 +154,24 @@ export class InlineVisitor {
     const childrenHtml = this.joinChildren(node.children);
 
     return `<mark${attrs}>${childrenHtml}</mark>`;
+  }
+
+  visitMath(node: any): string {
+    const attrs = this.renderAllAttributes(node.attributes);
+    try {
+      const html = katex.renderToString(node.content, {
+        displayMode: node.isBlock,
+        throwOnError: false,
+      });
+
+      if (node.isBlock) {
+        return `<div${attrs} class="zolt-math-block">${html}</div>`;
+      }
+
+      return `<span${attrs} class="zolt-math-inline">${html}</span>`;
+    } catch (e) {
+      return `<span${attrs} class="zolt-math-error">${node.content}</span>`;
+    }
   }
 
   visitInlineStyle(node: InlineStyleNode): string {

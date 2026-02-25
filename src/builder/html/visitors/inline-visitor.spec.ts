@@ -13,7 +13,8 @@ describe('InlineVisitor', () => {
     () => '', // joinChildren
     () => '', // renderAllAttributes
     (text) => text, // processInline
-    evaluator
+    evaluator,
+    (id) => ({ index: 1, refId: `fnref-${id}` })
   );
 
   test('should visit variable with ternary operator', () => {
@@ -53,7 +54,8 @@ describe('InlineVisitor', () => {
           .join('');
       },
       (text) => text,
-      evaluator
+      evaluator,
+      (id) => ({ index: 1, refId: `fnref-${id}` })
     );
 
     // This is a bit tricky because evaluateString is private,
@@ -84,7 +86,7 @@ describe('InlineVisitor', () => {
       () => '', // renderAllAttributes
       (text) => text, // processInline
       evaluator,
-      () => 0, // registerFootnoteRef
+      (id) => ({ index: 1, refId: `fnref-${id}` }),
       manglingResolver
     );
 
@@ -138,6 +140,32 @@ describe('InlineVisitor', () => {
       const html = protectedVisitor.visitImage(node);
       // The mangling resolver will change // to /
       expect(html).toContain('src="path/to/local.jpg"');
+    });
+  });
+
+  describe('Math Rendering', () => {
+    test('should render inline math using katex', () => {
+      const node: any = {
+        type: 'Math',
+        content: 'E=mc^2',
+        isBlock: false,
+      };
+      const html = visitor.visitMath(node);
+      expect(html).toContain('zolt-math-inline');
+      expect(html).toContain('katex');
+      expect(html).toContain('mc');
+    });
+
+    test('should render block math using katex', () => {
+      const node: any = {
+        type: 'Math',
+        content: '\\int x dx',
+        isBlock: true,
+      };
+      const html = visitor.visitMath(node);
+      expect(html).toContain('zolt-math-block');
+      expect(html).toContain('katex-display');
+      expect(html).toContain('int');
     });
   });
 });

@@ -5,9 +5,10 @@
   "main": "./dist/index.js",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/katex": "^0.16.8",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.3"
   },
   "bin": {
     "zolt": "./dist/cli/index.js"
@@ -33,11 +34,14 @@
     "type-check": "bun x tsc --noEmit",
     "prepublish": "bun run build",
     "format": "bun x prettier --write src",
-    "lint": "bun x prettier --check src"
+    "lint": "bun x prettier --check src",
+    "update:minor": "bunx npm-check-updates -i -t minor",
+    "update:latest": "bunx npm-check-updates -i -t latest"
   },
   "type": "module",
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "katex": "^0.16.33",
     "picocolors": "^1.1.1"
   }
 }

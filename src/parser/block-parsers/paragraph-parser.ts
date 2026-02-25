@@ -55,7 +55,7 @@ export class ParagraphParser {
         const attrContent = attrMatchNoSpace[2];
         const beforeIndex = content.length - fullMatch.length - 1;
         const charBefore = beforeIndex >= 0 ? content[beforeIndex] : '';
-        const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
+        const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`', '$'];
 
         if (
           charBefore !== '\\' &&

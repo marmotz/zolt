@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
 import { Token, TokenType } from '../../lexer/token-types';
+import { InlineParser } from '../inline-parser';
 import { CodeBlockParser } from './code-block-parser';
 
 describe('CodeBlockParser', () => {
-  const parser = new CodeBlockParser();
+  const inlineParser = new InlineParser();
+  const parser = new CodeBlockParser(inlineParser);
 
   const mockContext = (tokens: Token[]) => {
     let pos = 0;
@@ -19,6 +21,10 @@ describe('CodeBlockParser', () => {
       match: (...types: TokenType[]) => types.includes(tokens[pos]?.type),
       advance: () => tokens[pos++],
       isEof: () => pos >= tokens.length || tokens[pos].type === TokenType.EOF,
+      error: (msg: string) => {
+        throw new Error(msg);
+      },
+      warn: () => {},
     };
   };
 
@@ -28,7 +34,7 @@ const x = 1;
 \`\`\``);
     const tokens = lexer.tokenize();
     const ctx = mockContext(tokens);
-    const node = parser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof);
+    const node = parser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, ctx.error, ctx.warn);
 
     expect(node.type).toBe('CodeBlock');
     expect(node.language).toBe('typescript');

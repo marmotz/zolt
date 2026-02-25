@@ -13,10 +13,10 @@ import { TripleColonParser } from './triple-colon-parser';
 describe('BlockquoteParser', () => {
   const inlineParser = new InlineParser();
   const listParser = new ListParser(inlineParser);
-  const tripleColonParser = new TripleColonParser();
+  const tripleColonParser = new TripleColonParser(inlineParser);
   const headingParser = new HeadingParser(inlineParser);
-  const codeBlockParser = new CodeBlockParser();
-  const specialBlockParser = new SpecialBlockParser();
+  const codeBlockParser = new CodeBlockParser(inlineParser);
+  const specialBlockParser = new SpecialBlockParser(inlineParser);
   const paragraphParser = new ParagraphParser(inlineParser);
 
   const parser = new BlockquoteParser(listParser, tripleColonParser);
@@ -61,7 +61,7 @@ describe('BlockquoteParser', () => {
       ctx.isEof,
       () => null,
       () => headingParser.parseHeading(ctx.expect),
-      () => codeBlockParser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof),
+      () => codeBlockParser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, ctx.error as any, () => {}),
       () => specialBlockParser.parseHorizontalRule(ctx.expect),
       () =>
         paragraphParser.parseParagraph(
@@ -71,7 +71,8 @@ describe('BlockquoteParser', () => {
           ctx.isEof,
           () => false
         ),
-      ctx.error as any
+      ctx.error as any,
+      () => {}
     );
 
     expect(node.type).toBe('Blockquote');

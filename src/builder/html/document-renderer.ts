@@ -7,6 +7,7 @@ export interface DocumentRendererOptions {
   hasTabs: boolean;
   hasCharts: boolean;
   hasMermaid: boolean;
+  hasMath: boolean;
 }
 
 export class DocumentRenderer {
@@ -63,6 +64,10 @@ export class DocumentRenderer {
     const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
     const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
 
+    const mathCss = options.hasMath
+      ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
+      : '';
+
     let metaTags = '';
     if (description) metaTags += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
     if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
@@ -82,7 +87,7 @@ export class DocumentRenderer {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 ${metaTags}  <title>${title}</title>
-  <style>
+${mathCss}  <style>
 ${DEFAULT_CSS}
   </style>
 </head>
@@ -135,6 +140,10 @@ ${mermaidScript}
     const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
     const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
 
+    const mathCss = options.hasMath
+      ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
+      : '';
+
     let metaTags = '';
     if (description) metaTags += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
     if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
@@ -154,7 +163,7 @@ ${mermaidScript}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 ${metaTags}  <title>${title}</title>
-  <style>
+${mathCss}  <style>
 ${DEFAULT_CSS}
   </style>
 </head>

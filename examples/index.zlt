@@ -39,6 +39,7 @@ Welcome to the Zolt examples collection! This index provides an overview of all 
 
 - [media.zlt](media.zlt) — Images, videos, audio, embeds, and downloadable files with attributes
 - [charts.zlt](charts.zlt) — Chart types including line, bar, pie, and area with styling options
+- [math.zlt](math.zlt) — Mathematical formulas with LaTeX syntax (KaTeX)
 
 ## Documentation Features
 

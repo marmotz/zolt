@@ -19,6 +19,9 @@ describe('Parser', () => {
           if (c.type === 'Variable') {
             return `{$${c.name}}`;
           }
+          if (c.type === 'Math') {
+            return `$${c.content}$`;
+          }
           if (c.type === 'Bold') {
             return `**${getFlatContent(c)}**`;
           }
@@ -513,6 +516,52 @@ describe('Parser', () => {
 
         expect(ast.children[0].type).toBe('LinkReferenceDefinition');
         expect(ast.children[1].type).toBe('Paragraph');
+      });
+    });
+
+    describe('Math', () => {
+      test('should parse inline math', () => {
+        const lexer = new Lexer('La formule est $E=mc^2$');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        const para = ast.children[0] as any;
+        expect(para.children[1].type).toBe('Math');
+        expect(para.children[1].content).toBe('E=mc^2');
+        expect(para.children[1].isBlock).toBe(false);
+      });
+
+      test('should parse inline math with attributes', () => {
+        const lexer = new Lexer('$E=mc^2${#formula}');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        const para = ast.children[0] as any;
+        expect(para.children[0].type).toBe('Math');
+        expect(para.children[0].attributes.id).toBe('formula');
+      });
+
+      test('should parse math block', () => {
+        const lexer = new Lexer('$$\\int x dx$$');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('Math');
+        expect((ast.children[0] as any).content).toBe('\\int x dx');
+        expect((ast.children[0] as any).isBlock).toBe(true);
+      });
+
+      test('should parse math block with attributes', () => {
+        const lexer = new Lexer('$$\\int x dx$${#integral}');
+        const tokens = lexer.tokenize();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+
+        expect(ast.children[0].type).toBe('Math');
+        expect((ast.children[0] as any).attributes.id).toBe('integral');
       });
     });
   });

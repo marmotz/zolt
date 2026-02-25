@@ -140,7 +140,9 @@ export class Parser {
     const token = this.peek(offset);
     if (token.type === TokenType.TEXT) {
       const trimmed = token.value.trim();
-      if (trimmed.startsWith('$')) {
+      // On ne veut capturer que les définitions de variables comme $var = ... ou $$var = ...
+      // Elles doivent généralement être seules sur la ligne (le token contient toute la ligne jusqu'au newline)
+      if (/^\$\$?[a-zA-Z_]\w*\s*=\s+/.test(trimmed)) {
         return true;
       }
 
@@ -177,6 +179,7 @@ export class Parser {
       TokenType.TASK_LIST,
       TokenType.DEFINITION,
       TokenType.HORIZONTAL_RULE,
+      TokenType.MATH_BLOCK,
       TokenType.TRIPLE_COLON_START,
       TokenType.TRIPLE_COLON_END,
       TokenType.DOUBLE_BRACKET_START,
@@ -373,6 +376,9 @@ export class Parser {
     if (this.match(TokenType.HORIZONTAL_RULE)) {
       return this.specialBlockParser.parseHorizontalRule(this.expect.bind(this));
     }
+    if (this.match(TokenType.MATH_BLOCK)) {
+      return this.specialBlockParser.parseMathBlock(this.expect.bind(this));
+    }
     if (this.match(TokenType.INCLUDE)) {
       const token = this.expect(TokenType.INCLUDE);
       return {
@@ -447,7 +453,7 @@ export class Parser {
       const value = this.currentToken.value.trim();
 
       // Handle variable definitions
-      if (value.startsWith('$')) {
+      if (value.startsWith('$') && this.isNewBlockStart()) {
         return this.parseVariableDefinition();
       }
 

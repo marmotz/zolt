@@ -15,6 +15,7 @@ import {
   InlineStyleNode,
   ItalicNode,
   LinkNode,
+  MathNode,
   StrikethroughNode,
   SubscriptNode,
   SuperscriptNode,
@@ -200,6 +201,9 @@ export class InlineParser {
     }
     if (this.matchPattern(text, /^==(.+?)==/)) {
       return this.parseHighlight(text);
+    }
+    if (this.matchPattern(text, /^\$([^$]+)\$/)) {
+      return this.parseMathInline(text);
     }
     if (this.matchPattern(text, /^`([^`]+)`/)) {
       return this.parseCode(text);
@@ -591,6 +595,30 @@ export class InlineParser {
 
     return {
       node: { type: 'Highlight', children: this.parse(content), attributes } as HighlightNode,
+      remaining,
+    };
+  }
+
+  private parseMathInline(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\$([^$]+)\$/);
+    if (!match) {
+      return null;
+    }
+
+    const content = match[1];
+    let remaining = text.slice(match[0].length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
+
+    return {
+      node: { type: 'Math', content, isBlock: false, attributes } as MathNode,
       remaining,
     };
   }

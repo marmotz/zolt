@@ -81,4 +81,14 @@ export class SpecialBlockParser {
       content: token.value,
     };
   }
+
+  public parseMathBlock(expect: (type: TokenType) => Token): any {
+    const token = expect(TokenType.MATH_BLOCK);
+
+    return {
+      type: 'Math',
+      content: token.value.trim(),
+      isBlock: true,
+    };
+  }
 }

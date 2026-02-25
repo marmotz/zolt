@@ -241,4 +241,20 @@ describe('Lexer', () => {
     expect(tokens[0].type).toBe(TokenType.LINK_REF_DEF);
     expect(tokens[0].value).toBe('ref:https://example.com');
   });
+
+  test('should tokenize math block', () => {
+    const lexer = new Lexer('$$\\int x dx$$');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.MATH_BLOCK);
+    expect(tokens[0].value).toBe('\\int x dx');
+  });
+
+  test('should tokenize math block with newlines', () => {
+    const lexer = new Lexer('$$\n\\int x dx\n$$');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.MATH_BLOCK);
+    expect(tokens[0].value).toBe('\n\\int x dx\n');
+  });
 });

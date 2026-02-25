@@ -166,6 +166,13 @@ export interface AnchorNode {
   id: string;
 }
 
+export interface MathNode {
+  type: 'Math';
+  content: string;
+  isBlock: boolean;
+  attributes?: Attributes;
+}
+
 export interface LineBreakNode {
   type: 'LineBreak';
 }
@@ -348,6 +355,7 @@ export type ASTNode =
   | ForeachNode
   | ChartNode
   | ChartSeriesNode
+  | MathNode
   | MermaidNode;
 
 export interface IfNode {

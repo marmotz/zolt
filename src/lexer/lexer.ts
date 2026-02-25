@@ -84,6 +84,9 @@ export class Lexer {
     if (this.matchCodeBlock()) {
       return this.readCodeBlock();
     }
+    if (this.matchMathBlock()) {
+      return this.readMathBlock();
+    }
     if (this.matchTripleColon()) {
       return this.readTripleColon();
     }
@@ -319,6 +322,37 @@ export class Lexer {
     return {
       type: TokenType.CODE_BLOCK_END,
       value: '',
+      line,
+      column,
+      length: this.pos - start,
+    };
+  }
+
+  private matchMathBlock(): boolean {
+    return this.source.slice(this.pos).startsWith('$$');
+  }
+
+  private readMathBlock(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar();
+    this.advanceChar();
+
+    let content = '';
+    while (!this.isEof() && !this.source.slice(this.pos).startsWith('$$')) {
+      content += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar();
+      this.advanceChar();
+    }
+
+    return {
+      type: TokenType.MATH_BLOCK,
+      value: content,
       line,
       column,
       length: this.pos - start,

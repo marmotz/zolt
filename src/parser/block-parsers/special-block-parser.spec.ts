@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
 import { Token, TokenType } from '../../lexer/token-types';
+import { InlineParser } from '../inline-parser';
 import { SpecialBlockParser } from './special-block-parser';
 
 describe('SpecialBlockParser', () => {
-  const parser = new SpecialBlockParser();
+  const inlineParser = new InlineParser();
+  const parser = new SpecialBlockParser(inlineParser);
 
   const mockExpect = (tokens: Token[]) => {
     let pos = 0;

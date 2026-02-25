@@ -64,6 +64,9 @@ export enum TokenType {
   ANCHOR = 'ANCHOR',
   FOOTNOTE_DEF = 'FOOTNOTE_DEF',
   ATTRIBUTE_SHORTCUT = 'ATTRIBUTE_SHORTCUT',
+
+  MATH_INLINE = 'MATH_INLINE',
+  MATH_BLOCK = 'MATH_BLOCK',
 }
 
 export interface Token {
