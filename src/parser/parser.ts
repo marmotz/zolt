@@ -481,6 +481,7 @@ export class Parser {
     this.skipNewlines();
 
     // Check for indented lines that belong to this footnote
+    // OR if the footnote was empty, check for a block immediately following it
     while (!this.isEof()) {
       if (this.match(TokenType.INDENTATION)) {
         const next = this.peek(1);
@@ -494,6 +495,13 @@ export class Parser {
           const block = this.parseBlock();
           if (block) children.push(block);
         }
+        this.skipNewlines();
+      } else if (children.length === 0 && this.isNewBlockStart()) {
+        // If the footnote is still empty and we see a block start, consume it as part of the footnote
+        const block = this.parseBlock();
+        if (block) children.push(block);
+        // After one non-indented block, we only continue if subsequent lines are indented
+        // (to match standard Markdown/Zolt behavior where only the first block can be non-indented if empty)
         this.skipNewlines();
       } else {
         break;
