@@ -3,17 +3,15 @@
 ## Basic Date Variables
 
 Using automatic date variables:
-
-This document was created on: {$created}
-Last modified: {$modified}
+- This document was created on: {$created}
+- Last modified: {$modified}
 
 ## Date Formatting with Date.format()
 
 Use the `Date.format()` function to format dates:
-
-**Date only:** {{ Date.format($created, "DD/MM/YYYY") }}
-**Date and time:** {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
-**ISO format:** {{ Date.format($created, "YYYY-MM-DD") }}
+- **Date only:** {{ Date.format($created, "DD/MM/YYYY") }}
+- **Date and time:** {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+- **ISO format:** {{ Date.format($created, "YYYY-MM-DD") }}
 
 ## Format Tokens
 

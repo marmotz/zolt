@@ -90,4 +90,23 @@ describe('Include E2E', () => {
 
     expect(html).toContain('Hello Zolt!');
   });
+
+  test('should include headings from included files in TOC', async () => {
+    const includedFile = path.join(tempDir, 'content.zlt');
+    fs.writeFileSync(includedFile, '## Section from Include');
+
+    const mainFile = path.join(tempDir, 'main.zlt');
+    const mainContent = '[[toc]]\n\n# Main Title\n\n{{include content.zlt}}';
+
+    const lexer = new Lexer(mainContent);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens, mainFile);
+    const doc = parser.parse();
+    const builder = new HTMLBuilder();
+    const html = builder.visitDocument(doc);
+
+    expect(html).toContain('Main Title');
+    expect(html).toContain('Section from Include');
+    expect(html).toContain('class="zolt-toc"');
+  });
 });

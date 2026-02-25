@@ -139,7 +139,7 @@ export class HTMLBuilder implements Builder {
     this.currentFilePath = node.sourceFile || 'unknown';
     this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
-    this.currentHeadings.push(...this.documentRenderer.findAllHeadings(node.children));
+    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
 
     return this.documentRenderer.renderDocument(
       node,
@@ -153,13 +153,44 @@ export class HTMLBuilder implements Builder {
     this.currentFilePath = node.sourceFile || 'unknown';
     this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
-    this.currentHeadings.push(...this.documentRenderer.findAllHeadings(node.children));
+    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
 
     return this.documentRenderer.renderDocumentContent(
       node,
       this.joinChildren.bind(this),
       this.visitFrontmatter.bind(this)
     );
+  }
+
+  private findAllHeadingsRecursive(nodes: ASTNode[], currentPath: string, depth: number = 0): any[] {
+    const headings: any[] = [];
+    if (depth >= this.MAX_INCLUDE_DEPTH) return headings;
+
+    for (const node of nodes) {
+      if (node.type === 'Heading') {
+        headings.push(node);
+      } else if (node.type === 'Include') {
+        const includeNode = node as IncludeNode;
+        const currentDir = currentPath !== 'unknown' ? path.dirname(currentPath) : process.cwd();
+        const targetPath = path.resolve(currentDir, includeNode.path);
+
+        if (fs.existsSync(targetPath)) {
+          try {
+            const content = fs.readFileSync(targetPath, 'utf8');
+            const lexer = new Lexer(content);
+            const tokens = lexer.tokenize();
+            const parser = new Parser(tokens, targetPath);
+            const doc = parser.parse();
+            headings.push(...this.findAllHeadingsRecursive(doc.children, targetPath, depth + 1));
+          } catch (err) {
+            // Silently ignore errors during heading collection
+          }
+        }
+      } else if ('children' in node && Array.isArray(node.children)) {
+        headings.push(...this.findAllHeadingsRecursive(node.children as ASTNode[], currentPath, depth));
+      }
+    }
+    return headings;
   }
 
   public processInline(text: string): string {
