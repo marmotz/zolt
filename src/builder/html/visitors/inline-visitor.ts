@@ -191,7 +191,7 @@ export class InlineVisitor {
   }
 
   visitVideo(node: VideoNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
+    const nodeAttrs = { ...node.attributes, class: 'zolt-video' };
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
@@ -207,7 +207,7 @@ export class InlineVisitor {
     if (youtubeMatch) {
       const videoId = youtubeMatch[1];
       const embedSrc = 'https://www.youtube-nocookie.com/embed/' + videoId;
-      const videoAttrs = { ...node.attributes, border: '0' };
+      const videoAttrs = { ...nodeAttrs, border: '0' };
       const renderedAttrs = this.renderAllAttributes(videoAttrs);
 
       return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
@@ -216,17 +216,19 @@ export class InlineVisitor {
     if (vimeoMatch) {
       const videoId = vimeoMatch[1];
       const embedSrc = `https://player.vimeo.com/video/${videoId}`;
-      const videoAttrs = { ...node.attributes, border: '0' };
+      const videoAttrs = { ...nodeAttrs, border: '0' };
       const renderedAttrs = this.renderAllAttributes(videoAttrs);
 
       return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
     }
 
+    const attrs = this.renderAllAttributes({ ...nodeAttrs, controls: true });
+
     return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
+    const attrs = this.renderAllAttributes({ ...node.attributes, controls: true });
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
@@ -253,14 +255,14 @@ export class InlineVisitor {
       ? ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen'
       : '';
 
-    const embedAttrs = { ...node.attributes, border: '0' };
+    const embedAttrs = { ...node.attributes, border: '0', class: 'zolt-embed' };
     const renderedAttrs = this.renderAllAttributes(embedAttrs);
 
     return `<iframe src="${resolvedSrc}"${titleAttr}${renderedAttrs}${allowAttr}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
+    const attrs = this.renderAllAttributes({ ...node.attributes, target: '_blank' });
     const src = this.evaluateString(node.src);
     const title = node.title ? this.evaluateString(node.title) : null;
 

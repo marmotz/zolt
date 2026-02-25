@@ -175,6 +175,13 @@ export const BASE_CSS = `
     border-radius: 8px;
     border: 1px solid var(--zlt-color-border);
   }
+  
+  .zolt-video,
+  .zolt-embed {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16/9;
+  }
 
   body.color-scheme-dark .zolt-mermaid,
   @media (prefers-color-scheme: dark) {

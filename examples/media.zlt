@@ -32,23 +32,23 @@ Support for shadows and shorthand dimensions:
 
 Videos use the `!!` prefix. Zolt automatically detects YouTube/Vimeo URLs and converts them to responsive embeds.
 
-### Basic Kitten Video
-!![Cute Kittens Playing](https://www.youtube.com/embed/y0sF5xhGreA){w=560 h=315}
+### Local Video
+!![Cute Kittens Playing](kitten.mp4)
 
-### Kitten Video with Attributes
-!![Tiny Kittens](https://vimeo.com/284914042){width=100% shadow=true}
+### Youtube Video
+!![Cute Kittens Playing](https://www.youtube.com/embed/y0sF5xhGreA)
+
+### Vimeo Video with Attributes
+!![Tiny Kittens](https://vimeo.com/284914042){width=50%}
 
 ---
 
 ## 🎵 Audio
 
-Audio files use the `??` prefix and generate an `<audio>` tag.
+Audio files use the `??` prefix and generate an `audio` tag.
 
 ### Basic Audio
-??[Podcast Episode](podcast.mp3)
-
-### Audio with Controls
-??[Background Music](music.mp3){controls loop}
+??[Podcast Episode](classic.mp3)
 
 ---
 
@@ -57,19 +57,16 @@ Audio files use the `??` prefix and generate an `<audio>` tag.
 External content like YouTube, Vimeo, or maps use the `@@` prefix.
 
 ### YouTube Kitten Embed
-@@[Sleeping Kittens](https://www.youtube.com/embed/7zhpxOn6ZNo){width=100% height=400px}
+@@[Sleeping Kittens](https://www.youtube.com/embed/7zhpxOn6ZNo)
 
 ---
 
 ## 📂 Downloadable Files
 
-Files use the `&&` prefix and generate an `<a>` tag (often styled with an icon by themes).
+Files use the `&&` prefix and generate an `a` tag.
 
 ### PDF Document
 &&[Download User Manual](manual.pdf)
-
-### ZIP Archive
-&&[Source Code Assets](assets.zip){class=download-button}
 
 ---
 
