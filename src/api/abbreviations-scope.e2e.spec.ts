@@ -8,9 +8,10 @@ describe('API: Abbreviations Scope', () => {
   const file2 = '/tmp/test-scope-file2.zlt';
   const file3 = '/tmp/test-scope-file3.zlt';
 
+  let globalAbbreviations: Map<string, string>;
+
   beforeEach(async () => {
-    // Clear global abbreviations before each test
-    HTMLBuilder.clearGlobalAbbreviations();
+    globalAbbreviations = new Map();
   });
 
   afterEach(async () => {
@@ -59,9 +60,10 @@ describe('API: Abbreviations Scope', () => {
       await writeFile(file2, 'The API provides endpoints.');
       await writeFile(file3, 'Using the API in applications.');
 
-      const html1 = await buildFileToString(file1);
-      const html2 = await buildFileToString(file2);
-      const html3 = await buildFileToString(file3);
+      const options = { globalAbbreviations };
+      const html1 = await buildFileToString(file1, options);
+      const html2 = await buildFileToString(file2, options);
+      const html3 = await buildFileToString(file3, options);
 
       // All documents should have the abbreviation expanded
       expect(html1).toContain('<abbr title="Application Programming Interface">API</abbr>');

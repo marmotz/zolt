@@ -12,6 +12,7 @@ export interface BuildOptions {
   frontmatter?: boolean;
   filePath?: string;
   assetResolver?: (path: string) => string;
+  globalAbbreviations?: Map<string, string>;
 }
 
 export interface LintResult {
@@ -60,8 +61,19 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const lexer = new Lexer(content);
   const tokens = lexer.tokenize();
 
-  const parser = new Parser(tokens, options?.filePath);
+  const parser = new Parser(tokens, options?.filePath, options?.globalAbbreviations);
   const ast = parser.parse();
+
+  // If we have global abbreviations from the parser, update the options object
+  // so they can be passed to subsequent calls.
+  if (options && options.globalAbbreviations) {
+    const currentGlobals = parser.getGlobalAbbreviations();
+    if (currentGlobals) {
+      for (const [key, value] of currentGlobals.entries()) {
+        options.globalAbbreviations.set(key, value);
+      }
+    }
+  }
 
   // The parser now extracts the frontmatter. We should ensure the evaluator
   // has those variables before the builder starts.
@@ -102,7 +114,7 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
 export function extractAllAssets(content: string): { zltLinks: string[]; otherAssets: string[] } {
   const lexer = new Lexer(content);
   const tokens = lexer.tokenize();
-  const parser = new Parser(tokens);
+  const parser = new Parser(tokens, undefined, undefined);
   const ast = parser.parse();
 
   const zltLinks: string[] = [];
@@ -199,7 +211,7 @@ export async function lint(filePath: string): Promise<LintResult> {
     const lexer = new Lexer(content);
     const tokens = lexer.tokenize();
 
-    const parser = new Parser(tokens, filePath);
+    const parser = new Parser(tokens, filePath, undefined);
     parser.parse();
 
     // Collect warnings from parser

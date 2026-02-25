@@ -34,12 +34,14 @@ export class Parser {
   private indentationParser: IndentationParser;
   private specialBlockParser: SpecialBlockParser;
   private paragraphParser: ParagraphParser;
+  private initialGlobalAbbreviations: Map<string, string>;
 
-  constructor(tokens: Token[], filePath?: string) {
+  constructor(tokens: Token[], filePath?: string, initialGlobalAbbreviations?: Map<string, string>) {
     this.tokens = tokens;
     this.pos = 0;
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
+    this.initialGlobalAbbreviations = initialGlobalAbbreviations || new Map();
     this.inlineParser = new InlineParser();
     this.inlineParser.setWarningCallback((message, code) => {
       this.warn(message, code);
@@ -58,21 +60,20 @@ export class Parser {
     this.blockquoteParser = new BlockquoteParser(this.listParser, this.tripleColonParser);
   }
 
-  static get globalAbbreviations() {
-    return DefinitionCollector.globalAbbreviations;
-  }
-
-  static clearGlobalAbbreviations(): void {
-    DefinitionCollector.clearGlobalAbbreviations();
-  }
-
   parse(): DocumentNode {
     // Pass 1: Collect abbreviations and link references
     const { abbreviations, linkReferences, globalAbbreviations, footnotes } = this.definitionCollector.collect(
-      this.tokens
+      this.tokens,
+      this.initialGlobalAbbreviations
     );
 
     this.footnoteIds = footnotes;
+
+    // Update initialGlobalAbbreviations with newly found ones
+    for (const [key, value] of globalAbbreviations.entries()) {
+      this.initialGlobalAbbreviations.set(key, value);
+    }
+
     const allAbbreviations = new Map<string, string>([...globalAbbreviations.entries(), ...abbreviations.entries()]);
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
     this.inlineParser.setLinkReferences(linkReferences);
@@ -91,6 +92,10 @@ export class Parser {
       sourceFile: this.filePath,
       footnoteIds: this.footnoteIds,
     };
+  }
+
+  getGlobalAbbreviations(): Map<string, string> {
+    return this.initialGlobalAbbreviations;
   }
 
   private advance(): Token {

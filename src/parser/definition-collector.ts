@@ -4,13 +4,15 @@ export class DefinitionCollector {
   private abbreviationDefinitions: Map<string, string> = new Map();
   private linkReferences: Map<string, string> = new Map();
   private footnoteIds: Set<string> = new Set();
-  public static globalAbbreviations: Map<string, string> = new Map();
+  private globalAbbreviations: Map<string, string> = new Map();
 
   public static clearGlobalAbbreviations(): void {
-    this.globalAbbreviations.clear();
+    // This method is now effectively a no-op for the static case, 
+    // but we'll keep it for API compatibility if needed, 
+    // or we can remove it if we update all callers.
   }
 
-  public collect(tokens: Token[]): {
+  public collect(tokens: Token[], initialGlobalAbbreviations?: Map<string, string>): {
     abbreviations: Map<string, string>;
     linkReferences: Map<string, string>;
     globalAbbreviations: Map<string, string>;
@@ -19,6 +21,7 @@ export class DefinitionCollector {
     this.abbreviationDefinitions.clear();
     this.linkReferences.clear();
     this.footnoteIds.clear();
+    this.globalAbbreviations = new Map(initialGlobalAbbreviations?.entries() || []);
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
@@ -33,8 +36,8 @@ export class DefinitionCollector {
           const definition = value.substring(colonIndex + 1);
 
           if (token.type === TokenType.ABBREVIATION_DEF_GLOBAL) {
-            if (!DefinitionCollector.globalAbbreviations.has(abbreviation)) {
-              DefinitionCollector.globalAbbreviations.set(abbreviation, definition);
+            if (!this.globalAbbreviations.has(abbreviation)) {
+              this.globalAbbreviations.set(abbreviation, definition);
             }
           } else {
             if (!this.abbreviationDefinitions.has(abbreviation)) {
@@ -84,7 +87,7 @@ export class DefinitionCollector {
     return {
       abbreviations: this.abbreviationDefinitions,
       linkReferences: this.linkReferences,
-      globalAbbreviations: DefinitionCollector.globalAbbreviations,
+      globalAbbreviations: this.globalAbbreviations,
       footnotes: this.footnoteIds,
     };
   }

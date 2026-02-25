@@ -97,10 +97,6 @@ export class HTMLBuilder implements Builder {
     );
   }
 
-  static clearGlobalAbbreviations(): void {
-    Parser.clearGlobalAbbreviations();
-  }
-
   build(node: ASTNode): string {
     switch (node.type) {
       case 'Document':
@@ -353,12 +349,6 @@ export class HTMLBuilder implements Builder {
   }
 
   visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {
-    if (node.isGlobal) {
-      Parser.globalAbbreviations.set(node.abbreviation, node.definition);
-    } else {
-      this.abbreviationDefinitions.set(node.abbreviation, node.definition);
-    }
-
     return '';
   }
 
