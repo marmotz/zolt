@@ -402,7 +402,7 @@ export class SpecialBlockVisitor {
   visitMermaid(node: any): string {
     this.hasMermaid = true;
 
-    return `<div class="zolt-mermaid">\n  <pre class="mermaid">${this.escapeHtml(node.content)}</pre>\n</div>`;
+    return `<div class="zolt-mermaid">\n  <div class="mermaid">${this.escapeHtml(node.content)}</div>\n</div>`;
   }
 
   private escapeHtml(text: string): string {

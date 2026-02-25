@@ -1,6 +1,9 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { Lexer } from '../../lexer/lexer';
 import { InlineParser } from '../../parser/inline-parser';
 import { Parser } from '../../parser/parser';
-import { AbbreviationDefinitionNode, ASTNode, DocumentNode } from '../../parser/types';
+import { AbbreviationDefinitionNode, ASTNode, DocumentNode, IncludeNode } from '../../parser/types';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
@@ -18,6 +21,9 @@ export class HTMLBuilder implements Builder {
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
+  private includeStack: string[] = [];
+  private currentFilePath: string = 'unknown';
+  private readonly MAX_INCLUDE_DEPTH = 10;
 
   private blockVisitor: BlockVisitor;
   private inlineVisitor: InlineVisitor;
@@ -104,6 +110,8 @@ export class HTMLBuilder implements Builder {
         return this.blockVisitor.visitIndentation(node as any);
       case 'VariableDefinition':
         return this.visitVariableDefinition(node as any);
+      case 'Include':
+        return this.visitInclude(node as IncludeNode);
       case 'Attributes':
         return '';
       case 'AbbreviationDefinition':
@@ -128,6 +136,8 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.specialBlockVisitor.reset();
     this.blockVisitor.reset();
+    this.currentFilePath = node.sourceFile || 'unknown';
+    this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.documentRenderer.findAllHeadings(node.children));
 
@@ -140,6 +150,8 @@ export class HTMLBuilder implements Builder {
   }
 
   visitDocument(node: DocumentNode): string {
+    this.currentFilePath = node.sourceFile || 'unknown';
+    this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.documentRenderer.findAllHeadings(node.children));
 
@@ -164,6 +176,53 @@ export class HTMLBuilder implements Builder {
     // so we don't need to process them as text here.
 
     return this.processInline(text);
+  }
+
+  visitInclude(node: IncludeNode): string {
+    if (this.includeStack.length >= this.MAX_INCLUDE_DEPTH) {
+      console.warn(`[Include Error] Max inclusion depth reached: ${this.MAX_INCLUDE_DEPTH}`);
+      return `<div class="error">Error: Max inclusion depth reached</div>`;
+    }
+
+    const currentDir = this.currentFilePath !== 'unknown' 
+      ? path.dirname(this.currentFilePath) 
+      : process.cwd();
+    const targetPath = path.resolve(currentDir, node.path);
+
+    if (this.includeStack.includes(targetPath)) {
+      console.warn(`[Include Error] Circular inclusion detected: ${targetPath}`);
+      return `<div class="error">Error: Circular inclusion detected: ${node.path}</div>`;
+    }
+
+    if (!fs.existsSync(targetPath)) {
+      console.warn(`[Include Error] File not found: ${targetPath}`);
+      return `<div class="error">Error: Included file not found: ${node.path}</div>`;
+    }
+
+    try {
+      const content = fs.readFileSync(targetPath, 'utf8');
+      const lexer = new Lexer(content);
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens, targetPath);
+      const doc = parser.parse();
+
+      // Track the stack for recursion
+      const previousPath = this.currentFilePath;
+      this.currentFilePath = targetPath;
+      this.includeStack.push(targetPath);
+
+      // Render the children of the included document
+      const result = this.joinChildren(doc.children);
+
+      // Restore the stack
+      this.includeStack.pop();
+      this.currentFilePath = previousPath;
+
+      return result;
+    } catch (err: any) {
+      console.error(`[Include Error] Failed to process ${targetPath}: ${err.message}`);
+      return `<div class="error">Error: Failed to process include: ${node.path}</div>`;
+    }
   }
 
   visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {

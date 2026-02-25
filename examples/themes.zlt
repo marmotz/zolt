@@ -4,19 +4,27 @@ Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement à vos 
 
 ## Thèmes Standard
 
-Chaque thème ci-dessous utilise `color-scheme: auto` par défaut.
+Chaque thème ci-dessous dispose de trois variantes pour tester le comportement du mode de couleur.
 
-- [Thème Default](themes/default.zlt) — Moderne, propre et équilibré.
-- [Thème Professional](themes/professional.zlt) — Élégant avec titres serif (Georgia/Times).
-- [Thème Technical](themes/technical.zlt) — Orienté code avec titres monospace.
-- [Thème Playful](themes/playful.zlt) — Coloré, arrondi et dynamique.
+### 🎨 Thème Default
+- [Default (Auto)](themes/default-auto.zlt)
+- [Default (Force Light)](themes/default-light.zlt)
+- [Default (Force Dark)](themes/default-dark.zlt)
 
-## Contrôle du Mode de Couleur (Light/Dark)
+### 👔 Thème Professional
+- [Professional (Auto)](themes/professional-auto.zlt)
+- [Professional (Force Light)](themes/professional-light.zlt)
+- [Professional (Force Dark)](themes/professional-dark.zlt)
 
-Exemples de documents forçant un mode spécifique :
+### 💻 Thème Technical
+- [Technical (Auto)](themes/technical-auto.zlt)
+- [Technical (Force Light)](themes/technical-light.zlt)
+- [Technical (Force Dark)](themes/technical-dark.zlt)
 
-- [Professional (Forcé en Sombre)](themes/professional-dark.zlt) — `color-scheme: dark`
-- [Default (Forcé en Clair)](themes/default-light.zlt) — `color-scheme: light`
+### 🚀 Thème Playful
+- [Playful (Auto)](themes/playful-auto.zlt)
+- [Playful (Force Light)](themes/playful-light.zlt)
+- [Playful (Force Dark)](themes/playful-dark.zlt)
 
 ---
 [← Retour à l'Index des Exemples](index.zlt)

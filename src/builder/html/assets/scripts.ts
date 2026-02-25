@@ -251,6 +251,15 @@ export const MERMAID_SCRIPT = `
   <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      mermaid.initialize({ startOnLoad: true });
+      var isDark = document.body.classList.contains('color-scheme-dark') || 
+                   (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                    !document.body.classList.contains('color-scheme-light'));
+      
+      mermaid.initialize({ 
+        startOnLoad: true,
+        theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
+        fontFamily: 'inherit'
+      });
     });
   </script>`;

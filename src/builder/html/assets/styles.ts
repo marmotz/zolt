@@ -157,6 +157,23 @@ export const BASE_CSS = `
     box-shadow: 0 4px 12px var(--zlt-color-shadow);
   }
 
+  .zolt-mermaid {
+    margin: 2.5rem 0;
+    display: flex;
+    justify-content: center;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--zlt-color-border);
+  }
+
+  body.color-scheme-dark .zolt-mermaid,
+  @media (prefers-color-scheme: dark) {
+    body:not(.color-scheme-light) .zolt-mermaid {
+      background: #1a202c;
+    }
+  }
+
   :target {
     scroll-margin-top: 2rem;
     background-color: var(--zlt-color-highlight-bg);
@@ -226,6 +243,8 @@ export const THEMES_CSS = `
     --zlt-color-border: #e2e8f0;
     --zlt-color-link: #3182ce;
     --zlt-color-pre-border: #3182ce;
+    --zlt-color-pre-bg: #000000;
+    --zlt-color-pre-text: #48bb78;
     --zlt-color-block-bg: #ebf8ff;
   }
 

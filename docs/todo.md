@@ -299,11 +299,11 @@
 
 ### File Inclusion
 
-- [ ] `{{include path/to/file.zlt}}`
-- [ ] Relative path support
-- [ ] Recursion protection (max depth 10)
-- [ ] Loop detection
-- [ ] Variable inheritance from parent
+- [x] `{{include path/to/file.zlt}}`
+- [x] Relative path support
+- [x] Recursion protection (max depth 10)
+- [x] Loop detection
+- [x] Variable inheritance from parent
 
 ## 13. Code Blocks & Special Functions
 
@@ -371,9 +371,9 @@
 - [x] Emit warnings for unknown metadata in frontmatter
 - [ ] Emit warnings for syntax errors
 - [ ] Validate attribute syntax
-- [ ] File not found errors for includes
-- [ ] Inclusion loop detection errors
-- [ ] Max depth exceeded errors
+- [x] File not found errors for includes
+- [x] Inclusion loop detection errors
+- [x] Max depth exceeded errors
 - [ ] Permission denied errors
 
 ## 17. HTML Generation
@@ -396,7 +396,7 @@
 - [x] Unit tests for SourceEvaluator (:::foreach, :::if, :::comment blocks)
 - [ ] Unit tests for calculations and namespaces
 - [x] Unit tests for loops
-- [ ] Unit tests for file inclusion
+- [x] Unit tests for file inclusion
 - [x] Integration tests for complete documents (charts, mermaid)
 - [ ] Regression tests for Markdown compatibility
 

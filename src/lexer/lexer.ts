@@ -117,8 +117,47 @@ export class Lexer {
     if (this.matchInlineComment()) {
       return this.readInlineComment();
     }
+    if (this.matchInclude()) {
+      return this.readInclude();
+    }
 
     return this.readText();
+  }
+
+  private matchInclude(): boolean {
+    const remaining = this.source.slice(this.pos);
+    return /^{{include\s+[^}]+}}/.test(remaining);
+  }
+
+  private readInclude(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar(); // {
+    this.advanceChar(); // {
+    
+    // Skip "include" and whitespace
+    for (let i = 0; i < 7; i++) this.advanceChar();
+    this.skipWhitespace();
+
+    let path = '';
+    while (!this.isEof() && !this.source.slice(this.pos).startsWith('}}')) {
+      path += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar(); // }
+      this.advanceChar(); // }
+    }
+
+    return {
+      type: TokenType.INCLUDE,
+      value: path.trim(),
+      line,
+      column,
+      length: this.pos - start,
+    };
   }
 
   private matchHeading(): boolean {

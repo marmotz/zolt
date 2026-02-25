@@ -12,7 +12,7 @@ import { TripleColonParser } from './block-parsers/triple-colon-parser';
 import { DefinitionCollector } from './definition-collector';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
-import { ASTNode, DocumentNode, FrontmatterNode } from './types';
+import { ASTNode, DocumentNode, FrontmatterNode, VariableDefinitionNode } from './types';
 
 export class Parser {
   private tokens: Token[];
@@ -312,6 +312,13 @@ export class Parser {
     }
     if (this.match(TokenType.HORIZONTAL_RULE)) {
       return this.specialBlockParser.parseHorizontalRule(this.expect.bind(this));
+    }
+    if (this.match(TokenType.INCLUDE)) {
+      const token = this.expect(TokenType.INCLUDE);
+      return {
+        type: 'Include',
+        path: token.value,
+      };
     }
 
     if (this.match(TokenType.INDENTATION)) {

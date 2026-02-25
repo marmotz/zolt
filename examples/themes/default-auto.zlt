@@ -1,0 +1,6 @@
+---
+title: "Zolt Theme: Default (Auto)"
+theme: "default"
+color-scheme: "auto"
+---
+{{include _template.zlt}}
