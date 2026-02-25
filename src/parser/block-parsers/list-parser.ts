@@ -108,7 +108,7 @@ export class ListParser {
     if (attrMatchWithSpace) {
       const attrContent = attrMatchWithSpace[1];
       if (!attrContent.startsWith('$') && !attrContent.startsWith('{')) {
-        attributes = InlineParser.parseAttributes(attrContent);
+        attributes = this.inlineParser.parseAttributes(attrContent);
         content = content.slice(0, -attrMatchWithSpace[0].length).trim();
       }
     } else {
@@ -121,7 +121,7 @@ export class ListParser {
         const inlineDelimiters = [')', '*', '/', '_', '~', '}', '|', '=', '`'];
 
         if (!attrContent.startsWith('$') && !attrContent.startsWith('{') && !inlineDelimiters.includes(charBefore)) {
-          attributes = InlineParser.parseAttributes(attrContent);
+          attributes = this.inlineParser.parseAttributes(attrContent);
           content = content.slice(0, -fullMatch.length).trim();
         }
       }

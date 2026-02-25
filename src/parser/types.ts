@@ -126,12 +126,14 @@ export interface IncludeNode {
 export interface FootnoteNode {
   type: 'Footnote';
   id: string;
+  attributes?: Attributes;
 }
 
 export interface FootnoteDefinitionNode {
   type: 'FootnoteDefinition';
   id: string;
   children: ASTNode[];
+  attributes?: Attributes;
 }
 
 export interface AbbreviationNode {

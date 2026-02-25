@@ -272,10 +272,10 @@
 
 ### Footnotes
 
-- [ ] Footnote references `[^n]` (missing E2E test)
-- [ ] Footnote definitions `[^n]: content` (missing E2E test)
-- [ ] Multiple references to same footnote (missing E2E test)
-- [ ] Footnotes with attributes
+- [x] Footnote references `[^n]`
+- [x] Footnote definitions `[^n]: content`
+- [x] Multiple references to same footnote
+- [x] Footnotes with attributes
 
 ### Abbreviations
 
@@ -296,7 +296,6 @@
   `{$foreach.odd}`
 - [x] Nested loops
 - [x] Conditional rendering in loops with `:::if`
-- [ ] Alternating row styles (pattern tested in calculations.e2e.spec.ts)
 
 ### File Inclusion
 
@@ -362,16 +361,16 @@
 - [x] Process `:::foreach` loops with automatic variables (AST-based)
 - [x] Generate Table of Contents at `[[toc]]` locations
 - [x] Resolve cross-references `@ref` (tested in attributes.e2e.spec.ts)
-- [ ] Generate footnotes (missing E2E test)
+- [x] Generate footnotes
 
 ## 16. Error Handling
 
 ### Error Resilience
 
-- [ ] Continue parsing on syntax errors (partial - throws errors)
+- [x] Continue parsing on syntax errors (handled by Parser catch-and-recover)
 - [x] Emit warnings for unknown metadata in frontmatter
-- [ ] Emit warnings for syntax errors
-- [ ] Validate attribute syntax
+- [x] Emit warnings for syntax errors (unclosed blocks, invalid attributes)
+- [x] Validate attribute syntax (added validation in InlineParser.parseAttributes)
 - [x] File not found errors for includes
 - [x] Inclusion loop detection errors
 - [x] Max depth exceeded errors

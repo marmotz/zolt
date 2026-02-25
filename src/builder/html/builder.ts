@@ -18,8 +18,8 @@ type InitialVariables = Record<string, number | string | boolean | null | undefi
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
-  private footnoteDefinitions: Map<string, ASTNode[]> = new Map();
-  private footnoteReferences: string[] = [];
+  private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: any }> = new Map();
+  private footnoteReferences: { id: string; refId: string }[] = [];
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
@@ -55,11 +55,15 @@ export class HTMLBuilder implements Builder {
     const processInlineContentBound = this.processInlineContent.bind(this);
 
     const registerFootnoteRef = (id: string) => {
-      if (!this.footnoteReferences.includes(id)) {
-        this.footnoteReferences.push(id);
-      }
+      const count = this.footnoteReferences.filter((ref) => ref.id === id).length;
+      const refId = count === 0 ? id : `${id}:${count}`;
+      this.footnoteReferences.push({ id, refId });
 
-      return this.footnoteReferences.indexOf(id) + 1;
+      const uniqueIds = Array.from(new Set(this.footnoteReferences.map((ref) => ref.id)));
+      return {
+        index: uniqueIds.indexOf(id) + 1,
+        refId,
+      };
     };
 
     this.blockVisitor = new BlockVisitor(
@@ -211,24 +215,30 @@ export class HTMLBuilder implements Builder {
 
     let html = '<section class="footnotes">\n<hr>\n<ol>\n';
 
-    for (const id of this.footnoteReferences) {
-      const children = this.footnoteDefinitions.get(id);
-      if (!children) continue;
+    const uniqueIds = Array.from(new Set(this.footnoteReferences.map((ref) => ref.id)));
 
-      const content = children ? this.joinChildren(children) : '';
+    for (const id of uniqueIds) {
+      const def = this.footnoteDefinitions.get(id);
+      if (!def) continue;
 
-      // Backlink
-      const backlink = ` <a href="#fnref:${id}" class="footnote-backref">↩</a>`;
+      const content = def.children ? this.joinChildren(def.children) : '';
+      const attrs = this.attributeRenderer.renderAllAttributes(def.attributes);
 
-      // If content is wrapped in a paragraph, append the backlink before the closing </p>
+      // Backlinks
+      const relevantRefs = this.footnoteReferences.filter((ref) => ref.id === id);
+      const backlinks = relevantRefs
+        .map((ref) => `<a href="#fnref:${ref.refId}" class="footnote-backref">↩</a>`)
+        .join(' ');
+
+      // If content is wrapped in a paragraph, append the backlinks before the closing </p>
       let itemContent = content;
       if (itemContent.endsWith('</p>')) {
-        itemContent = itemContent.substring(0, itemContent.length - 4) + backlink + '</p>';
+        itemContent = itemContent.substring(0, itemContent.length - 4) + ' ' + backlinks + '</p>';
       } else {
-        itemContent += backlink;
+        itemContent += ' ' + backlinks;
       }
 
-      html += `<li id="fn:${id}">${itemContent}</li>\n`;
+      html += `<li id="fn:${id}"${attrs}>${itemContent}</li>\n`;
     }
 
     html += '</ol>\n</section>';
@@ -237,7 +247,7 @@ export class HTMLBuilder implements Builder {
   }
 
   private visitFootnoteDefinition(node: any): string {
-    this.footnoteDefinitions.set(node.id, node.children);
+    this.footnoteDefinitions.set(node.id, { children: node.children, attributes: node.attributes });
     return '';
   }
 

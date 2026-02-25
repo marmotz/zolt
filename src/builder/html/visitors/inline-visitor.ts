@@ -28,7 +28,7 @@ export class InlineVisitor {
     private renderAllAttributes: (attrs?: any) => string,
     private processInline: (text: string) => string,
     private evaluator: any,
-    private registerFootnoteRef: (id: string) => number,
+    private registerFootnoteRef: (id: string) => { index: number; refId: string },
     private assetResolver?: (path: string) => string
   ) {}
 
@@ -92,9 +92,10 @@ export class InlineVisitor {
   }
 
   visitFootnote(node: any): string {
-    const index = this.registerFootnoteRef(node.id);
+    const { index, refId } = this.registerFootnoteRef(node.id);
+    const attrs = this.renderAllAttributes(node.attributes);
 
-    return `<sup><a href="#fn:${node.id}" id="fnref:${node.id}">[${index}]</a></sup>`;
+    return `<sup><a href="#fn:${node.id}" id="fnref:${refId}"${attrs}>[${index}]</a></sup>`;
   }
 
   visitBold(node: BoldNode): string {

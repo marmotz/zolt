@@ -1,4 +1,4 @@
-type Value = number | string | boolean | null | Date | Value[] | { [key: string]: Value };
+export type Value = number | string | boolean | null | Date | Value[] | { [key: string]: Value };
 
 interface Variables {
   [key: string]: Value;

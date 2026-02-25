@@ -11,13 +11,17 @@ import {
 } from '../types';
 
 export class TripleColonParser {
+  constructor(private inlineParser: InlineParser) {}
+
   public parseTripleColonBlock(
     advance: () => Token,
     expect: (type: TokenType) => Token,
     match: (...types: TokenType[]) => boolean,
     skipNewlines: () => void,
     isEof: () => boolean,
-    parseBlock: () => ASTNode | null
+    parseBlock: () => ASTNode | null,
+    error: (message: string, code: string) => never,
+    warn: (message: string, code: string) => void
   ): ASTNode {
     const startToken = expect(TokenType.TRIPLE_COLON_START);
     const value = startToken.value;
@@ -44,7 +48,7 @@ export class TripleColonParser {
       }
 
       if (!shouldSkip) {
-        attributes = InlineParser.parseAttributes(attrContent);
+        attributes = this.inlineParser.parseAttributes(attrContent);
         remaining = value.replace(/\s+\{([^}]+)}$/, '').trim();
       }
     }
@@ -86,6 +90,8 @@ export class TripleColonParser {
 
     if (match(TokenType.TRIPLE_COLON_END)) {
       advance();
+    } else {
+      warn(`Unclosed triple colon block starting with :::${blockType}`, 'UNCLOSED_TRIPLE_COLON_BLOCK');
     }
 
     return {
@@ -166,7 +172,7 @@ export class TripleColonParser {
         const chartAttrMatch = chartValue.match(/\s+\{([^}]+)}$/);
         let chartRemaining = chartValue;
         if (chartAttrMatch) {
-          chartAttributes = InlineParser.parseAttributes(chartAttrMatch[1]);
+          chartAttributes = this.inlineParser.parseAttributes(chartAttrMatch[1]);
           chartRemaining = chartValue.replace(/\s+\{([^}]+)}$/, '').trim();
         }
 

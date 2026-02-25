@@ -1,6 +1,4 @@
-import { ExpressionEvaluator } from './expression-evaluator';
-
-type Value = number | string | boolean | null | Value[] | { [key: string]: Value };
+import { ExpressionEvaluator, Value } from './expression-evaluator';
 
 export class ContentProcessor {
   private evaluator: ExpressionEvaluator;

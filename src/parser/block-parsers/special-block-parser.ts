@@ -3,6 +3,8 @@ import { InlineParser } from '../inline-parser';
 import { Attributes } from '../types';
 
 export class SpecialBlockParser {
+  constructor(private inlineParser: InlineParser) {}
+
   public parseDoubleBracketBlock(expect: (type: TokenType) => Token): any {
     const token = expect(TokenType.DOUBLE_BRACKET_START);
     const value = token.value;
@@ -14,7 +16,7 @@ export class SpecialBlockParser {
       blockType = value.substring(0, firstSpaceIndex);
       const attrStr = value.substring(firstSpaceIndex + 1).trim();
       const attrMatch = attrStr.match(/^\{([^}]+)}$/);
-      if (attrMatch) attributes = InlineParser.parseAttributes(attrMatch[1]);
+      if (attrMatch) attributes = this.inlineParser.parseAttributes(attrMatch[1]);
     }
 
     return { type: 'DoubleBracketBlock', blockType, content: '', attributes };
@@ -36,7 +38,7 @@ export class SpecialBlockParser {
       const cleanAttrs = attrsStr.startsWith(':') ? attrsStr.substring(1) : attrsStr;
       const attrMatch = cleanAttrs.match(/^\{([^}]+)}$/);
       if (attrMatch && !attrMatch[1].startsWith('$') && !attrMatch[1].startsWith('{')) {
-        attributes = InlineParser.parseAttributes(attrMatch[1]);
+        attributes = this.inlineParser.parseAttributes(attrMatch[1]);
       }
     }
 

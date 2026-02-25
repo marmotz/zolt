@@ -29,7 +29,8 @@ export class IndentationParser {
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
     parseParagraph: () => ParagraphNode,
-    error: (message: string, code: string) => never
+    error: (message: string, code: string) => never,
+    warn: (message: string, code: string) => void
   ): IndentationNode {
     const startToken = expect(TokenType.TECHNICAL_INDENT);
     const baseLevel = startToken.level || 1;
@@ -48,7 +49,9 @@ export class IndentationParser {
       parseHeading,
       parseCodeBlock,
       parseHorizontalRule,
-      parseParagraph
+      parseParagraph,
+      error,
+      warn
     );
     if (firstLineContent) children.push(firstLineContent);
 
@@ -72,7 +75,8 @@ export class IndentationParser {
               parseCodeBlock,
               parseHorizontalRule,
               parseParagraph,
-              error
+              error,
+              warn
             )
           );
           continue;
@@ -91,7 +95,9 @@ export class IndentationParser {
           parseHeading,
           parseCodeBlock,
           parseHorizontalRule,
-          parseParagraph
+          parseParagraph,
+          error,
+          warn
         );
         if (lineContent) children.push(lineContent);
         continue;
@@ -117,7 +123,9 @@ export class IndentationParser {
     parseHeading: () => ASTNode,
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
-    parseParagraph: () => ParagraphNode
+    parseParagraph: () => ParagraphNode,
+    error: (message: string, code: string) => never,
+    warn: (message: string, code: string) => void
   ): ASTNode | null {
     if (match(TokenType.TECHNICAL_INDENT, TokenType.NEWLINE, TokenType.EOF)) {
       return null;
@@ -132,7 +140,16 @@ export class IndentationParser {
       return parseHorizontalRule();
     }
     if (match(TokenType.TRIPLE_COLON_START)) {
-      return this.tripleColonParser.parseTripleColonBlock(advance, expect, match, skipNewlines, isEof, parseBlock);
+      return this.tripleColonParser.parseTripleColonBlock(
+        advance,
+        expect,
+        match,
+        skipNewlines,
+        isEof,
+        parseBlock,
+        error,
+        warn
+      );
     }
     if (match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
       return this.parseIndentationList(tokens, pos, currentToken, advance, match, skipNewlines, isEof, parseBlock);

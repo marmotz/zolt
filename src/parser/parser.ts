@@ -12,14 +12,7 @@ import { TripleColonParser } from './block-parsers/triple-colon-parser';
 import { DefinitionCollector } from './definition-collector';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
-import {
-  ASTNode,
-  DocumentNode,
-  FootnoteDefinitionNode,
-  FrontmatterNode,
-  ParagraphNode,
-  VariableDefinitionNode,
-} from './types';
+import { ASTNode, DocumentNode, FootnoteDefinitionNode, FrontmatterNode, VariableDefinitionNode } from './types';
 
 export class Parser {
   private tokens: Token[];
@@ -48,15 +41,18 @@ export class Parser {
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
     this.inlineParser = new InlineParser();
+    this.inlineParser.setWarningCallback((message, code) => {
+      this.warn(message, code);
+    });
 
     this.definitionCollector = new DefinitionCollector();
     this.tableParser = new TableParser(this.inlineParser);
     this.listParser = new ListParser(this.inlineParser);
-    this.tripleColonParser = new TripleColonParser();
+    this.tripleColonParser = new TripleColonParser(this.inlineParser);
     this.frontmatterParser = new FrontmatterParser();
     this.headingParser = new HeadingParser(this.inlineParser);
-    this.codeBlockParser = new CodeBlockParser();
-    this.specialBlockParser = new SpecialBlockParser();
+    this.codeBlockParser = new CodeBlockParser(this.inlineParser);
+    this.specialBlockParser = new SpecialBlockParser(this.inlineParser);
     this.paragraphParser = new ParagraphParser(this.inlineParser);
     this.indentationParser = new IndentationParser(this.listParser, this.tripleColonParser);
     this.blockquoteParser = new BlockquoteParser(this.listParser, this.tripleColonParser);
@@ -117,6 +113,15 @@ export class Parser {
 
   private error(message: string, code: string): never {
     throw new ParseError(message, this.currentToken.line, this.currentToken.column, this.filePath, code);
+  }
+
+  private warn(message: string, code: string, token: Token = this.currentToken): void {
+    this.warnings.push({
+      line: token.line,
+      column: token.column,
+      message,
+      code,
+    });
   }
 
   private expect(type: TokenType): Token {
@@ -258,7 +263,9 @@ export class Parser {
         this.expect.bind(this),
         this.match.bind(this),
         this.advance.bind(this),
-        this.isEof.bind(this)
+        this.isEof.bind(this),
+        this.error.bind(this),
+        this.warn.bind(this)
       );
     }
     if (this.match(TokenType.BLOCKQUOTE)) {
@@ -278,7 +285,9 @@ export class Parser {
           this.expect.bind(this),
           this.match.bind(this),
           this.advance.bind(this),
-          this.isEof.bind(this)
+          this.isEof.bind(this),
+          this.error.bind(this),
+          this.warn.bind(this)
         ),
         this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
         this.paragraphParser.parseParagraph.bind(
@@ -289,7 +298,8 @@ export class Parser {
           this.isEof.bind(this),
           this.isNewBlockStart.bind(this)
         ),
-        this.error.bind(this)
+        this.error.bind(this),
+        this.warn.bind(this)
       );
     }
     if (this.match(TokenType.TECHNICAL_INDENT)) {
@@ -309,7 +319,9 @@ export class Parser {
           this.expect.bind(this),
           this.match.bind(this),
           this.advance.bind(this),
-          this.isEof.bind(this)
+          this.isEof.bind(this),
+          this.error.bind(this),
+          this.warn.bind(this)
         ),
         this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
         this.paragraphParser.parseParagraph.bind(
@@ -320,7 +332,8 @@ export class Parser {
           this.isEof.bind(this),
           this.isNewBlockStart.bind(this)
         ),
-        this.error.bind(this)
+        this.error.bind(this),
+        this.warn.bind(this)
       );
     }
     if (this.match(TokenType.TRIPLE_COLON_START)) {
@@ -330,7 +343,9 @@ export class Parser {
         this.match.bind(this),
         this.skipNewlines.bind(this),
         this.isEof.bind(this),
-        this.parseBlock.bind(this)
+        this.parseBlock.bind(this),
+        this.error.bind(this),
+        this.warn.bind(this)
       );
     }
     if (this.match(TokenType.TRIPLE_COLON_END)) {
@@ -444,7 +459,7 @@ export class Parser {
 
           return {
             type: 'Attributes',
-            attributes: InlineParser.parseAttributes(attrContent),
+            attributes: InlineParser.parseAttributes(attrContent, (message, code) => this.warn(message, code)),
           } as any;
         }
       }
@@ -463,6 +478,7 @@ export class Parser {
     const token = this.advance();
     let id = token.value;
     let initialContent = '';
+    let attributes: any;
 
     if (token.type === TokenType.LINK_REF_DEF) {
       const colonIndex = id.indexOf(':');
@@ -474,20 +490,31 @@ export class Parser {
 
     // The rest of the line is a paragraph or other content.
     if (initialContent) {
-      children.push({
-        type: 'Paragraph',
-        children: this.inlineParser.parse(initialContent),
-      } as ParagraphNode);
-    } else if (!this.match(TokenType.NEWLINE) && !this.isEof()) {
-      children.push(
-        this.paragraphParser.parseParagraph(
-          this.match.bind(this),
-          this.advance.bind(this),
-          this.peek.bind(this),
-          this.isEof.bind(this),
-          this.isNewBlockStart.bind(this)
-        )
+      const paragraph = this.paragraphParser.parseParagraph(
+        () => false, // No match needed as we already have content
+        () => ({ type: TokenType.TEXT, value: initialContent }) as any,
+        () => ({ type: TokenType.EOF }) as any,
+        () => false, // Not EOF yet
+        () => true // New block start
       );
+      if (paragraph.attributes) {
+        attributes = paragraph.attributes;
+        delete paragraph.attributes;
+      }
+      children.push(paragraph);
+    } else if (!this.match(TokenType.NEWLINE) && !this.isEof()) {
+      const paragraph = this.paragraphParser.parseParagraph(
+        this.match.bind(this),
+        this.advance.bind(this),
+        this.peek.bind(this),
+        this.isEof.bind(this),
+        this.isNewBlockStart.bind(this)
+      );
+      if (paragraph.attributes) {
+        attributes = paragraph.attributes;
+        delete paragraph.attributes;
+      }
+      children.push(paragraph);
     }
 
     this.skipNewlines();
@@ -524,6 +551,7 @@ export class Parser {
       type: 'FootnoteDefinition',
       id,
       children,
+      attributes,
     };
   }
 
@@ -544,20 +572,34 @@ export class Parser {
 
       if (this.isEof()) break;
 
-      const block = this.parseBlock();
-      if (block) {
-        if (block.type === 'Attributes' && children.length > 0) {
-          const lastChild = children[children.length - 1] as any;
-          if (lastChild && lastChild.type !== 'Text') {
-            lastChild.attributes = { ...(lastChild.attributes || {}), ...(block.attributes || {}) };
+      try {
+        const block = this.parseBlock();
+        if (block) {
+          if (block.type === 'Attributes' && children.length > 0) {
+            const lastChild = children[children.length - 1] as any;
+            if (lastChild && lastChild.type !== 'Text') {
+              lastChild.attributes = { ...(lastChild.attributes || {}), ...(block.attributes || {}) };
+            }
+          } else {
+            children.push(block);
           }
+        }
+      } catch (e) {
+        if (e instanceof ParseError) {
+          this.warn(e.message, e.code);
+          // Recovery: skip until next newline or EOF to try to parse the next block
+          while (!this.match(TokenType.NEWLINE, TokenType.EOF)) {
+            this.advance();
+          }
+          this.skipNewlines();
         } else {
-          children.push(block);
+          throw e;
         }
       }
 
       if (this.pos === startPos) {
-        this.error(`Parser stuck at token ${this.currentToken.type}`, 'PARSER_STUCK');
+        this.warn(`Parser stuck at token ${this.currentToken.type}. Skipping...`, 'PARSER_STUCK');
+        this.advance();
       }
     }
 

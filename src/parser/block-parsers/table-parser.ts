@@ -39,9 +39,9 @@ export class TableParser {
         const attrStr = value.substring(firstSpaceIndex + 1).trim();
         // Check if it's already an attribute string like {id=foo} or just raw like id=foo
         if (attrStr.startsWith('{') && attrStr.endsWith('}')) {
-          attributes = InlineParser.parseAttributes(attrStr.substring(1, attrStr.length - 1));
+          attributes = this.inlineParser.parseAttributes(attrStr.substring(1, attrStr.length - 1));
         } else {
-          attributes = InlineParser.parseAttributes(attrStr);
+          attributes = this.inlineParser.parseAttributes(attrStr);
         }
       }
       skipNewlines();

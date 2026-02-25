@@ -123,7 +123,9 @@ describe('API: Date Namespace', () => {
 
     test('Date.calc() should support multiple units and negative values', async () => {
       // 2026-02-25 + 1 day - 1 hour
-      const html = await buildString('{{ Date.format(Date.calc("2026-02-25T10:00:00", { days: 1, hours: -1 }), "YYYY-MM-DD HH:mm") }}');
+      const html = await buildString(
+        '{{ Date.format(Date.calc("2026-02-25T10:00:00", { days: 1, hours: -1 }), "YYYY-MM-DD HH:mm") }}'
+      );
       expect(html).toContain('2026-02-26 09:00');
     });
 

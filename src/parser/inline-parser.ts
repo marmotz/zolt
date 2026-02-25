@@ -28,6 +28,11 @@ export class InlineParser {
   private globalAbbreviations: Map<string, string> = new Map();
   private linkReferences: Map<string, string> = new Map();
   private footnoteIds: Set<string> = new Set();
+  private onWarning?: (message: string, code: string) => void;
+
+  setWarningCallback(callback: (message: string, code: string) => void): void {
+    this.onWarning = callback;
+  }
 
   setGlobalAbbreviations(abbreviations: Map<string, string>): void {
     this.globalAbbreviations = abbreviations;
@@ -330,11 +335,21 @@ export class InlineParser {
     }
 
     let remaining = text.slice(fullMatch.length);
+    let attributes: Attributes | undefined;
+
+    if (remaining.startsWith('{')) {
+      const attrContent = this.extractBalancedBraces(remaining, 1);
+      if (attrContent !== null) {
+        attributes = this.parseAttributes(attrContent);
+        remaining = remaining.slice(1 + attrContent.length + 1);
+      }
+    }
 
     return {
       node: {
         type: 'Footnote',
         id,
+        attributes,
       } as FootnoteNode,
       remaining,
     };
@@ -707,7 +722,10 @@ export class InlineParser {
     };
   }
 
-  public static parseAttributes(attrStr?: string): Attributes | undefined {
+  public static parseAttributes(
+    attrStr?: string,
+    onWarning?: (message: string, code: string) => void
+  ): Attributes | undefined {
     if (!attrStr) {
       return undefined;
     }
@@ -723,7 +741,7 @@ export class InlineParser {
       }
       if (remaining.length === 0) break;
 
-      // console.log('Parsing attribute, remaining:', remaining);
+      const startLen = remaining.length;
 
       const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
       const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
@@ -774,9 +792,20 @@ export class InlineParser {
             this.setAttribute(attrs, key, '');
             remaining = remaining.slice(key.length);
           } else {
+            if (onWarning) {
+              onWarning(`Invalid attribute syntax near: "${remaining.slice(0, 10)}..."`, 'INVALID_ATTRIBUTE_SYNTAX');
+            }
             remaining = remaining.slice(1);
           }
         }
+      }
+
+      // Safety to prevent infinite loops if no progress is made
+      if (remaining.length === startLen) {
+        if (onWarning) {
+          onWarning(`Stuck parsing attributes at: "${remaining.slice(0, 10)}..."`, 'ATTRIBUTE_PARSER_STUCK');
+        }
+        remaining = remaining.slice(1);
       }
     }
 
@@ -793,8 +822,8 @@ export class InlineParser {
     }
   }
 
-  private parseAttributes(attrStr?: string): Attributes | undefined {
-    return InlineParser.parseAttributes(attrStr);
+  public parseAttributes(attrStr?: string): Attributes | undefined {
+    return InlineParser.parseAttributes(attrStr, this.onWarning);
   }
 
   private setAttribute(attrs: Attributes, key: string, value: string): void {

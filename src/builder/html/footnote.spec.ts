@@ -84,9 +84,9 @@ Ref 2[reuse].
     const html = builder.buildDocument(doc);
 
     expect(html).toContain('Ref 1<sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup>');
-    expect(html).toContain('Ref 2<sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup>');
+    expect(html).toContain('Ref 2<sup><a href="#fn:reuse" id="fnref:reuse:1">[1]</a></sup>');
     expect(html).toContain(
-      '<li id="fn:reuse"><p>This is reused. <a href="#fnref:reuse" class="footnote-backref">↩</a></p></li>'
+      '<li id="fn:reuse"><p>This is reused. <a href="#fnref:reuse" class="footnote-backref">↩</a> <a href="#fnref:reuse:1" class="footnote-backref">↩</a></p></li>'
     );
   });
 });
