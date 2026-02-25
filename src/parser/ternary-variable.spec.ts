@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import { InlineParser } from './inline-parser';
 import { VariableNode } from './types';
 
@@ -25,7 +25,7 @@ describe('InlineParser with Ternary Variables', () => {
     expect(nodes[0].type).toBe('Variable');
     expect((nodes[0] as VariableNode).name).toBe('product.onSale ? "Sale!" : ""');
   });
-  
+
   test('should parse ternary within a sentence', () => {
     const nodes = parser.parse('Is it featured? {$featured ? "Yes" : "No"}.');
     expect(nodes).toHaveLength(3);

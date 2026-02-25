@@ -1,6 +1,6 @@
-import { expect, test, describe } from 'bun:test';
-import { ExpressionEvaluator } from './expression-evaluator';
+import { describe, expect, test } from 'bun:test';
 import { ContentProcessor } from './content-processor';
+import { ExpressionEvaluator } from './expression-evaluator';
 
 describe('Ternary Operator', () => {
   test('should evaluate simple ternary in expression', () => {
@@ -37,9 +37,9 @@ describe('Ternary Operator', () => {
   test('should handle ternary in ContentProcessor variable expansion', () => {
     const evaluator = new ExpressionEvaluator({ featured: true });
     const processor = new ContentProcessor(evaluator);
-    
+
     expect(processor.processContent('Featured: {$featured ? "Yes" : "No"}')).toBe('Featured: Yes');
-    
+
     evaluator.setVariable('featured', false);
     expect(processor.processContent('Featured: {$featured ? "Yes" : "No"}')).toBe('Featured: No');
   });
@@ -47,9 +47,9 @@ describe('Ternary Operator', () => {
   test('should handle ternary in ContentProcessor expressions', () => {
     const evaluator = new ExpressionEvaluator({ age: 20 });
     const processor = new ContentProcessor(evaluator);
-    
+
     expect(processor.processContent('Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}')).toBe('Statut: Adulte');
-    
+
     evaluator.setVariable('age', 15);
     expect(processor.processContent('Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}')).toBe('Statut: Mineur');
   });

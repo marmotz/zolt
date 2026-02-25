@@ -18,7 +18,9 @@ describe('Footnotes HTML Rendering', () => {
 
     expect(html).toContain('This is a note<sup><a href="#fn:1" id="fnref:1">[1]</a></sup>.');
     expect(html).toContain('<section class="footnotes">');
-    expect(html).toContain('<li id="fn:1"><p>Footnote content. <a href="#fnref:1" class="footnote-backref">↩</a></p></li>');
+    expect(html).toContain(
+      '<li id="fn:1"><p>Footnote content. <a href="#fnref:1" class="footnote-backref">↩</a></p></li>'
+    );
   });
 
   it('should handle multiple footnotes in order of appearance', () => {
@@ -63,7 +65,9 @@ describe('Footnotes HTML Rendering', () => {
     const builder = new HTMLBuilder();
     const html = builder.buildDocument(doc);
 
-    expect(html).toContain('<li id="fn:complex"><p>Main line.</p><ul>\n<li>Item 1</li><li>Item 2</li>\n</ul><blockquote><p>A quote.</p></blockquote><pre><code class="language-js">  console.log(&quot;hello&quot;);</code></pre> <a href="#fnref:complex" class="footnote-backref">↩</a></li>');
+    expect(html).toContain(
+      '<li id="fn:complex"><p>Main line.</p><ul>\n<li>Item 1</li><li>Item 2</li>\n</ul><blockquote><p>A quote.</p></blockquote><pre><code class="language-js">  console.log(&quot;hello&quot;);</code></pre> <a href="#fnref:complex" class="footnote-backref">↩</a></li>'
+    );
   });
 
   it('should handle reusing footnotes without caret and definitions without caret', () => {
@@ -81,6 +85,8 @@ Ref 2[reuse].
 
     expect(html).toContain('Ref 1<sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup>');
     expect(html).toContain('Ref 2<sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup>');
-    expect(html).toContain('<li id="fn:reuse"><p>This is reused. <a href="#fnref:reuse" class="footnote-backref">↩</a></p></li>');
+    expect(html).toContain(
+      '<li id="fn:reuse"><p>This is reused. <a href="#fnref:reuse" class="footnote-backref">↩</a></p></li>'
+    );
   });
 });

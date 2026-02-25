@@ -1,9 +1,9 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
-import { HTMLBuilder } from '../builder/html/builder';
 
 describe('Include E2E', () => {
   let tempDir: string;
@@ -22,7 +22,7 @@ describe('Include E2E', () => {
 
     const mainFile = path.join(tempDir, 'main.zlt');
     const mainContent = 'Main Title\n\n{{include included.zlt}}';
-    
+
     const lexer = new Lexer(mainContent);
     const tokens = lexer.tokenize();
     const parser = new Parser(tokens, mainFile);
@@ -69,7 +69,7 @@ describe('Include E2E', () => {
     const parser = new Parser(tokens, path.join(tempDir, 'main.zlt'));
     const doc = parser.parse();
     const builder = new HTMLBuilder();
-    
+
     const html = builder.visitDocument(doc);
     expect(html).toContain('Circular inclusion detected');
   });

@@ -177,7 +177,7 @@ export class Lexer {
 
     this.advanceChar(); // {
     this.advanceChar(); // {
-    
+
     // Skip "include" and whitespace
     for (let i = 0; i < 7; i++) this.advanceChar();
     this.skipWhitespace();

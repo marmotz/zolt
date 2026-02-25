@@ -94,7 +94,7 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 
 ### Images
 
-![Zolt Logo](logo.png){width=200px align=center}
+![Zolt Logo](../resources/logo.png){width=200px align=center}
 
 ### Links
 
@@ -159,7 +159,6 @@ npm install -g zolt-cli
 Create a `.zlt` file and start writing!
 :::
 :::
-:::
 
 ### Accordions
 
@@ -171,7 +170,6 @@ Zolt supports variables, loops, calculations, and much more.
 - Use comments for notes
 - Leverage variables for reusability
 - Organize with sections
-:::
 :::
 
 ### Columns
@@ -197,8 +195,6 @@ Additional details can be hidden in accordions within columns.
 
 **Note:**
 > Sidebars are perfect for supplementary information.
-:::
-:::
 :::
 :::
 
@@ -241,7 +237,6 @@ $products = [
 :::foreach {$products as $product}
 :::if {$product.in_stock}
 - **{$product.name}** - ${{$product.price}}
-:::
 :::
 :::
 
