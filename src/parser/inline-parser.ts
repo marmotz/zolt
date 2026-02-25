@@ -49,6 +49,19 @@ export class InlineParser {
     let remaining = text;
 
     while (remaining.length > 0) {
+      // Handle escaped characters
+      if (remaining[0] === '\\' && remaining.length > 1) {
+        const nextChar = remaining[1];
+        const lastNode = nodes[nodes.length - 1];
+        if (lastNode && lastNode.type === 'Text') {
+          (lastNode as TextNode).content += nextChar;
+        } else {
+          nodes.push(this.createTextNode(nextChar));
+        }
+        remaining = remaining.slice(2);
+        continue;
+      }
+
       const result = this.parseInlineElement(remaining);
       if (result) {
         nodes.push(result.node);

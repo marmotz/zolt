@@ -335,6 +335,29 @@ describe('InlineParser', () => {
     });
   });
 
+  describe('Escaping', () => {
+    test('should handle escaped characters', () => {
+      const nodes = parser.parse('\\`print()\\`');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Text');
+      expect((nodes[0] as any).content).toBe('`print()`');
+    });
+
+    test('should handle escaped delimiters', () => {
+      const nodes = parser.parse('\\*\\*not bold\\*\\*');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Text');
+      expect((nodes[0] as any).content).toBe('**not bold**');
+    });
+
+    test('should handle escaped backslash', () => {
+      const nodes = parser.parse('\\\\text');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Text');
+      expect((nodes[0] as any).content).toBe('\\text');
+    });
+  });
+
   describe('Variables with Ternary', () => {
     test('should parse variable with ternary operator', () => {
       const nodes = parser.parse('{$featured ? "Yes" : "No"}');
