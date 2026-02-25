@@ -184,7 +184,8 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt);
 
-    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+    const isRemote = src.startsWith('http://') || src.startsWith('https://');
+    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
     return `<img src="${resolvedSrc}" alt="${alt}"${attrs}>`;
   }
@@ -194,7 +195,32 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
-    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+    const isRemote = src.startsWith('http://') || src.startsWith('https://');
+    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
+
+    // Detect if it's an embeddable remote video
+    const youtubeMatch = resolvedSrc.match(
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/
+    );
+    const vimeoMatch = resolvedSrc.match(/(?:https?:\/\/)?(?:www\.)?(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
+
+    if (youtubeMatch) {
+      const videoId = youtubeMatch[1];
+      const embedSrc = 'https://www.youtube-nocookie.com/embed/' + videoId;
+      const videoAttrs = { ...node.attributes, border: '0' };
+      const renderedAttrs = this.renderAllAttributes(videoAttrs);
+
+      return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    }
+
+    if (vimeoMatch) {
+      const videoId = vimeoMatch[1];
+      const embedSrc = `https://player.vimeo.com/video/${videoId}`;
+      const videoAttrs = { ...node.attributes, border: '0' };
+      const renderedAttrs = this.renderAllAttributes(videoAttrs);
+
+      return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    }
 
     return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
   }
@@ -204,19 +230,33 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
-    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+    const isRemote = src.startsWith('http://') || src.startsWith('https://');
+    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
     return `<audio src="${resolvedSrc}"${attrs}>${alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
-    const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
+    const title = this.evaluateString(node.title ?? '');
+    const titleAttr = title ? ` title="${title}"` : '';
 
-    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+    const isRemote = src.startsWith('http://') || src.startsWith('https://');
+    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    return `<iframe src="${resolvedSrc}"${title}${attrs}></iframe>`;
+    // Add standard permissions for common embed types if not present
+    const isVideoEmbed =
+      resolvedSrc.includes('youtube.com') ||
+      resolvedSrc.includes('vimeo.com') ||
+      resolvedSrc.includes('youtube-nocookie.com');
+    const allowAttr = isVideoEmbed
+      ? ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen'
+      : '';
+
+    const embedAttrs = { ...node.attributes, border: '0' };
+    const renderedAttrs = this.renderAllAttributes(embedAttrs);
+
+    return `<iframe src="${resolvedSrc}"${titleAttr}${renderedAttrs}${allowAttr}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
@@ -224,7 +264,8 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const title = node.title ? this.evaluateString(node.title) : null;
 
-    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+    const isRemote = src.startsWith('http://') || src.startsWith('https://');
+    const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
     return `<a href="${resolvedSrc}"${attrs}>${title || resolvedSrc}</a>`;
   }

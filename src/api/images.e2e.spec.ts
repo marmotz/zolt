@@ -32,6 +32,23 @@ describe('API: Images', () => {
     expect(html).toContain('<video src="video.mp4" autoplay>Video</video>');
   });
 
+  test('should automatically embed YouTube videos', async () => {
+    const html = await buildString('!![Intro](https://www.youtube.com/watch?v=dQw4w9WgXcQ)');
+    expect(html).toContain('<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"');
+    expect(html).toContain('title="Intro"');
+    expect(html).toContain('style="border: 0"');
+    expect(html).toContain('referrerpolicy="strict-origin-when-cross-origin"');
+    expect(html).toContain('allowfullscreen');
+  });
+
+  test('should automatically embed Vimeo videos', async () => {
+    const html = await buildString('!![Demo](https://vimeo.com/123456789)');
+    expect(html).toContain('<iframe src="https://player.vimeo.com/video/123456789"');
+    expect(html).toContain('title="Demo"');
+    expect(html).toContain('style="border: 0"');
+    expect(html).toContain('referrerpolicy="strict-origin-when-cross-origin"');
+  });
+
   test('should build audio', async () => {
     const html = await buildString('??[Audio](audio.mp3){controls}');
     expect(html).toContain('<audio src="audio.mp3" controls>Audio</audio>');
@@ -39,7 +56,7 @@ describe('API: Images', () => {
 
   test('should build embed', async () => {
     const html = await buildString('@@[Title](https://youtube.com/embed/123){width=100%}');
-    expect(html).toContain('<iframe src="https://youtube.com/embed/123" title="Title" style="width: 100%"></iframe>');
+    expect(html).toContain('<iframe src="https://youtube.com/embed/123" title="Title" style="width: 100%; border: 0"');
   });
 
   test('should build downloadable file', async () => {
@@ -81,5 +98,10 @@ describe('API: Images', () => {
     const html = await buildString('![Alt](img.jpg){float=right margin-left=2rem}');
     expect(html).toContain('style="float: right; margin-left: 2rem"');
     expect(html).not.toContain('margin-left: 1rem');
+  });
+
+  test('should NOT lose slashes in YouTube URLs', async () => {
+    const html = await buildString('!![Kittens](https://www.youtube.com/watch?v=y0sF5xhGreA)');
+    expect(html).toContain('src="https://www.youtube-nocookie.com/embed/y0sF5xhGreA"');
   });
 });

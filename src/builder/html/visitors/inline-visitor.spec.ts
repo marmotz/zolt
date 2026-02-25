@@ -74,4 +74,70 @@ describe('InlineVisitor', () => {
     const html2 = realVisitor.visitImage(node);
     expect(html2).toContain('src="normal.jpg"');
   });
+
+  describe('Remote URL Protection', () => {
+    // Mock asset resolver that mangles paths (simulating the CLI bug)
+    const manglingResolver = (path: string) => path.replace(/\/\//g, '/');
+
+    const protectedVisitor = new InlineVisitor(
+      () => '', // joinChildren
+      () => '', // renderAllAttributes
+      (text) => text, // processInline
+      evaluator,
+      () => 0, // registerFootnoteRef
+      manglingResolver
+    );
+
+    test('should NOT mangle remote image URLs', () => {
+      const node: any = {
+        type: 'Image',
+        src: 'https://example.com/image.jpg',
+        alt: 'Alt',
+      };
+      const html = protectedVisitor.visitImage(node);
+      expect(html).toContain('src="https://example.com/image.jpg"');
+      expect(html).not.toContain('src="https:/example.com/image.jpg"');
+    });
+
+    test('should NOT mangle remote video URLs', () => {
+      const node: any = {
+        type: 'Video',
+        src: 'https://www.youtube.com/watch?v=123',
+        alt: 'Video',
+      };
+      const html = protectedVisitor.visitVideo(node);
+      // It should use youtube-nocookie and have both slashes
+      expect(html).toContain('src="https://www.youtube-nocookie.com/embed/123"');
+    });
+
+    test('should NOT mangle remote audio URLs', () => {
+      const node: any = {
+        type: 'Audio',
+        src: 'https://example.com/audio.mp3',
+        alt: 'Audio',
+      };
+      const html = protectedVisitor.visitAudio(node);
+      expect(html).toContain('src="https://example.com/audio.mp3"');
+    });
+
+    test('should NOT mangle remote embed URLs', () => {
+      const node: any = {
+        type: 'Embed',
+        src: 'https://example.com/embed',
+      };
+      const html = protectedVisitor.visitEmbed(node);
+      expect(html).toContain('src="https://example.com/embed"');
+    });
+
+    test('should still use assetResolver for local paths', () => {
+      const node: any = {
+        type: 'Image',
+        src: 'path//to//local.jpg',
+        alt: 'Local',
+      };
+      const html = protectedVisitor.visitImage(node);
+      // The mangling resolver will change // to /
+      expect(html).toContain('src="path/to/local.jpg"');
+    });
+  });
 });

@@ -47,6 +47,7 @@ export class InlineParser {
     }
     const nodes: ASTNode[] = [];
     let remaining = text;
+    let lastChar = '';
 
     while (remaining.length > 0) {
       // Handle escaped characters
@@ -55,6 +56,7 @@ export class InlineParser {
         if (nextChar === 'n') {
           nodes.push({ type: 'LineBreak' });
           remaining = remaining.slice(2);
+          lastChar = '\n';
           continue;
         }
         const lastNode = nodes[nodes.length - 1];
@@ -64,13 +66,17 @@ export class InlineParser {
           nodes.push(this.createTextNode(nextChar));
         }
         remaining = remaining.slice(2);
+        lastChar = nextChar;
         continue;
       }
 
-      const result = this.parseInlineElement(remaining);
+      const result = this.parseInlineElement(remaining, lastChar);
       if (result) {
         nodes.push(result.node);
+        const matchLength = remaining.length - result.remaining.length;
+        const matchedText = remaining.slice(0, matchLength);
         remaining = result.remaining;
+        lastChar = matchedText[matchedText.length - 1] || '';
       } else {
         const char = remaining[0];
         const lastNode = nodes[nodes.length - 1];
@@ -80,6 +86,7 @@ export class InlineParser {
           nodes.push(this.createTextNode(char));
         }
         remaining = remaining.slice(1);
+        lastChar = char;
       }
     }
 
@@ -134,7 +141,7 @@ export class InlineParser {
     return result;
   }
 
-  private parseInlineElement(text: string): { node: ASTNode; remaining: string } | null {
+  private parseInlineElement(text: string, lastChar: string): { node: ASTNode; remaining: string } | null {
     if (this.matchPattern(text, /^\{\{(.+?)}}/)) {
       return this.parseExpression(text);
     }
@@ -177,7 +184,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^\*\*(.+?)\*\*/)) {
       return this.parseBold(text);
     }
-    if (this.matchPattern(text, /^\/\/(.+?)\/\//)) {
+    if (lastChar !== ':' && this.matchPattern(text, /^\/\/(.+?)\/\//)) {
       return this.parseItalic(text);
     }
     if (this.matchPattern(text, /^__(.+?)__/)) {

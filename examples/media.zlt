@@ -30,13 +30,13 @@ Support for shadows and shorthand dimensions:
 
 ## 🎥 Videos
 
-Videos use the `!!` prefix and generate a `video` tag.
+Videos use the `!!` prefix. Zolt automatically detects YouTube/Vimeo URLs and converts them to responsive embeds.
 
-### Basic Video
-!![Demo Video](video.mp4)
+### Basic Kitten Video
+!![Cute Kittens Playing](https://www.youtube.com/embed/y0sF5xhGreA){w=560 h=315}
 
-### Video with Controls
-!![Tutorial](tutorial.mp4){controls autoplay muted loop}
+### Kitten Video with Attributes
+!![Tiny Kittens](https://vimeo.com/284914042){width=100% shadow=true}
 
 ---
 
@@ -56,8 +56,8 @@ Audio files use the `??` prefix and generate an `<audio>` tag.
 
 External content like YouTube, Vimeo, or maps use the `@@` prefix.
 
-### YouTube Embed
-@@[Zolt Introduction](https://www.youtube.com/embed/dQw4w9WgXcQ){width=100% height=400px}
+### YouTube Kitten Embed
+@@[Sleeping Kittens](https://www.youtube.com/embed/7zhpxOn6ZNo){width=100% height=400px}
 
 ---
 

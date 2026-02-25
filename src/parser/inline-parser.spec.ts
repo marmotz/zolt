@@ -72,6 +72,13 @@ describe('InlineParser', () => {
       expect(nodes[0].type).toBe('Italic');
       expect(getFlatContent(nodes[0])).toBe('visit: example.com/path');
     });
+
+    test('should not trigger italic for URLs in text', () => {
+      const nodes = parser.parse('Visit https://zolt.marmotz.dev today.');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Text');
+      expect((nodes[0] as any).content).toBe('Visit https://zolt.marmotz.dev today.');
+    });
   });
 
   describe('Bold with asterisks', () => {
