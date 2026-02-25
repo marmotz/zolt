@@ -5,6 +5,7 @@ import {
   DefinitionDescriptionNode,
   DefinitionTermNode,
   HeadingNode,
+  HorizontalRuleNode,
   IndentationNode,
   ListItemNode,
   ListNode,

@@ -29,6 +29,7 @@
     "build:windows": "bun build src/cli.ts --outfile dist/zolt-windows-x64.exe --target bun-x64-windows --compile",
     "dev": "bun run src/cli/index.ts",
     "test": "bun test",
+    "type-check": "bun x tsc --noEmit",
     "prepublish": "bun run build",
     "format": "bun x prettier --write src",
     "lint": "bun x prettier --check src"

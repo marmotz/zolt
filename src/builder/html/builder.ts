@@ -59,7 +59,7 @@ export class HTMLBuilder implements Builder {
 
     this.inlineVisitor = new InlineVisitor(joinChildrenBound, renderAttrsBound, processInlineBound, this.evaluator);
 
-    this.tableVisitor = new TableVisitor(buildBound, joinChildrenBound, renderAttrsBound);
+    this.tableVisitor = new TableVisitor(joinChildrenBound, renderAttrsBound);
 
     this.specialBlockVisitor = new SpecialBlockVisitor(
       buildBound,
@@ -215,9 +215,7 @@ export class HTMLBuilder implements Builder {
       return `<div class="error">Error: Max inclusion depth reached</div>`;
     }
 
-    const currentDir = this.currentFilePath !== 'unknown' 
-      ? path.dirname(this.currentFilePath) 
-      : process.cwd();
+    const currentDir = this.currentFilePath !== 'unknown' ? path.dirname(this.currentFilePath) : process.cwd();
     const targetPath = path.resolve(currentDir, node.path);
 
     if (this.includeStack.includes(targetPath)) {

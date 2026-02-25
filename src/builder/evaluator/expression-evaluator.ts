@@ -615,21 +615,8 @@ export class ExpressionEvaluator {
         const dateValue = args[0];
         const formatStr = String(args[1] ?? 'YYYY-MM-DD');
 
-        if (dateValue === null || dateValue === undefined) {
-          return '';
-        }
-
-        let date: Date;
-        if (typeof dateValue === 'number') {
-          date = new Date(dateValue);
-        } else if (typeof dateValue === 'string') {
-          // Try to handle ISO date strings or other common formats
-          date = new Date(dateValue);
-        } else {
-          return '';
-        }
-
-        if (isNaN(date.getTime())) {
+        const date = this.parseDate(dateValue);
+        if (!date) {
           return '';
         }
 
@@ -637,35 +624,87 @@ export class ExpressionEvaluator {
       }
       case 'now':
         return Date.now();
+      case 'timestamp': {
+        const dateValue = args[0];
+        const d = this.parseDate(dateValue) || new Date();
+
+        return Math.floor(d.getTime() / 1000);
+      }
+      case 'msTimestamp': {
+        const dateValue = args[0];
+        const d = this.parseDate(dateValue) || new Date();
+
+        return d.getTime();
+      }
       default:
         return null;
     }
   }
 
-  private formatDate(date: Date, format: string): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const shortYear = year.toString().slice(-2);
-    
-    const hours24 = date.getHours();
-    const hours12 = hours24 % 12 || 12;
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const ampm = hours24 < 12 ? 'am' : 'pm';
+  private parseDate(value: Value): Date | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
 
-    return format
-      .replace(/YYYY/g, year.toString())
-      .replace(/YY/g, shortYear)
-      .replace(/MM/g, month)
-      .replace(/DD/g, day)
-      .replace(/HH/g, hours24.toString().padStart(2, '0'))
-      .replace(/H/g, hours24.toString())
-      .replace(/hh/g, hours12.toString().padStart(2, '0'))
-      .replace(/h/g, hours12.toString())
-      .replace(/mm/g, minutes)
-      .replace(/ss/g, seconds)
-      .replace(/a/g, ampm);
+    let date: Date;
+    if (typeof value === 'number' || typeof value === 'string') {
+      date = new Date(value);
+    } else {
+      return null;
+    }
+
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  private formatDate(date: Date, format: string): string {
+    const locale = (this.getVariable('lang') || this.getVariable('locale') || undefined) as string | undefined;
+
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    const monthLong = new Intl.DateTimeFormat(locale, { month: 'long' }).format(date);
+    const monthShort = new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
+    const dayLong = new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(date);
+    const dayShort = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date);
+
+    const replacements: Record<string, () => string> = {
+      YYYY: () => date.getFullYear().toString(),
+      YY: () => date.getFullYear().toString().slice(-2),
+      // Months - Long
+      MMMM: () => monthLong.toUpperCase(),
+      mmmm: () => monthLong.toLowerCase(),
+      Mmmm: () => capitalize(monthLong.toLowerCase()),
+      // Months - Short
+      MMM: () => monthShort.toUpperCase(),
+      mmm: () => monthShort.toLowerCase(),
+      Mmm: () => capitalize(monthShort.toLowerCase()),
+      // Days - Long
+      DDDD: () => dayLong.toUpperCase(),
+      dddd: () => dayLong.toLowerCase(),
+      Dddd: () => capitalize(dayLong.toLowerCase()),
+      // Days - Short
+      DDD: () => dayShort.toUpperCase(),
+      ddd: () => dayShort.toLowerCase(),
+      Ddd: () => capitalize(dayShort.toLowerCase()),
+      // Standard tokens
+      MM: () => (date.getMonth() + 1).toString().padStart(2, '0'),
+      M: () => (date.getMonth() + 1).toString(),
+      DD: () => date.getDate().toString().padStart(2, '0'),
+      D: () => date.getDate().toString(),
+      HH: () => date.getHours().toString().padStart(2, '0'),
+      H: () => date.getHours().toString(),
+      hh: () => (date.getHours() % 12 || 12).toString().padStart(2, '0'),
+      h: () => (date.getHours() % 12 || 12).toString(),
+      mm: () => date.getMinutes().toString().padStart(2, '0'),
+      m: () => date.getMinutes().toString(),
+      ss: () => date.getSeconds().toString().padStart(2, '0'),
+      s: () => date.getSeconds().toString(),
+      a: () => (date.getHours() < 12 ? 'am' : 'pm'),
+      A: () => (date.getHours() < 12 ? 'AM' : 'PM'),
+    };
+
+    const tokens = Object.keys(replacements).sort((a, b) => b.length - a.length);
+    const regex = new RegExp(tokens.join('|'), 'g');
+
+    return format.replace(regex, (match) => replacements[match]());
   }
 
   private escapeRegex(str: string): string {

@@ -1,8 +1,7 @@
-import { ASTNode, TableCellNode, TableNode, TableRowNode } from '../../parser/types';
+import { ASTNode, TableCellNode, TableNode, TableRowNode } from '../../../parser/types';
 
 export class TableVisitor {
   constructor(
-    private build: (node: ASTNode) => string,
     private joinChildren: (nodes: ASTNode[]) => string,
     private renderAllAttributes: (attrs?: any) => string
   ) {}

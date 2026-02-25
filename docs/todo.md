@@ -22,8 +22,8 @@
 - [x] Parse variable definitions `$var = "value"`
 - [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and code blocks)
 - [x] Implement automatic date variables (`{$created}`, `{$modified}`)
-- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `H`, `hh`, `h`, `mm`, `ss`, `a`)
-- [ ] Support timezone configuration (`$timezone = "Europe/Paris"`)
+- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `H`, `hh`, `h`, `mm`, `ss`, `a`, `MMMM`, `MMM`, `dddd`, `ddd`, `m`, `s`)
+- [x] Support date localization using `$lang` or `$locale` variables in `Date.format()`
 - [x] Implement AST-based evaluation for `:::foreach`, `:::if`, and expressions (replaces SourceEvaluator)
 
 ## 2. Universal Attribute System `{}`
@@ -247,7 +247,7 @@
 
 ### Date Namespace
 
-- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a)
+- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a, MMMM, MMM, dddd, ddd, m, s) and localization support.
 - [x] `Date.now()` - Get current timestamp
 - [ ] `Date.parse(text, format)` - Parse a date string
 - [ ] `Date.add(date, duration)` - Add duration to date

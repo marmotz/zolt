@@ -1034,6 +1034,7 @@ Zolt supporte l'opérateur ternaire pour l'affichage conditionnel simple au sein
 **Syntaxe :** `{$condition ? valeur_si_vrai : valeur_si_faux}` ou `{{ condition ? valeur_si_vrai : valeur_si_faux }}`
 
 **Exemple :**
+
 ```
 Featured: {$featured ? "Oui" : "Non"}
 Statut: {{ $age >= 18 ? "Adulte" : "Mineur" }}
@@ -1338,22 +1339,54 @@ Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux names
 |-----------------------------|-------------------------|---------------------------------------|
 | `Date.format(date, format)` | Formate une date        | `Date.format($created, "DD/MM/YYYY")` |
 | `Date.now()`                | Date et heure actuelles | `Date.now()`                          |
+| `Date.timestamp(date)`      | Timestamp en secondes   | `Date.timestamp($created)`            |
+| `Date.msTimestamp(date)`    | Timestamp en ms         | `Date.msTimestamp($created)`          |
 
 #### Format Tokens
 
-| Token  | Description        | Exemple |
-|--------|--------------------|---------|
-| `DD`   | Jour (2 chiffres)  | 23      |
-| `MM`   | Mois (2 chiffres)  | 02      |
-| `YYYY` | Année (4 chiffres) | 2026    |
-| `YY`   | Année (2 chiffres) | 26      |
-| `HH`   | Heure (24h, 00-23) | 14      |
-| `H`    | Heure (24h, 0-23)  | 14      |
-| `hh`   | Heure (12h, 01-12) | 02      |
-| `h`    | Heure (12h, 1-12)  | 2       |
-| `a`    | AM/PM (minuscule)  | am      |
-| `mm`   | Minutes            | 30      |
-| `ss`   | Secondes           | 45      |
+| Token  | Description         | Exemple  |
+|--------|---------------------|----------|
+| `DD`   | Jour (2 chiffres)   | 14       |
+| `D`    | Jour (1-2 chiffres) | 2, 14    |
+| `dddd` | Jour (minuscules)   | mercredi |
+| `DDDD` | Jour (MAJUSCULES)   | MERCREDI |
+| `Dddd` | Jour (Capitalisé)   | Mercredi |
+| `ddd`  | Jour abr. (min.)    | mer.     |
+| `DDD`  | Jour abr. (MAJ.)    | MER.     |
+| `Ddd`  | Jour abr. (Cap.)    | Mer.     |
+| `MM`   | Mois (2 chiffres)   | 02       |
+| `M`    | Mois (1-2 chiffres) | 2        |
+| `mmmm` | Mois (minuscules)   | février  |
+| `MMMM` | Mois (MAJUSCULES)   | FÉVRIER  |
+| `Mmmm` | Mois (Capitalisé)   | Février  |
+| `mmm`  | Mois abr. (min.)    | févr.    |
+| `MMM`  | Mois abr. (MAJ.)    | FÉVR.    |
+| `Mmm`  | Mois abr. (Cap.)    | Févr.    |
+| `YYYY` | Année (4 chiffres)  | 2026     |
+| `YY`   | Année (2 chiffres)  | 26       |
+| `HH`   | Heure (24h, 00-23)  | 02, 14   |
+| `H`    | Heure (24h, 0-23)   | 2, 14    |
+| `hh`   | Heure (12h, 01-12)  | 02       |
+| `h`    | Heure (12h, 1-12)   | 2        |
+| `a`    | am/pm (minuscule)   | am       |
+| `A`    | AM/PM (majuscule)   | AM       |
+| `mm`   | Minutes (00-59)     | 05, 30   |
+| `m`    | Minutes (0-59)      | 5        |
+| `ss`   | Secondes (00-59)    | 07, 30   |
+| `s`    | Secondes (0-59)     | 7        |
+
+#### Localisation
+
+Le formatage des noms de jours (`dddd`, `ddd`) et de mois (`MMMM`, `MMM`) dépend de la locale définie dans les variables
+`$lang` (souvent via le frontmatter). Si aucune n'est définie, la locale du système est utilisée.
+
+Exemple en frontmatter :
+
+```yaml
+---
+lang: fr-FR
+---
+```
 
 #### Exemples d'Utilisation
 

@@ -358,7 +358,7 @@ export class SpecialBlockVisitor {
     if (node.attributes) {
       for (const [key, value] of Object.entries(node.attributes)) {
         if (key !== 'legend' && key !== 'grid' && key !== 'stacked') {
-          filteredAttrs[key] = value;
+          filteredAttrs[key] = value as string;
         }
       }
     }
@@ -379,7 +379,7 @@ export class SpecialBlockVisitor {
     if (series.attributes) {
       for (const [key, value] of Object.entries(series.attributes)) {
         if (key !== 'title' && key !== 'color-scheme' && key !== 'legend' && key !== 'grid' && key !== 'stacked') {
-          filteredAttrs[key] = value;
+          filteredAttrs[key] = value as string;
         }
       }
     }
