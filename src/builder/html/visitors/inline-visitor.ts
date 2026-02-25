@@ -53,6 +53,8 @@ export class InlineVisitor {
         return this.visitHighlight(node as any);
       case 'InlineStyle':
         return this.visitInlineStyle(node as any);
+      case 'LineBreak':
+        return this.visitLineBreak();
       case 'Link':
         return this.visitLink(node as any);
       case 'Image':
@@ -82,6 +84,10 @@ export class InlineVisitor {
 
   visitText(node: TextNode): string {
     return node.content;
+  }
+
+  visitLineBreak(): string {
+    return '<br />';
   }
 
   visitFootnote(node: any): string {

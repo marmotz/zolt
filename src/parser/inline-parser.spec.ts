@@ -356,6 +356,14 @@ describe('InlineParser', () => {
       expect(nodes[0].type).toBe('Text');
       expect((nodes[0] as any).content).toBe('\\text');
     });
+
+    test('should handle escaped line break (\\n)', () => {
+      const nodes = parser.parse('line 1\\nline 2');
+      expect(nodes).toHaveLength(3);
+      expect(nodes[0].type).toBe('Text');
+      expect(nodes[1].type).toBe('LineBreak');
+      expect(nodes[2].type).toBe('Text');
+    });
   });
 
   describe('Variables with Ternary', () => {

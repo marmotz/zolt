@@ -149,6 +149,8 @@ export const BASE_CSS = `
   .zolt-toc ul { list-style: none; padding-left: 1.2rem; }
   .zolt-toc a { color: var(--zlt-color-text); }
   .zolt-toc a:hover { color: var(--zlt-color-primary); }
+  .zolt-toc-number { margin-right: 0.5rem; }
+  .zolt-heading-number { margin-right: 0.5rem; }
 
   .zolt-chart {
     margin: 2.5rem 0;

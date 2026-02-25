@@ -164,6 +164,10 @@ export interface AnchorNode {
   id: string;
 }
 
+export interface LineBreakNode {
+  type: 'LineBreak';
+}
+
 export interface AttributesNode {
   type: 'Attributes';
   attributes: Attributes;
@@ -316,6 +320,7 @@ export type ASTNode =
   | LinkReferenceDefinitionNode
   | CommentInlineNode
   | AnchorNode
+  | LineBreakNode
   | AttributesNode
   | ParagraphNode
   | HeadingNode

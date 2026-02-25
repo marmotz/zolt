@@ -590,4 +590,9 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('href="#target"');
     });
   });
+
+  test('should build line break (\\n)', () => {
+    const html = builder.processInline('line 1\\nline 2');
+    expect(html).toBe('line 1<br />line 2');
+  });
 });

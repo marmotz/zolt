@@ -1,23 +1,17 @@
-# Complete Zolt Example - All Features
-
-```yaml
 ---
 title: "Zolt - The Complete Example"
 author: "Jane Doe"
 date: {$created}
 version: 1.0
 tags: [documentation, tutorial, zolt, complete]
-toc: true
-toc_depth: 2
 numbering: true
 theme: professional
 ---
-```
 
 # {$title}
 
-**Author:** {$author}
-**Version:** v{$version}
+**Author:** {$author} \n
+**Version:** v{$version} \n
 **Tags:** {{ String.join($tags, ", ") }}
 
 ---
@@ -28,7 +22,7 @@ theme: professional
 
 ---
 
-## 1. Introduction
+## Introduction
 
 Welcome to this ||comprehensive||{color=blue font-weight=bold} example showcasing all Zolt features!
 
@@ -40,7 +34,7 @@ Zolt combines the simplicity of Markdown with powerful features for professional
 
 ---
 
-## 2. Text Formatting
+## Text Formatting
 
 ### Basic Formatting
 
@@ -59,7 +53,7 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 
 ---
 
-## 3. Lists and Structure
+## Lists and Structure
 
 ### Various List Types
 
@@ -96,7 +90,7 @@ Mark ||important text||{color=red} with ||inline styles||{background=yellow}.
 
 ---
 
-## 4. Media and Links
+## Media and Links
 
 ### Images
 
@@ -117,7 +111,7 @@ Check out our [main guide][guide] and [API docs][api].
 
 ---
 
-## 5. Code and Technical Content
+## Code and Technical Content
 
 ### Code Blocks
 
@@ -144,7 +138,7 @@ $$
 
 ---
 
-## 6. Interactive Components
+## Interactive Components
 
 ### Tabs
 
@@ -210,7 +204,7 @@ Additional details can be hidden in accordions within columns.
 
 ---
 
-## 7. Data and Calculations
+## Data and Calculations
 
 ### Variables and Math
 
@@ -232,7 +226,7 @@ $scores = [85, 92, 78, 95, 88]
 
 ---
 
-## 8. Dynamic Content with Loops
+## Dynamic Content with Loops
 
 ### Product List
 
@@ -273,7 +267,7 @@ $team = [
 
 ---
 
-## 9. Visualizations
+## Visualizations
 
 ### Charts
 
