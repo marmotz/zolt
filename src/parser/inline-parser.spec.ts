@@ -46,10 +46,10 @@ describe('InlineParser', () => {
     });
 
     test('should parse italic with date format', () => {
-      const nodes = parser.parse('//Last updated: DD/MM/YYYY HH:mm:ss//');
+      const nodes = parser.parse('//Last updated: DD/MM/YYYY hh:mm:ss//');
       expect(nodes).toHaveLength(1);
       expect(nodes[0].type).toBe('Italic');
-      expect(getFlatContent(nodes[0])).toBe('Last updated: DD/MM/YYYY HH:mm:ss');
+      expect(getFlatContent(nodes[0])).toBe('Last updated: DD/MM/YYYY hh:mm:ss');
     });
 
     test('should parse italic with expression immediately after opening delimiter', () => {

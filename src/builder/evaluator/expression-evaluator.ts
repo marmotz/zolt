@@ -656,7 +656,7 @@ export class ExpressionEvaluator {
       .replace(/YY/g, shortYear)
       .replace(/MM/g, month)
       .replace(/DD/g, day)
-      .replace(/HH/g, hours)
+      .replace(/hh/g, hours)
       .replace(/mm/g, minutes)
       .replace(/ss/g, seconds);
   }

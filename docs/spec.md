@@ -1329,7 +1329,7 @@ Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux names
 
 ```
 {{ Date.format($created, "DD/MM/YYYY") }}        # 23/02/2026
-{{ Date.format($modified, "YYYY-MM-DD HH:mm") }} # 2026-02-23 14:30
+{{ Date.format($modified, "YYYY-MM-DD hh:mm") }} # 2026-02-23 14:30
 ```
 
 #### Fonctions Disponibles
@@ -1347,7 +1347,7 @@ Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux names
 | `MM`   | Mois (2 chiffres)  | 02      |
 | `YYYY` | Année (4 chiffres) | 2026    |
 | `YY`   | Année (2 chiffres) | 26      |
-| `HH`   | Heure (24h)        | 14      |
+| `hh`   | Heure (24h)        | 14      |
 | `mm`   | Minutes            | 30      |
 | `ss`   | Secondes           | 45      |
 
@@ -1360,7 +1360,7 @@ Modifié le : {$modified}
 
 # Dates formatées
 Date de création : {{ Date.format($created, "DD/MM/YYYY") }}
-Dernière modification : {{ Date.format($modified, "DD MMMM YYYY à HH:mm") }}
+Dernière modification : {{ Date.format($modified, "DD MMMM YYYY à hh:mm") }}
 
 # Format ISO
 Publié le : {{ Date.format($created, "YYYY-MM-DD") }}
@@ -1377,7 +1377,7 @@ Année de création : {{ String.upper(Date.format($created, "YYYY")) }}
 
 # Formatage conditionnel
 :::if {{ $modified > $created }}
-Dernière mise à jour : {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+Dernière mise à jour : {{ Date.format($modified, "DD/MM/YYYY hh:mm") }}
 :::
 ```
 

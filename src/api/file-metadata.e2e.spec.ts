@@ -39,7 +39,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should support datetime format with Date.format()', async () => {
-      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "DD/MM/YYYY HH:mm:ss") }}');
+      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "DD/MM/YYYY hh:mm:ss") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/);
@@ -113,8 +113,8 @@ describe('API: File Metadata Variables', () => {
       expect(html).toMatch(/Year: \d{2}/);
     });
 
-    test('should support HH token for hours', async () => {
-      await writeFile(testFilePath, 'Hour: {{ Date.format($modified, "HH") }}');
+    test('should support hh token for hours', async () => {
+      await writeFile(testFilePath, 'Hour: {{ Date.format($modified, "hh") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Hour: \d{2}/);
@@ -156,7 +156,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should support full datetime format', async () => {
-      await writeFile(testFilePath, 'Full: {{ Date.format($modified, "YYYY-MM-DD HH:mm:ss") }}');
+      await writeFile(testFilePath, 'Full: {{ Date.format($modified, "YYYY-MM-DD hh:mm:ss") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Full: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
@@ -186,7 +186,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should format $modified variable', async () => {
-      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "YYYY-MM-DD HH:mm") }}');
+      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "YYYY-MM-DD hh:mm") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Modified: \d{4}-\d{2}-\d{2} \d{2}:\d{2}/);
@@ -195,7 +195,7 @@ describe('API: File Metadata Variables', () => {
     test('should format both dates in same document', async () => {
       await writeFile(
         testFilePath,
-        'Created: {{ Date.format($created, "YYYY-MM-DD") }}\nModified: {{ Date.format($modified, "YYYY-MM-DD HH:mm") }}'
+        'Created: {{ Date.format($created, "YYYY-MM-DD") }}\nModified: {{ Date.format($modified, "YYYY-MM-DD hh:mm") }}'
       );
       const html = await buildFileToString(testFilePath);
 
