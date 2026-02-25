@@ -147,6 +147,7 @@ export class Parser {
 
       return [
         TokenType.BULLET_LIST,
+        TokenType.PLAIN_LIST,
         TokenType.ORDERED_LIST,
         TokenType.TASK_LIST,
         TokenType.DEFINITION,
@@ -166,6 +167,7 @@ export class Parser {
       TokenType.BLOCKQUOTE,
       TokenType.TECHNICAL_INDENT,
       TokenType.BULLET_LIST,
+      TokenType.PLAIN_LIST,
       TokenType.ORDERED_LIST,
       TokenType.TASK_LIST,
       TokenType.DEFINITION,
@@ -357,6 +359,7 @@ export class Parser {
       const next = this.peek(1);
       if (
         next.type === TokenType.BULLET_LIST ||
+        next.type === TokenType.PLAIN_LIST ||
         next.type === TokenType.ORDERED_LIST ||
         next.type === TokenType.TASK_LIST ||
         next.type === TokenType.DEFINITION
@@ -373,7 +376,15 @@ export class Parser {
       }
     }
 
-    if (this.match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION)) {
+    if (
+      this.match(
+        TokenType.BULLET_LIST,
+        TokenType.PLAIN_LIST,
+        TokenType.ORDERED_LIST,
+        TokenType.TASK_LIST,
+        TokenType.DEFINITION
+      )
+    ) {
       return this.listParser.parseList(
         this.advance.bind(this),
         this.peek.bind(this),

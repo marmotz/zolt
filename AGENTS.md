@@ -99,7 +99,11 @@ you MUST follow when working on this repository.
 3. **Do Not Over-Engineer:** Stick to the established architecture. If a feature needs a new token, add it to
    `TokenType` in `src/lexer/token-types.ts`, implement lexing rules in `src/lexer/lexer.ts`, and then build the parser
    component in `src/parser/`. Do not bypass the Lexer-Parser pipeline.
-4. **Testing is Mandatory:** Every parser or lexer change needs a corresponding spec. When fixing a bug, you MUST add a permanent regression test to the relevant spec file to ensure the issue never recurs. Before claiming a task is done, run `bun test` and ensure 100% of the tests pass. Run `bun run format` to clean up the code.
+4. **Testing is Mandatory:** Every change needs a corresponding spec. **DO NOT create temporary test files.** When
+   adding a feature or fixing a bug, you MUST add permanent regression tests to the relevant spec file (e.g.,
+   `src/parser/parser.spec.ts`) or create a new permanent spec file if the feature justifies it. Every bug MUST have its
+   own dedicated test case to ensure the issue never recurs. Before claiming a task is done, run `bun test` and ensure
+   100% of the tests pass. Run `bun run format` to clean up the code.
 5. **No Placeholders:** Write complete code. Do not leave `// TODO` or `...` inside code blocks unless specifically
    requested by the user.
 

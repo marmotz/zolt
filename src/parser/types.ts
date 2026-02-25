@@ -207,7 +207,7 @@ export interface DefinitionDescriptionNode {
 
 export interface ListNode {
   type: 'List';
-  kind: 'bullet' | 'numbered' | 'task' | 'definition';
+  kind: 'bullet' | 'numbered' | 'task' | 'definition' | 'plain';
   children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[];
   attributes?: Attributes;
 }

@@ -224,6 +224,16 @@ describe('Lexer', () => {
     expect(defTokens[1].value).toBe(':   Definition');
   });
 
+  test('should tokenize plain list', () => {
+    const lexer = new Lexer('+ item 1\n+ item 2');
+    const tokens = lexer.tokenize();
+
+    const plainTokens = tokens.filter((t) => t.type === TokenType.PLAIN_LIST);
+    expect(plainTokens.length).toBe(2);
+    expect(plainTokens[0].value).toBe('+ item 1');
+    expect(plainTokens[1].value).toBe('+ item 2');
+  });
+
   test('should tokenize link reference definition', () => {
     const lexer = new Lexer('[ref]: https://example.com');
     const tokens = lexer.tokenize();

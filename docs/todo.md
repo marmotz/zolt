@@ -98,16 +98,17 @@
 
 ### List Types
 
-- [ ] Bullet lists `- item`
-- [ ] Numbered lists `1. item`
-- [ ] Task lists `- [ ] task` and `- [ ] task`
+- [x] Bullet lists `- item`
+- [x] Numbered lists `1. item`
+- [x] Task lists `- [ ] task` and `- [x] task`
 - [x] Definition lists `: term` / `: definition`
+- [x] Plain lists `+ item` (without bullets)
 
 ### List Features
 
-- [ ] Nested lists (2 spaces or 1 tab indentation)
-- [ ] Attributes on list items
-- [ ] Mixed list types
+- [x] Nested lists (2 spaces or 1 tab indentation)
+- [x] Attributes on list items
+- [x] Mixed list types
 
 ## 5. Links
 

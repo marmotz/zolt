@@ -10,9 +10,9 @@ theme: professional
 
 # {$title}
 
-**Author:** {$author} \n
-**Version:** v{$version} \n
-**Tags:** {{ String.join($tags, ", ") }}
++ **Author:** {$author}
++ **Version:** v{$version}
++ **Tags:** {{ String.join($tags, ", ") }}
 
 ---
 
@@ -209,7 +209,9 @@ $quantity = 3
 $tax_rate = 0.08
 
 **Subtotal:** ${{$price * $quantity}}
+
 **Tax:** ${{$price * $quantity * $tax_rate}}
+
 **Total:** ${{$price * $quantity * (1 + $tax_rate)}}
 
 ### Statistics
@@ -217,7 +219,9 @@ $tax_rate = 0.08
 $scores = [85, 92, 78, 95, 88]
 
 **Average:** {{ Math.round(List.avg($scores)) }}
+
 **Highest:** {{ List.max($scores) }}
+
 **Lowest:** {{ List.min($scores) }}
 
 ---
@@ -231,8 +235,6 @@ $products = [
   {name: "Mouse", price: 29, in_stock: true},
   {name: "Keyboard", price: 79, in_stock: false}
 ]
-
-### Available Products
 
 :::foreach {$products as $product}
 :::if {$product.in_stock}
@@ -248,15 +250,12 @@ $team = [
   {name: "Charlie", role: "Manager", level: "Senior"}
 ]
 
-### Team Roster
-
 :::foreach {$team as $member}
 :::if {$member.level == "Senior"}
-### 👤 {$member.name} — {$member.role} {.senior-badge}
+- 👤 {$member.name} — {$member.role} {.senior-badge}
 :::
 :::if {$member.level == "Junior"}
-### 👤 {$member.name} — {$member.role}
-:::
+- 👤 {$member.name} — {$member.role}
 :::
 :::
 
@@ -280,7 +279,6 @@ Clothing: 320
 Home: 280
 :::
 :::
-:::
 
 ### Data Table
 
@@ -292,7 +290,7 @@ Home: 280
 
 ---
 
-## 10. Advanced Features
+## Advanced Features
 
 ### Footnotes
 
@@ -325,7 +323,7 @@ The API provides endpoints at various URLs.
 
 ---
 
-## 11. Callouts and Alerts
+## Callouts and Alerts
 
 :::info [Information]
 This is an informational message for general guidance.
@@ -345,7 +343,7 @@ Your changes have been saved successfully.
 
 ---
 
-## 12. Citations
+## Citations
 
 > "The best documentation is the kind that writes itself."
 > — Anonymous Technical Writer
@@ -355,7 +353,7 @@ Your changes have been saved successfully.
 
 ---
 
-## 13. Escaping Examples
+## Escaping Examples
 
 To display literal characters, use backslash:
 
@@ -365,30 +363,30 @@ To display literal characters, use backslash:
 
 ---
 
-## 14. Complete Example Summary
+## Complete Example Summary
 
 This document demonstrates:
 
-✅ All text formatting options
-✅ Lists (bullets, numbered, tasks, definitions)
-✅ Links (external, internal, references)
-✅ Images and media
-✅ Code blocks with syntax highlighting
-✅ Mathematical formulas
-✅ Tabs and accordions
-✅ Multi-column layouts
-✅ Variables and calculations
-✅ Loops and dynamic content
-✅ Charts and visualizations
-✅ Tables with advanced features
-✅ Footnotes and abbreviations
-✅ Callouts and alerts
-✅ Citations and blockquotes
-✅ Character escaping
++ ✅ All text formatting options
++ ✅ Lists (bullets, numbered, tasks, definitions)
++ ✅ Links (external, internal, references)
++ ✅ Images and media
++ ✅ Code blocks with syntax highlighting
++ ✅ Mathematical formulas
++ ✅ Tabs and accordions
++ ✅ Multi-column layouts
++ ✅ Variables and calculations
++ ✅ Loops and dynamic content
++ ✅ Charts and visualizations
++ ✅ Tables with advanced features
++ ✅ Footnotes and abbreviations
++ ✅ Callouts and alerts
++ ✅ Citations and blockquotes
++ ✅ Character escaping
 
 ---
 
-## 15. Next Steps
+## Next Steps
 
 Now that you've seen all Zolt features:
 
@@ -422,11 +420,11 @@ Common Zolt editor shortcuts:
 ### Troubleshooting
 
 :::details [Common Issues]
-**Issue:** Chart not displaying
-**Solution:** Check data format and syntax
-
-**Issue:** Loop not working
-**Solution:** Verify array structure and variable names
++ **Issue:** Chart not displaying
++ **Solution:** Check data format and syntax
+---
++ **Issue:** Loop not working
++ **Solution:** Verify array structure and variable names
 :::
 
 ### Resources
@@ -443,7 +441,7 @@ Common Zolt editor shortcuts:
 
 **© 2026 Zolt Project.** Built with ❤️ using Zolt.
 
-*Document created: {$created}*
-*Last modified: {$modified}*
++ **Document created:** {{ Date.format($created, "YYYY-MM-DD HH:mm:ss" ) }}
++ **Last modified:** {{ Date.format($modified, "YYYY-MM-DD HH:mm:ss" ) }}
 
 [← Back to Examples Index](index.zlt)

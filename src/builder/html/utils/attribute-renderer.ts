@@ -42,6 +42,8 @@ export class AttributeRenderer {
       width: 'width',
       height: 'height',
       float: 'float',
+      'list-style': 'list-style',
+      'list-style-type': 'list-style-type',
     };
 
     for (const [key, value] of Object.entries(attrs)) {
@@ -75,6 +77,8 @@ export class AttributeRenderer {
       'width',
       'height',
       'float',
+      'list-style',
+      'list-style-type',
     ]);
     const filtered: Attributes = {};
     for (const [key, value] of Object.entries(attrs)) {

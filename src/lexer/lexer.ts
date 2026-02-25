@@ -452,8 +452,8 @@ export class Lexer {
     const remaining = this.source.slice(this.pos);
 
     return (
-      /^[-*]\s+\[[ x]]\s/.test(remaining) ||
-      /^[-*]\s/.test(remaining) ||
+      /^[-*+]\s+\[[ x]]\s/.test(remaining) ||
+      /^[-*+]\s/.test(remaining) ||
       /^\d+\.\s/.test(remaining) ||
       /^\[[ x]]\s/.test(remaining) ||
       /^:\s/.test(remaining)
@@ -467,8 +467,10 @@ export class Lexer {
     const remaining = this.source.slice(this.pos);
 
     let type: TokenType;
-    if (/^[-*]\s+\[[ x]]\s/.test(remaining)) {
+    if (/^[-*+]\s+\[[ x]]\s/.test(remaining)) {
       type = TokenType.TASK_LIST;
+    } else if (/^\+\s/.test(remaining)) {
+      type = TokenType.PLAIN_LIST;
     } else if (/^[-*]\s/.test(remaining)) {
       type = TokenType.BULLET_LIST;
     } else if (/^\d+\.\s/.test(remaining)) {

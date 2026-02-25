@@ -281,6 +281,15 @@ attributs.
 - Item 3
 ```
 
+#### Listes sans puce (Plain)
+
+Utilisent le préfixe `+ ` pour afficher des éléments sans marqueur visuel (puce ou numéro) et sans décalage à gauche.
+
+```
++ Premier élément
++ Deuxième élément
+```
+
 #### Listes Numérotées
 
 ```

@@ -102,6 +102,13 @@ export class BlockVisitor {
       tag = 'dl';
     }
 
+    if (node.kind === 'plain') {
+      if (!node.attributes) {
+        node.attributes = {};
+      }
+      node.attributes.class = (node.attributes.class ? node.attributes.class + ' ' : '') + 'zolt-list-plain';
+    }
+
     const childrenHtml = this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
 

@@ -285,4 +285,55 @@ describe('CLI Watch', () => {
       proc.kill('SIGINT');
     }
   });
+
+  test('should not loop when building in the same directory with assets', async () => {
+    const testDir = join(baseTestDir, 'loop-prevention');
+    await mkdir(testDir, { recursive: true });
+    const inputFile = join(testDir, 'index.zlt');
+    const assetFile = join(testDir, 'image.jpg');
+
+    await writeFile(inputFile, '# Main\n![Image](image.jpg)');
+    await writeFile(assetFile, 'fake image content');
+
+    const proc = spawn('bun', ['run', CLI_SRC, 'build', inputFile, '--watch'], {
+      shell: true,
+    });
+
+    try {
+      let buildCount = 0;
+      await new Promise<void>((resolve, reject) => {
+        proc.stdout.on('data', (data) => {
+          const out = data.toString();
+          if (out.includes('Built:')) {
+            buildCount++;
+            if (buildCount === 1) {
+              // Trigger a real change
+              setTimeout(async () => {
+                await writeFile(inputFile, '# Main Updated\n![Image](image.jpg)');
+              }, 500);
+            }
+          }
+        });
+
+        // Wait to see if it loops
+        setTimeout(() => {
+          if (buildCount > 2) {
+            reject(new Error(`Infinite loop detected! Build count: ${buildCount}`));
+          } else if (buildCount === 2) {
+            resolve();
+          }
+        }, 2000);
+
+        setTimeout(() => {
+          if (buildCount === 2) {
+            resolve();
+          } else {
+            reject(new Error(`Expected exactly 2 builds, got ${buildCount}`));
+          }
+        }, 4000);
+      });
+    } finally {
+      proc.kill('SIGINT');
+    }
+  });
 });

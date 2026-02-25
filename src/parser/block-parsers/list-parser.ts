@@ -5,10 +5,12 @@ import { ASTNode, Attributes, DefinitionDescriptionNode, DefinitionTermNode, Lis
 export class ListParser {
   constructor(private inlineParser: InlineParser) {}
 
-  public getListKind(type: TokenType): 'bullet' | 'numbered' | 'task' | 'definition' | null {
+  public getListKind(type: TokenType): 'bullet' | 'numbered' | 'task' | 'definition' | 'plain' | null {
     switch (type) {
       case TokenType.BULLET_LIST:
         return 'bullet';
+      case TokenType.PLAIN_LIST:
+        return 'plain';
       case TokenType.ORDERED_LIST:
         return 'numbered';
       case TokenType.TASK_LIST:
@@ -83,10 +85,13 @@ export class ListParser {
     if (match(TokenType.TASK_LIST)) {
       const token = advance();
       checked = /\[x]/i.test(token.value);
-      content = token.value.replace(/^([-*]\s+)?\[[ x]]\s+/i, '');
+      content = token.value.replace(/^([-*+]\s+)?\[[ x]]\s+/i, '');
     } else if (match(TokenType.BULLET_LIST)) {
       const token = advance();
       content = token.value.replace(/^[-*]\s+/, '');
+    } else if (match(TokenType.PLAIN_LIST)) {
+      const token = advance();
+      content = token.value.replace(/^\+\s+/, '');
     } else if (match(TokenType.ORDERED_LIST)) {
       const token = advance();
       content = token.value.replace(/^\d+\.\s+/, '');

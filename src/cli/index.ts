@@ -62,8 +62,11 @@ async function buildFileWithDeps(
       if (assetStat.isFile()) {
         touchedFiles.add(fullAssetPath);
         await mkdir(dirname(destAssetPath), { recursive: true });
-        await copyFile(fullAssetPath, destAssetPath);
-        // console.log(`Copied asset: ${asset} -> ${destAssetPath}`);
+
+        // Only copy if source and destination are different to avoid watch loops
+        if (fullAssetPath !== resolve(destAssetPath)) {
+          await copyFile(fullAssetPath, destAssetPath);
+        }
       }
     } catch {
       console.warn(`${pc.yellow('Warning:')} Asset file not found: ${fullAssetPath}`);

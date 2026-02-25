@@ -42,6 +42,19 @@ describe('ListParser', () => {
     expect((ast.children[0] as any).children[1].checked).toBe(true);
   });
 
+  test('should parse plain list', () => {
+    const input = `+ item 1
++ item 2`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('List');
+    expect((ast.children[0] as any).kind).toBe('plain');
+    expect((ast.children[0] as any).children.length).toBe(2);
+  });
+
   test('should parse definition list', () => {
     const input = `: Term
 :   Definition`;
