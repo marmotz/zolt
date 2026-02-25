@@ -33,7 +33,7 @@ export class HTMLBuilder implements Builder {
   private specialBlockVisitor: SpecialBlockVisitor;
   private documentRenderer: DocumentRenderer;
 
-  constructor(initialVariables?: InitialVariables) {
+  constructor(initialVariables?: InitialVariables, private assetResolver?: (path: string) => string) {
     this.evaluator = new ExpressionEvaluator();
     if (initialVariables) {
       for (const [key, value] of Object.entries(initialVariables)) {
@@ -72,7 +72,8 @@ export class HTMLBuilder implements Builder {
       renderAttrsBound,
       processInlineBound,
       this.evaluator,
-      registerFootnoteRef
+      registerFootnoteRef,
+      this.assetResolver
     );
 
     this.tableVisitor = new TableVisitor(joinChildrenBound, renderAttrsBound);

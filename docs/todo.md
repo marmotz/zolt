@@ -55,10 +55,10 @@
 
 ### Attributes on Images
 
-- [x] `{w=width}` or `{width=value}` - Width
-- [x] `{h=height}` or `{height=value}` - Height
+- [x] `{w=width}` or `{width=value}` - Width (tested in images.e2e.spec.ts)
+- [x] `{h=height}` or `{height=value}` - Height (tested in images.e2e.spec.ts)
 - [x] `{align=value}` - Alignment (left, center, right)
-- [ ] `{shadow=value}` - Shadow
+- [x] `{shadow=value}` - Shadow (tested in images.e2e.spec.ts)
 - [x] `{float=value}` - Float
 
 ### Image Syntax

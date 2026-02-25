@@ -35,6 +35,10 @@ export const BASE_CSS = `
   dd { margin-left: 1.5rem; }
   a { color: var(--zlt-color-link); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
   blockquote {
     margin: 1.5em 0;
     padding: 0.5em 1.2rem;

@@ -11,11 +11,7 @@ export interface BuildOptions {
   variables?: Record<string, any>;
   frontmatter?: boolean;
   filePath?: string;
-}
-
-export interface LintOptions {
-  format?: 'json' | 'text';
-  fix?: boolean;
+  assetResolver?: (path: string) => string;
 }
 
 export interface LintResult {
@@ -83,7 +79,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   let builder: Builder;
 
   if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder(mergedVariables);
+    builder = new HTMLBuilder(mergedVariables, options?.assetResolver);
   } else {
     throw new Error(`Unsupported output type: ${options.type}`);
   }

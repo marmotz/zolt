@@ -28,7 +28,8 @@ export class InlineVisitor {
     private renderAllAttributes: (attrs?: any) => string,
     private processInline: (text: string) => string,
     private evaluator: any,
-    private registerFootnoteRef: (id: string) => number
+    private registerFootnoteRef: (id: string) => number,
+    private assetResolver?: (path: string) => string
   ) {}
 
   public visit(node: ASTNode): string {
@@ -161,7 +162,18 @@ export class InlineVisitor {
   visitLink(node: LinkNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
     const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
-    const href = transformHref(this.evaluateString(node.href));
+    let href = this.evaluateString(node.href);
+
+    const isExternal = href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:');
+    const isAnchor = href.startsWith('#');
+    const isZlt = href.endsWith('.zlt');
+
+    if (!isExternal && !isAnchor && !isZlt && this.assetResolver) {
+      href = this.assetResolver(href);
+    } else {
+      href = transformHref(href);
+    }
+
     const childrenHtml = this.joinChildren(node.children);
 
     return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
@@ -172,7 +184,9 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt);
 
-    return `<img src="${src}" alt="${alt}"${attrs}>`;
+    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+
+    return `<img src="${resolvedSrc}" alt="${alt}"${attrs}>`;
   }
 
   visitVideo(node: VideoNode): string {
@@ -180,7 +194,9 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
-    return `<video src="${src}"${attrs}>${alt}</video>`;
+    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+
+    return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
@@ -188,7 +204,9 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
-    return `<audio src="${src}"${attrs}>${alt}</audio>`;
+    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+
+    return `<audio src="${resolvedSrc}"${attrs}>${alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {
@@ -196,15 +214,19 @@ export class InlineVisitor {
     const src = this.evaluateString(node.src);
     const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
 
-    return `<iframe src="${src}"${title}${attrs}></iframe>`;
+    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+
+    return `<iframe src="${resolvedSrc}"${title}${attrs}></iframe>`;
   }
 
   visitFile(node: FileNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
-    const src = transformHref(this.evaluateString(node.src));
+    const src = this.evaluateString(node.src);
     const title = node.title ? this.evaluateString(node.title) : null;
 
-    return `<a href="${src}"${attrs}>${title || src}</a>`;
+    const resolvedSrc = this.assetResolver ? this.assetResolver(src) : src;
+
+    return `<a href="${resolvedSrc}"${attrs}>${title || resolvedSrc}</a>`;
   }
 
   visitVariable(node: VariableNode): string {

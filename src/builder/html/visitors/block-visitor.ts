@@ -6,6 +6,7 @@ import {
   DefinitionTermNode,
   HeadingNode,
   HorizontalRuleNode,
+  ImageNode,
   IndentationNode,
   ListItemNode,
   ListNode,
@@ -77,6 +78,19 @@ export class BlockVisitor {
   }
 
   visitParagraph(node: ParagraphNode): string {
+    // Check for single image with align=center
+    if (node.children.length === 1 && node.children[0].type === 'Image') {
+      const imageNode = node.children[0] as ImageNode;
+      if (imageNode.attributes && imageNode.attributes.align === 'center') {
+        // Add style to paragraph
+        if (!node.attributes) node.attributes = {};
+        const currentStyle = node.attributes.style ? node.attributes.style + ';' : '';
+        node.attributes.style = `${currentStyle}text-align: center`;
+        // Remove align from image to avoid invalid attribute
+        delete imageNode.attributes.align;
+      }
+    }
+
     const attrs = this.renderAllAttributes(node.attributes);
     const childrenHtml = this.joinChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();

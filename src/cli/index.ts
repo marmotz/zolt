@@ -2,7 +2,7 @@
 
 import { watch as watchFile } from 'fs';
 import { copyFile, mkdir, stat } from 'fs/promises';
-import { basename, dirname, join, resolve } from 'path';
+import { basename, dirname, join, relative, resolve } from 'path';
 import pc from 'picocolors';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
@@ -38,7 +38,25 @@ async function buildFileWithDeps(
   }
 
   await mkdir(dirname(outputFile), { recursive: true });
-  await buildFile(absoluteInput, outputFile, { type });
+
+  const assetResolver = (originalAssetPath: string): string => {
+    const absoluteAssetPath = resolve(dirname(absoluteInput), originalAssetPath);
+    const assetPathRelativeToBase = relative(baseInputDir, absoluteAssetPath);
+
+    let destAssetAbsolutePath;
+    if (assetPathRelativeToBase.startsWith('..')) {
+      const oneLevelUp = dirname(baseInputDir);
+      const pathFromOneLevelUp = relative(oneLevelUp, absoluteAssetPath);
+      destAssetAbsolutePath = resolve(outputDir, pathFromOneLevelUp);
+    } else {
+      destAssetAbsolutePath = resolve(outputDir, assetPathRelativeToBase);
+    }
+
+    const newRelativePathForHtml = relative(dirname(outputFile), destAssetAbsolutePath);
+    return newRelativePathForHtml.replace(/\\/g, '/');
+  };
+
+  await buildFile(absoluteInput, outputFile, { type, assetResolver });
   console.log(`${pc.green('Built:')} ${outputFile}`);
 
   const inputDir = dirname(absoluteInput);
@@ -47,15 +65,16 @@ async function buildFileWithDeps(
   const assets = await getAssetFiles(absoluteInput);
   for (const asset of assets) {
     const fullAssetPath = resolve(inputDir, asset);
+    const assetPathRelativeToBase = relative(baseInputDir, fullAssetPath);
 
-    // Calculate where the asset should go relative to the outputDir
-    // We want it to be in the same relative position as the inputFile
-    const inputRelativeDir = absoluteInput.startsWith(baseInputDir)
-      ? dirname(absoluteInput)
-          .slice(baseInputDir.length)
-          .replace(/^[/\\]+/, '')
-      : '';
-    const destAssetPath = join(outputDir, inputRelativeDir, asset);
+    let destAssetPath;
+    if (assetPathRelativeToBase.startsWith('..')) {
+      const oneLevelUp = dirname(baseInputDir);
+      const pathFromOneLevelUp = relative(oneLevelUp, fullAssetPath);
+      destAssetPath = resolve(outputDir, pathFromOneLevelUp);
+    } else {
+      destAssetPath = resolve(outputDir, assetPathRelativeToBase);
+    }
 
     try {
       const assetStat = await stat(fullAssetPath);
@@ -63,7 +82,6 @@ async function buildFileWithDeps(
         touchedFiles.add(fullAssetPath);
         await mkdir(dirname(destAssetPath), { recursive: true });
 
-        // Only copy if source and destination are different to avoid watch loops
         if (fullAssetPath !== resolve(destAssetPath)) {
           await copyFile(fullAssetPath, destAssetPath);
         }

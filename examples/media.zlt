@@ -1,0 +1,90 @@
+# Media Management Examples in Zolt
+
+Zolt uses distinct prefixes to identify different types of media, allowing the parser to generate the correct HTML tags automatically.
+
+## 🖼️ Images
+
+Images use the `!` prefix.
+
+### Basic Image
+![Zolt Logo](../resources/icon.png)
+
+### Image with Attributes
+You can control size, alignment, and more using the `{}` syntax.
+
+![Zolt Logo](../resources/logo.png){width=300px align=center}
+
+### Advanced Image Styling
+Support for shadows and shorthand dimensions:
+
++ **Shadow:**
++ ![Icon](../resources/icon.png){shadow=true}
+
++ **Shorthand (w/h):**
++ ![Icon](../resources/icon.png){w=50 h=50}
+
++ **Floating:**
++ ![Icon](../resources/icon.png){w=100 float=right} This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right. This text will wrap around the floating image on the right.
+
+---
+
+## 🎥 Videos
+
+Videos use the `!!` prefix and generate a `video` tag.
+
+### Basic Video
+!![Demo Video](video.mp4)
+
+### Video with Controls
+!![Tutorial](tutorial.mp4){controls autoplay muted loop}
+
+---
+
+## 🎵 Audio
+
+Audio files use the `??` prefix and generate an `<audio>` tag.
+
+### Basic Audio
+??[Podcast Episode](podcast.mp3)
+
+### Audio with Controls
+??[Background Music](music.mp3){controls loop}
+
+---
+
+## 🌍 Embeds (iFrames)
+
+External content like YouTube, Vimeo, or maps use the `@@` prefix.
+
+### YouTube Embed
+@@[Zolt Introduction](https://www.youtube.com/embed/dQw4w9WgXcQ){width=100% height=400px}
+
+---
+
+## 📂 Downloadable Files
+
+Files use the `&&` prefix and generate an `<a>` tag (often styled with an icon by themes).
+
+### PDF Document
+&&[Download User Manual](manual.pdf)
+
+### ZIP Archive
+&&[Source Code Assets](assets.zip){class=download-button}
+
+---
+
+## 🎨 Media Attributes Reference
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `w`, `width` | Width (adds `px` if unitless) | `{w=200}` |
+| `h`, `height` | Height (adds `px` if unitless) | `{h=150}` |
+| `shadow` | Adds a box-shadow (`true` uses theme variable) | `{shadow=true}` |
+| `align` | Alignment (`left`, `center`, `right`) | `{align=center}` |
+| `float` | CSS float (`left`, `right`) | `{float=right}` |
+| `controls` | Show media controls (Video/Audio) | `{controls}` |
+| `autoplay` | Start playing automatically | `{autoplay}` |
+| `muted` | Mute the audio | `{muted}` |
+| `loop` | Restart when finished | `{loop}` |
+
+[← Back to Examples Index](index.zlt)

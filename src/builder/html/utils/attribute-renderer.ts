@@ -41,15 +41,38 @@ export class AttributeRenderer {
       transform: 'transform',
       width: 'width',
       height: 'height',
+      w: 'width',
+      h: 'height',
       float: 'float',
+      'margin-left': 'margin-left',
+      'margin-right': 'margin-right',
       'list-style': 'list-style',
       'list-style-type': 'list-style-type',
+      shadow: 'box-shadow',
     };
 
     for (const [key, value] of Object.entries(attrs)) {
       if (value !== undefined && cssPropertyMap[key]) {
-        const processedValue = this.evaluateString(String(value));
+        let processedValue = this.evaluateString(String(value));
+
+        if (key === 'shadow' && processedValue === 'true') {
+          processedValue = '0 4px 12px var(--zlt-color-shadow)';
+        }
+
+        // Add px to numeric width/height if no unit specified
+        if ((key === 'width' || key === 'height' || key === 'w' || key === 'h') && /^\d+(\.\d+)?$/.test(processedValue)) {
+          processedValue += 'px';
+        }
+
         cssProps.push(`${cssPropertyMap[key]}: ${processedValue}`);
+
+        if (key === 'float') {
+          if (processedValue === 'right' && !attrs['margin-left'] && !attrs['margin']) {
+            cssProps.push('margin-left: 1rem');
+          } else if (processedValue === 'left' && !attrs['margin-right'] && !attrs['margin']) {
+            cssProps.push('margin-right: 1rem');
+          }
+        }
       }
     }
 
@@ -76,9 +99,14 @@ export class AttributeRenderer {
       'transform',
       'width',
       'height',
+      'w',
+      'h',
       'float',
+      'margin-left',
+      'margin-right',
       'list-style',
       'list-style-type',
+      'shadow',
     ]);
     const filtered: Attributes = {};
     for (const [key, value] of Object.entries(attrs)) {

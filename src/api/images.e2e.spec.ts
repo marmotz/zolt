@@ -51,4 +51,35 @@ describe('API: Images', () => {
     const html = await buildString('[Link](url.zlt){color=red target=_blank}');
     expect(html).toContain('<a href="url.html" style="color: red" target="_blank">Link</a>');
   });
+
+  test('should handle shadow attribute on images', async () => {
+    const html = await buildString('![Alt](img.jpg){shadow=true}');
+    expect(html).toContain('style="box-shadow: 0 4px 12px var(--zlt-color-shadow)"');
+  });
+
+  test('should handle custom shadow value', async () => {
+    const html = await buildString('![Alt](img.jpg){shadow="10px 10px 5px grey"}');
+    expect(html).toContain('style="box-shadow: 10px 10px 5px grey"');
+  });
+
+  test('should handle shorthand w and h attributes', async () => {
+    const html = await buildString('![Alt](img.jpg){w=300 h=200}');
+    expect(html).toContain('style="width: 300px; height: 200px"');
+  });
+
+  test('should add margin-left to float:right images', async () => {
+    const html = await buildString('![Alt](img.jpg){float=right}');
+    expect(html).toContain('style="float: right; margin-left: 1rem"');
+  });
+
+  test('should add margin-right to float:left images', async () => {
+    const html = await buildString('![Alt](img.jpg){float=left}');
+    expect(html).toContain('style="float: left; margin-right: 1rem"');
+  });
+
+  test('should not add automatic margin if explicitly provided', async () => {
+    const html = await buildString('![Alt](img.jpg){float=right margin-left=2rem}');
+    expect(html).toContain('style="float: right; margin-left: 2rem"');
+    expect(html).not.toContain('margin-left: 1rem');
+  });
 });
