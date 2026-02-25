@@ -39,7 +39,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should support datetime format with Date.format()', async () => {
-      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "DD/MM/YYYY hh:mm:ss") }}');
+      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "DD/MM/YYYY HH:mm:ss") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/);
@@ -113,11 +113,39 @@ describe('API: File Metadata Variables', () => {
       expect(html).toMatch(/Year: \d{2}/);
     });
 
-    test('should support hh token for hours', async () => {
+    test('should support HH token for hours (24h)', async () => {
+      await writeFile(testFilePath, 'Hour: {{ Date.format($modified, "HH") }}');
+      const html = await buildFileToString(testFilePath);
+
+      expect(html).toMatch(/Hour: \d{2}/);
+    });
+
+    test('should support H token for hours (24h, no padding)', async () => {
+      await writeFile(testFilePath, 'Hour: {{ Date.format($modified, "H") }}');
+      const html = await buildFileToString(testFilePath);
+
+      expect(html).toMatch(/Hour: \d{1,2}/);
+    });
+
+    test('should support hh token for hours (12h)', async () => {
       await writeFile(testFilePath, 'Hour: {{ Date.format($modified, "hh") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Hour: \d{2}/);
+    });
+
+    test('should support h token for 12-hour format (no padding)', async () => {
+      await writeFile(testFilePath, 'Hour12: {{ Date.format($modified, "h") }}');
+      const html = await buildFileToString(testFilePath);
+
+      expect(html).toMatch(/Hour12: \d{1,2}/);
+    });
+
+    test('should support a token for am/pm', async () => {
+      await writeFile(testFilePath, 'Period: {{ Date.format($modified, "a") }}');
+      const html = await buildFileToString(testFilePath);
+
+      expect(html).toMatch(/Period: [ap]m/);
     });
 
     test('should support mm token for minutes', async () => {
@@ -156,7 +184,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should support full datetime format', async () => {
-      await writeFile(testFilePath, 'Full: {{ Date.format($modified, "YYYY-MM-DD hh:mm:ss") }}');
+      await writeFile(testFilePath, 'Full: {{ Date.format($modified, "YYYY-MM-DD HH:mm:ss") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Full: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
@@ -186,7 +214,7 @@ describe('API: File Metadata Variables', () => {
     });
 
     test('should format $modified variable', async () => {
-      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "YYYY-MM-DD hh:mm") }}');
+      await writeFile(testFilePath, 'Modified: {{ Date.format($modified, "YYYY-MM-DD HH:mm") }}');
       const html = await buildFileToString(testFilePath);
 
       expect(html).toMatch(/Modified: \d{4}-\d{2}-\d{2} \d{2}:\d{2}/);
@@ -195,7 +223,7 @@ describe('API: File Metadata Variables', () => {
     test('should format both dates in same document', async () => {
       await writeFile(
         testFilePath,
-        'Created: {{ Date.format($created, "YYYY-MM-DD") }}\nModified: {{ Date.format($modified, "YYYY-MM-DD hh:mm") }}'
+        'Created: {{ Date.format($created, "YYYY-MM-DD") }}\nModified: {{ Date.format($modified, "YYYY-MM-DD HH:mm") }}'
       );
       const html = await buildFileToString(testFilePath);
 

@@ -22,7 +22,7 @@
 - [x] Parse variable definitions `$var = "value"`
 - [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and code blocks)
 - [x] Implement automatic date variables (`{$created}`, `{$modified}`)
-- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `hh`, `mm`, `ss`)
+- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `H`, `hh`, `h`, `mm`, `ss`, `a`)
 - [ ] Support timezone configuration (`$timezone = "Europe/Paris"`)
 - [x] Implement AST-based evaluation for `:::foreach`, `:::if`, and expressions (replaces SourceEvaluator)
 
@@ -247,7 +247,7 @@
 
 ### Date Namespace
 
-- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, hh, mm, ss)
+- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a)
 - [x] `Date.now()` - Get current timestamp
 - [ ] `Date.parse(text, format)` - Parse a date string
 - [ ] `Date.add(date, duration)` - Add duration to date

@@ -647,18 +647,25 @@ export class ExpressionEvaluator {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     const shortYear = year.toString().slice(-2);
-    const hours = date.getHours().toString().padStart(2, '0');
+    
+    const hours24 = date.getHours();
+    const hours12 = hours24 % 12 || 12;
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const seconds = date.getSeconds().toString().padStart(2, '0');
+    const ampm = hours24 < 12 ? 'am' : 'pm';
 
     return format
       .replace(/YYYY/g, year.toString())
       .replace(/YY/g, shortYear)
       .replace(/MM/g, month)
       .replace(/DD/g, day)
-      .replace(/hh/g, hours)
+      .replace(/HH/g, hours24.toString().padStart(2, '0'))
+      .replace(/H/g, hours24.toString())
+      .replace(/hh/g, hours12.toString().padStart(2, '0'))
+      .replace(/h/g, hours12.toString())
       .replace(/mm/g, minutes)
-      .replace(/ss/g, seconds);
+      .replace(/ss/g, seconds)
+      .replace(/a/g, ampm);
   }
 
   private escapeRegex(str: string): string {

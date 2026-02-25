@@ -10,7 +10,8 @@ Using automatic date variables:
 
 Use the `Date.format()` function to format dates:
 - **Date only:** {{ Date.format($created, "DD/MM/YYYY") }}
-- **Date and time:** {{ Date.format($modified, "DD/MM/YYYY hh:mm") }}
+- **Date and time:** {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+- **12-hour format:** {{ Date.format($modified, "DD/MM/YYYY hh:mm a") }}
 - **ISO format:** {{ Date.format($created, "YYYY-MM-DD") }}
 
 ## Format Tokens
@@ -23,7 +24,11 @@ Available format tokens:
 | `MM`   | Month (2 digits) | 02      |
 | `YYYY` | Year (4 digits)  | 2026    |
 | `YY`   | Year (2 digits)  | 26      |
-| `hh`   | Hour (24h)       | 14      |
+| `HH`   | Hour (24h, 00-23) | 14      |
+| `H`    | Hour (24h, 0-23)  | 14      |
+| `hh`   | Hour (12h, 01-12) | 02      |
+| `h`    | Hour (12h, 1-12)  | 2       |
+| `a`    | am/pm            | am      |
 | `mm`   | Minutes          | 30      |
 | `ss`   | Seconds          | 45      |
 
@@ -52,7 +57,7 @@ Created: {{ Date.format($created, "DD MMM, YYYY") }}
 # My Document
 
 **Created:** {{ Date.format($created, "DD MMMM YYYY") }}
-**Last Updated:** {{ Date.format($modified, "DD MMMM YYYY à hh:mm") }}
+**Last Updated:** {{ Date.format($modified, "DD MMMM YYYY à HH:mm") }}
 
 ### Version History
 
@@ -71,13 +76,13 @@ Created: {{ Date.format($created, "DD MMM, YYYY") }}
 
 ### Technical Report
 
-**Report Generated:** {{ Date.format($created, "DD/MM/YYYY hh:mm") }}
+**Report Generated:** {{ Date.format($created, "DD/MM/YYYY HH:mm") }}
 
 ## Multiple Date Formats in Same Document
 
 **Short format:** {{ Date.format($created, "DD/MM/YYYY") }}
 **Long format:** {{ Date.format($created, "DD MMMM, YYYY") }}
-**Full datetime:** {{ Date.format($created, "YYYY-MM-DD hh:mm:ss") }}
+**Full datetime:** {{ Date.format($created, "YYYY-MM-DD HH:mm:ss") }}
 **Compact:** {{ Date.format($created, "YYYYMMDD") }}
 
 ## Combining with Other Functions
@@ -95,7 +100,7 @@ Timestamp in seconds: {{ Math.floor($created / 1000) }}
 
 :::if {{ $modified > $created }}
 *This document has been updated since creation.*
-Last update: {{ Date.format($modified, "DD/MM/YYYY hh:mm") }}
+Last update: {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
 :::
 
 ## Use Cases
@@ -105,7 +110,7 @@ Last update: {{ Date.format($modified, "DD/MM/YYYY hh:mm") }}
 # Meeting Minutes - {{ Date.format($created, "DD MMMM YYYY") }}
 
 **Date:** {{ Date.format($created, "DD MMMM YYYY") }}
-**Time:** {{ Date.format($created, "hh:mm") }}
+**Time:** {{ Date.format($created, "HH:mm") }}
 
 ### Changelog
 
@@ -147,7 +152,7 @@ Last update: {{ Date.format($modified, "DD/MM/YYYY hh:mm") }}
 Get the current date and time:
 
 **Current date:** {{ Date.format(Date.now(), "DD/MM/YYYY") }}
-**Current datetime:** {{ Date.format(Date.now(), "YYYY-MM-DD hh:mm:ss") }}
+**Current datetime:** {{ Date.format(Date.now(), "YYYY-MM-DD HH:mm:ss") }}
 
 ## Complex Examples
 
@@ -185,6 +190,6 @@ Modified: {{ Date.format($modified, $fmt) }}
 ### Always Show Both Dates
 
 **Created:** {{ Date.format($created, "DD MMMM YYYY") }}
-**Last modified:** {{ Date.format($modified, "DD MMMM YYYY 'at' hh:mm") }}
+**Last modified:** {{ Date.format($modified, "DD MMMM YYYY 'at' HH:mm") }}
 
 [← Back to Examples Index](index.zlt)
