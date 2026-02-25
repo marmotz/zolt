@@ -282,11 +282,15 @@ Home: 280
 
 ### Data Table
 
-| Metric | Q1 | Q2 | Q3 | Q4 |
-|:-------|:---|:---|:---|:---|
-| Revenue | $100K | $120K | $145K | $180K |
-| Growth | 0% | 20% | 45% | 80% |
-| Profit | $20K | $30K | $45K | $65K |
+[[table id=report]]
+| Category               | Metric    | Q1        | Q2        | Q3        | Q4        |
+| :--------------------- | :-------- | :-------: | :-------: | :-------: | :-------: |
+| [rowspan=2] Financials | Revenue   | $100K     | $120K     | $145K     | $180K     |
+|                          Profit    | $20K      | $30K      | $45K      | $65K      |
+| [rowspan=2] Growth     | Monthly   | 2%        | 3%        | 4%        | 5%        |
+|                          Annual    | 15%       | 18%       | 22%       | 25%       |
+| [colspan=2] [h] Total Summary      | **$120K** | **$150K** | **$190K** | **$245K** |
+[[/table]]
 
 ---
 

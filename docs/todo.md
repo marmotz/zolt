@@ -170,9 +170,9 @@
 
 - [x] Basic tables with `|` syntax
 - [x] `[[table]]` and `[[/table]]` wrapper
-- [ ] Header marker `[h]`
-- [ ] Column merge `[colspan=N]`
-- [ ] Row merge `[rowspan=N]`
+- [x] Header marker `[h]`
+- [x] Column merge `[colspan=N]`
+- [x] Row merge `[rowspan=N]`
 - [x] Alignment markers `:---`, `:---:`, `---:`
 - [x] Table attributes `{id=value}`
 

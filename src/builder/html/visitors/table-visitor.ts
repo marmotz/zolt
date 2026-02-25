@@ -39,11 +39,23 @@ export class TableVisitor {
     return html;
   }
 
-  visitTableCell(node: TableCellNode, isHeader: boolean): string {
-    const tag = isHeader ? 'th' : 'td';
+  visitTableCell(node: TableCellNode, isHeaderRow: boolean): string {
+    const tag = node.isHeader || isHeaderRow ? 'th' : 'td';
     const childrenHtml = this.joinChildren(node.children);
-    const alignStyle = node.alignment ? ` style="text-align: ${node.alignment};"` : '';
 
-    return `<${tag}${alignStyle}>${childrenHtml}</${tag}>`;
+    const attrs: string[] = [];
+    if (node.alignment) {
+      attrs.push(`style="text-align: ${node.alignment};"`);
+    }
+    if (node.colspan) {
+      attrs.push(`colspan="${node.colspan}"`);
+    }
+    if (node.rowspan) {
+      attrs.push(`rowspan="${node.rowspan}"`);
+    }
+
+    const attrsStr = attrs.length > 0 ? ' ' + attrs.join(' ') : '';
+
+    return `<${tag}${attrsStr}>${childrenHtml}</${tag}>`;
   }
 }

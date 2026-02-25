@@ -341,6 +341,17 @@ export class Parser {
         children: [{ type: 'Text', content: ':::' }],
       } as any;
     }
+
+    if (this.tableParser.isTableStart(this.currentToken)) {
+      return this.tableParser.parseTable(
+        this.expect.bind(this),
+        this.match.bind(this),
+        this.skipNewlines.bind(this),
+        this.isEof.bind(this),
+        this.peek.bind(this)
+      );
+    }
+
     if (this.match(TokenType.DOUBLE_BRACKET_START)) {
       return this.specialBlockParser.parseDoubleBracketBlock(this.expect.bind(this));
     }
@@ -415,16 +426,6 @@ export class Parser {
     }
     if (this.match(TokenType.COMMENT_INLINE)) {
       return this.specialBlockParser.parseCommentInline(this.expect.bind(this));
-    }
-
-    if (this.tableParser.isTableStart(this.currentToken)) {
-      return this.tableParser.parseTable(
-        this.expect.bind(this),
-        this.match.bind(this),
-        this.skipNewlines.bind(this),
-        this.isEof.bind(this),
-        this.peek.bind(this)
-      );
     }
 
     if (this.match(TokenType.TEXT)) {

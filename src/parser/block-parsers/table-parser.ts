@@ -1,11 +1,14 @@
 import { Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { TableCellNode, TableNode, TableRowNode } from '../types';
+import { Attributes, TableCellNode, TableNode, TableRowNode } from '../types';
 
 export class TableParser {
   constructor(private inlineParser: InlineParser) {}
 
   public isTableStart(token: Token): boolean {
+    if (token.type === TokenType.DOUBLE_BRACKET_START) {
+      return token.value.startsWith('table');
+    }
     if (token.type !== TokenType.TEXT) {
       return false;
     }
@@ -24,8 +27,41 @@ export class TableParser {
     const rows: TableRowNode[] = [];
     let header: TableRowNode | undefined;
     let alignments: ('left' | 'center' | 'right' | undefined)[] = [];
+    let attributes: Attributes | undefined;
+    let isWrapped = false;
 
-    while (!isEof() && this.isTableStart(peek())) {
+    if (match(TokenType.DOUBLE_BRACKET_START) && peek().value.startsWith('table')) {
+      const token = expect(TokenType.DOUBLE_BRACKET_START);
+      isWrapped = true;
+      const value = token.value;
+      const firstSpaceIndex = value.indexOf(' ');
+      if (firstSpaceIndex !== -1) {
+        const attrStr = value.substring(firstSpaceIndex + 1).trim();
+        // Check if it's already an attribute string like {id=foo} or just raw like id=foo
+        if (attrStr.startsWith('{') && attrStr.endsWith('}')) {
+          attributes = InlineParser.parseAttributes(attrStr.substring(1, attrStr.length - 1));
+        } else {
+          attributes = InlineParser.parseAttributes(attrStr);
+        }
+      }
+      skipNewlines();
+    }
+
+    while (
+      !isEof() &&
+      (this.isTableStart(peek()) ||
+        (isWrapped && peek().type === TokenType.TEXT && peek().value.trim().startsWith('|')))
+    ) {
+      if (match(TokenType.DOUBLE_BRACKET_START)) {
+        if (this.currentTokenIsTableEnd(peek())) {
+          break;
+        }
+      }
+
+      if (!peek().value.trim().startsWith('|')) {
+        break;
+      }
+
       const { row, rawCells } = this.parseTableRow(expect);
 
       // Check if this is a separator row (e.g., |---|---|)
@@ -41,25 +77,65 @@ export class TableParser {
       skipNewlines();
     }
 
-    // Apply alignments to header and all rows
-    if (alignments.length > 0) {
-      if (header) {
-        header.cells.forEach((cell, i) => {
-          if (alignments[i]) cell.alignment = alignments[i];
-        });
-      }
-      for (const row of rows) {
-        row.cells.forEach((cell, i) => {
-          if (alignments[i]) cell.alignment = alignments[i];
-        });
-      }
+    if (isWrapped && match(TokenType.DOUBLE_BRACKET_START) && this.currentTokenIsTableEnd(peek())) {
+      expect(TokenType.DOUBLE_BRACKET_START);
     }
+
+    this.applyAlignments(header, rows, alignments);
 
     return {
       type: 'Table',
       header,
       rows,
+      attributes,
     };
+  }
+
+  private applyAlignments(
+    header: TableRowNode | undefined,
+    rows: TableRowNode[],
+    alignments: ('left' | 'center' | 'right' | undefined)[]
+  ): void {
+    if (alignments.length === 0) return;
+
+    const allRows = header ? [header, ...rows] : rows;
+    const occupied: Set<number>[] = [];
+
+    allRows.forEach((row, rowIndex) => {
+      let currentCol = 0;
+      if (!occupied[rowIndex]) occupied[rowIndex] = new Set();
+      const rowOccupied = occupied[rowIndex];
+
+      row.cells.forEach((cell) => {
+        // Find next free column in current row
+        while (rowOccupied.has(currentCol)) {
+          currentCol++;
+        }
+
+        // Apply alignment from the logical column index
+        if (currentCol < alignments.length && alignments[currentCol]) {
+          cell.alignment = alignments[currentCol];
+        }
+
+        const colspan = cell.colspan || 1;
+        const rowspan = cell.rowspan || 1;
+
+        // Mark occupied cells for current and subsequent rows
+        for (let r = 0; r < rowspan; r++) {
+          const targetRowIndex = rowIndex + r;
+          if (!occupied[targetRowIndex]) occupied[targetRowIndex] = new Set();
+          for (let c = 0; c < colspan; c++) {
+            occupied[targetRowIndex].add(currentCol + c);
+          }
+        }
+
+        currentCol += colspan;
+      });
+    });
+  }
+
+  private currentTokenIsTableEnd(token: Token): boolean {
+    return token.type === TokenType.DOUBLE_BRACKET_START && token.value === '/table';
   }
 
   private parseTableRow(expect: (type: TokenType) => Token): { row: TableRowNode; rawCells: string[] } {
@@ -71,10 +147,37 @@ export class TableParser {
     const cellContents = content.split('|');
     const rawCells = cellContents.map((c) => c.trim());
 
-    const cells: TableCellNode[] = rawCells.map((cell) => ({
-      type: 'TableCell',
-      children: this.inlineParser.parse(cell),
-    }));
+    const cells: TableCellNode[] = rawCells.map((cell) => {
+      let isHeader = false;
+      let colspan: number | undefined;
+      let rowspan: number | undefined;
+      let cellContent = cell;
+
+      // Match markers: [h], [colspan=N], [rowspan=N]
+      const markerRegex = /^\[(h|colspan=(\d+)|rowspan=(\d+))]\s*/g;
+      let match;
+      while ((match = markerRegex.exec(cellContent)) !== null) {
+        if (match[1] === 'h') {
+          isHeader = true;
+        } else if (match[1].startsWith('colspan=')) {
+          colspan = parseInt(match[2], 10);
+        } else if (match[1].startsWith('rowspan=')) {
+          rowspan = parseInt(match[3], 10);
+        }
+        // Move cellContent past the marker
+        cellContent = cellContent.substring(match[0].length);
+        // Reset regex because we modified cellContent
+        markerRegex.lastIndex = 0;
+      }
+
+      return {
+        type: 'TableCell',
+        children: this.inlineParser.parse(cellContent.trim()),
+        isHeader: isHeader || undefined,
+        colspan,
+        rowspan,
+      };
+    });
 
     return {
       row: {

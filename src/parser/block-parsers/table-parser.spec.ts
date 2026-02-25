@@ -32,4 +32,48 @@ describe('TableParser', () => {
     expect(table.header.cells[1].alignment).toBe('center');
     expect(table.header.cells[2].alignment).toBe('right');
   });
+
+  test('should parse [h] marker in cells', () => {
+    const input = `| [h] Col 1 | [h] Col 2 |
+| A | B |`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    const table = ast.children[0] as any;
+    expect(table.rows[0].cells[0].isHeader).toBe(true);
+    expect(table.rows[0].cells[1].isHeader).toBe(true);
+    expect(table.rows[1].cells[0].isHeader).toBeUndefined();
+  });
+
+  test('should parse colspan and rowspan', () => {
+    const input = `| [colspan=2] Wide |
+| [rowspan=2] Tall | Cell |
+| | Cell |`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    const table = ast.children[0] as any;
+    expect(table.rows[0].cells[0].colspan).toBe(2);
+    expect(table.rows[1].cells[0].rowspan).toBe(2);
+  });
+
+  test('should handle [[table]] wrapper', () => {
+    const input = `[[table id=my-table]]
+| [h] A | [h] B |
+| 1 | 2 |
+[[/table]]`;
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children.length).toBe(1);
+    expect(ast.children[0].type).toBe('Table');
+    const table = ast.children[0] as any;
+    expect(table.attributes?.id).toBe('my-table');
+  });
 });
