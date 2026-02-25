@@ -5,30 +5,9 @@ This file serves as an index to test various Frontmatter features (YAML metadata
 ## Basic Examples
 - [Basic Configuration](frontmatter/basic.zlt) — Simple title, author, and date.
 - [Complete Example](frontmatter/complete.zlt) — Using all standard fields (tags, description, version, etc.).
-- [Variable Usage](frontmatter/variables.zlt) — How to inject frontmatter values into the content.
 
-## Specific Metadata
-- [Blog Post](frontmatter/metadata-blog.zlt) — Categories, cover images, and "featured" status.
-- [Open Source Project](frontmatter/project.zlt) — GitHub repository, license, and contributors.
-
-## Logic and Conditions
-- [Theme Selection](frontmatter/conditional-theme.zlt) — Style change based on a variable.
-- [Themes and Colors](themes.zlt) — Complete index of built-in themes and Light/Dark modes.
-- [Feature Flags](frontmatter/conditional-features.zlt) — Conditional display of sections (comments, search, etc.).
-
-## Advanced Content Management
-- [Multiple Authors](frontmatter/authors.zlt) — Iterating over a list of authors with roles and emails.
-- [Version Management](frontmatter/versioning.zlt) — Change history (changelog) structured in YAML.
-- [Localization](frontmatter/localization.zlt) — Language, locale, and text direction.
-- [Multi-language](frontmatter/advanced-multi-lang.zlt) — List of files by language.
-- [Document Series](frontmatter/advanced-series.zlt) — Navigation between tutorial parts.
-- [Custom Fields](frontmatter/custom-fields.zlt) — Defining metadata specific to your needs (difficulty, duration, etc.).
-
-## Common Patterns
-- [API Documentation](frontmatter/patterns-api.zlt) — Typical configuration for an API (base URL, auth, etc.).
-
-## Document Configuration
-- [Rendering Parameters](frontmatter/config.zlt) — Control over TOC, numbering, and highlighting.
+## Themes and Appearance
+- [Themes and Colors](themes.zlt) — Controlling document appearance and color schemes via Frontmatter.
 
 ---
 [← Back to Examples Index](index.zlt)

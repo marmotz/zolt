@@ -7,9 +7,10 @@ tags: [documentation, tutorial, zolt]
 description: "A comprehensive guide to the Zolt markup language"
 lang: en
 toc: true
-numbering: true
 theme: professional
 ---
+$numbering = true
+
 # Complete Frontmatter Example
 
 All commonly used metadata fields.

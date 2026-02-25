@@ -9,7 +9,7 @@ import { createFileDateVariables } from '../utils/file-metadata';
 export interface BuildOptions {
   type?: 'html' | 'pdf';
   variables?: Record<string, any>;
-  frontMatter?: boolean;
+  frontmatter?: boolean;
   filePath?: string;
 }
 
