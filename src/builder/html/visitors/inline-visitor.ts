@@ -160,8 +160,22 @@ export class InlineVisitor {
   }
 
   visitLink(node: LinkNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
-    const title = node.title ? ` title="${this.evaluateString(node.title)}"` : '';
+    const nodeAttrs = { ...node.attributes };
+
+    // If title property is present and not already in attributes, add it to attributes
+    if (node.title && !nodeAttrs.title) {
+      nodeAttrs.title = node.title;
+    }
+
+    // Add rel="noopener" for target="_blank"
+    if (nodeAttrs.target === '_blank') {
+      const currentRel = nodeAttrs.rel || '';
+      if (!currentRel.includes('noopener')) {
+        nodeAttrs.rel = currentRel ? `${currentRel} noopener` : 'noopener';
+      }
+    }
+
+    const attrs = this.renderAllAttributes(nodeAttrs);
     let href = this.evaluateString(node.href);
 
     const isExternal = href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:');
@@ -176,7 +190,7 @@ export class InlineVisitor {
 
     const childrenHtml = this.joinChildren(node.children);
 
-    return `<a href="${href}"${title}${attrs}>${childrenHtml}</a>`;
+    return `<a href="${href}"${attrs}>${childrenHtml}</a>`;
   }
 
   visitImage(node: ImageNode): string {
@@ -222,15 +236,13 @@ export class InlineVisitor {
       return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
     }
 
-    const { controls, ...nodeAttrsWithoutControls } = (nodeAttrs as any) ?? {};
-    const attrs = this.renderAllAttributes(nodeAttrsWithoutControls);
+    const attrs = this.renderAllAttributes(nodeAttrs);
 
     return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
-    const { controls, ...nodeAttrsWithoutControls } = (node.attributes as any) ?? {};
-    const attrs = this.renderAllAttributes(nodeAttrsWithoutControls);
+    const attrs = this.renderAllAttributes(node.attributes);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
@@ -264,7 +276,15 @@ export class InlineVisitor {
   }
 
   visitFile(node: FileNode): string {
-    const attrs = this.renderAllAttributes({ ...node.attributes, target: '_blank' });
+    const nodeAttrs: any = { ...node.attributes, target: '_blank' };
+
+    // Add rel="noopener" for target="_blank"
+    const currentRel = nodeAttrs.rel || '';
+    if (!currentRel.includes('noopener')) {
+      nodeAttrs.rel = currentRel ? `${currentRel} noopener` : 'noopener';
+    }
+
+    const attrs = this.renderAllAttributes(nodeAttrs);
     let src = this.evaluateString(node.src);
     const title = node.title ? this.evaluateString(node.title) : null;
 

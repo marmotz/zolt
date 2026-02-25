@@ -22,7 +22,8 @@
 - [x] Parse variable definitions `$var = "value"`
 - [x] Replace variable occurrences `{$var}` (Note: skipped inside code spans and code blocks)
 - [x] Implement automatic date variables (`{$created}`, `{$modified}`)
-- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `H`, `hh`, `h`, `mm`, `ss`, `a`, `MMMM`, `MMM`, `dddd`, `ddd`, `m`, `s`)
+- [x] Support date formatting with `Date.format()` function (tokens: `DD`, `MM`, `YYYY`, `YY`, `HH`, `H`, `hh`, `h`,
+  `mm`, `ss`, `a`, `MMMM`, `MMM`, `dddd`, `ddd`, `m`, `s`)
 - [x] Support date localization using `$lang` or `$locale` variables in `Date.format()`
 - [x] Implement AST-based evaluation for `:::foreach`, `:::if`, and expressions (replaces SourceEvaluator)
 
@@ -69,9 +70,8 @@
 ### Attributes on Videos
 
 - [x] `{autoplay}` - Autoplay (tested in images.e2e.spec.ts)
-- [ ] `{loop}` - Loop (missing E2E test)
-- [ ] `{muted}` - Son désactivé (missing E2E test)
-
+- [x] `{loop}` - Loop (tested in images.e2e.spec.ts)
+- [x] `{muted}` - Son désactivé (tested in images.e2e.spec.ts)
 
 ## 3. Typography & Inline Formatting
 
@@ -126,9 +126,8 @@
 ### Link Attributes
 
 - [x] `{target=_blank}` - Open in new tab (tested in images.e2e.spec.ts)
-- [ ] `{rel=noopener}` - Security for target=\_blank (missing E2E test)
-- [ ] `{download}` - Force download (missing E2E test)
-- [ ] `{title=value}` - Tooltip (missing E2E test)
+- [x] `{rel=noopener}` - Security for target=_blank (tested in links-security.e2e.spec.ts)
+- [x] `{title=value}` - Tooltip (tested in links-security.e2e.spec.ts)
 
 ## 6. Blockquotes & Citations
 
@@ -248,7 +247,8 @@
 
 ### Date Namespace
 
-- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a, MMMM, MMM, dddd, ddd, m, s) and localization support.
+- [x] `Date.format(date, format)` - Format a date with tokens (DD, MM, YYYY, YY, HH, H, hh, h, mm, ss, a, MMMM, MMM,
+  dddd, ddd, m, s) and localization support.
 - [x] `Date.now()` - Get current timestamp
 - [ ] `Date.parse(text, format)` - Parse a date string
 - [ ] `Date.add(date, duration)` - Add duration to date

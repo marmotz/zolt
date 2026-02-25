@@ -368,7 +368,7 @@ Le Zolt propose une syntaxe riche pour les liens, avec attributs et références
 
 ```
 [Lien externe](https://zolt.marmotz.dev){target=_blank rel=noopener}
-[Télécharger PDF](document.pdf){download=true}
+[Google](https://google.com){target=_blank}
 [Lien important](page.html){color=blue font-weight=bold}
 ```
 

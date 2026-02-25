@@ -29,8 +29,12 @@ describe('API: Images', () => {
 
   test('should build video', async () => {
     const html = await buildString('!![Video](video.mp4){autoplay controls}');
-    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay>Video</video>');
-    expect(html).not.toContain('controls');
+    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay controls>Video</video>');
+  });
+
+  test('should build video with autoplay, loop and muted', async () => {
+    const html = await buildString('!![Video](video.mp4){autoplay loop muted}');
+    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay loop muted>Video</video>');
   });
 
   test('should automatically embed YouTube videos', async () => {
@@ -52,8 +56,12 @@ describe('API: Images', () => {
 
   test('should build audio', async () => {
     const html = await buildString('??[Audio](audio.mp3){controls}');
-    expect(html).toContain('<audio src="audio.mp3">Audio</audio>');
-    expect(html).not.toContain('controls');
+    expect(html).toContain('<audio src="audio.mp3" controls>Audio</audio>');
+  });
+
+  test('should build audio with loop and muted', async () => {
+    const html = await buildString('??[Audio](audio.mp3){loop muted}');
+    expect(html).toContain('<audio src="audio.mp3" loop muted>Audio</audio>');
   });
 
   test('should build embed', async () => {
@@ -63,12 +71,22 @@ describe('API: Images', () => {
 
   test('should build downloadable file', async () => {
     const html = await buildString('&&[Download](doc.pdf){class=download-btn}');
-    expect(html).toContain('<a href="doc.pdf" class="download-btn" target="_blank">Download</a>');
+    expect(html).toContain('<a href="doc.pdf" class="download-btn" target="_blank" rel="noopener">Download</a>');
+  });
+
+  test('should build downloadable file with download attribute', async () => {
+    const html = await buildString('&&[Download](doc.pdf){download=true}');
+    expect(html).toContain('<a href="doc.pdf" download="true" target="_blank" rel="noopener">Download</a>');
   });
 
   test('should build link with attributes', async () => {
     const html = await buildString('[Link](url.zlt){color=red target=_blank}');
-    expect(html).toContain('<a href="url.html" style="color: red" target="_blank">Link</a>');
+    expect(html).toContain('<a href="url.html" style="color: red" target="_blank" rel="noopener">Link</a>');
+  });
+
+  test('should build link with attributes and download', async () => {
+    const html = await buildString('[Link](url.zlt){color=red download=true}');
+    expect(html).toContain('<a href="url.html" style="color: red" download="true">Link</a>');
   });
 
   test('should handle shadow attribute on images', async () => {

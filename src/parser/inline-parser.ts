@@ -717,6 +717,13 @@ export class InlineParser {
 
     while (remaining.length > 0) {
       remaining = remaining.trimStart();
+      // Handle leading commas or spaces
+      if (remaining.startsWith(',')) {
+        remaining = remaining.slice(1).trimStart();
+      }
+      if (remaining.length === 0) break;
+
+      // console.log('Parsing attribute, remaining:', remaining);
 
       const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
       const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
@@ -738,15 +745,17 @@ export class InlineParser {
           const afterKey = remaining.slice(keyValueMatch[0].length);
           let value = '';
 
-          const nextKeyMatch = afterKey.match(/ ([a-zA-Z-]+=|#|\.)/);
+          // Look for next attribute separator (space or comma) followed by a key, shortcut or boolean
+          const nextKeyMatch = afterKey.match(/[ ,]([a-zA-Z-]+=|#|\.)/);
           if (nextKeyMatch) {
             value = afterKey.slice(0, nextKeyMatch.index);
           } else {
             value = afterKey;
           }
 
-          this.setAttribute(attrs, key, value.trim());
-          remaining = remaining.slice(key.length + 1 + value.length);
+          // Trim and remove trailing comma if present
+          this.setAttribute(attrs, key, value.trim().replace(/,$/, ''));
+          remaining = remaining.slice(keyValueMatch[0].length + value.length);
         } else {
           // Handle shortcuts like .class or #id, or boolean attributes
           const shortcutMatch = remaining.match(/^([.#][a-zA-Z0-9_-]+)/);
