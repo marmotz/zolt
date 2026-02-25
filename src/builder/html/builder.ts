@@ -33,7 +33,10 @@ export class HTMLBuilder implements Builder {
   private specialBlockVisitor: SpecialBlockVisitor;
   private documentRenderer: DocumentRenderer;
 
-  constructor(initialVariables?: InitialVariables, private assetResolver?: (path: string) => string) {
+  constructor(
+    initialVariables?: InitialVariables,
+    private assetResolver?: (path: string) => string
+  ) {
     this.evaluator = new ExpressionEvaluator();
     if (initialVariables) {
       for (const [key, value] of Object.entries(initialVariables)) {

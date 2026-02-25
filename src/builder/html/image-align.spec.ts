@@ -37,10 +37,7 @@ describe('HTMLBuilder Image Alignment', () => {
 
     const paragraphNode: ParagraphNode = {
       type: 'Paragraph',
-      children: [
-        { type: 'Text', content: 'Some text ' },
-        imageNode,
-      ],
+      children: [{ type: 'Text', content: 'Some text ' }, imageNode],
     };
 
     const html = builder.build(paragraphNode);

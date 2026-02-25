@@ -60,7 +60,10 @@ export class AttributeRenderer {
         }
 
         // Add px to numeric width/height if no unit specified
-        if ((key === 'width' || key === 'height' || key === 'w' || key === 'h') && /^\d+(\.\d+)?$/.test(processedValue)) {
+        if (
+          (key === 'width' || key === 'height' || key === 'w' || key === 'h') &&
+          /^\d+(\.\d+)?$/.test(processedValue)
+        ) {
           processedValue += 'px';
         }
 
