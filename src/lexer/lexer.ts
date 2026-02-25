@@ -111,6 +111,9 @@ export class Lexer {
     if (this.matchAbbreviationDef()) {
       return this.readAbbreviationDef();
     }
+    if (this.matchFootnoteDef()) {
+      return this.readFootnoteDef();
+    }
     if (this.matchLinkRefDef()) {
       return this.readLinkRefDef();
     }
@@ -122,6 +125,44 @@ export class Lexer {
     }
 
     return this.readText();
+  }
+
+  private matchFootnoteDef(): boolean {
+    const remaining = this.source.slice(this.pos);
+
+    return /^\[\^([^\]]+)]:\s+/.test(remaining);
+  }
+
+  private readFootnoteDef(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    this.advanceChar(); // [
+    this.advanceChar(); // ^
+
+    let label = '';
+    while (!this.isEof() && this.peekChar() !== ']') {
+      label += this.advanceChar();
+    }
+
+    if (!this.isEof()) {
+      this.advanceChar(); // ]
+    }
+
+    if (!this.isEof() && this.peekChar() === ':') {
+      this.advanceChar(); // :
+    }
+
+    this.skipWhitespace();
+
+    return {
+      type: TokenType.FOOTNOTE_DEF,
+      value: label,
+      line,
+      column,
+      length: this.pos - start,
+    };
   }
 
   private matchInclude(): boolean {
@@ -228,8 +269,15 @@ export class Lexer {
   }
 
   private readCodeBlockContent(): Token {
-    if (this.source.slice(this.pos).startsWith('```')) {
+    const remaining = this.source.slice(this.pos);
+    const match = remaining.match(/^(\s*)```/);
+
+    if (match) {
       this.state.exitCodeBlock();
+      // Skip the indentation before ```
+      for (let i = 0; i < match[1].length; i++) {
+        this.advanceChar();
+      }
 
       return this.readCodeBlockEnd();
     }

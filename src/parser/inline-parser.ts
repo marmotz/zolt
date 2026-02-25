@@ -9,6 +9,7 @@ import {
   EmbedNode,
   ExpressionNode,
   FileNode,
+  FootnoteNode,
   HighlightNode,
   ImageNode,
   InlineStyleNode,
@@ -26,6 +27,7 @@ import {
 export class InlineParser {
   private globalAbbreviations: Map<string, string> = new Map();
   private linkReferences: Map<string, string> = new Map();
+  private footnoteIds: Set<string> = new Set();
 
   setGlobalAbbreviations(abbreviations: Map<string, string>): void {
     this.globalAbbreviations = abbreviations;
@@ -33,6 +35,10 @@ export class InlineParser {
 
   setLinkReferences(references: Map<string, string>): void {
     this.linkReferences = references;
+  }
+
+  setFootnotes(footnotes: Set<string>): void {
+    this.footnoteIds = footnotes;
   }
 
   parse(text: string): ASTNode[] {
@@ -137,6 +143,9 @@ export class InlineParser {
     }
     if (this.matchPattern(text, /^\[([^\]]+)]\(([^)]+)\)/) || this.matchPattern(text, /^\[([^\]]+)]\[([^\]]*)]/)) {
       return this.parseLink(text);
+    }
+    if (this.matchPattern(text, /^\[\^?([^\]]+)]/)) {
+      return this.parseFootnote(text);
     }
     if (this.matchPattern(text, /^\^\{([^}]+)}/)) {
       return this.parseSuperscript(text);
@@ -264,6 +273,44 @@ export class InlineParser {
         alt,
         attributes,
       } as ImageNode,
+      remaining,
+    };
+  }
+
+  private parseFootnote(text: string): { node: ASTNode; remaining: string } | null {
+    const match = this.matchPattern(text, /^\[(\^?)([^\]]+)]/);
+    if (!match) {
+      return null;
+    }
+
+    const hasCaret = match[1] === '^';
+    const id = match[2];
+    const fullMatch = match[0];
+    const remainingAfterMatch = text.slice(fullMatch.length);
+
+    // If it's [label](url), [label][ref], or [label]{attrs}, it's likely a link, not a footnote.
+    // EXCEPT if it starts with ^, then it's definitely a footnote.
+    if (!hasCaret) {
+      if (
+        remainingAfterMatch.startsWith('(') ||
+        remainingAfterMatch.startsWith('[') ||
+        remainingAfterMatch.startsWith('{')
+      ) {
+        return null;
+      }
+      // If it doesn't have a caret, it MUST be a known footnote ID
+      if (!this.footnoteIds.has(id)) {
+        return null;
+      }
+    }
+
+    let remaining = text.slice(fullMatch.length);
+
+    return {
+      node: {
+        type: 'Footnote',
+        id,
+      } as FootnoteNode,
       remaining,
     };
   }

@@ -18,6 +18,8 @@ type InitialVariables = Record<string, number | string | boolean | null | undefi
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
   private abbreviationDefinitions: Map<string, string> = new Map();
+  private footnoteDefinitions: Map<string, ASTNode[]> = new Map();
+  private footnoteReferences: string[] = [];
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
@@ -49,6 +51,14 @@ export class HTMLBuilder implements Builder {
     const processInlineBound = this.processInline.bind(this);
     const processInlineContentBound = this.processInlineContent.bind(this);
 
+    const registerFootnoteRef = (id: string) => {
+      if (!this.footnoteReferences.includes(id)) {
+        this.footnoteReferences.push(id);
+      }
+
+      return this.footnoteReferences.indexOf(id) + 1;
+    };
+
     this.blockVisitor = new BlockVisitor(
       buildBound,
       joinChildrenBound,
@@ -57,7 +67,13 @@ export class HTMLBuilder implements Builder {
       this.evaluator
     );
 
-    this.inlineVisitor = new InlineVisitor(joinChildrenBound, renderAttrsBound, processInlineBound, this.evaluator);
+    this.inlineVisitor = new InlineVisitor(
+      joinChildrenBound,
+      renderAttrsBound,
+      processInlineBound,
+      this.evaluator,
+      registerFootnoteRef
+    );
 
     this.tableVisitor = new TableVisitor(joinChildrenBound, renderAttrsBound);
 
@@ -116,6 +132,8 @@ export class HTMLBuilder implements Builder {
         return '';
       case 'AbbreviationDefinition':
         return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+      case 'FootnoteDefinition':
+        return this.visitFootnoteDefinition(node as any);
       case 'Frontmatter':
         return this.visitFrontmatter(node as any);
       case 'LinkReferenceDefinition':
@@ -136,30 +154,87 @@ export class HTMLBuilder implements Builder {
   buildDocument(node: DocumentNode): string {
     this.specialBlockVisitor.reset();
     this.blockVisitor.reset();
+    this.footnoteDefinitions.clear();
+    this.footnoteReferences = [];
+    if (node.footnoteIds) {
+      this.inlineParser.setFootnotes(node.footnoteIds);
+    }
     this.currentFilePath = node.sourceFile || 'unknown';
     this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
 
-    return this.documentRenderer.renderDocument(
+    const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
-      this.specialBlockVisitor,
       this.joinChildren.bind(this),
+      this.visitFrontmatter.bind(this)
+    );
+
+    const footnotesHtml = this.renderFootnotes();
+
+    return this.documentRenderer.renderDocumentWithContent(
+      node,
+      contentHtml + footnotesHtml,
+      this.specialBlockVisitor,
       this.visitFrontmatter.bind(this)
     );
   }
 
   visitDocument(node: DocumentNode): string {
+    if (node.footnoteIds) {
+      this.inlineParser.setFootnotes(node.footnoteIds);
+    }
     this.currentFilePath = node.sourceFile || 'unknown';
     this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
 
-    return this.documentRenderer.renderDocumentContent(
+    const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
       this.joinChildren.bind(this),
       this.visitFrontmatter.bind(this)
     );
+
+    const footnotesHtml = this.renderFootnotes();
+
+    return contentHtml + footnotesHtml;
+  }
+
+  private renderFootnotes(): string {
+    if (this.footnoteReferences.length === 0) {
+      return '';
+    }
+
+    let html = '<section class="footnotes">\n<hr>\n<ol>\n';
+
+    for (const id of this.footnoteReferences) {
+      const children = this.footnoteDefinitions.get(id);
+      if (!children) continue;
+
+      const content = children ? this.joinChildren(children) : '';
+
+      // Backlink
+      const backlink = ` <a href="#fnref:${id}" class="footnote-backref">↩</a>`;
+
+      // If content is wrapped in a paragraph, append the backlink before the closing </p>
+      let itemContent = content;
+      if (itemContent.endsWith('</p>')) {
+        itemContent = itemContent.substring(0, itemContent.length - 4) + backlink + '</p>';
+      } else {
+        itemContent += backlink;
+      }
+
+      html += `<li id="fn:${id}">${itemContent}</li>\n`;
+    }
+
+    html += '</ol>\n</section>';
+
+    return html;
+  }
+
+  private visitFootnoteDefinition(node: any): string {
+    this.footnoteDefinitions.set(node.id, node.children);
+    return '';
   }
 
   private findAllHeadingsRecursive(nodes: ASTNode[], currentPath: string, depth: number = 0): any[] {

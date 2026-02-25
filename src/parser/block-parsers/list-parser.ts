@@ -5,7 +5,7 @@ import { ASTNode, Attributes, DefinitionDescriptionNode, DefinitionTermNode, Lis
 export class ListParser {
   constructor(private inlineParser: InlineParser) {}
 
-  public getListKind(type: TokenType): 'bullet' | 'numbered' | 'task' | 'definition' {
+  public getListKind(type: TokenType): 'bullet' | 'numbered' | 'task' | 'definition' | null {
     switch (type) {
       case TokenType.BULLET_LIST:
         return 'bullet';
@@ -16,7 +16,7 @@ export class ListParser {
       case TokenType.DEFINITION:
         return 'definition';
       default:
-        return 'bullet';
+        return null;
     }
   }
 
@@ -31,6 +31,10 @@ export class ListParser {
   ): ListNode {
     const firstToken = indent !== '' ? peek(1) : peek();
     const kind = this.getListKind(firstToken.type);
+    if (!kind) {
+      // Should not happen if called correctly, but for safety:
+      return { type: 'List', kind: 'bullet', children: [] };
+    }
     const children: (ListItemNode | DefinitionTermNode | DefinitionDescriptionNode)[] = [];
 
     while (!isEof()) {
@@ -44,10 +48,8 @@ export class ListParser {
         }
         advance(); // consume indentation
       } else {
-        if (!match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION)) {
-          break;
-        }
-        if (this.getListKind(peek().type) !== kind) {
+        const currentKind = this.getListKind(peek().type);
+        if (!currentKind || currentKind !== kind) {
           break;
         }
       }

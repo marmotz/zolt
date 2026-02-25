@@ -152,6 +152,8 @@ export class IndentationParser {
     parseBlock: () => ASTNode | null
   ): any {
     const kind = this.listParser.getListKind(currentToken().type);
+    if (!kind) return null;
+
     const children: any[] = [];
 
     while (!isEof()) {

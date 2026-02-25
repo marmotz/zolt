@@ -12,7 +12,14 @@ import { TripleColonParser } from './block-parsers/triple-colon-parser';
 import { DefinitionCollector } from './definition-collector';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
-import { ASTNode, DocumentNode, FrontmatterNode, VariableDefinitionNode } from './types';
+import {
+  ASTNode,
+  DocumentNode,
+  FootnoteDefinitionNode,
+  FrontmatterNode,
+  ParagraphNode,
+  VariableDefinitionNode,
+} from './types';
 
 export class Parser {
   private tokens: Token[];
@@ -20,6 +27,7 @@ export class Parser {
   private currentToken: Token;
   private filePath: string;
   private inlineParser: InlineParser;
+  private footnoteIds: Set<string> = new Set();
   public warnings: { line: number; column: number; message: string; code: string }[] = [];
 
   private definitionCollector: DefinitionCollector;
@@ -64,11 +72,15 @@ export class Parser {
 
   parse(): DocumentNode {
     // Pass 1: Collect abbreviations and link references
-    const { abbreviations, linkReferences, globalAbbreviations } = this.definitionCollector.collect(this.tokens);
+    const { abbreviations, linkReferences, globalAbbreviations, footnotes } = this.definitionCollector.collect(
+      this.tokens
+    );
 
+    this.footnoteIds = footnotes;
     const allAbbreviations = new Map<string, string>([...globalAbbreviations.entries(), ...abbreviations.entries()]);
     this.inlineParser.setGlobalAbbreviations(allAbbreviations);
     this.inlineParser.setLinkReferences(linkReferences);
+    this.inlineParser.setFootnotes(footnotes);
 
     // Pass 2: Full parse
     this.pos = 0;
@@ -81,6 +93,7 @@ export class Parser {
       children,
       frontmatter,
       sourceFile: this.filePath,
+      footnoteIds: this.footnoteIds,
     };
   }
 
@@ -129,6 +142,23 @@ export class Parser {
       return /^\{([^}]+)}$/.test(trimmed) && !trimmed.startsWith('{$') && !trimmed.startsWith('{{');
     }
 
+    if (token.type === TokenType.INDENTATION) {
+      const next = this.peek(offset + 1);
+
+      return [
+        TokenType.BULLET_LIST,
+        TokenType.ORDERED_LIST,
+        TokenType.TASK_LIST,
+        TokenType.DEFINITION,
+        TokenType.BLOCKQUOTE,
+        TokenType.HEADING,
+        TokenType.CODE_BLOCK_START,
+        TokenType.TRIPLE_COLON_START,
+        TokenType.FOOTNOTE_DEF,
+        TokenType.TECHNICAL_INDENT,
+      ].includes(next.type);
+    }
+
     return [
       TokenType.HEADING,
       TokenType.CODE_BLOCK,
@@ -145,6 +175,8 @@ export class Parser {
       TokenType.DOUBLE_BRACKET_START,
       TokenType.ABBREVIATION_DEF,
       TokenType.ABBREVIATION_DEF_GLOBAL,
+      TokenType.FOOTNOTE_DEF,
+      TokenType.LINK_REF_DEF,
       TokenType.COMMENT_INLINE,
       TokenType.FRONTMATTER,
     ].includes(token.type);
@@ -358,7 +390,16 @@ export class Parser {
     if (this.match(TokenType.ABBREVIATION_DEF) || this.match(TokenType.ABBREVIATION_DEF_GLOBAL)) {
       return this.specialBlockParser.parseAbbreviationDef(this.expect.bind(this), this.match.bind(this));
     }
+    if (this.match(TokenType.FOOTNOTE_DEF)) {
+      return this.parseFootnoteDefinition();
+    }
     if (this.match(TokenType.LINK_REF_DEF)) {
+      const value = this.currentToken.value;
+      const ref = value.substring(0, value.indexOf(':'));
+      if (this.footnoteIds.has(ref)) {
+        return this.parseFootnoteDefinition();
+      }
+
       return this.specialBlockParser.parseLinkReferenceDef(this.expect.bind(this));
     }
     if (this.match(TokenType.COMMENT_INLINE)) {
@@ -404,6 +445,66 @@ export class Parser {
       this.isEof.bind(this),
       this.isNewBlockStart.bind(this)
     );
+  }
+
+  private parseFootnoteDefinition(): FootnoteDefinitionNode {
+    const token = this.advance();
+    let id = token.value;
+    let initialContent = '';
+
+    if (token.type === TokenType.LINK_REF_DEF) {
+      const colonIndex = id.indexOf(':');
+      id = id.substring(0, colonIndex);
+      initialContent = token.value.substring(colonIndex + 1).trim();
+    }
+
+    const children: ASTNode[] = [];
+
+    // The rest of the line is a paragraph or other content.
+    if (initialContent) {
+      children.push({
+        type: 'Paragraph',
+        children: this.inlineParser.parse(initialContent),
+      } as ParagraphNode);
+    } else if (!this.match(TokenType.NEWLINE) && !this.isEof()) {
+      children.push(
+        this.paragraphParser.parseParagraph(
+          this.match.bind(this),
+          this.advance.bind(this),
+          this.peek.bind(this),
+          this.isEof.bind(this),
+          this.isNewBlockStart.bind(this)
+        )
+      );
+    }
+
+    this.skipNewlines();
+
+    // Check for indented lines that belong to this footnote
+    while (!this.isEof()) {
+      if (this.match(TokenType.INDENTATION)) {
+        const next = this.peek(1);
+        if (
+          [TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION].includes(next.type)
+        ) {
+          const block = this.parseBlock();
+          if (block) children.push(block);
+        } else {
+          this.advance(); // Skip indentation for non-list blocks
+          const block = this.parseBlock();
+          if (block) children.push(block);
+        }
+        this.skipNewlines();
+      } else {
+        break;
+      }
+    }
+
+    return {
+      type: 'FootnoteDefinition',
+      id,
+      children,
+    };
   }
 
   private parseDocument(): ASTNode[] {

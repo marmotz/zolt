@@ -131,7 +131,7 @@ export interface FootnoteNode {
 export interface FootnoteDefinitionNode {
   type: 'FootnoteDefinition';
   id: string;
-  content: string;
+  children: ASTNode[];
 }
 
 export interface AbbreviationNode {
@@ -286,6 +286,7 @@ export interface DocumentNode {
   children: ASTNode[];
   frontmatter?: FrontmatterNode;
   sourceFile: string;
+  footnoteIds?: Set<string>;
 }
 
 export type ASTNode =

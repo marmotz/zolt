@@ -27,7 +27,8 @@ export class InlineVisitor {
     private joinChildren: (nodes: ASTNode[]) => string,
     private renderAllAttributes: (attrs?: any) => string,
     private processInline: (text: string) => string,
-    private evaluator: any
+    private evaluator: any,
+    private registerFootnoteRef: (id: string) => number
   ) {}
 
   public visit(node: ASTNode): string {
@@ -70,6 +71,8 @@ export class InlineVisitor {
         return this.visitExpression(node as any);
       case 'Abbreviation':
         return this.visitAbbreviation(node as any);
+      case 'Footnote':
+        return this.visitFootnote(node as any);
       case 'CommentInline':
         return '';
       default:
@@ -79,6 +82,12 @@ export class InlineVisitor {
 
   visitText(node: TextNode): string {
     return node.content;
+  }
+
+  visitFootnote(node: any): string {
+    const index = this.registerFootnoteRef(node.id);
+
+    return `<sup><a href="#fn:${node.id}" id="fnref:${node.id}">[${index}]</a></sup>`;
   }
 
   visitBold(node: BoldNode): string {
