@@ -11,6 +11,8 @@ describe('CLI', () => {
   const testDir = '/tmp/zolt-cli-test';
 
   beforeEach(async () => {
+    process.env.NO_COLOR = 'true';
+
     await mkdir(testDir, { recursive: true });
   });
 
@@ -62,6 +64,7 @@ describe('CLI', () => {
         proc.on('close', (code) => resolve({ output: data, exitCode: code ?? 1 }));
         proc.on('error', reject);
       });
+      console.log('Help output:', output);
       expect(output).toContain('Zolt - The high-voltage successor to Markdown');
       expect(exitCode).toBe(0);
     });
