@@ -28,7 +28,7 @@ export class HTMLBuilder implements Builder {
   private tableVisitor: TableVisitor;
   private specialBlockVisitor: SpecialBlockVisitor;
   private documentRenderer: DocumentRenderer;
-  private highlighter?: Highlighter;
+  private static highlighterPromise: Promise<Highlighter> | null = null;
   private projectGraph?: ProjectNode[];
   private currentFilePath?: string;
 
@@ -102,8 +102,8 @@ export class HTMLBuilder implements Builder {
   }
 
   private async ensureHighlighter(): Promise<Highlighter> {
-    if (!this.highlighter) {
-      this.highlighter = await createHighlighter({
+    if (!HTMLBuilder.highlighterPromise) {
+      HTMLBuilder.highlighterPromise = createHighlighter({
         themes: ['github-dark'],
         langs: [
           zoltLanguage,
@@ -127,7 +127,7 @@ export class HTMLBuilder implements Builder {
         ],
       });
     }
-    return this.highlighter;
+    return HTMLBuilder.highlighterPromise;
   }
 
   async build(node: ASTNode): Promise<string> {

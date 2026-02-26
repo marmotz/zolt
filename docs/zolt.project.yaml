@@ -1,6 +1,11 @@
 title: Zolt documentation
-author: Zolt Contributor
+author: Marmotz
 version: 0.3.0
 theme: technical
 image: ../resources/logo.png
 layout: _layout.zlt
+icon_png: "assets/favicons/favicon-96x96.png"
+icon_svg: "assets/favicons/favicon.svg"
+icon_ico: "favicon.ico"
+icon_apple: "assets/favicons/apple-touch-icon.png"
+manifest: "assets/favicons/site.webmanifest"

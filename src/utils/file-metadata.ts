@@ -18,6 +18,11 @@ export const KNOWN_METADATA_KEYS = new Set([
   'theme',
   'color-scheme',
   'layout',
+  'icon_png',
+  'icon_svg',
+  'icon_ico',
+  'icon_apple',
+  'manifest',
 ]);
 
 export function createFileDateVariables(metadata: FileMetadata): { created: string; modified: string } {

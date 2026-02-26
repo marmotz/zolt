@@ -9,7 +9,9 @@ lang: en
 
 # Zolt Documentation
 
-**Zolt** is a lightweight markup language designed to be fully readable as plain text while offering the semantic power of HTML5 and the precision of LaTeX. It combines the simplicity of Markdown with advanced features for professional documentation.
+**Zolt** is a markup language designed to be fully readable as plain text while offering the semantic power of HTML5 and
+the precision of LaTeX.
+It combines the simplicity of Markdown with advanced features for professional documentation.
 
 ---
 
@@ -18,14 +20,14 @@ lang: en
 New to Zolt? Start here:
 
 1. [Basic Syntax](basic-syntax.zlt) — Learn text formatting, typography, and inline styles
-2. [Lists](lists.zlt) — Bullet, numbered, task, and definition lists
-3. [Links & Media](links-media.zlt) — Hyperlinks, images, videos, and audio
+1. [Lists](lists.zlt) — Bullet, numbered, task, and definition lists
+1. [Links & Media](links-media.zlt) — Hyperlinks, images, videos, and audio
 
 ---
 
 ## Feature Overview
 
-Zolt extends Markdown with powerful features:
+Zolt comes with powerful features:
 
 | Feature | Syntax | Description |
 |---------|--------|-------------|
@@ -51,6 +53,16 @@ Zolt extends Markdown with powerful features:
 
 - [Tables](tables.zlt) — Grid tables with cell merging
 - [Semantic Blocks](blocks.zlt) — Tabs, accordions, columns, and callouts
+- [Citations & Technical Content](citations.zlt) — Blockquotes and technical indentation
+
+### Technical Features
+
+- [Code Blocks](code-blocks.zlt) — Syntax highlighting and code display
+- [Mathematical Formulas](math.zlt) — LaTeX equations with KaTeX
+
+### Reference
+
+- [Quick Reference](quick-reference.zlt) — Quick syntax lookup
 
 ### Dynamic Content
 

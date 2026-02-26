@@ -1,0 +1,224 @@
+---
+title: "Mathematical Formulas"
+description: "Write mathematical equations using LaTeX syntax in Zolt"
+---
+
+# Mathematical Formulas
+
+Zolt integrates **KaTeX** for high-performance mathematical rendering. You can use LaTeX syntax for both inline and block formulas.
+
+---
+
+## Inline Math
+
+Use single dollar signs `$` for inline formulas:
+
+```zolt
+The mass-energy equivalence is defined by $E = mc^2$.
+
+The Pythagorean theorem: $a^2 + b^2 = c^2$.
+
+Greek letters: $\alpha, \beta, \gamma, \Delta, \Omega$.
+```
+
+### Result
+
+- The mass-energy equivalence is defined by E = mc².
+- The Pythagorean theorem: a² + b² = c².
+- Greek letters: α, β, γ, Δ, Ω.
+
+---
+
+## Block Math
+
+Use double dollar signs `$$` for standalone block formulas:
+
+```zolt
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+```
+
+### Result
+
+∫(-∞ to ∞) e^(-x²) dx = √π
+
+---
+
+## Advanced Equations
+
+### Aligned Equations
+
+```zolt
+$$
+\begin{aligned}
+(a+b)^2 &= (a+b)(a+b) \\
+        &= a^2 + ab + ba + b^2 \\
+        &= a^2 + 2ab + b^2
+\end{aligned}
+$$
+```
+
+### Quadratic Formula
+
+```zolt
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+```
+
+---
+
+## Common Mathematical Symbols
+
+### Operations
+
+| Symbol | LaTeX | Example |
+|--------|-------|---------|
+| Fraction | `\frac{a}{b}` | ½ |
+| Square root | `\sqrt{x}` | √x |
+| nth root | `\sqrt[n]{x}` | ⁿ√x |
+| Power | `a^b` | aᵇ |
+| Subscript | `a_b` | aᵦ |
+
+### Greek Letters
+
+| Lowercase | LaTeX | Uppercase | LaTeX |
+|-----------|-------|-----------|-------|
+| α | `\alpha` | Α | `A` |
+| β | `\beta` | Β | `B` |
+| γ | `\gamma` | Γ | `\Gamma` |
+| δ | `\delta` | Δ | `\Delta` |
+| ε | `\epsilon` | Ε | `E` |
+| θ | `\theta` | Θ | `\Theta` |
+| λ | `\lambda` | Λ | `\Lambda` |
+| μ | `\mu` | Μ | `M` |
+| π | `\pi` | Π | `\Pi` |
+| σ | `\sigma` | Σ | `\Sigma` |
+| φ | `\phi` | Φ | `\Phi` |
+| ω | `\omega` | Ω | `\Omega` |
+
+### Relations
+
+| Symbol | LaTeX |
+|--------|-------|
+| ≠ | `\neq` |
+| ≤ | `\leq` |
+| ≥ | `\geq` |
+| ≈ | `\approx` |
+| ≡ | `\equiv` |
+| ∈ | `\in` |
+| ∉ | `\notin` |
+| ⊂ | `\subset` |
+| ∪ | `\cup` |
+| ∩ | `\cap` |
+
+### Calculus
+
+| Symbol | LaTeX |
+|--------|-------|
+| ∫ | `\int` |
+| ∮ | `\oint` |
+| ∂ | `\partial` |
+| ∇ | `\nabla` |
+| ∞ | `\infty` |
+| lim | `\lim` |
+| sum | `\sum` |
+| prod | `\prod` |
+
+---
+
+## Examples by Field
+
+### Physics
+
+**Einstein's Mass-Energy Equivalence:**
+
+```zolt
+$$E = mc^2$$
+```
+
+**Newton's Second Law:**
+
+```zolt
+$$F = ma$$
+```
+
+**Maxwell's Equations:**
+
+```zolt
+$$
+\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}
+$$
+```
+
+### Statistics
+
+**Normal Distribution:**
+
+```zolt
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
+$$
+```
+
+### Trigonometry
+
+```zolt
+| Function | Identity |
+| :--- | :--- |
+| Sine | $\sin^2\theta + \cos^2\theta = 1$ |
+| Tangent | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ |
+```
+
+### Linear Algebra
+
+**Matrix:**
+
+```zolt
+$$
+\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+$$
+```
+
+**Determinant:**
+
+```zolt
+$$
+\det(A) = ad - bc
+$$
+```
+
+---
+
+## Formulas with Attributes
+
+Apply Zolt attributes to formulas:
+
+```zolt
+Important formula: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ {#quadratic}
+```
+
+```zolt
+$$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$ {color=red}
+```
+
+---
+
+## Best Practices
+
+1. **Use inline math** for short formulas within text
+2. **Use block math** for complex equations
+3. **Escape dollar signs** with `\$` if needed literally
+4. **Test rendering** especially for complex LaTeX
+
+---
+
+## Next Steps
+
+- [Code Blocks](code-blocks.zlt) — Syntax highlighting
+- [Advanced Features](advanced.zlt) — Charts and data
+- [Variables](variables.zlt) — Calculations in Zolt

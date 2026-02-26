@@ -1,0 +1,193 @@
+---
+title: "Quick Reference"
+description: "Quick reference guide for Zolt syntax"
+---
+
+# Quick Reference
+
+This page provides a quick reference for common Zolt syntax patterns.
+
+---
+
+## Text Formatting
+
+| Zolt Syntax | Result |
+|-------------|--------|
+| `**bold**` | **bold** |
+| `//italic//` | *italic* |
+| `__underline__` | <u>underline</u> |
+| `~~strikethrough~~` | ~~strikethrough~~ |
+| `^{superscript}` | <sup>superscript</sup> |
+| `_{subscript}` | <sub>subscript</sub> |
+| `==highlight==` | <mark>highlight</mark> |
+
+---
+
+## Headings
+
+```zolt
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+```
+
+---
+
+## Lists
+
+| Type | Syntax |
+|------|--------|
+| Bullet | `- Item` |
+| Numbered | `1. Item` |
+| Task | `- [ ] Task` |
+| Definition | `: Term` |
+
+---
+
+## Links
+
+```zolt
+[Link](url)
+[Link](url){target=_blank}
+[Reference][ref]
+
+[ref]: url
+```
+
+---
+
+## Media
+
+| Type | Syntax |
+|------|--------|
+| Image | `![alt](image.jpg)` |
+| Video | `!![alt](video.mp4)` |
+| Audio | `??[alt](audio.mp3)` |
+| Embed | `@@[alt](youtube_url)` |
+| File | `&&[alt](file.pdf)` |
+
+---
+
+## Code
+
+```zolt
+`inline code`
+
+```language
+code block
+```
+```
+
+---
+
+## Attributes
+
+Apply to any element:
+
+```zolt
+Text{color=red}
+![img](img.jpg){w=200}
+## Heading{#id}
+```
+
+---
+
+## Variables
+
+```zolt
+$name = "value"
+{$name}
+{{ 10 + 5 }}
+```
+
+---
+
+## Blocks
+
+```zolt
+:::info [Title]
+Content
+:::
+
+:::tabs
+:::tab [Tab]
+Content
+:::
+:::
+```
+
+---
+
+## Tables
+
+```zolt
+[[table]]
+| Header | Header |
+| :--- | :--- |
+| Cell | Cell |
+[[/table]]
+```
+
+---
+
+## Math
+
+```zolt
+$inline$
+$$
+block
+$$
+```
+
+---
+
+## Common Attributes
+
+| Attribute | Example |
+|-----------|---------|
+| ID | `{#my-id}` |
+| Class | `{.my-class}` |
+| Color | `{color=red}` |
+| Style | `{background=yellow}` |
+| Width | `{w=200}` |
+
+---
+
+## Escape Characters
+
+| Syntax | Result |
+|--------|--------|
+| `\[` | [ |
+| `\{` | { |
+| `\*` | * |
+| `\\` | \ |
+
+---
+
+## Footnotes
+
+```zolt
+Text[^1]
+
+[^1]: Definition
+```
+
+---
+
+## Abbreviations
+
+```zolt
+HTML{abbr="HyperText Markup Language"}
+
+*[HTML]: HyperText Markup Language
+```
+
+---
+
+## Next Steps
+
+- [Index](index.zlt) — Back to documentation
+- [Basic Syntax](basic-syntax.zlt) — Full syntax guide

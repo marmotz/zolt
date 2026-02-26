@@ -1,0 +1,158 @@
+---
+title: "Code Blocks"
+description: "Display code with syntax highlighting in Zolt"
+---
+
+# Code Blocks
+
+Zolt supports code blocks with syntax highlighting for technical documentation.
+
+---
+
+## Basic Code Blocks
+
+Create code blocks using triple backticks:
+
+````zolt
+```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+```
+````
+
+### Language Support
+
+Specify the language after the opening backticks:
+
+| Language | Syntax |
+|----------|--------|
+| JavaScript | ` ```javascript ` |
+| Python | ` ```python ` |
+| TypeScript | ` ```typescript ` |
+| HTML | ` ```html ` |
+| CSS | ` ```css ` |
+| JSON | ` ```json ` |
+| Bash | ` ```bash ` |
+| SQL | ` ```sql ` |
+
+---
+
+## Code Block Attributes
+
+Apply attributes to code blocks:
+
+````zolt
+```python {title="main.py"}
+def hello():
+    print("Hello, World!")
+```
+````
+
+### Available Attributes
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `title` | Display title | `{title="main.py"}` |
+| `highlight` | Highlight lines | `{highlight=1,3-5}` |
+| `start` | Starting line number | `{start=10}` |
+
+### Example with Highlighting
+
+````zolt
+```javascript {highlight=2-4}
+function processData(data) {
+    const result = data.map(item => item.value);  // Highlighted
+    return result.filter(x => x > 0);             // Highlighted
+}
+```
+````
+
+### Example with Line Numbers
+
+````zolt
+```python {start=10}
+def calculate(a, b):
+    # This function adds two numbers
+    return a + b
+```
+````
+
+---
+
+## Inline Code
+
+Use single backticks for inline code:
+
+```zolt
+Use the `print()` function to output text.
+
+The `$variable` syntax is used for variables.
+```
+
+---
+
+## Code in Lists
+
+Combine code blocks with lists:
+
+```zolt
+To install the package:
+
+1. Run the command:
+   ```bash
+   npm install zolt-cli
+   ```
+
+2. Verify installation:
+   ```bash
+   zolt --version
+   ```
+
+3. Create a new project:
+   ```bash
+   zolt init my-project
+   ```
+```
+
+---
+
+## Technical Indentation
+
+Use `&` for terminal-style content without syntax highlighting:
+
+```zolt
+& $ npm install zolt
+& Added 45 packages in 3s
+& 
+& $ zolt build
+& Building...
+& Done!
+```
+
+### Nested Indentation
+
+```zolt
+& Installation
+&& Step 1: Download
+&& Step 2: Install
+& Configuration
+&& Edit config file
+```
+
+---
+
+## Best Practices
+
+1. **Specify language** for proper syntax highlighting
+2. **Use titles** for code block identification
+3. **Highlight key lines** for emphasis
+4. **Use inline code** for short snippets
+
+---
+
+## Next Steps
+
+- [Mathematical Formulas](math.zlt) — LaTeX math rendering
+- [Advanced Features](advanced.zlt) — Charts and loops
+- [Basic Syntax](basic-syntax.zlt) — More formatting options

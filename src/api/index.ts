@@ -180,6 +180,21 @@ export function extractAllAssets(
   if (projectMetadata?.image) {
     checkHref(projectMetadata.image);
   }
+  if (projectMetadata?.icon_png) {
+    checkHref(projectMetadata.icon_png);
+  }
+  if (projectMetadata?.icon_svg) {
+    checkHref(projectMetadata.icon_svg);
+  }
+  if (projectMetadata?.icon_ico) {
+    checkHref(projectMetadata.icon_ico);
+  }
+  if (projectMetadata?.icon_apple) {
+    checkHref(projectMetadata.icon_apple);
+  }
+  if (projectMetadata?.manifest) {
+    checkHref(projectMetadata.manifest);
+  }
   if (projectMetadata?.layout) {
     checkHref(projectMetadata.layout);
   }
@@ -187,6 +202,21 @@ export function extractAllAssets(
   // Check file metadata
   if (ast?.fileMetadata?.data.image) {
     checkHref(ast.fileMetadata.data.image);
+  }
+  if (ast?.fileMetadata?.data.icon_png) {
+    checkHref(ast.fileMetadata.data.icon_png);
+  }
+  if (ast?.fileMetadata?.data.icon_svg) {
+    checkHref(ast.fileMetadata.data.icon_svg);
+  }
+  if (ast?.fileMetadata?.data.icon_ico) {
+    checkHref(ast.fileMetadata.data.icon_ico);
+  }
+  if (ast?.fileMetadata?.data.icon_apple) {
+    checkHref(ast.fileMetadata.data.icon_apple);
+  }
+  if (ast?.fileMetadata?.data.manifest) {
+    checkHref(ast.fileMetadata.data.manifest);
   }
   if (ast?.fileMetadata?.data.layout) {
     checkHref(ast.fileMetadata.data.layout);

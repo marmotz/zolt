@@ -104,12 +104,27 @@ export class DocumentRenderer {
     if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
     metaTags += `  <meta property="og:type" content="website">\n`;
 
+    const iconPng = this.getMetadata('icon_png');
+    const iconSvg = this.getMetadata('icon_svg');
+    const iconIco = this.getMetadata('icon_ico');
+    const iconApple = this.getMetadata('icon_apple');
+    const manifest = this.getMetadata('manifest');
+
+    let linkTags = '';
+    if (iconPng)
+      linkTags += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
+    if (iconSvg) linkTags += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
+    if (iconIco) linkTags += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
+    if (iconApple)
+      linkTags += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
+    if (manifest) linkTags += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+
     return `<!DOCTYPE html>
 <html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-${metaTags}  <title>${title}</title>
+${metaTags}${linkTags}  <title>${title}</title>
 ${mathCss}  <style>
 ${DEFAULT_CSS}
   </style>
@@ -199,12 +214,27 @@ ${CODE_COPY_SCRIPT}
     if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
     metaTags += `  <meta property="og:type" content="website">\n`;
 
+    const iconPng = this.getMetadata('icon_png');
+    const iconSvg = this.getMetadata('icon_svg');
+    const iconIco = this.getMetadata('icon_ico');
+    const iconApple = this.getMetadata('icon_apple');
+    const manifest = this.getMetadata('manifest');
+
+    let linkTags = '';
+    if (iconPng)
+      linkTags += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
+    if (iconSvg) linkTags += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
+    if (iconIco) linkTags += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
+    if (iconApple)
+      linkTags += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
+    if (manifest) linkTags += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+
     return `<!DOCTYPE html>
 <html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-${metaTags}  <title>${title}</title>
+${metaTags}${linkTags}  <title>${title}</title>
 ${mathCss}  <style>
 ${DEFAULT_CSS}
   </style>
@@ -224,7 +254,17 @@ ${CODE_COPY_SCRIPT}
     let val = this.evaluator.getVariable(key);
     val = val !== null && val !== undefined ? val : defaultValue;
 
-    if (key === 'image' && typeof val === 'string' && val && this.assetResolver) {
+    if (
+      (key === 'image' ||
+        key === 'icon_png' ||
+        key === 'icon_svg' ||
+        key === 'icon_ico' ||
+        key === 'icon_apple' ||
+        key === 'manifest') &&
+      typeof val === 'string' &&
+      val &&
+      this.assetResolver
+    ) {
       if (!val.startsWith('http://') && !val.startsWith('https://') && !val.startsWith('/')) {
         return this.assetResolver(val);
       }
