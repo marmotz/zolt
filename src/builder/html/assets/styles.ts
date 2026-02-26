@@ -87,6 +87,7 @@ export const BASE_CSS = `
     text-underline-offset: 3px;
     cursor: help;
   }
+  
   .columns {
     display: flex;
     gap: 1.5rem;
@@ -97,13 +98,25 @@ export const BASE_CSS = `
     display: grid;
     grid-template-columns: repeat(var(--zolt-cols, 1), 1fr);
   }
-  .column { flex: 1 1 0; min-width: 0; }
+  .column {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  
   .triple-colon-block {
     padding: 1.2rem;
     margin: 1.5rem 0;
-    border-left: 4px solid var(--zlt-color-border);
     background: var(--zlt-color-block-bg);
-    border-radius: 4px;
+  }
+  .triple-colon-block.columns, .triple-colon-block.column {
+    background: var(--zlt-color-bg);
+  }
+  .triple-colon-block.column {
+    border-left: 1px solid var(--zlt-color-border);
+    margin: 0;
+  }
+  .triple-colon-block.column:first-child {
+    border-width: 0;
   }
   .triple-colon-block.info { border-left-color: #3b82f6; background: var(--zlt-color-info-bg); }
   .triple-colon-block.warning { border-left-color: #f59e0b; background: var(--zlt-color-warning-bg); }
