@@ -406,6 +406,11 @@ export const BASE_CSS = `
   .zolt-code-block .line {
     padding: 0 1rem;
     border-left: 3px solid transparent;
+    min-height: 1.5em; /* Ensure empty lines have height */
+  }
+
+  .zolt-code-block .line:empty::before {
+    content: "\\00a0"; /* Non-breaking space */
   }
 
   .zolt-code-block .line.highlight {

@@ -91,6 +91,6 @@ describe('SpecialBlockVisitor', () => {
     visitor.sidebarSide = 'right';
     visitor.reset();
     expect(visitor.hasSidebar).toBe(false);
-    expect(visitor.sidebarSide).toBe('left');
+    expect(visitor.sidebarSide as any).toBe('left');
   });
 });

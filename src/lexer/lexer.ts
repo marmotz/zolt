@@ -20,7 +20,7 @@ export class Lexer {
 
   tokenize(): Token[] {
     while (!this.isEof()) {
-      if (this.peekChar() === '\n') {
+      if (this.peekChar() === '\n' && this.state.mode !== 'CODE') {
         const line = this.line;
         const column = this.column;
         this.advanceChar();
