@@ -144,8 +144,7 @@ export class TableParser {
 
     // Remove leading and trailing pipes
     const content = line.replace(/^\|/, '').replace(/\|$/, '');
-    const cellContents = content.split('|');
-    const rawCells = cellContents.map((c) => c.trim());
+    const rawCells = this.splitCells(content);
 
     const cells: TableCellNode[] = rawCells.map((cell) => {
       let isHeader = false;
@@ -186,6 +185,60 @@ export class TableParser {
       },
       rawCells,
     };
+  }
+
+  private splitCells(content: string): string[] {
+    const cells: string[] = [];
+    let currentCell = '';
+    let inBackticks = false;
+    let backtickCount = 0;
+    let escaped = false;
+
+    for (let i = 0; i < content.length; i++) {
+      const char = content[i];
+
+      if (escaped) {
+        currentCell += char;
+        escaped = false;
+        continue;
+      }
+
+      if (char === '\\') {
+        escaped = true;
+        currentCell += char;
+        continue;
+      }
+
+      if (char === '`') {
+        let count = 1;
+        while (i + 1 < content.length && content[i + 1] === '`') {
+          count++;
+          i++;
+        }
+        const backticks = '`'.repeat(count);
+        currentCell += backticks;
+
+        if (!inBackticks) {
+          inBackticks = true;
+          backtickCount = count;
+        } else if (count === backtickCount) {
+          inBackticks = false;
+          backtickCount = 0;
+        }
+        continue;
+      }
+
+      if (char === '|' && !inBackticks) {
+        cells.push(currentCell.trim());
+        currentCell = '';
+      } else {
+        currentCell += char;
+      }
+    }
+
+    cells.push(currentCell.trim());
+
+    return cells;
   }
 
   private isSeparatorRow(rawCells: string[]): boolean {

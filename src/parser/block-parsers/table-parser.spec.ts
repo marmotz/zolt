@@ -76,4 +76,28 @@ describe('TableParser', () => {
     const table = ast.children[0] as any;
     expect(table.attributes?.id).toBe('my-table');
   });
+
+  test('should ignore pipes inside backticks', () => {
+    const input = '| Syntax | Result |\n| --- | --- |\n| `||` | pipe |';
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Table');
+    const table = ast.children[0] as any;
+    expect(table.rows[0].cells.length).toBe(2);
+  });
+
+  test('should ignore escaped pipes', () => {
+    const input = '| Syntax | Result |\n| --- | --- |\n| \\| | literal pipe |';
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('Table');
+    const table = ast.children[0] as any;
+    expect(table.rows[0].cells.length).toBe(2);
+  });
 });

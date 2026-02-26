@@ -118,6 +118,10 @@ export const BASE_CSS = `
   .triple-colon-block.column:first-child {
     border-width: 0;
   }
+  .triple-colon-block.info,
+  .triple-colon-block.warning,
+  .triple-colon-block.error,
+  .triple-colon-block.success { border-left: 4px solid; }
   .triple-colon-block.info { border-left-color: #3b82f6; background: var(--zlt-color-info-bg); }
   .triple-colon-block.warning { border-left-color: #f59e0b; background: var(--zlt-color-warning-bg); }
   .triple-colon-block.error { border-left-color: #ef4444; background: var(--zlt-color-error-bg); }
@@ -463,6 +467,8 @@ export const THEMES_CSS = `
     --zlt-color-table-header-bg: #f8f8f8;
     --zlt-color-shadow: rgba(0,0,0,0.05);
     --zlt-color-highlight-bg: #fffde7;
+    --zlt-color-error: #ef4444;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   /* Default Dark (Forced & Auto) */
@@ -488,6 +494,8 @@ export const THEMES_CSS = `
     --zlt-color-table-header-bg: #1e293b;
     --zlt-color-shadow: rgba(0,0,0,0.3);
     --zlt-color-highlight-bg: #3e3e10;
+    --zlt-color-error: #f87171;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -513,6 +521,8 @@ export const THEMES_CSS = `
       --zlt-color-table-header-bg: #1e293b;
       --zlt-color-shadow: rgba(0,0,0,0.3);
       --zlt-color-highlight-bg: #3e3e10;
+      --zlt-color-error: #f87171;
+      --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
     }
   }
 
@@ -532,6 +542,20 @@ export const THEMES_CSS = `
     --zlt-color-quote-border: #1a202c;
     --zlt-quote-font-style: italic;
     --zlt-color-block-bg: #edf2f7;
+    --zlt-color-info-bg: #e0f2fe;
+    --zlt-color-warning-bg: #fef3c7;
+    --zlt-color-error-bg: #fee2e2;
+    --zlt-color-success-bg: #dcfce7;
+    --zlt-color-text-soft: #4a5568;
+    --zlt-color-quote-text: #4a5568;
+    --zlt-color-code-bg: #f7fafc;
+    --zlt-color-code-text: #2d3748;
+    --zlt-color-table-header-bg: #edf2f7;
+    --zlt-color-primary-soft: rgba(26, 32, 44, 0.1);
+    --zlt-color-shadow: rgba(0, 0, 0, 0.1);
+    --zlt-color-highlight-bg: #fefcbf;
+    --zlt-color-error: #c53030;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   /* Professional Dark (Forced) */
@@ -549,6 +573,15 @@ export const THEMES_CSS = `
     --zlt-color-error-bg: #7f1d1d;
     --zlt-color-success-bg: #064e3b;
     --zlt-color-table-header-bg: #334155;
+    --zlt-color-text-soft: #94a3b8;
+    --zlt-color-quote-text: #94a3b8;
+    --zlt-color-code-bg: #0f172a;
+    --zlt-color-code-text: #e2e8f0;
+    --zlt-color-primary-soft: rgba(248, 250, 252, 0.1);
+    --zlt-color-shadow: rgba(0, 0, 0, 0.3);
+    --zlt-color-highlight-bg: #3e3e10;
+    --zlt-color-error: #f87171;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -566,6 +599,15 @@ export const THEMES_CSS = `
       --zlt-color-error-bg: #7f1d1d;
       --zlt-color-success-bg: #064e3b;
       --zlt-color-table-header-bg: #334155;
+      --zlt-color-text-soft: #94a3b8;
+      --zlt-color-quote-text: #94a3b8;
+      --zlt-color-code-bg: #0f172a;
+      --zlt-color-code-text: #e2e8f0;
+      --zlt-color-primary-soft: rgba(248, 250, 252, 0.1);
+      --zlt-color-shadow: rgba(0, 0, 0, 0.3);
+      --zlt-color-highlight-bg: #3e3e10;
+      --zlt-color-error: #f87171;
+      --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
     }
   }
 
@@ -582,6 +624,22 @@ export const THEMES_CSS = `
     --zlt-color-pre-bg: #000000;
     --zlt-color-pre-text: #48bb78;
     --zlt-color-block-bg: #ebf8ff;
+    --zlt-color-info-bg: #e0f2fe;
+    --zlt-color-warning-bg: #fff7ed;
+    --zlt-color-error-bg: #fff1f1;
+    --zlt-color-success-bg: #f0fdf4;
+    --zlt-color-text-soft: #4a5568;
+    --zlt-color-quote-bg: #edf2f7;
+    --zlt-color-quote-border: #3182ce;
+    --zlt-color-quote-text: #2d3748;
+    --zlt-color-code-bg: #e2e8f0;
+    --zlt-color-code-text: #2c5282;
+    --zlt-color-table-header-bg: #edf2f7;
+    --zlt-color-primary-soft: rgba(49, 130, 206, 0.1);
+    --zlt-color-shadow: rgba(0, 0, 0, 0.1);
+    --zlt-color-highlight-bg: #fefcbf;
+    --zlt-color-error: #e53e3e;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   /* Technical Dark (Forced) */
@@ -599,6 +657,15 @@ export const THEMES_CSS = `
     --zlt-color-error-bg: #490202;
     --zlt-color-success-bg: #033a16;
     --zlt-color-table-header-bg: #161b22;
+    --zlt-color-text-soft: #8b949e;
+    --zlt-color-quote-text: #8b949e;
+    --zlt-color-code-bg: #161b22;
+    --zlt-color-code-text: #79c0ff;
+    --zlt-color-primary-soft: rgba(74, 222, 128, 0.1);
+    --zlt-color-shadow: rgba(0, 0, 0, 0.5);
+    --zlt-color-highlight-bg: #3e3e10;
+    --zlt-color-error: #ff7b72;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -616,11 +683,21 @@ export const THEMES_CSS = `
       --zlt-color-error-bg: #490202;
       --zlt-color-success-bg: #033a16;
       --zlt-color-table-header-bg: #161b22;
+      --zlt-color-text-soft: #8b949e;
+      --zlt-color-quote-text: #8b949e;
+      --zlt-color-code-bg: #161b22;
+      --zlt-color-code-text: #79c0ff;
+      --zlt-color-primary-soft: rgba(74, 222, 128, 0.1);
+      --zlt-color-shadow: rgba(0, 0, 0, 0.5);
+      --zlt-color-highlight-bg: #3e3e10;
+      --zlt-color-error: #ff7b72;
+      --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
     }
   }
 
   /* --- THEME: PLAYFUL --- */
   body.theme-playful {
+    --zlt-font-headings: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
     --zlt-color-primary: #ec4899;
     --zlt-color-bg: #fffafb;
     --zlt-color-text: #4a5568;
@@ -629,6 +706,24 @@ export const THEMES_CSS = `
     --zlt-color-link: #db2777;
     --zlt-max-width: 750px;
     --zlt-color-block-bg: #fdf2f8;
+    --zlt-color-info-bg: #e0f2fe;
+    --zlt-color-warning-bg: #fffbeb;
+    --zlt-color-error-bg: #fff1f2;
+    --zlt-color-success-bg: #f0fdf4;
+    --zlt-color-text-soft: #718096;
+    --zlt-color-quote-bg: #fff5f7;
+    --zlt-color-quote-border: #ec4899;
+    --zlt-color-quote-text: #718096;
+    --zlt-color-code-bg: #fff5f7;
+    --zlt-color-code-text: #be185d;
+    --zlt-color-pre-bg: #1a202c;
+    --zlt-color-pre-text: #fbb6ce;
+    --zlt-color-table-header-bg: #fdf2f8;
+    --zlt-color-primary-soft: rgba(236, 72, 153, 0.1);
+    --zlt-color-shadow: rgba(236, 72, 153, 0.1);
+    --zlt-color-highlight-bg: #fefcbf;
+    --zlt-color-error: #e11d48;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   /* Playful Dark (Forced) */
@@ -645,6 +740,15 @@ export const THEMES_CSS = `
     --zlt-color-error-bg: #7f1d1d;
     --zlt-color-success-bg: #064e3b;
     --zlt-color-table-header-bg: #1a0b2e;
+    --zlt-color-text-soft: #a78bfa;
+    --zlt-color-quote-text: #a78bfa;
+    --zlt-color-code-bg: #1a0b2e;
+    --zlt-color-code-text: #ff71ce;
+    --zlt-color-primary-soft: rgba(255, 113, 206, 0.1);
+    --zlt-color-shadow: rgba(0, 0, 0, 0.4);
+    --zlt-color-highlight-bg: #3e3e10;
+    --zlt-color-error: #ff71ce;
+    --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -661,6 +765,15 @@ export const THEMES_CSS = `
       --zlt-color-error-bg: #7f1d1d;
       --zlt-color-success-bg: #064e3b;
       --zlt-color-table-header-bg: #1a0b2e;
+      --zlt-color-text-soft: #a78bfa;
+      --zlt-color-quote-text: #a78bfa;
+      --zlt-color-code-bg: #1a0b2e;
+      --zlt-color-code-text: #ff71ce;
+      --zlt-color-primary-soft: rgba(255, 113, 206, 0.1);
+      --zlt-color-shadow: rgba(0, 0, 0, 0.4);
+      --zlt-color-highlight-bg: #3e3e10;
+      --zlt-color-error: #ff71ce;
+      --zlt-font-mono: 'SF Mono', Monaco, Consolas, monospace;
     }
   }
 `;

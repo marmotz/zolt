@@ -171,6 +171,17 @@ describe('Parser', () => {
     expect((ast.children[0] as any).content).toBe('const x = 1;');
   });
 
+  test('should not interpret horizontal rules inside code blocks', () => {
+    const lexer = new Lexer('```zolt\n---\n***\n___\n```');
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    expect(ast.children[0].type).toBe('CodeBlock');
+    const codeBlock = ast.children[0] as any;
+    expect(codeBlock.content).toBe('---\n***\n___');
+  });
+
   test('should parse horizontal rule', () => {
     const lexer = new Lexer('---');
     const tokens = lexer.tokenize();

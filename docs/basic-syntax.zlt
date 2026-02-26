@@ -23,27 +23,6 @@ Zolt supports several inline text formatting options:
 | `_{text}` | <sub>subscript</sub> | Subscript (supports nesting) |
 | `==text==` | <mark>highlight</mark> | Native highlight |
 
-### Examples
-
-```zolt
-**Bold text**
-//Italic text//
-__Underlined text~~
-~~Strikethrough~~
-^{superscript}
-_{subscript}
-==highlighted==
-```
-
-Result:
-- **Bold text**
-- *Italic text*
-- <u>Underlined text</u>
-- ~~Strikethrough~~
-- <sup>superscript</sup>
-- <sub>subscript</sub>
-- <mark>highlighted</mark>
-
 ---
 
 ## Inline Styles
@@ -66,6 +45,14 @@ This is ||highlighted||{background=yellow}.
 This is ||bold and blue||{font-weight=bold color=blue}.
 ```
 
+:::info [Result]
+This is ||important||{color=red} text.
+
+This is ||highlighted||{background=yellow}.
+
+This is ||bold and blue||{font-weight=bold color=blue}.
+:::
+
 ### Common Attributes
 
 | Attribute | Description | Example |
@@ -87,6 +74,14 @@ This is ||bold and blue||{font-weight=bold color=blue}.
 ||$variable||{font-family=monospace background=#F3F4F6}
 ```
 
+:::info [Result]
+||Warning:||{color=red font-weight=bold} This action cannot be undone.
+
+||NEW||{background=blue color=white padding=2px 8px border-radius=12px}
+
+||$variable||{font-family=monospace background=#F3F4F6}
+:::
+
 ---
 
 ## Character Escaping
@@ -97,9 +92,9 @@ Display literal special characters using the backslash `\` character.
 
 | Syntax | Result |
 |--------|--------|
-| `\[text\]` | [text] |
-| `\{text\}` | {text} |
-| `\|\|text\|\|` | ||text|| |
+| `\[text]` | [text] |
+| `\{text}` | {text} |
+| `\|\|text\|\|` | \|\|text\|\| |
 | `\-` | - (not a list item) |
 | `\.` | . (not a list) |
 | `\\` | \ (literal backslash) |
@@ -107,9 +102,9 @@ Display literal special characters using the backslash `\` character.
 ### Examples
 
 ```zolt
-This is not a \[link\]
+This is not a \[link]
 
-This is not bold \*text\*
+This is not bold \**text\**
 
 Use the function \`print()\`
 
@@ -117,6 +112,18 @@ Literal pipe: \|
 
 Literal backslash: \\
 ```
+
+:::info [Result]
+This is not a \[link]
+
+This is not bold \**text\**
+
+Use the function \`print()\`
+
+Literal pipe: \|
+
+Literal backslash: \\
+:::
 
 ---
 
@@ -130,16 +137,33 @@ Add notes that won't appear in the rendered output.
 This is visible %% this is hidden %% text.
 ```
 
+:::info [Result]
+This is visible %% this is hidden %% text.
+:::
+
 ### Block Comments
 
 ```zolt
+Before
 :::comment
 This entire block
 is a comment
 and won't appear
 in the output.
 :::
+After
 ```
+
+:::info [Result]
+Before
+:::comment
+This entire block
+is a comment
+and won't appear
+in the output.
+:::
+After
+:::
 
 ---
 
@@ -155,17 +179,25 @@ Create visual separators between sections.
 ___    (thin)
 ```
 
+---
+***
+___
+
 ### With Attributes
 
 ```zolt
----{color=red style=dashed}
+--- {color=red style=dashed}
 
-***{color=blue}
+*** {color=blue}
 
 ___ {width=50% align=center}
 ```
 
----
+--- {color=red style=dashed}
+
+*** {color=blue}
+
+___ {width=50% align=center}
 
 ## Headings
 
@@ -181,6 +213,15 @@ Create document structure with headings.
 ##### Heading 5
 ###### Heading 6
 ```
+
+:::info [Result]
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+:::
 
 ### Heading Attributes
 
@@ -215,11 +256,3 @@ The parser processes elements in this order:
 2. Blocks `[[...]]` and `:::`
 3. Inline formatting (bold, italic, etc.)
 4. Attributes `{}` applied to the element on the left
-
----
-
-## Next Steps
-
-- [Lists](lists.zlt) — Learn about bullet, numbered, and task lists
-- [Links & Media](links-media.zlt) — Add links and media content
-- [Variables](variables.zlt) — Use variables for reusable content

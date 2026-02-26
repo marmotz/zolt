@@ -36,8 +36,8 @@ export const zoltLanguage = {
     },
     underline: {
       name: 'markup.underline.zolt',
-      begin: '__',
-      end: '__',
+      begin: '(?<!_)__(?!_)',
+      end: '(?<!_)__(?!_)',
       patterns: [{ include: '#inline' }],
     },
     strikethrough: {
@@ -212,7 +212,7 @@ export const zoltLanguage = {
     },
     {
       name: 'hr.zolt',
-      match: '^([-*_]){3,}\\s*$',
+      match: '^([-*_]){3,}(\\s|:|$).*$',
     },
     {
       name: 'keyword.control.table.zolt',

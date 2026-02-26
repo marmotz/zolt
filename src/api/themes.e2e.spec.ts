@@ -36,4 +36,18 @@ color-scheme: light
     const html = await buildString(content);
     expect(html).toContain('<body class="theme-playful color-scheme-light">');
   });
+
+  it('should contain the new semantic background variables in the styles', async () => {
+    const html = await buildString('# Test');
+    expect(html).toContain('--zlt-color-info-bg');
+    expect(html).toContain('--zlt-color-warning-bg');
+    expect(html).toContain('--zlt-color-error-bg');
+    expect(html).toContain('--zlt-color-success-bg');
+  });
+
+  it('should contain the new error and mono font variables in the styles', async () => {
+    const html = await buildString('# Test');
+    expect(html).toContain('--zlt-color-error:');
+    expect(html).toContain('--zlt-font-mono:');
+  });
 });
