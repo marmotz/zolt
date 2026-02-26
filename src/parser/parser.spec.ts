@@ -616,6 +616,7 @@ describe('Parser', () => {
         const lexer = new Lexer(`{{include ${includedFile}}}`);
         const tokens = lexer.tokenize();
         const parser = new Parser(tokens, mainFile);
+        parser.parse();
 
         expect(parser.warnings.length).toBeGreaterThan(0);
         expect(parser.warnings[0].message).toContain('Unknown metadata');

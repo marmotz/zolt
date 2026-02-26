@@ -36,7 +36,7 @@ describe('CLI Watch', () => {
           if (output.includes('Watching for changes')) {
             setTimeout(() => {
               resolve();
-            }, 500);
+            }, 100);
           }
         });
         proc.stderr.on('data', (data) => {
@@ -58,8 +58,8 @@ describe('CLI Watch', () => {
         let output = '';
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Change detected, rebuilding')) {
-            setTimeout(resolve, 500); // Rebuild might take longer
+          if (output.includes('Waiting for changes')) {
+            setTimeout(resolve, 100);
           }
         });
         proc.on('error', reject);
@@ -98,7 +98,7 @@ describe('CLI Watch', () => {
           if (output.includes('Watching for changes')) {
             setTimeout(() => {
               resolve();
-            }, 500);
+            }, 100);
           }
         });
         proc.stderr.on('data', (data) => {
@@ -120,8 +120,8 @@ describe('CLI Watch', () => {
         let output = '';
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Change detected, rebuilding')) {
-            setTimeout(resolve, 500); // Rebuild might take longer
+          if (output.includes('Waiting for changes')) {
+            setTimeout(resolve, 100);
           }
         });
         proc.on('error', reject);
@@ -160,7 +160,7 @@ describe('CLI Watch', () => {
           if (output.includes('Watching for changes')) {
             setTimeout(() => {
               resolve();
-            }, 500);
+            }, 100);
           }
         });
         proc.stderr.on('data', (data) => {
@@ -188,8 +188,8 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput += data.toString();
-          if (rebuildOutput.includes('Change detected, rebuilding')) {
-            setTimeout(resolve, 500);
+          if (rebuildOutput.includes('Waiting for changes')) {
+            setTimeout(resolve, 100);
           }
         });
         proc.stderr.on('data', (data) => {
@@ -232,7 +232,7 @@ describe('CLI Watch', () => {
         proc.stdout.on('data', (data) => {
           output += data.toString();
           if (output.includes('Watching for changes')) {
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 50);
           }
         });
         proc.stderr.on('data', (data) => {
@@ -251,8 +251,8 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput += data.toString();
-          if (rebuildOutput.includes('Change detected, rebuilding')) {
-            setTimeout(resolve, 1000);
+          if (rebuildOutput.includes('Waiting for changes')) {
+            setTimeout(resolve, 100);
           }
         });
         proc.on('error', reject);
@@ -270,8 +270,8 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput2 += data.toString();
-          if (rebuildOutput2.includes('Change detected, rebuilding')) {
-            setTimeout(resolve, 1000);
+          if (rebuildOutput2.includes('Waiting for changes')) {
+            setTimeout(resolve, 200);
           }
         });
         proc.on('error', reject);
@@ -310,7 +310,7 @@ describe('CLI Watch', () => {
               // Trigger a real change
               setTimeout(async () => {
                 await writeFile(inputFile, '# Main Updated\n![Image](image.jpg)');
-              }, 500);
+              }, 50);
             }
           }
         });
@@ -322,7 +322,7 @@ describe('CLI Watch', () => {
           } else if (buildCount === 2) {
             resolve();
           }
-        }, 2000);
+        }, 300);
 
         setTimeout(() => {
           if (buildCount === 2) {
@@ -330,7 +330,7 @@ describe('CLI Watch', () => {
           } else {
             reject(new Error(`Expected exactly 2 builds, got ${buildCount}`));
           }
-        }, 4000);
+        }, 600);
       });
     } finally {
       proc.kill('SIGINT');

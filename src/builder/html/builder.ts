@@ -18,7 +18,6 @@ export class HTMLBuilder implements Builder {
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
-  private currentFilePath: string = 'unknown';
 
   private blockVisitor: BlockVisitor;
   private inlineVisitor: InlineVisitor;
@@ -158,7 +157,6 @@ export class HTMLBuilder implements Builder {
     if (node.footnoteIds) {
       this.inlineParser.setFootnotes(node.footnoteIds);
     }
-    this.currentFilePath = node.sourceFile || 'unknown';
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children));
 
@@ -189,7 +187,6 @@ export class HTMLBuilder implements Builder {
     if (node.footnoteIds) {
       this.inlineParser.setFootnotes(node.footnoteIds);
     }
-    this.currentFilePath = node.sourceFile || 'unknown';
     this.currentHeadings.length = 0;
     this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children));
 
@@ -320,17 +317,15 @@ export class HTMLBuilder implements Builder {
       if (trimmed.startsWith('$')) {
         return true;
       }
+
       if (/[+\-*/%^]/.test(trimmed)) {
         const numOnly = /^-?\d+(?:\.\d+)?$/.test(trimmed);
         if (!numOnly) {
           return true;
         }
       }
-      if (/^(Math|List|String|Date)\.\w+\(/.test(trimmed)) {
-        return true;
-      }
 
-      return false;
+      return /^(Math|List|String|Date)\.\w+\(/.test(trimmed);
     };
 
     if (isExpression(value)) {

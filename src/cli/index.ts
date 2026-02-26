@@ -395,7 +395,7 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
                 isBuilding = false;
                 console.log(`\n${pc.cyan('Waiting for changes...')}`);
               }
-            }, 100);
+            }, 20);
           });
 
           watcher.on('error', () => {
