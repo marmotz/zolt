@@ -54,7 +54,7 @@ export function getExpandedContent(
     evaluator.setVariable(key, value);
   }
 
-  const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath);
+  const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath, [], undefined, false, true);
   return sourceEvaluator.evaluate(content);
 }
 
@@ -162,13 +162,19 @@ export function extractAllAssets(
   };
 
   // Check project metadata
-  if (projectMetadata && projectMetadata.image) {
+  if (projectMetadata?.image) {
     checkHref(projectMetadata.image);
+  }
+  if (projectMetadata?.layout) {
+    checkHref(projectMetadata.layout);
   }
 
   // Check file metadata
-  if (ast.fileMetadata && ast.fileMetadata.data && ast.fileMetadata.data.image) {
+  if (ast?.fileMetadata?.data.image) {
     checkHref(ast.fileMetadata.data.image);
+  }
+  if (ast?.fileMetadata?.data.layout) {
+    checkHref(ast.fileMetadata.data.layout);
   }
 
   const visit = (node: any) => {

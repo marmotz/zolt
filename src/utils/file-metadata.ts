@@ -17,6 +17,7 @@ export const KNOWN_METADATA_KEYS = new Set([
   'toc',
   'theme',
   'color-scheme',
+  'layout',
 ]);
 
 export function createFileDateVariables(metadata: FileMetadata): { created: string; modified: string } {

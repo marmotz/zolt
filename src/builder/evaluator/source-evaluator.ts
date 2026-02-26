@@ -8,13 +8,26 @@ export class SourceEvaluator {
   private contentProcessor: ContentProcessor;
   private filePath: string;
   private includeStack: string[];
+  private contentToInject?: string;
+  private isLayoutProcessing: boolean;
+  private allowLayout: boolean;
   private readonly MAX_INCLUDE_DEPTH = 10;
 
-  constructor(evaluator: ExpressionEvaluator, filePath: string = 'unknown', includeStack: string[] = []) {
+  constructor(
+    evaluator: ExpressionEvaluator,
+    filePath: string = 'unknown',
+    includeStack: string[] = [],
+    contentToInject?: string,
+    isLayoutProcessing: boolean = false,
+    allowLayout: boolean = false
+  ) {
     this.evaluator = evaluator;
     this.contentProcessor = new ContentProcessor(evaluator);
     this.filePath = filePath;
     this.includeStack = includeStack;
+    this.contentToInject = contentToInject;
+    this.isLayoutProcessing = isLayoutProcessing;
+    this.allowLayout = allowLayout;
   }
 
   evaluate(source: string): string {
@@ -32,6 +45,16 @@ export class SourceEvaluator {
     }
 
     let fileMetadataProcessed = false;
+    const metadataLines: string[] = [];
+    let rootLayout: string | undefined = undefined;
+
+    // Initial check for layout from project metadata
+    if (this.allowLayout && !this.isLayoutProcessing) {
+      const layoutVar = this.evaluator.getVariable('layout');
+      if (typeof layoutVar === 'string') {
+        rootLayout = layoutVar;
+      }
+    }
 
     while (i < lines.length) {
       const line = lines[i];
@@ -39,7 +62,6 @@ export class SourceEvaluator {
 
       // Handle file metadata (frontmatter) at the very beginning
       if (!fileMetadataProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
-        const metadataLines: string[] = [];
         metadataLines.push(line);
         i++;
         while (i < lines.length && lines[i].trim() !== '---') {
@@ -54,8 +76,14 @@ export class SourceEvaluator {
         // Process metadata to extract variables
         this.processMetadata(metadataLines);
 
-        // Keep metadata in the output for the Parser to handle properly later
-        result.push(...metadataLines);
+        // Update root layout if defined in file metadata
+        if (this.allowLayout && !this.isLayoutProcessing) {
+          const layoutVar = this.evaluator.getVariable('layout');
+          if (typeof layoutVar === 'string') {
+            rootLayout = layoutVar;
+          }
+        }
+
         fileMetadataProcessed = true;
         continue;
       }
@@ -77,37 +105,117 @@ export class SourceEvaluator {
         continue;
       }
 
-      if (trimmed.startsWith(':::foreach')) {
+      let processedLine = line;
+      if (this.contentToInject !== undefined && processedLine.includes(':::content')) {
+        processedLine = processedLine.replace(/:::content/g, this.contentToInject);
+      }
+
+      const trimmedProcessed = processedLine.trim();
+
+      if (trimmedProcessed.startsWith(':::foreach')) {
         const { blockLines, nextIndex } = this.collectBlock(lines, i);
-        const blockType = trimmed.substring(3).trim();
+        const blockType = trimmedProcessed.substring(3).trim();
         const expanded = this.evaluateForeach(blockType, blockLines.join('\n'));
         result.push(expanded);
         i = nextIndex;
-      } else if (trimmed.startsWith(':::if')) {
+      } else if (trimmedProcessed.startsWith(':::if')) {
         const { blockLines, nextIndex } = this.collectBlock(lines, i);
-        const condition = trimmed.substring(5).trim();
+        const condition = trimmedProcessed.substring(5).trim();
         if (this.contentProcessor.evaluateCondition(condition)) {
           result.push(this.evaluate(blockLines.join('\n')));
         }
         i = nextIndex;
-      } else if (trimmed.startsWith(':::include')) {
-        const rawPath = trimmed.substring(10).trim();
+      } else if (trimmedProcessed.startsWith(':::include')) {
+        const rawPath = trimmedProcessed.substring(10).trim();
         const includePath = this.contentProcessor.processContent(rawPath);
         const expanded = this.evaluateInclude(includePath);
         result.push(expanded);
         i++;
-      } else if (trimmed.startsWith(':::comment')) {
+      } else if (trimmedProcessed.startsWith(':::comment')) {
         const { nextIndex } = this.collectBlock(lines, i);
         i = nextIndex;
       } else {
         // Variable definitions or normal content
-        const processed = this.contentProcessor.processContent(line);
+        const processed = this.contentProcessor.processContent(processedLine);
         result.push(processed);
         i++;
       }
     }
 
-    return result.join('\n');
+    const expandedBody = result.join('\n');
+
+    // Only apply layout if we are allowed to (typically at the root level)
+    if (rootLayout) {
+      return this.evaluateLayout(rootLayout, expandedBody, metadataLines);
+    }
+
+    if (metadataLines.length > 0) {
+      return metadataLines.join('\n') + '\n' + expandedBody;
+    }
+
+    return expandedBody;
+  }
+
+  private evaluateLayout(layoutPath: string, contentToInject: string, documentMetadataLines: string[]): string {
+    const currentIncludeStack = [...this.includeStack];
+
+    if (this.filePath !== 'unknown') {
+      const absoluteFilePath = path.resolve(this.filePath);
+      if (!currentIncludeStack.includes(absoluteFilePath)) {
+        currentIncludeStack.push(absoluteFilePath);
+      }
+    }
+
+    const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
+    const targetPath = path.resolve(currentDir, layoutPath);
+
+    if (!fs.existsSync(targetPath)) {
+      const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+      return `${metadata}:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
+    }
+
+    try {
+      const layoutContent = fs.readFileSync(targetPath, 'utf8');
+
+      // We use the same evaluator so that variables from the document are preserved.
+      // We pass contentToInject so it can be replaced where :::content is.
+      const layoutEvaluator = new SourceEvaluator(
+        this.evaluator,
+        targetPath,
+        currentIncludeStack,
+        contentToInject,
+        true,
+        false
+      );
+      const expandedLayout = layoutEvaluator.evaluate(layoutContent);
+
+      // expandedLayout already contains layout's metadata at the top if it has any.
+      // We want to merge documentMetadataLines into it.
+      if (documentMetadataLines.length > 0) {
+        // If layout has metadata, they are at the beginning.
+        if (expandedLayout.startsWith('---\n')) {
+          const secondDashIndex = expandedLayout.indexOf('\n---', 4);
+          if (secondDashIndex !== -1) {
+            const layoutMetadataContent = expandedLayout.substring(4, secondDashIndex);
+            const layoutBody = expandedLayout.substring(secondDashIndex + 4);
+
+            // Merge: Document metadata after Layout metadata so they override.
+            // We strip '---' from documentMetadataLines if they are there.
+            const cleanDocMetadata = documentMetadataLines.filter((l) => l.trim() !== '---').join('\n');
+
+            return `---\n${layoutMetadataContent}\n${cleanDocMetadata}\n---${layoutBody}`;
+          }
+        }
+
+        // If layout has no metadata, just prepend document metadata.
+        return documentMetadataLines.join('\n') + '\n' + expandedLayout;
+      }
+
+      return expandedLayout;
+    } catch (err: any) {
+      const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+      return `${metadata}:::error Failed to process layout: ${layoutPath} (${err.message}):::\n${contentToInject}`;
+    }
   }
 
   private processMetadata(lines: string[]): void {
@@ -124,7 +232,17 @@ export class SourceEvaluator {
         const value = match[2].trim();
 
         // Use the evaluator to parse the value (handle numbers, booleans, strings)
-        this.evaluator.setVariable(key, this.evaluator.parseValue(value));
+        const parsedValue = this.evaluator.parseValue(value);
+
+        // If we are processing a layout, we don't want to override variables
+        // already set by the document or project metadata.
+        if (this.isLayoutProcessing) {
+          if (this.evaluator.getVariable(key) === undefined) {
+            this.evaluator.setVariable(key, parsedValue);
+          }
+        } else {
+          this.evaluator.setVariable(key, parsedValue);
+        }
       }
     }
   }
@@ -156,7 +274,14 @@ export class SourceEvaluator {
 
     try {
       const content = fs.readFileSync(targetPath, 'utf8');
-      const childEvaluator = new SourceEvaluator(this.evaluator, targetPath, currentIncludeStack);
+      const childEvaluator = new SourceEvaluator(
+        this.evaluator,
+        targetPath,
+        currentIncludeStack,
+        undefined,
+        false,
+        false
+      );
       return childEvaluator.evaluate(content);
     } catch (err: any) {
       return `:::error Failed to process include: ${includePath} (${err.message}):::`;

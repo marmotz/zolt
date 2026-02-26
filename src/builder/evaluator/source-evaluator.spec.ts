@@ -199,4 +199,60 @@ End`;
     const result = sourceEvaluator.evaluate(':::include file0.zlt');
     expect(result).toContain('Max inclusion depth reached');
   });
+
+  test('should handle layout injection', () => {
+    const layoutPath = path.join(tempDir, 'layout.zlt');
+    fs.writeFileSync(layoutPath, 'Header\n:::content\nFooter');
+
+    const evaluator = new ExpressionEvaluator();
+    evaluator.setVariable('layout', 'layout.zlt');
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'), [], undefined, false, true);
+
+    const result = sourceEvaluator.evaluate('My Content');
+    expect(result).toBe('Header\nMy Content\nFooter');
+  });
+
+  test('should merge metadata between document and layout', () => {
+    const layoutPath = path.join(tempDir, 'layout.zlt');
+    fs.writeFileSync(
+      layoutPath,
+      `---
+title: Layout Title
+theme: dark
+---
+:::content`
+    );
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'), [], undefined, false, true);
+
+    const input = `---
+layout: layout.zlt
+title: Doc Title
+---
+Content`;
+
+    const result = sourceEvaluator.evaluate(input);
+
+    // Metadata should be merged, with document metadata taking priority
+    expect(result).toContain('---');
+    expect(result).toContain('title: Layout Title');
+    expect(result).toContain('theme: dark');
+    expect(result).toContain('layout: layout.zlt');
+    expect(result).toContain('title: Doc Title'); // Overrides Layout Title
+    expect(result).toContain('Content');
+  });
+
+  test('should replace multiple :::content tags (if present)', () => {
+    const layoutPath = path.join(tempDir, 'layout.zlt');
+    fs.writeFileSync(layoutPath, 'Content 1: :::content\nContent 2: :::content');
+
+    const evaluator = new ExpressionEvaluator();
+    evaluator.setVariable('layout', 'layout.zlt');
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'), [], undefined, false, true);
+
+    const result = sourceEvaluator.evaluate('My Content');
+    expect(result).toContain('Content 1: My Content');
+    expect(result).toContain('Content 2: My Content');
+  });
 });

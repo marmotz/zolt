@@ -415,8 +415,8 @@
 ### Documentation creator
 
 - [x] Rename frontmatter to file metadata
-- [ ] Project metadata file
-- [ ] new layout metadata to set layout of current file (in file metadata) or globally (in project metadata file)
+- [x] Project metadata file
+- [x] new layout metadata to set layout of current file (in file metadata) or globally (in project metadata file)
 - [ ] new sidebar markup to define sidebar structure
 - [ ] new filetree markup to display file tree based on the dependencies of the input file
 
