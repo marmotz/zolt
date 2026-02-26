@@ -1,6 +1,6 @@
 import { ASTNode, DocumentNode } from '../parser/types';
 
 export interface Builder {
-  build(node: ASTNode): string;
-  buildDocument(node: DocumentNode): string;
+  build(node: ASTNode): Promise<string>;
+  buildDocument(node: DocumentNode): Promise<string>;
 }

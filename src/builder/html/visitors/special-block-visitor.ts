@@ -10,10 +10,11 @@ export class SpecialBlockVisitor {
   public sidebarSide: 'left' | 'right' = 'left';
 
   constructor(
-    private joinChildren: (nodes: ASTNode[]) => string,
+    private joinChildren: (nodes: ASTNode[]) => Promise<string>,
+    private joinInlineChildren: (nodes: ASTNode[]) => Promise<string>,
     private renderAllAttributes: (attrs?: any) => string,
     private evaluator: any,
-    private processInlineContent: (text: string) => string,
+    private processInlineContent: (text: string) => Promise<string>,
     private currentHeadings: HeadingNode[],
     private projectGraph?: any,
     private currentFilePath?: string
@@ -28,13 +29,13 @@ export class SpecialBlockVisitor {
     this.sidebarSide = 'left';
   }
 
-  visitTripleColonBlock(node: TripleColonBlockNode): string {
+  async visitTripleColonBlock(node: TripleColonBlockNode): Promise<string> {
     if (node.blockType === 'tabs') {
-      return this.visitTabsBlock(node);
+      return await this.visitTabsBlock(node);
     }
 
     if (node.blockType === 'tab') {
-      return this.visitTabBlock(node);
+      return await this.visitTabBlock(node);
     }
 
     if (node.blockType === 'sidebar') {
@@ -42,7 +43,7 @@ export class SpecialBlockVisitor {
       const side = node.attributes?.side === 'right' ? 'right' : 'left';
       this.sidebarSide = side;
       const attrs = this.renderAllAttributes(node.attributes);
-      const childrenHtml = this.joinChildren(node.children);
+      const childrenHtml = await this.joinChildren(node.children);
       return `<aside${attrs} class="zolt-sidebar zolt-sidebar-${side}" data-type="sidebar">\n${childrenHtml}\n</aside>`;
     }
 
@@ -52,16 +53,16 @@ export class SpecialBlockVisitor {
       node.blockType === 'sidebar-footer'
     ) {
       const attrs = this.renderAllAttributes(node.attributes);
-      const childrenHtml = this.joinChildren(node.children);
+      const childrenHtml = await this.joinChildren(node.children);
       return `<div${attrs} class="zolt-${node.blockType}">\n${childrenHtml}\n</div>`;
     }
 
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     if (node.blockType === 'details') {
       const open = node.attributes?.open === 'true' ? ' open' : '';
       const attrs = this.renderAllAttributes(node.attributes);
-      const title = node.title ? this.processInlineContent(node.title) : 'Details';
+      const title = node.title ? await this.processInlineContent(node.title) : 'Details';
 
       return `<details${attrs}${open} class="triple-colon-block details" data-type="details">\n  <summary>${title}</summary>\n  <div class="details-content">\n${childrenHtml}\n  </div>\n</details>`;
     }
@@ -90,7 +91,7 @@ export class SpecialBlockVisitor {
 
     let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
     if (node.title && node.blockType !== 'column' && node.blockType !== 'columns') {
-      const title = this.processInlineContent(node.title);
+      const title = await this.processInlineContent(node.title);
       html += `<div class="block-title">${title}</div>\n`;
     }
     html += `${childrenHtml}\n</div>`;
@@ -98,7 +99,7 @@ export class SpecialBlockVisitor {
     return html;
   }
 
-  private visitTabsBlock(node: TripleColonBlockNode): string {
+  private async visitTabsBlock(node: TripleColonBlockNode): Promise<string> {
     this.hasTabs = true;
     const tabsId = `zolt-tabs-${this.tabsCounter++}`;
     const defaultTab = node.attributes?.default || null;
@@ -126,48 +127,49 @@ export class SpecialBlockVisitor {
       }
     });
 
-    tabChildren.forEach((tab, index) => {
+    for (let index = 0; index < tabChildren.length; index++) {
+      const tab = tabChildren[index];
       const panelId = `${tabsId}-panel-${index}`;
       const buttonId = `${tabsId}-button-${index}`;
       const isActive = index === activeIndex;
       const title = tab.title || `Tab ${index + 1}`;
 
       buttons.push(
-        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${this.processInlineContent(title)}</button>`
+        `    <button id="${buttonId}" class="zolt-tab-button${isActive ? ' active' : ''}" role="tab" aria-selected="${isActive}" aria-controls="${panelId}" data-tab-index="${index}">${await this.processInlineContent(title)}</button>`
       );
 
-      const tabContent = this.joinChildren(tab.children);
+      const tabContent = await this.joinChildren(tab.children);
       panels.push(
         `  <div id="${panelId}" class="zolt-tab-panel${isActive ? ' active' : ''}" role="tabpanel" aria-labelledby="${buttonId}" data-tab-index="${index}">\n${tabContent}\n  </div>`
       );
-    });
+    }
 
     const defaultAttr = defaultTab ? ` data-default="${defaultTab}"` : '';
 
     return `<div id="${tabsId}" class="zolt-tabs"${defaultAttr}>\n  <div class="zolt-tab-list" role="tablist">\n${buttons.join('\n')}\n  </div>\n${panels.join('\n')}\n</div>`;
   }
 
-  private visitTabBlock(node: TripleColonBlockNode): string {
-    const childrenHtml = this.joinChildren(node.children);
+  private async visitTabBlock(node: TripleColonBlockNode): Promise<string> {
+    const childrenHtml = await this.joinChildren(node.children);
     const activeAttr = node.attributes?.active === 'true' ? ' data-active="true"' : '';
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="zolt-tab-placeholder"${activeAttr} data-type="tab">\n${childrenHtml}\n</div>`;
   }
 
-  visitDoubleBracketBlock(node: DoubleBracketBlockNode): string {
+  async visitDoubleBracketBlock(node: DoubleBracketBlockNode): Promise<string> {
     if (node.blockType === 'toc') {
-      return this.visitToc(node);
+      return await this.visitToc(node);
     }
     if (node.blockType === 'filetree') {
-      return this.visitFileTree(node);
+      return await this.visitFileTree(node);
     }
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
   }
 
-  private visitFileTree(node: DoubleBracketBlockNode): string {
+  private async visitFileTree(node: DoubleBracketBlockNode): Promise<string> {
     if (!this.projectGraph) {
       return '<div class="zolt-filetree-error">Project graph not available. Please specify an entry point.</div>';
     }
@@ -218,7 +220,7 @@ export class SpecialBlockVisitor {
     return html;
   }
 
-  private visitToc(node: DoubleBracketBlockNode): string {
+  private async visitToc(node: DoubleBracketBlockNode): Promise<string> {
     const fromAttr = node.attributes?.from;
     const toAttr = node.attributes?.to;
     const depthAttr = node.attributes?.depth;
@@ -253,7 +255,7 @@ export class SpecialBlockVisitor {
       return '';
     }
 
-    const tocHtml = this.buildTocTree(filteredHeadings, from, numbered);
+    const tocHtml = await this.buildTocTree(filteredHeadings, from, numbered);
     const classAttr = ` class="zolt-toc${customClass ? ' ' + customClass : ''}"`;
 
     const cleanAttrs: Attributes = { ...node.attributes };
@@ -268,7 +270,7 @@ export class SpecialBlockVisitor {
     return `<nav${attrs}${classAttr}>\n${tocHtml}\n</nav>`;
   }
 
-  private buildTocTree(headings: HeadingNode[], from: number, numbered: boolean): string {
+  private async buildTocTree(headings: HeadingNode[], from: number, numbered: boolean): Promise<string> {
     let html = '<ul>\n';
     const counters: number[] = new Array(7).fill(0);
     let currentDepth = 0;
@@ -309,7 +311,7 @@ export class SpecialBlockVisitor {
         numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
       }
 
-      const renderedContent = this.joinChildren(h.children).trim();
+      const renderedContent = (await this.joinInlineChildren(h.children)).trim();
       const textContent = renderedContent.replace(/<[^>]+>/g, '').trim();
       const id = h.attributes?.id || slugify(textContent);
 
@@ -371,7 +373,7 @@ export class SpecialBlockVisitor {
 
     const dataJson = JSON.stringify(series.data);
 
-    return `  <div${attrs}${titleAttr}${schemeAttr}${legendAttr}${gridAttr}${stackedAttr}\n       class="zolt-chart-series"\n       data-chart-type="${series.chartType}"\n       data-data='${this.escapeHtml(dataJson)}'>\n  </div>`;
+    return `  <div${attrs}${titleAttr}${schemeAttr}${legendAttr}${gridAttr}${stackedAttr}\n       class="zolt-chart-series"\n       data-chart-type="${series.chartType}"\n       data-data='${dataJson}'>\n  </div>`;
   }
 
   visitMermaid(node: any): string {

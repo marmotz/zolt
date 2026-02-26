@@ -4,56 +4,56 @@ import { extractZltLinks, getLinkedFiles } from './index';
 
 describe('API: Links', () => {
   describe('extractZltLinks', () => {
-    test('should extract single .zlt link', () => {
+    test('should extract single .zlt link', async () => {
       const content = '[Link](file.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['file.zlt']);
     });
 
-    test('should extract multiple .zlt links', () => {
+    test('should extract multiple .zlt links', async () => {
       const content = '[Link1](file1.zlt) and [Link2](file2.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['file1.zlt', 'file2.zlt']);
     });
 
-    test('should not extract http links', () => {
+    test('should not extract http links', async () => {
       const content = '[Google](https://google.com) and [Link](file.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['file.zlt']);
     });
 
-    test('should not extract anchor links', () => {
+    test('should not extract anchor links', async () => {
       const content = '[Anchor](#section) and [Link](file.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['file.zlt']);
     });
 
-    test('should deduplicate links', () => {
+    test('should deduplicate links', async () => {
       const content = '[Link1](file.zlt) and [Link2](file.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['file.zlt']);
     });
 
-    test('should return empty array for no links', () => {
+    test('should return empty array for no links', async () => {
       const content = 'No links here';
       const links = extractZltLinks(content);
 
       expect(links).toEqual([]);
     });
 
-    test('should extract links in list items', () => {
+    test('should extract links in list items', async () => {
       const content = '- [item 1](item1.zlt)\n- [item 2](item2.zlt)';
       const links = extractZltLinks(content);
 
       expect(links).toEqual(['item1.zlt', 'item2.zlt']);
     });
 
-    test('should not be greedy with spaces and text between links', () => {
+    test('should not be greedy with spaces and text between links', async () => {
       const content = '- [link1](file1.zlt) — some description\n- [link2](file2.zlt)';
       const links = extractZltLinks(content);
       expect(links).toEqual(['file1.zlt', 'file2.zlt']);

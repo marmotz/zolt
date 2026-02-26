@@ -25,40 +25,40 @@ import { formatValue, transformHref } from '../utils/string-utils';
 
 export class InlineVisitor {
   constructor(
-    private joinChildren: (nodes: ASTNode[]) => string,
+    private joinChildren: (nodes: ASTNode[]) => Promise<string>,
     private renderAllAttributes: (attrs?: any) => string,
-    private processInline: (text: string) => string,
+    private processInline: (text: string) => Promise<string>,
     private evaluator: any,
     private registerFootnoteRef: (id: string) => { index: number; refId: string },
     private assetResolver?: (path: string) => string
   ) {}
 
-  public visit(node: ASTNode): string {
+  public async visit(node: ASTNode): Promise<string> {
     switch (node.type) {
       case 'Text':
         return this.visitText(node as any);
       case 'Bold':
-        return this.visitBold(node as any);
+        return await this.visitBold(node as any);
       case 'Italic':
-        return this.visitItalic(node as any);
+        return await this.visitItalic(node as any);
       case 'Underline':
-        return this.visitUnderline(node as any);
+        return await this.visitUnderline(node as any);
       case 'Strikethrough':
-        return this.visitStrikethrough(node as any);
+        return await this.visitStrikethrough(node as any);
       case 'Code':
         return this.visitCode(node as any);
       case 'Superscript':
-        return this.visitSuperscript(node as any);
+        return await this.visitSuperscript(node as any);
       case 'Subscript':
-        return this.visitSubscript(node as any);
+        return await this.visitSubscript(node as any);
       case 'Highlight':
-        return this.visitHighlight(node as any);
+        return await this.visitHighlight(node as any);
       case 'InlineStyle':
-        return this.visitInlineStyle(node as any);
+        return await this.visitInlineStyle(node as any);
       case 'LineBreak':
         return this.visitLineBreak();
       case 'Link':
-        return this.visitLink(node as any);
+        return await this.visitLink(node as any);
       case 'Image':
         return this.visitImage(node as any);
       case 'Video':
@@ -101,30 +101,30 @@ export class InlineVisitor {
     return `<sup><a href="#fn:${node.id}" id="fnref:${refId}"${attrs}>[${index}]</a></sup>`;
   }
 
-  visitBold(node: BoldNode): string {
+  async visitBold(node: BoldNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<strong${attrs}>${childrenHtml}</strong>`;
   }
 
-  visitItalic(node: ItalicNode): string {
+  async visitItalic(node: ItalicNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<em${attrs}>${childrenHtml}</em>`;
   }
 
-  visitUnderline(node: UnderlineNode): string {
+  async visitUnderline(node: UnderlineNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<u${attrs}>${childrenHtml}</u>`;
   }
 
-  visitStrikethrough(node: StrikethroughNode): string {
+  async visitStrikethrough(node: StrikethroughNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<del${attrs}>${childrenHtml}</del>`;
   }
@@ -135,23 +135,23 @@ export class InlineVisitor {
     return `<code${attrs}>${node.content}</code>`;
   }
 
-  visitSuperscript(node: SuperscriptNode): string {
+  async visitSuperscript(node: SuperscriptNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<sup${attrs}>${childrenHtml}</sup>`;
   }
 
-  visitSubscript(node: SubscriptNode): string {
+  async visitSubscript(node: SubscriptNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<sub${attrs}>${childrenHtml}</sub>`;
   }
 
-  visitHighlight(node: HighlightNode): string {
+  async visitHighlight(node: HighlightNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<mark${attrs}>${childrenHtml}</mark>`;
   }
@@ -174,22 +174,20 @@ export class InlineVisitor {
     }
   }
 
-  visitInlineStyle(node: InlineStyleNode): string {
+  async visitInlineStyle(node: InlineStyleNode): Promise<string> {
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<span${attrs}>${childrenHtml}</span>`;
   }
 
-  visitLink(node: LinkNode): string {
+  async visitLink(node: LinkNode): Promise<string> {
     const nodeAttrs = { ...node.attributes };
 
-    // If title property is present and not already in attributes, add it to attributes
     if (node.title && !nodeAttrs.title) {
       nodeAttrs.title = node.title;
     }
 
-    // Add rel="noopener" for target="_blank"
     if (nodeAttrs.target === '_blank') {
       const currentRel = nodeAttrs.rel || '';
       if (!currentRel.includes('noopener')) {
@@ -210,7 +208,7 @@ export class InlineVisitor {
       href = transformHref(href);
     }
 
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
 
     return `<a href="${href}"${attrs}>${childrenHtml}</a>`;
   }
@@ -234,7 +232,6 @@ export class InlineVisitor {
     const isRemote = src.startsWith('http://') || src.startsWith('https://');
     const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    // Detect if it's an embeddable remote video
     const youtubeMatch = resolvedSrc.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/
     );
@@ -282,7 +279,6 @@ export class InlineVisitor {
     const isRemote = src.startsWith('http://') || src.startsWith('https://');
     const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    // Add standard permissions for common embed types if not present
     const isVideoEmbed =
       resolvedSrc.includes('youtube.com') ||
       resolvedSrc.includes('vimeo.com') ||
@@ -300,7 +296,6 @@ export class InlineVisitor {
   visitFile(node: FileNode): string {
     const nodeAttrs: any = { ...node.attributes, target: '_blank' };
 
-    // Add rel="noopener" for target="_blank"
     const currentRel = nodeAttrs.rel || '';
     if (!currentRel.includes('noopener')) {
       nodeAttrs.rel = currentRel ? `${currentRel} noopener` : 'noopener';
@@ -373,7 +368,6 @@ export class InlineVisitor {
   }
 
   private evaluateString(text: string): string {
-    // Basic evaluation for string attributes that might contain variables
     return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/g, (_, name) => {
       try {
         const val = this.evaluator.evaluate('$' + name);

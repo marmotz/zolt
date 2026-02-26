@@ -7,7 +7,7 @@ describe('DocumentRenderer', () => {
   const evaluator = new ExpressionEvaluator();
   const renderer = new DocumentRenderer(evaluator);
 
-  test('should render empty document shell', () => {
+  test('should render empty document shell', async () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
@@ -32,7 +32,7 @@ describe('DocumentRenderer', () => {
     expect(html).toContain('<title>Document</title>');
   });
 
-  test('should include scripts when needed', () => {
+  test('should include scripts when needed', async () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],
@@ -57,7 +57,7 @@ describe('DocumentRenderer', () => {
     expect(html).toContain('mermaid');
   });
 
-  test('should wrap content when sidebar is present', () => {
+  test('should wrap content when sidebar is present', async () => {
     const node: DocumentNode = {
       type: 'Document',
       children: [],

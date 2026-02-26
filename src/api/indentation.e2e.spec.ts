@@ -1,17 +1,5 @@
 import { expect, test } from 'bun:test';
-import { HTMLBuilder } from '../builder/html/builder';
-import { Lexer } from '../lexer/lexer';
-import { Parser } from '../parser/parser';
-
-async function buildString(input: string): Promise<string> {
-  const lexer = new Lexer(input);
-  const tokens = lexer.tokenize();
-  const parser = new Parser(tokens);
-  const ast = parser.parse();
-  const builder = new HTMLBuilder();
-
-  return builder.visitDocument(ast);
-}
+import { buildString } from './index';
 
 test('should build simple technical indentation', async () => {
   const html = await buildString('& Indented text');

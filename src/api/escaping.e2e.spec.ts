@@ -33,7 +33,9 @@ describe('E2E: Escaping', () => {
   test('should handle escaped line breaks', async () => {
     const input = 'Line 1\\nLine 2';
     const html = await buildString(input);
-    expect(html).toContain('Line 1<br />Line 2');
+    expect(html).toContain('Line 1');
+    expect(html).toContain('<br />');
+    expect(html).toContain('Line 2');
   });
 
   test('should escape attribute braces', async () => {

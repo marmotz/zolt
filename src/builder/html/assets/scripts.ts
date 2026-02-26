@@ -263,3 +263,26 @@ export const MERMAID_SCRIPT = `
       });
     });
   </script>`;
+
+export const CODE_COPY_SCRIPT = `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.zolt-copy-button').forEach(function(button) {
+        button.addEventListener('click', function() {
+          var codeBlock = this.closest('.zolt-code-block');
+          var code = codeBlock.querySelector('code').innerText;
+          
+          navigator.clipboard.writeText(code).then(function() {
+            var originalText = button.innerText;
+            button.innerText = 'Copié !';
+            button.classList.add('copied');
+            
+            setTimeout(function() {
+              button.innerText = originalText;
+              button.classList.remove('copied');
+            }, 2000);
+          });
+        });
+      });
+    });
+  </script>`;

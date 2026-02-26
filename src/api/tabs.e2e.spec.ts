@@ -88,8 +88,8 @@ print("hello")
 :::`;
     const html = await buildString(input);
     expect(html).toContain('class="zolt-tabs"');
-    expect(html).toContain('class="language-javascript"');
-    expect(html).toContain('class="language-python"');
+    expect(html).toContain('zolt-tabs-0-panel-0');
+    expect(html).toContain('zolt-tabs-0-panel-1');
   });
 
   test('should handle nested content in tabs', async () => {

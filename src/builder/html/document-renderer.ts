@@ -1,6 +1,6 @@
 import { ASTNode, DocumentNode, HeadingNode } from '../../parser/types';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
-import { ANCHOR_SCRIPT, CHART_SCRIPT, MERMAID_SCRIPT, TABS_SCRIPT } from './assets/scripts';
+import { ANCHOR_SCRIPT, CHART_SCRIPT, CODE_COPY_SCRIPT, MERMAID_SCRIPT, TABS_SCRIPT } from './assets/scripts';
 import { DEFAULT_CSS } from './assets/styles';
 
 export interface DocumentRendererOptions {
@@ -120,6 +120,7 @@ ${tabsScript}
 ${anchorScript}
 ${chartScript}
 ${mermaidScript}
+${CODE_COPY_SCRIPT}
 </body>
 </html>`;
   }
@@ -214,6 +215,7 @@ ${tabsScript}
 ${anchorScript}
 ${chartScript}
 ${mermaidScript}
+${CODE_COPY_SCRIPT}
 </body>
 </html>`;
   }

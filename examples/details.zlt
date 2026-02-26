@@ -100,7 +100,7 @@ def hello():
 :::
 
 :::details [Show JavaScript Example]
-```javascript
+```javascript {title="Un super code JS" highlight=11 start=10}
 function hello() {
     console.log("Hello, World!");
 }

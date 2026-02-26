@@ -48,6 +48,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "katex": "^0.16.33",
-    "picocolors": "^1.1.1"
+    "picocolors": "^1.1.1",
+    "shiki": "^3.23.0"
   }
 }

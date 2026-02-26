@@ -5,7 +5,7 @@ import { HTMLBuilder } from './builder';
 describe('HTMLBuilder Image Alignment', () => {
   const builder = new HTMLBuilder();
 
-  test('should apply text-align: center to paragraph when it contains only an image with align=center', () => {
+  test('should apply text-align: center to paragraph when it contains only an image with align=center', async () => {
     const imageNode: ImageNode = {
       type: 'Image',
       src: 'img.jpg',
@@ -18,7 +18,7 @@ describe('HTMLBuilder Image Alignment', () => {
       children: [imageNode],
     };
 
-    const html = builder.build(paragraphNode);
+    const html = await builder.build(paragraphNode);
     // The style attribute might be rendered with or without spaces depending on implementation details
     // but based on my code: node.attributes.style = `${currentStyle}text-align: center`;
     // and renderAllAttributes probably adds style="..."
@@ -27,7 +27,7 @@ describe('HTMLBuilder Image Alignment', () => {
     expect(html).not.toContain('align="center"');
   });
 
-  test('should not apply text-align: center if paragraph has other content', () => {
+  test('should not apply text-align: center if paragraph has other content', async () => {
     const imageNode: ImageNode = {
       type: 'Image',
       src: 'img.jpg',
@@ -40,12 +40,12 @@ describe('HTMLBuilder Image Alignment', () => {
       children: [{ type: 'Text', content: 'Some text ' }, imageNode],
     };
 
-    const html = builder.build(paragraphNode);
+    const html = await builder.build(paragraphNode);
     expect(html).not.toContain('text-align: center');
     expect(html).toContain('<img src="img.jpg" alt="Centered Image" align="center">');
   });
 
-  test('should preserve existing paragraph styles', () => {
+  test('should preserve existing paragraph styles', async () => {
     const imageNode: ImageNode = {
       type: 'Image',
       src: 'img.jpg',
@@ -59,7 +59,7 @@ describe('HTMLBuilder Image Alignment', () => {
       attributes: { style: 'color: red' },
     };
 
-    const html = builder.build(paragraphNode);
+    const html = await builder.build(paragraphNode);
     expect(html).toContain('style="color: red;text-align: center"');
   });
 });

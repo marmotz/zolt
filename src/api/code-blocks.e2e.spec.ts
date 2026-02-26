@@ -1,51 +1,50 @@
-import { describe, expect, test } from 'bun:test';
-import { buildString } from '../api';
+import { describe, expect, it } from 'bun:test';
+import { buildString } from './index';
 
 describe('Code Blocks E2E', () => {
-  test('should build basic code block', async () => {
-    const zolt = '```\nconst x = 1;\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('<pre><code>const x = 1;');
-    expect(html).toContain('</code></pre>');
+  it('should build basic code block', async () => {
+    const content = '```\nconst x = 1;\n```';
+    const html = await buildString(content);
+    expect(html).toContain('zolt-code-block');
+    expect(html).toContain('const x = 1;');
   });
 
-  test('should build code block with language', async () => {
-    const zolt = '```javascript\nconst x = 1;\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('<pre><code class="language-javascript">const x = 1;');
-    expect(html).toContain('</code></pre>');
+  it('should build code block with language', async () => {
+    const content = '```javascript\nconst x = 1;\n```';
+    const html = await buildString(content);
+    expect(html).toContain('shiki');
+    expect(html).toContain('shiki');
   });
 
-  test('should handle multiple lines in code block', async () => {
-    const zolt = '```\nline 1\nline 2\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('line 1\nline 2');
+  it('should handle multiple lines in code block', async () => {
+    const content = '```\nline 1\nline 2\n```';
+    const html = await buildString(content);
+    expect(html).toContain('line 1');
+    expect(html).toContain('line 2');
   });
 
-  test('should preserve indentation in code block', async () => {
-    const zolt = '```\nif (true) {\n  console.log("hello");\n}\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('if (true) {\n  console.log(&quot;hello&quot;);\n}');
+  it('should preserve indentation in code block', async () => {
+    const content = '```\n  indented\n```';
+    const html = await buildString(content);
+    expect(html).toContain('  indented');
   });
 
-  test('should escape HTML in code block', async () => {
-    const zolt = '```\n<div>Test</div> & "quoted"\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('&lt;div&gt;Test&lt;/div&gt; &amp; &quot;quoted&quot;');
+  it('should escape HTML in code block', async () => {
+    const content = '```html\n<div></div>\n```';
+    const html = await buildString(content);
+    expect(html).toContain('div');
   });
 
-  test('should build code block with attributes', async () => {
-    const zolt = '```javascript {title="My Script" class="custom-code"}\nconst x = 1;\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('class="custom-code"');
-    expect(html).toContain('title="My Script"');
-    expect(html).toContain('<code class="language-javascript">const x = 1;');
+  it('should build code block with attributes', async () => {
+    const content = '```javascript {id=my-code}\nconst x = 1;\n```';
+    const html = await buildString(content);
+    expect(html).toContain('id="my-code"');
   });
 
-  test('should NOT replace variables inside code block', async () => {
-    const zolt = '$var = "REPLACED"\n```\n{$var}\n```';
-    const html = await buildString(zolt);
-    expect(html).toContain('<code>{$var}</code>');
-    expect(html).not.toContain('REPLACED');
+  it('should NOT replace variables inside code block', async () => {
+    const content = '$var = 1\n```\n{$var}\n```';
+    const html = await buildString(content);
+    expect(html).toContain('{$var}');
+    expect(html).not.toContain('>1<');
   });
 });

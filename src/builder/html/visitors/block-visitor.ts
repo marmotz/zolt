@@ -1,7 +1,6 @@
 import {
   ASTNode,
   BlockquoteNode,
-  CodeBlockNode,
   DefinitionDescriptionNode,
   DefinitionTermNode,
   HeadingNode,
@@ -18,10 +17,11 @@ export class BlockVisitor {
   public headingCounters: number[] = new Array(7).fill(0);
 
   constructor(
-    private build: (node: ASTNode) => string,
-    private joinChildren: (nodes: ASTNode[]) => string,
+    private build: (node: ASTNode) => Promise<string>,
+    private joinChildren: (nodes: ASTNode[]) => Promise<string>,
+    private joinInlineChildren: (nodes: ASTNode[]) => Promise<string>,
     private renderAllAttributes: (attrs?: any) => string,
-    private processInlineContent: (text: string) => string,
+    private processInlineContent: (text: string) => Promise<string>,
     private evaluator: any
   ) {}
 
@@ -29,9 +29,9 @@ export class BlockVisitor {
     this.headingCounters.fill(0);
   }
 
-  visitHeading(node: HeadingNode): string {
+  async visitHeading(node: HeadingNode): Promise<string> {
     const level = Math.min(Math.max(node.level, 1), 6);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinInlineChildren(node.children);
     const renderedContent = childrenHtml.trim();
 
     if (!renderedContent) {
@@ -77,7 +77,7 @@ export class BlockVisitor {
     return `<h${level}${attrs}>${numberStr}${renderedContent}</h${level}>`;
   }
 
-  visitParagraph(node: ParagraphNode): string {
+  async visitParagraph(node: ParagraphNode): Promise<string> {
     // Check for single image with align=center
     if (node.children.length === 1 && node.children[0].type === 'Image') {
       const imageNode = node.children[0] as ImageNode;
@@ -92,7 +92,7 @@ export class BlockVisitor {
     }
 
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
     if (!trimmed) {
       return '';
@@ -101,14 +101,14 @@ export class BlockVisitor {
     return `<p${attrs}>${trimmed}</p>`;
   }
 
-  visitBlockquote(node: BlockquoteNode): string {
-    const childrenHtml = this.joinChildren(node.children);
+  async visitBlockquote(node: BlockquoteNode): Promise<string> {
+    const childrenHtml = await this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<blockquote${attrs}>${childrenHtml}</blockquote>`;
   }
 
-  visitList(node: ListNode): string {
+  async visitList(node: ListNode): Promise<string> {
     let tag = 'ul';
     if (node.kind === 'numbered') {
       tag = 'ol';
@@ -123,7 +123,7 @@ export class BlockVisitor {
       node.attributes.class = (node.attributes.class ? node.attributes.class + ' ' : '') + 'zolt-list-plain';
     }
 
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<${tag}${attrs}>
@@ -131,12 +131,12 @@ ${childrenHtml}
 </${tag}>`;
   }
 
-  visitListItem(node: ListItemNode): string {
+  async visitListItem(node: ListItemNode): Promise<string> {
     const checkbox =
       node.checked !== undefined
         ? `<input type="checkbox" ${node.checked ? 'checked' : ''} onclick="return false;">`
         : '';
-    const childrenHtml = this.joinChildren(node.children);
+    const childrenHtml = await this.joinChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
@@ -144,8 +144,8 @@ ${childrenHtml}
     return `<li${attrs}>${checkbox}${trimmed}</li>`;
   }
 
-  visitDefinitionTerm(node: DefinitionTermNode): string {
-    const childrenHtml = this.joinChildren(node.children);
+  async visitDefinitionTerm(node: DefinitionTermNode): Promise<string> {
+    const childrenHtml = await this.joinChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
@@ -153,8 +153,8 @@ ${childrenHtml}
     return `<dt${attrs}>${trimmed}</dt>`;
   }
 
-  visitDefinitionDescription(node: DefinitionDescriptionNode): string {
-    const childrenHtml = this.joinChildren(node.children);
+  async visitDefinitionDescription(node: DefinitionDescriptionNode): Promise<string> {
+    const childrenHtml = await this.joinChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
 
     const attrs = this.renderAllAttributes(node.attributes);
@@ -162,21 +162,8 @@ ${childrenHtml}
     return `<dd${attrs}>${trimmed}</dd>`;
   }
 
-  visitCodeBlock(node: CodeBlockNode): string {
-    const lang = node.language ? ` class="language-${node.language}"` : '';
-    const attrs = this.renderAllAttributes(node.attributes);
-    const escapedContent = node.content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-
-    return `<pre${attrs}><code${lang}>${escapedContent}</code></pre>`;
-  }
-
-  visitIndentation(node: IndentationNode): string {
-    const childrenHtml = this.joinChildren(node.children);
+  async visitIndentation(node: IndentationNode): Promise<string> {
+    const childrenHtml = await this.joinChildren(node.children);
     if (!childrenHtml.trim()) {
       return '';
     }

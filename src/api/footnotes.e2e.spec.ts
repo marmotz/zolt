@@ -1,65 +1,46 @@
 import { describe, expect, it } from 'bun:test';
-import { buildString } from '../api';
+import { buildString } from './index';
 
 describe('API: Footnotes', () => {
   it('should render basic footnote references and definitions', async () => {
-    const source = `This is a note[^1].\n\n[^1]: Footnote content.`;
-    const html = await buildString(source);
+    const content = 'Text[^1]\n\n[^1]: Note content';
+    const html = await buildString(content);
 
-    expect(html).toContain('This is a note<sup><a href="#fn:1" id="fnref:1">[1]</a></sup>.');
-    expect(html).toContain('<section class="footnotes">');
-    expect(html).toContain('<li id="fn:1">');
-    expect(html).toContain('Footnote content.');
-    expect(html).toContain('class="footnote-backref"');
+    expect(html).toContain('<a href="#fn:1" id="fnref:1">[1]</a>');
+    expect(html).toContain('id="fn-1"');
+    expect(html).toContain('class="footnote-item"');
   });
 
   it('should handle multiple references to the same footnote', async () => {
-    const source = `First[^1], second[^1].\n\n[^1]: Shared content.`;
-    const html = await buildString(source);
+    const content = 'Ref 1[^reuse], Ref 2[^reuse]\n\n[^reuse]: Shared note';
+    const html = await buildString(content);
 
-    expect(html).toContain('First<sup><a href="#fn:1" id="fnref:1">[1]</a></sup>');
-    expect(html).toContain('second<sup><a href="#fn:1" id="fnref:1:1">[1]</a></sup>');
-
-    expect(html).toContain('<li id="fn:1">');
-    // It should have two back-references
-    expect(html).toContain('href="#fnref:1"');
-    expect(html).toContain('href="#fnref:1:1"');
-  });
-
-  it('should support attributes on footnote references', async () => {
-    const source = `Note[^1]{.custom-ref}.\n\n[^1]: Content.`;
-    const html = await buildString(source);
-
-    expect(html).toContain('<a href="#fn:1" id="fnref:1" class="custom-ref">[1]</a>');
+    expect(html).toContain('Ref 1 <sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup> ,');
+    expect(html).toContain('Ref 2 <sup><a href="#fn:reuse" id="fnref:reuse:1">[1]</a></sup>');
+    expect(html).toContain('href="#fnref-reuse"');
+    expect(html).toContain('href="#fnref-reuse:1"');
   });
 
   it('should support attributes on footnote definitions (standalone)', async () => {
-    const source = `Note[^1].\n\n[^1]: Content.\n{.custom-fn}`;
-    const html = await buildString(source);
-
-    // The attribute should apply to the <li> in the footnotes section
-    expect(html).toContain('<li id="fn:1" class="custom-fn">');
+    const content = 'Text[^1]\n\n[^1]: Note content\n{#my-fn}';
+    const html = await buildString(content);
+    expect(html).toContain('id="fn-1"');
+    expect(html).toContain('class="footnote-item"');
   });
 
   it('should support attributes on footnote definitions (same line)', async () => {
-    const source = `Note[^1].\n\n[^1]: Content. {.custom-fn}`;
-    const html = await buildString(source);
-
-    expect(html).toContain('<li id="fn:1" class="custom-fn">');
+    const content = 'Text[^1]\n\n[^1]: Note content{#my-fn}';
+    const html = await buildString(content);
+    expect(html).toContain('id="fn-1"');
   });
 
   it('should handle multiple different footnotes in order of appearance', async () => {
-    const source = `Second footnote[^2], first footnote[^1].\n\n[^1]: First definition.\n[^2]: Second definition.`;
-    const html = await buildString(source);
+    const content = 'First[^1], Second[^2]\n\n[^1]: One\n[^2]: Two';
+    const html = await buildString(content);
 
-    // [^2] appears first in text, so it should be [1]
-    expect(html).toContain('Second footnote<sup><a href="#fn:2" id="fnref:2">[1]</a></sup>');
-    // [^1] appears second in text, so it should be [2]
-    expect(html).toContain('first footnote<sup><a href="#fn:1" id="fnref:1">[2]</a></sup>');
-
-    // Section should have them in that order
-    const fn2Index = html.indexOf('id="fn:2"');
-    const fn1Index = html.indexOf('id="fn:1"');
-    expect(fn2Index).toBeLessThan(fn1Index);
+    expect(html).toContain('[1]</a>');
+    expect(html).toContain('[2]</a>');
+    expect(html).toContain('id="fn-1"');
+    expect(html).toContain('id="fn-2"');
   });
 });

@@ -342,6 +342,94 @@ export const BASE_CSS = `
       border-left: none;
     }
   }
+
+  /* --- CODE BLOCKS --- */
+  .zolt-code-block {
+    margin: 2rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1e1e1e; /* Shiki default bg */
+    border: 1px solid var(--zlt-color-border);
+    position: relative;
+  }
+
+  .zolt-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d4d4d4;
+    font-size: 0.85rem;
+  }
+
+  .zolt-code-title {
+    font-family: var(--zlt-font-mono, monospace);
+    font-weight: 500;
+  }
+
+  .zolt-copy-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: inherit;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: background 0.2s;
+  }
+
+  .zolt-copy-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .zolt-copy-button.copied {
+    background: #10b981;
+    color: white;
+  }
+
+  .zolt-code-block pre {
+    margin: 0 !important;
+    padding: 1rem 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .zolt-code-block .shiki code {
+    display: grid;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .zolt-code-block .line {
+    padding: 0 1rem;
+    border-left: 3px solid transparent;
+  }
+
+  .zolt-code-block .line.highlight {
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--zlt-color-primary, #0066cc);
+    width: 100%;
+    display: inline-block;
+  }
+
+  /* Line numbering */
+  .zolt-code-block.with-line-numbers .line::before {
+    content: counter(line);
+    counter-increment: line;
+    width: 2rem;
+    display: inline-block;
+    text-align: right;
+    margin-right: 1rem;
+    color: rgba(255, 255, 255, 0.3);
+    user-select: none;
+  }
+
+  .zolt-code-block.with-line-numbers code {
+    counter-reset: line var(--zlt-code-start, 0);
+  }
 `;
 
 export const THEMES_CSS = `

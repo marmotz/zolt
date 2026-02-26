@@ -1783,11 +1783,11 @@ code ici
 
 #### Attributs Disponibles
 
-| Attribut        | Description                | Exemple           |
-|-----------------|----------------------------|-------------------|
-| `title="..."`   | Titre du bloc              | `title="main.py"` |
-| `highlight=N-M` | Surlignage de lignes       | `highlight=2-4`   |
-| `start=N`       | Numérotation starting line | `start=10`        |
+| Attribut          | Description                | Exemple              |
+|-------------------|----------------------------|----------------------|
+| `title="..."`     | Titre du bloc              | `title="main.py"`    |
+| `highlight=X,Y-Z` | Surlignage de lignes       | `highlight=1,3-4,10` |
+| `start=N`         | Numérotation starting line | `start=10`           |
 
 #### Exemple
 

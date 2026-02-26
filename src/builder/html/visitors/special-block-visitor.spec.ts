@@ -7,15 +7,16 @@ describe('SpecialBlockVisitor', () => {
 
   beforeEach(() => {
     visitor = new SpecialBlockVisitor(
-      (nodes: ASTNode[]) => nodes.map((n) => (n as any).content || '').join(''),
+      async (nodes: ASTNode[]) => nodes.map((n) => (n as any).content || '').join(''),
+      async (nodes: ASTNode[]) => nodes.map((n) => (n as any).content || '').join(''),
       (attrs?: any) => (attrs ? ' with-attrs' : ''),
       { getVariable: () => null },
-      (text: string) => text,
+      async (text: string) => text,
       []
     );
   });
 
-  test('should render sidebar block', () => {
+  test('should render sidebar block', async () => {
     const node: TripleColonBlockNode = {
       type: 'TripleColonBlock',
       blockType: 'sidebar',
@@ -23,14 +24,14 @@ describe('SpecialBlockVisitor', () => {
       attributes: { side: 'right' },
     };
 
-    const html = visitor.visitTripleColonBlock(node);
+    const html = await visitor.visitTripleColonBlock(node);
     expect(html).toContain('class="zolt-sidebar zolt-sidebar-right"');
     expect(html).toContain('Sidebar Content');
     expect(visitor.hasSidebar).toBe(true);
     expect(visitor.sidebarSide).toBe('right');
   });
 
-  test('should render sidebar components', () => {
+  test('should render sidebar components', async () => {
     const header: TripleColonBlockNode = {
       type: 'TripleColonBlock',
       blockType: 'sidebar-header',
@@ -47,12 +48,12 @@ describe('SpecialBlockVisitor', () => {
       children: [{ type: 'Text', content: 'Footer' } as any],
     };
 
-    expect(visitor.visitTripleColonBlock(header)).toContain('class="zolt-sidebar-header"');
-    expect(visitor.visitTripleColonBlock(content)).toContain('class="zolt-sidebar-content"');
-    expect(visitor.visitTripleColonBlock(footer)).toContain('class="zolt-sidebar-footer"');
+    expect(await visitor.visitTripleColonBlock(header)).toContain('class="zolt-sidebar-header"');
+    expect(await visitor.visitTripleColonBlock(content)).toContain('class="zolt-sidebar-content"');
+    expect(await visitor.visitTripleColonBlock(footer)).toContain('class="zolt-sidebar-footer"');
   });
 
-  test('should render filetree', () => {
+  test('should render filetree', async () => {
     const graph = {
       path: 'index.zlt',
       absPath: '/root/index.zlt',
@@ -68,17 +69,18 @@ describe('SpecialBlockVisitor', () => {
     };
 
     const visitorWithGraph = new SpecialBlockVisitor(
-      () => '',
+      async () => '',
+      async () => '',
       () => '',
       { getVariable: () => null },
-      (text: string) => text,
+      async (text: string) => text,
       [],
       graph,
       '/root/index.zlt'
     );
 
     const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree', attributes: {} };
-    const html = visitorWithGraph.visitDoubleBracketBlock(node);
+    const html = await visitorWithGraph.visitDoubleBracketBlock(node);
 
     expect(html).toContain('zolt-filetree');
     expect(html).toContain('Home');
@@ -91,6 +93,6 @@ describe('SpecialBlockVisitor', () => {
     visitor.sidebarSide = 'right';
     visitor.reset();
     expect(visitor.hasSidebar).toBe(false);
-    expect(visitor.sidebarSide as string).toBe('left');
+    expect(visitor.sidebarSide).toBe('left');
   });
 });
