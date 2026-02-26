@@ -1,4 +1,4 @@
-export type LexerMode = 'BLOCK' | 'INLINE' | 'CODE' | 'FRONTMATTER' | 'TABLE' | 'TRIPLE_COLON';
+export type LexerMode = 'BLOCK' | 'INLINE' | 'CODE' | 'FILE_METADATA' | 'TABLE' | 'TRIPLE_COLON';
 
 export class LexerState {
   mode: LexerMode;

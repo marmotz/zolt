@@ -101,11 +101,11 @@ Génère automatiquement une ancre pour les références croisées.
 !![Alt](video.mp4){autoplay loop muted}
 ```
 
-| Attribut   | Description            |
-|------------|------------------------|
-| `autoplay` | Lecture automatique    |
-| `loop`     | Boucle                 |
-| `muted`    | Son désactivé          |
+| Attribut   | Description         |
+|------------|---------------------|
+| `autoplay` | Lecture automatique |
+| `loop`     | Boucle              |
+| `muted`    | Son désactivé       |
 
 ### 1.6 Autonumérotation des Titres
 
@@ -1223,9 +1223,9 @@ Contenu avec notes[^1] et[^2].
 
 ```
 
-### 5.6 Frontmatter/Métadonnées
+### 5.6 Métadonnées de fichier
 
-Le frontmatter permet de définir des métadonnées au début du fichier en utilisant la syntaxe YAML.
+Les métadonnées de fichier permet de définir des métadonnées au début du fichier en utilisant la syntaxe YAML.
 
 #### Syntaxe
 
@@ -1242,7 +1242,7 @@ description: 'Description courte du document'
 
 #### Variables Automatiques
 
-Les métadonnées du frontmatter sont accessibles comme des variables :
+Les métadonnées de fichier sont accessibles comme des variables :
 
 ```
 # {$title}
@@ -1343,16 +1343,17 @@ Le Zolt fournit un namespace `Date` pour formater les dates, similaire aux names
 
 #### Fonctions Disponibles
 
-| Fonction                    | Description                             | Exemple                                                 |
-|-----------------------------|-----------------------------------------|---------------------------------------------------------|
-| `Date.format(date, format)` | Formate une date              | `Date.format($created, "DD/MM/YYYY")`                   |
-| `Date.parse(text, format)`  | Parse une chaîne en objet Date| `Date.parse("25/02/2026", "DD/MM/YYYY")`                |
-| `Date.calc(date, duration)` | Calcule une date (objet dur.) | `Date.calc($created, { days: 7, hours: 2 })`            |
-| `Date.diff(d1, d2, unit)`   | Différence entre deux dates   | `Date.diff($end, $start, "days")`                       |
+| Fonction                    | Description                    | Exemple                                      |
+|-----------------------------|--------------------------------|----------------------------------------------|
+| `Date.format(date, format)` | Formate une date               | `Date.format($created, "DD/MM/YYYY")`        |
+| `Date.parse(text, format)`  | Parse une chaîne en objet Date | `Date.parse("25/02/2026", "DD/MM/YYYY")`     |
+| `Date.calc(date, duration)` | Calcule une date (objet dur.)  | `Date.calc($created, { days: 7, hours: 2 })` |
+| `Date.diff(d1, d2, unit)`   | Différence entre deux dates    | `Date.diff($end, $start, "days")`            |
 
-| `Date.now()`                | Timestamp actuel (ms)                   | `Date.now()`                                            |
-| `Date.timestamp(date)`      | Timestamp en secondes                   | `Date.timestamp($created)`                              |
-| `Date.msTimestamp(date) `   | Timestamp en millisecondes              | `Date.msTimestamp($created)`                            |
+| `Date.now()`                | Timestamp actuel (ms)                   |
+`Date.now()`                                            |
+| `Date.timestamp(date)`      | Timestamp en secondes | `Date.timestamp($created)`                              |
+| `Date.msTimestamp(date) `   | Timestamp en millisecondes | `Date.msTimestamp($created)`                            |
 
 #### Unités pour Date.calc et Date.diff
 
@@ -1404,9 +1405,9 @@ La fonction `diff` accepte l'unité en troisième argument.
 #### Localisation
 
 Le formatage des noms de jours (`dddd`, `ddd`) et de mois (`MMMM`, `MMM`) dépend de la locale définie dans les variables
-`$lang` (souvent via le frontmatter). Si aucune n'est définie, la locale du système est utilisée.
+`$lang` (souvent via le file metadata). Si aucune n'est définie, la locale du système est utilisée.
 
-Exemple en frontmatter :
+Exemple en file metadata :
 
 ```yaml
 ---
@@ -1940,7 +1941,7 @@ reconnaître les motifs syntaxiques.
 **Responsabilités :**
 
 - Produire des Tokens avec position (ligne, colonne)
-- Gérer les états du lexer (BLOCK, INLINE, CODE, FRONTMATTER)
+- Gérer les états du lexer (BLOCK, INLINE, CODE, FILE_METADATA)
 - Détecter les motifs syntaxiques (headings, listes, blocs de code, etc.)
 
 **Types de Tokens produits :**
@@ -1948,7 +1949,7 @@ reconnaître les motifs syntaxiques.
 - Tokens structuraux : NEWLINE, INDENT, DEDENT, EOF
 - Tokens de headings : HEADING (contient le niveau et le contenu)
 - Tokens de listes : BULLET_LIST, ORDERED_LIST, TASK_LIST, DEFINITION
-- Tokens de blocs : BLOCKQUOTE, CODE_BLOCK, HORIZONTAL_RULE, FRONTMATTER
+- Tokens de blocs : BLOCKQUOTE, CODE_BLOCK, HORIZONTAL_RULE, FILE_METADATA
 - Tokens spéciaux : TRIPLE_COLON_START, TRIPLE_COLON_END, DOUBLE_BRACKET_START, DOUBLE_BRACKET_END
 - Tokens inline : TEXT, BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, etc.
 - Tokens médias : IMAGE, VIDEO, AUDIO, EMBED, FILE
@@ -1975,7 +1976,7 @@ descendante (Recursive Descent Parser).
   HighlightNode, InlineStyleNode
 - Nœuds médias : LinkNode, ImageNode, VideoNode, AudioNode, EmbedNode, FileNode
 - Nœuds spéciaux : VariableNode, ExpressionNode, IncludeNode, ForeachNode, IfNode, FootnoteNode, FootnoteDefinitionNode,
-  AbbreviationNode, FrontmatterNode
+  AbbreviationNode, FileMetadataNode
 
 ### 7.4 Couche 3 : Builder (Génération de Sortie)
 
@@ -2056,7 +2057,7 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 | **Séparateurs stylés**   | Limité               | `--- {color=red style=dashed}`         |
 | **Inline stylé**         | Non supporté         | `**texte**{attr}`                      |
 | **Notes de bas de page** | Extension            | `[^1]` natif + définitions             |
-| **FrontMatter**          | Non supporté         | YAML natif avec variables auto         |
+| **File metadata**        | Non supporté         | YAML natif avec variables auto         |
 | **Dates auto**           | Non supporté         | `{$created}`, `{$modified}`            |
 | **Abréviations**         | Non supporté         | `{abbr="..."}`                         |
 | **TOC dynamique**        | Extension            | `[[toc {from=2 to=4}]]`                |
@@ -2507,7 +2508,7 @@ Pour développer un parseur Zolt :
 | **Commentaire**        | Texte non affiché : `:::comment` bloc ou `%% inline %%`          |
 | **Liste de définition** | Liste terme/définition avec syntaxe `:terme`                     |
 | **Échappement**        | Caractère `\` pour afficher littéralement les opérateurs         |
-| **Frontmatter**        | Métadonnées YAML en haut de fichier (titre, auteur, etc.)        |
+| **File metadata**      | Métadonnées YAML en haut de fichier (titre, auteur, etc.)        |
 | **TOC**                | Table des matières générée avec `[[toc]]`                        |
 | **Note de bas de page** | Référence `[^n]` avec définition en bas de page                 |
 | **Boucle**             | Structure `:::foreach` pour itérer sur des tableaux              |

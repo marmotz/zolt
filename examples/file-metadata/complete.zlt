@@ -11,7 +11,7 @@ theme: professional
 ---
 $numbering = true
 
-# Complete Frontmatter Example
+# Complete File Metadata Example
 
 All commonly used metadata fields.
 
@@ -36,4 +36,4 @@ All commonly used metadata fields.
 **Theme:** {{ $theme }}
 
 
-[← Retour à l'index](../frontmatter.zlt)
+[← Retour à l'index](../file-metadata.zlt)

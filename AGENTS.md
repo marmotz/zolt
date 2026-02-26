@@ -46,7 +46,7 @@ you MUST follow when working on this repository.
 ### TypeScript & Typing
 
 - **Strict Mode:** `strict` is set to `true` in `tsconfig.json`. You must strictly type all variables and returns. Avoid
-  `any` at all costs. Use well-defined interfaces (e.g., `ASTNode`, `FrontmatterNode`).
+  `any` at all costs. Use well-defined interfaces (e.g., `ASTNode`, `FileMetadataNode`).
 - **Module Resolution:** We use `ESNext` and `bundler` resolution.
 - **Imports:** When adding imports, ensure they point to the correct internal modules.
 
@@ -87,7 +87,7 @@ you MUST follow when working on this repository.
 - **ParseError:** When encountering invalid syntax, throw domain-specific error classes. For parsing, use
   `throw new ParseError(message, line, column, filePath, errorCode)`. This ensures precise error reporting for the end
   user.
-- **Warnings:** The `Parser` class maintains a `warnings` array. Append non-fatal issues (like invalid frontmatter
+- **Warnings:** The `Parser` class maintains a `warnings` array. Append non-fatal issues (like invalid file metadata
   types) to `this.warnings` instead of throwing an error.
 
 ## 4. Core Mandates for AI Agents

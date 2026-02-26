@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { buildString } from './index';
 
-describe('E2E: Frontmatter and Evaluation Architecture', () => {
-  it('should use frontmatter variables in the document body', async () => {
+describe('E2E: File metadata and Evaluation Architecture', () => {
+  it('should use file metadata variables in the document body', async () => {
     const content = `---
 title: "Zolt Rocks"
 author: "Zolt Team"
@@ -14,7 +14,7 @@ By {$author}`;
     expect(html).toContain('By Zolt Team');
   });
 
-  it('should use frontmatter variables in conditional blocks', async () => {
+  it('should use file metadata variables in conditional blocks', async () => {
     const content = `---
 show_secret: true
 ---
@@ -25,7 +25,7 @@ The secret is: Zolt
     expect(html).toContain('The secret is: Zolt');
   });
 
-  it('should use frontmatter variables in foreach loops', async () => {
+  it('should use file metadata variables in foreach loops', async () => {
     const content = `---
 items: [A, B, C]
 ---
@@ -38,7 +38,7 @@ items: [A, B, C]
     expect(html).toContain('<li>Item C</li>');
   });
 
-  it('should format dates from frontmatter correctly', async () => {
+  it('should format dates from file metadata correctly', async () => {
     const content = `---
 my_date: 2026-02-18
 ---

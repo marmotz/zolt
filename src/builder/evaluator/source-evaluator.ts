@@ -24,14 +24,14 @@ export class SourceEvaluator {
       }
     }
 
-    let frontmatterProcessed = false;
+    let fileMetadataProcessed = false;
 
     while (i < lines.length) {
       const line = lines[i];
       const trimmed = line.trim();
 
-      // Skip frontmatter at the very beginning
-      if (!frontmatterProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
+      // Skip file metadata at the very beginning
+      if (!fileMetadataProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
         result.push(line);
         i++;
         while (i < lines.length && lines[i].trim() !== '---') {
@@ -42,12 +42,12 @@ export class SourceEvaluator {
           result.push(lines[i]);
           i++;
         }
-        frontmatterProcessed = true;
+        fileMetadataProcessed = true;
         continue;
       }
 
       if (trimmed !== '') {
-        frontmatterProcessed = true;
+        fileMetadataProcessed = true;
       }
 
       if (trimmed.startsWith('```')) {

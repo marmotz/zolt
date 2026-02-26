@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { buildString } from './index';
 
 describe('E2E: Meta Tags Generation', () => {
-  it('should generate standard meta tags from frontmatter', async () => {
+  it('should generate standard meta tags from file metadata', async () => {
     const content = `---
 title: "SEO Test"
 description: "A cool document about Zolt"

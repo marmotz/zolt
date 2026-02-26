@@ -30,7 +30,7 @@
     "build:macos-x64": "bun build src/cli.ts --outfile dist/zolt-macos-x64 --target bun-x64-macos --compile",
     "build:macos-arm64": "bun build src/cli.ts --outfile dist/zolt-macos-arm64 --target bun-aarch64-macos --compile",
     "build:windows": "bun build src/cli.ts --outfile dist/zolt-windows-x64.exe --target bun-x64-windows --compile",
-    "build-doc": "mkdir html && bun dev build examples/index.zlt -o html",
+    "build-doc": "rm -rf html && mkdir html && bun dev build examples/index.zlt -o html",
     "dev": "bun run src/cli/index.ts",
     "test": "bun test",
     "type-check": "bun x tsc --noEmit",

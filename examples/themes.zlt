@@ -1,6 +1,6 @@
 # Zolt Themes Index
 
-Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement à vos préférences de couleur (Light/Dark mode). Vous pouvez également forcer un mode spécifique via le frontmatter.
+Zolt propose plusieurs thèmes intégrés qui s'adaptent automatiquement à vos préférences de couleur (Light/Dark mode). Vous pouvez également forcer un mode spécifique via le file metadata.
 
 ## Thèmes Standard
 

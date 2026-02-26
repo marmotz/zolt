@@ -8,7 +8,7 @@ describe('E2E: Themes and Color Scheme', () => {
     expect(html).toContain('<body class="theme-default color-scheme-auto">');
   });
 
-  it('should apply the specified theme from frontmatter', async () => {
+  it('should apply the specified theme from file metadata', async () => {
     const content = `---
 theme: professional
 ---

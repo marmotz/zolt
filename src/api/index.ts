@@ -9,7 +9,7 @@ import { createFileDateVariables } from '../utils/file-metadata';
 export interface BuildOptions {
   type?: 'html' | 'pdf';
   variables?: Record<string, any>;
-  frontmatter?: boolean;
+  fileMetadata?: boolean;
   filePath?: string;
   assetResolver?: (path: string) => string;
   globalAbbreviations?: Map<string, string>;
@@ -75,17 +75,17 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     }
   }
 
-  // The parser now extracts the frontmatter. We should ensure the evaluator
+  // The parser now extracts the file metadata. We should ensure the evaluator
   // has those variables before the builder starts.
-  if (ast.frontmatter) {
-    for (const [key, value] of Object.entries(ast.frontmatter.data)) {
+  if (ast.fileMetadata) {
+    for (const [key, value] of Object.entries(ast.fileMetadata.data)) {
       evaluator.setVariable(key, value);
     }
   }
 
   const mergedVariables = { ...initialVariables };
-  if (ast.frontmatter) {
-    Object.assign(mergedVariables, ast.frontmatter.data);
+  if (ast.fileMetadata) {
+    Object.assign(mergedVariables, ast.fileMetadata.data);
   }
 
   let builder: Builder;

@@ -243,8 +243,8 @@ export interface HorizontalRuleNode {
   attributes?: Attributes;
 }
 
-export interface FrontmatterNode {
-  type: 'Frontmatter';
+export interface FileMetadataNode {
+  type: 'FileMetadata';
   data: Record<string, any>;
 }
 
@@ -301,7 +301,7 @@ export interface IndentationNode {
 export interface DocumentNode {
   type: 'Document';
   children: ASTNode[];
-  frontmatter?: FrontmatterNode;
+  fileMetadata?: FileMetadataNode;
   sourceFile: string;
   footnoteIds?: Set<string>;
 }
@@ -344,7 +344,7 @@ export type ASTNode =
   | DefinitionDescriptionNode
   | CodeBlockNode
   | HorizontalRuleNode
-  | FrontmatterNode
+  | FileMetadataNode
   | TripleColonBlockNode
   | VariableDefinitionNode
   | TableNode

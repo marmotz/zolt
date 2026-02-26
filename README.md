@@ -33,7 +33,7 @@ documentation features. Write in plain text, publish anywhere.
 - **📈 Charts** - Native charts (line, bar, pie, area)
 - **🔄 Loops** - Iterate over data structures
 - **📅 Dates** - Automatic timestamps
-- **🏷️ Metadata** - YAML frontmatter support
+- **🏷️ Metadata** - YAML file metadata support
 - **🎨 Styling** - Universal attribute system `{}`
 
 ### 🌟 Unique to Zolt
@@ -183,7 +183,7 @@ Check the [`examples/`](examples) directory for comprehensive examples:
 | [tabs.zlt](examples/tabs.zlt)                   | Tabbed navigation                                     |
 | [columns.zlt](examples/columns.zlt)             | Multi-column layouts                                  |
 | [footnotes.zlt](examples/footnotes.zlt)         | Footnotes and references                              |
-| [frontmatter.zlt](examples/frontmatter.zlt)     | YAML metadata                                         |
+| [file-metadata.zlt](examples/file-metadata.zlt) | YAML metadata                                         |
 | [dates.zlt](examples/dates.zlt)                 | Automatic dates                                       |
 | [abbreviations.zlt](examples/abbreviations.zlt) | Abbreviations with tooltips                           |
 | [toc.zlt](examples/toc.zlt)                     | Table of contents                                     |

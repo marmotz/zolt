@@ -3,7 +3,7 @@ import { unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { lint } from './index';
 
-describe('Linter: Frontmatter Validation', () => {
+describe('Linter: File metadata Validation', () => {
   const testFile = join(process.cwd(), 'temp_lint_test.zlt');
 
   it('should warn about unknown metadata fields', async () => {

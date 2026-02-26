@@ -43,9 +43,9 @@ Available format tokens:
 
 ## Date Localization
 
-Date names (`MMMM`, `MMM`, `dddd`, `ddd`) are localized based on the `$lang` or `$locale` variables, which are typically defined in the document's frontmatter.
+Date names (`MMMM`, `MMM`, `dddd`, `ddd`) are localized based on the `$lang` or `$locale` variables, which are typically defined in the document's file metadata.
 
-Example frontmatter:
+Example file metadata:
 ```yaml
 ---
 lang: fr-FR

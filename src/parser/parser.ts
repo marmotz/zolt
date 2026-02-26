@@ -4,7 +4,7 @@ import { Lexer } from '../lexer/lexer';
 import { Token, TokenType } from '../lexer/token-types';
 import { BlockquoteParser } from './block-parsers/blockquote-parser';
 import { CodeBlockParser } from './block-parsers/code-block-parser';
-import { FrontmatterParser } from './block-parsers/frontmatter-parser';
+import { FileMetadataParser } from './block-parsers/file-metadata-parser';
 import { HeadingParser } from './block-parsers/heading-parser';
 import { IndentationParser } from './block-parsers/indentation-parser';
 import { ListParser } from './block-parsers/list-parser';
@@ -18,8 +18,8 @@ import { InlineParser } from './inline-parser';
 import {
   ASTNode,
   DocumentNode,
+  FileMetadataNode,
   FootnoteDefinitionNode,
-  FrontmatterNode,
   IncludeNode,
   VariableDefinitionNode,
 } from './types';
@@ -39,7 +39,7 @@ export class Parser {
   private tableParser: TableParser;
   private listParser: ListParser;
   private tripleColonParser: TripleColonParser;
-  private frontmatterParser: FrontmatterParser;
+  private fileMetadataParser: FileMetadataParser;
   private headingParser: HeadingParser;
   private blockquoteParser: BlockquoteParser;
   private codeBlockParser: CodeBlockParser;
@@ -69,7 +69,7 @@ export class Parser {
     this.tableParser = new TableParser(this.inlineParser);
     this.listParser = new ListParser(this.inlineParser);
     this.tripleColonParser = new TripleColonParser(this.inlineParser);
-    this.frontmatterParser = new FrontmatterParser();
+    this.fileMetadataParser = new FileMetadataParser();
     this.headingParser = new HeadingParser(this.inlineParser);
     this.codeBlockParser = new CodeBlockParser(this.inlineParser);
     this.specialBlockParser = new SpecialBlockParser(this.inlineParser);
@@ -101,12 +101,12 @@ export class Parser {
     this.pos = 0;
     this.currentToken = this.tokens[0];
     const children = this.parseDocument();
-    const frontmatter = children.find((child) => child.type === 'Frontmatter') as FrontmatterNode | undefined;
+    const fileMetadata = children.find((child) => child.type === 'FileMetadata') as FileMetadataNode | undefined;
 
     return {
       type: 'Document',
       children,
-      frontmatter,
+      fileMetadata,
       sourceFile: this.filePath,
       footnoteIds: this.footnoteIds,
     };
@@ -211,7 +211,7 @@ export class Parser {
       TokenType.FOOTNOTE_DEF,
       TokenType.LINK_REF_DEF,
       TokenType.COMMENT_INLINE,
-      TokenType.FRONTMATTER,
+      TokenType.FILE_METADATA,
     ].includes(token.type);
   }
 
@@ -665,9 +665,9 @@ export class Parser {
   private parseDocument(): ASTNode[] {
     const children: ASTNode[] = [];
 
-    if (this.match(TokenType.FRONTMATTER)) {
+    if (this.match(TokenType.FILE_METADATA)) {
       children.push(
-        this.frontmatterParser.parseFrontmatter(this.expect.bind(this), (message, line, column, code) => {
+        this.fileMetadataParser.parseFileMetadata(this.expect.bind(this), (message, line, column, code) => {
           this.warnings.push({ line, column, message, code });
         })
       );

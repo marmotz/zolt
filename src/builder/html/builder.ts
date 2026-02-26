@@ -132,8 +132,8 @@ export class HTMLBuilder implements Builder {
         return this.visitAbbreviationDefinition();
       case 'FootnoteDefinition':
         return this.visitFootnoteDefinition(node as any);
-      case 'Frontmatter':
-        return this.visitFrontmatter(node as any);
+      case 'FileMetadata':
+        return this.visitFileMetadata(node as any);
       case 'LinkReferenceDefinition':
         return '';
       case 'Table':
@@ -163,7 +163,7 @@ export class HTMLBuilder implements Builder {
     const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
       this.joinChildren.bind(this),
-      this.visitFrontmatter.bind(this)
+      this.visitFileMetadata.bind(this)
     );
 
     const footnotesHtml = this.renderFootnotes();
@@ -179,7 +179,7 @@ export class HTMLBuilder implements Builder {
       node,
       contentHtml + footnotesHtml,
       options,
-      this.visitFrontmatter.bind(this)
+      this.visitFileMetadata.bind(this)
     );
   }
 
@@ -193,7 +193,7 @@ export class HTMLBuilder implements Builder {
     const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
       this.joinChildren.bind(this),
-      this.visitFrontmatter.bind(this)
+      this.visitFileMetadata.bind(this)
     );
 
     const footnotesHtml = this.renderFootnotes();
@@ -290,7 +290,7 @@ export class HTMLBuilder implements Builder {
     return '';
   }
 
-  visitFrontmatter(node: { data: Record<string, any> }): string {
+  visitFileMetadata(node: { data: Record<string, any> }): string {
     if (node.data) {
       for (const [key, value] of Object.entries(node.data)) {
         this.evaluator.setVariable(key, value);

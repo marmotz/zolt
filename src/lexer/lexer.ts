@@ -99,8 +99,8 @@ export class Lexer {
     if (this.matchTechnicalIndentation()) {
       return this.readTechnicalIndentation();
     }
-    if (this.matchFrontmatter()) {
-      return this.readFrontmatter();
+    if (this.matchFileMetadata()) {
+      return this.readFileMetadata();
     }
     if (this.matchHorizontalRule()) {
       return this.readHorizontalRule();
@@ -567,7 +567,7 @@ export class Lexer {
     };
   }
 
-  private matchFrontmatter(): boolean {
+  private matchFileMetadata(): boolean {
     if (this.pos !== 0 || !this.source.slice(this.pos).startsWith('---')) {
       return false;
     }
@@ -576,7 +576,7 @@ export class Lexer {
     return afterFirstDash.includes('---');
   }
 
-  private readFrontmatter(): Token {
+  private readFileMetadata(): Token {
     const start = this.pos;
     const line = this.line;
     const column = this.column;
@@ -597,7 +597,7 @@ export class Lexer {
     }
 
     return {
-      type: TokenType.FRONTMATTER,
+      type: TokenType.FILE_METADATA,
       value: content,
       line,
       column,

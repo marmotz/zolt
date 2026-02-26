@@ -56,9 +56,9 @@ describe('Block Type Recognition', () => {
     expect(ast.children[0].type).toBe('Indentation');
   });
 
-  test('should recognize frontmatter', () => {
+  test('should recognize file metadata', () => {
     const ast = parse('---\ntitle: test\n---\nContent');
-    expect(ast.children[0].type).toBe('Frontmatter');
+    expect(ast.children[0].type).toBe('FileMetadata');
   });
 
   test('should recognize variable definitions', () => {

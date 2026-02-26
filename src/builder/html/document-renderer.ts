@@ -17,10 +17,10 @@ export class DocumentRenderer {
     node: DocumentNode,
     options: DocumentRendererOptions,
     buildChildren: (nodes: ASTNode[]) => string,
-    visitFrontmatter: (node: any) => string
+    visitFileMetadata: (node: any) => string
   ): string {
-    if (node.frontmatter) {
-      visitFrontmatter(node.frontmatter);
+    if (node.fileMetadata) {
+      visitFileMetadata(node.fileMetadata);
     }
 
     const children = [...node.children];
@@ -40,14 +40,14 @@ export class DocumentRenderer {
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
-    const lang = node.frontmatter?.data?.lang || 'en';
-    const title = node.frontmatter?.data?.title || 'Document';
-    const description = node.frontmatter?.data?.description || '';
-    const author = node.frontmatter?.data?.author || '';
+    const lang = node.fileMetadata?.data?.lang || 'en';
+    const title = node.fileMetadata?.data?.title || 'Document';
+    const description = node.fileMetadata?.data?.description || '';
+    const author = node.fileMetadata?.data?.author || '';
 
     let keywords = '';
-    const rawKeywords = node.frontmatter?.data?.keywords;
-    const rawTags = node.frontmatter?.data?.tags;
+    const rawKeywords = node.fileMetadata?.data?.keywords;
+    const rawTags = node.fileMetadata?.data?.tags;
 
     if (Array.isArray(rawKeywords)) {
       keywords = rawKeywords.join(', ');
@@ -57,8 +57,8 @@ export class DocumentRenderer {
       keywords = rawTags.join(', ');
     }
 
-    const robots = node.frontmatter?.data?.robots || '';
-    const ogImage = node.frontmatter?.data?.image || '';
+    const robots = node.fileMetadata?.data?.robots || '';
+    const ogImage = node.fileMetadata?.data?.image || '';
 
     const theme = this.evaluator.getVariable('theme') || 'default';
     const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
@@ -105,10 +105,10 @@ ${mermaidScript}
     node: DocumentNode,
     contentHtml: string,
     options: DocumentRendererOptions,
-    visitFrontmatter: (node: any) => string
+    visitFileMetadata: (node: any) => string
   ): string {
-    if (node.frontmatter) {
-      visitFrontmatter(node.frontmatter);
+    if (node.fileMetadata) {
+      visitFileMetadata(node.fileMetadata);
     }
 
     const tabsScript = options.hasTabs ? TABS_SCRIPT : '';
@@ -116,14 +116,14 @@ ${mermaidScript}
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
-    const lang = node.frontmatter?.data?.lang || 'en';
-    const title = node.frontmatter?.data?.title || 'Document';
-    const description = node.frontmatter?.data?.description || '';
-    const author = node.frontmatter?.data?.author || '';
+    const lang = node.fileMetadata?.data?.lang || 'en';
+    const title = node.fileMetadata?.data?.title || 'Document';
+    const description = node.fileMetadata?.data?.description || '';
+    const author = node.fileMetadata?.data?.author || '';
 
     let keywords = '';
-    const rawKeywords = node.frontmatter?.data?.keywords;
-    const rawTags = node.frontmatter?.data?.tags;
+    const rawKeywords = node.fileMetadata?.data?.keywords;
+    const rawTags = node.fileMetadata?.data?.tags;
 
     if (Array.isArray(rawKeywords)) {
       keywords = rawKeywords.join(', ');
@@ -133,8 +133,8 @@ ${mermaidScript}
       keywords = rawTags.join(', ');
     }
 
-    const robots = node.frontmatter?.data?.robots || '';
-    const ogImage = node.frontmatter?.data?.image || '';
+    const robots = node.fileMetadata?.data?.robots || '';
+    const ogImage = node.fileMetadata?.data?.image || '';
 
     const theme = this.evaluator.getVariable('theme') || 'default';
     const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
@@ -192,10 +192,10 @@ ${mermaidScript}
   public renderDocumentContent(
     node: DocumentNode,
     buildChildren: (nodes: ASTNode[]) => string,
-    visitFrontmatter: (node: any) => string
+    visitFileMetadata: (node: any) => string
   ): string {
-    if (node.frontmatter) {
-      visitFrontmatter(node.frontmatter);
+    if (node.fileMetadata) {
+      visitFileMetadata(node.fileMetadata);
     }
 
     const children = [...node.children];

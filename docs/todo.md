@@ -8,14 +8,14 @@
 - [x] Implement `:::comment` blocks
 - [x] Implement inline comments `%% ... %%`
 
-### Phase 0.5: Frontmatter
+### Phase 0.5: File metadata
 
-- [x] Parse YAML frontmatter at start of file
-- [x] Create automatic variables from frontmatter (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
+- [x] Parse YAML file metadata at start of file
+- [x] Create automatic variables from file metadata (`{$title}`, `{$author}`, `{$date}`, `{$version}`, `{$tags}`,
   `{$description}`, `{$lang}`, `{$toc}`, `{$theme}`)
 - [x] Implement theme system (`default`, `professional`, `technical`, `playful`)
 - [x] Support `color-scheme` (`auto`, `light`, `dark`) with automatic system preference detection
-- [x] Generate HTML `<meta>` and Open Graph tags from frontmatter (with strict TS typing)
+- [x] Generate HTML `<meta>` and Open Graph tags from file metadata (with strict TS typing)
 
 ### Phase 1: Variables
 
@@ -368,7 +368,7 @@
 ### Error Resilience
 
 - [x] Continue parsing on syntax errors (handled by Parser catch-and-recover)
-- [x] Emit warnings for unknown metadata in frontmatter
+- [x] Emit warnings for unknown metadata in file metadata
 - [x] Emit warnings for syntax errors (unclosed blocks, invalid attributes)
 - [x] Validate attribute syntax (added validation in InlineParser.parseAttributes)
 - [x] File not found errors for includes
@@ -400,11 +400,6 @@
 - [x] Integration tests for complete documents (charts, mermaid)
 - [x] Regression tests for Markdown compatibility
 
-### Test Files
-
-- [ ] Create test files for each feature
-- [ ] Create example files from spec.md section 12
-
 ## 19. Documentation
 
 ### Developer Documentation
@@ -417,7 +412,7 @@
 
 ### Documentation creator
 
-- [ ] Rename frontmatter to metadata
+- [x] Rename frontmatter to file metadata
 - [ ] Project metadata file
 - [ ] new layout metadata to set layout of current file (in file metadata) or globally (in project metadata file)
 - [ ] new sidebar markup to define sidebar structure
@@ -453,7 +448,7 @@
 ## Legend
 
 - `[ ]` - Todo (not implemented)
-- `[ ]` - Completed
+- `[x]` - Completed
 - `[*]` - In progress
 
 ## Notes

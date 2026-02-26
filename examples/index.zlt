@@ -43,7 +43,7 @@ Welcome to the Zolt examples collection! This index provides an overview of all 
 
 ## Documentation Features
 
-- [frontmatter.zlt](frontmatter.zlt) — YAML metadata for document configuration and variables
+- [file-metadata.zlt](file-metadata.zlt) — YAML metadata for document configuration and variables
 - [themes.zlt](themes.zlt) — Built-in themes (Professional, Technical, Playful) and Light/Dark modes
 - [dates.zlt](dates.zlt) — Automatic date variables, formatting options, and timezone handling
 - [footnotes.zlt](footnotes.zlt) — Footnote references with academic and practical use cases

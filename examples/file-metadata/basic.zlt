@@ -3,9 +3,9 @@ title: "My Basic Document"
 author: "John Doe"
 date: 2026-02-18
 ---
-# Basic Frontmatter
+# Basic File Metadata
 
-Simple YAML frontmatter at the top of the file.
+Simple YAML metadata at the top of the file.
 
 **Title:** {$title}
 
@@ -13,4 +13,4 @@ Simple YAML frontmatter at the top of the file.
 
 **Date:** {{Date.format($date, "DD/MM/YYYY")}}
 
-[← Retour à l'index](../frontmatter.zlt)
+[← Retour à l'index](../file-metadata.zlt)

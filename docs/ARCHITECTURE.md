@@ -151,7 +151,7 @@ const html = await buildString('# Hello World\n\nThis is **bold**', { type: 'htm
 interface BuildOptions {
   type: 'html' | 'pdf' | string; // Output format
   variables?: Record<string, any>; // Global variables
-  frontmatter?: boolean; // Parse YAML frontmatter
+  fileMetadata?: boolean; // Parse YAML file metadata
   [key: string]: any; // Future options
 }
 ```
@@ -209,7 +209,7 @@ This file defines all token types used by the lexer and provides the Token inter
 - **Structural tokens**: NEWLINE, INDENT, DEDENT, EOF
 - **Heading tokens**: HEADING, HEADING_MARKER
 - **List tokens**: BULLET_LIST, ORDERED_LIST, TASK_LIST, DEFINITION
-- **Block element tokens**: BLOCKQUOTE, INDENTATION, CODE_BLOCK, HORIZONTAL_RULE, FRONTMATTER
+- **Block element tokens**: BLOCKQUOTE, INDENTATION, CODE_BLOCK, HORIZONTAL_RULE, FILE_METADATA
 - **Special block tokens**: TRIPLE_COLON_START, TRIPLE_COLON_END, DOUBLE_BRACKET_START, DOUBLE_BRACKET_END
 - **Inline style tokens**: TEXT, BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, SUPERSCRIPT, SUBSCRIPT, HIGHLIGHT, INLINE_STYLE
 - **Link and media tokens**: LINK_START, LINK_END, LINK_REF_DEF, IMAGE, VIDEO, AUDIO, EMBED, FILE
@@ -228,13 +228,13 @@ This is the core Lexer class that transforms input strings into tokens. Key resp
 - Contains pattern matching methods (matchHeading, matchCodeBlock, etc.) for recognizing different syntax elements
 - Reads and creates appropriate tokens for each recognized pattern
 - Handles whitespace, EOF detection, and character advancement with line/column tracking
-- Uses LexerState to manage modes (BLOCK, INLINE, CODE, FRONTMATTER, TABLE, TRIPLE_COLON)
+- Uses LexerState to manage modes (BLOCK, INLINE, CODE, FILE_METADATA, TABLE, TRIPLE_COLON)
 
 #### `src/lexer/state/lexer-state.ts`
 
 This file defines the LexerState class that manages lexer context during tokenization:
 
-- **mode**: Current parsing mode (BLOCK, INLINE, CODE, FRONTMATTER, TABLE, TRIPLE_COLON)
+- **mode**: Current parsing mode (BLOCK, INLINE, CODE, FILE_METADATA, TABLE, TRIPLE_COLON)
 - **indentStack**: Tracks indentation levels for Python-like block detection
 - **codeLanguage**: Stores the language identifier from code blocks
 - **blockDepth**: Tracks nested block depth
@@ -273,11 +273,11 @@ src/parser/
 
 This file defines all AST node type interfaces. Key interfaces include:
 
-- **DocumentNode**: Root node containing children and optional frontmatter
+- **DocumentNode**: Root node containing children and optional file metadata
 - **Block nodes**: HeadingNode, ParagraphNode, BlockquoteNode, ListNode, ListItemNode, CodeBlockNode, TripleColonBlockNode, DoubleBracketBlockNode, HorizontalRuleNode, IndentationNode
 - **Inline nodes**: BoldNode, ItalicNode, UnderlineNode, StrikethroughNode, CodeNode, SuperscriptNode, SubscriptNode, HighlightNode, InlineStyleNode
 - **Media nodes**: LinkNode, ImageNode, VideoNode, AudioNode, EmbedNode, FileNode
-- **Special nodes**: VariableNode, ExpressionNode, IncludeNode, ForeachNode, IfNode, FootnoteNode, FootnoteDefinitionNode, AbbreviationNode, FrontmatterNode
+- **Special nodes**: VariableNode, ExpressionNode, IncludeNode, ForeachNode, IfNode, FootnoteNode, FootnoteDefinitionNode, AbbreviationNode, FileMetadataNode
 
 All nodes share a base ASTNode interface with type and optional attributes.
 
@@ -287,7 +287,7 @@ The main Parser class implementing recursive descent parsing:
 
 - Consumes tokens from the lexer
 - Parses document structure by delegating to specialized methods
-- **parseDocument()**: Entry point handling optional frontmatter and block parsing
+- **parseDocument()**: Entry point handling optional file metadata and block parsing
 - **parseBlock()**: Dispatches to specific block parsers based on token type
 - **parseHeading()**: Handles # heading syntax with level detection
 - **parseParagraph()**: Reads text content until new block or EOF
