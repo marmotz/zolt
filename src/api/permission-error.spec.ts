@@ -2,10 +2,7 @@ import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { HTMLBuilder } from '../builder/html/builder';
-import { Lexer } from '../lexer/lexer';
-import { Parser } from '../parser/parser';
-import { lint } from './index';
+import { buildString, lint } from './index';
 
 describe('Include Permission Errors', () => {
   let tempDir: string;
@@ -28,17 +25,11 @@ describe('Include Permission Errors', () => {
     fs.chmodSync(includedFile, 0);
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '{{include secret.zlt}}';
+    const mainContent = ':::include secret.zlt';
 
-    const lexer = new Lexer(mainContent);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, mainFile);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
+    const html = await buildString(mainContent, { filePath: mainFile });
 
-    const html = builder.visitDocument(doc);
-
-    expect(html).toContain('Permission denied');
+    expect(html).toContain('permission denied');
   });
 
   test('should handle permission denied during linting', async () => {

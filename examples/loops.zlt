@@ -226,7 +226,7 @@ $menu_items = [
 
 :::foreach {$menu_items as $item}
 :::if {$item.active}
-**[{$item.title}]({$item.url})** {.active}
+||**[{$item.title}]({$item.url})**||{.active}
 :::
 :::if {!$item.active}
 [{$item.title}]({$item.url})
@@ -245,10 +245,10 @@ $milestones = [
 
 :::foreach {$milestones as $milestone}
 :::if {$milestone.completed}
-✅ **{$milestone.name}** - Complete
++ ✅ **{$milestone.name}** - Complete
 :::
 :::if {!$milestone.completed}
-⏳ **{$milestone.name}** - In Progress
++ ⏳ **{$milestone.name}** - In Progress
 :::
 :::
 

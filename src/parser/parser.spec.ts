@@ -1,7 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from './parser';
 
@@ -565,61 +562,6 @@ describe('Parser', () => {
 
         expect(ast.children[0].type).toBe('Math');
         expect((ast.children[0] as any).attributes.id).toBe('integral');
-      });
-    });
-
-    describe('Include', () => {
-      let tempDir: string;
-
-      beforeEach(() => {
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zolt-parser-include-test-'));
-      });
-
-      afterEach(() => {
-        fs.rmSync(tempDir, { recursive: true, force: true });
-      });
-
-      test('should populate children in IncludeNode during parsing', () => {
-        const includedFile = path.join(tempDir, 'included.zlt');
-        fs.writeFileSync(includedFile, '# Included Content');
-
-        const mainFile = path.join(tempDir, 'main.zlt');
-        const lexer = new Lexer(`{{include ${includedFile}}}`);
-        const tokens = lexer.tokenize();
-        const parser = new Parser(tokens, mainFile);
-        const ast = parser.parse();
-
-        expect(ast.children[0].type).toBe('Include');
-        const includeNode = ast.children[0] as any;
-        expect(includeNode.children.length).toBeGreaterThan(0);
-        expect(includeNode.children[0].type).toBe('Heading');
-        expect(includeNode.children[0].children[0].content).toBe('Included Content');
-      });
-
-      test('should capture error in IncludeNode if file not found', () => {
-        const lexer = new Lexer('{{include missing.zlt}}');
-        const tokens = lexer.tokenize();
-        const parser = new Parser(tokens, 'main.zlt');
-        const ast = parser.parse();
-
-        expect(ast.children[0].type).toBe('Include');
-        const includeNode = ast.children[0] as any;
-        expect(includeNode.error).toContain('file not found');
-        expect(includeNode.children).toEqual([]);
-      });
-
-      test('should bubble up warnings from included file', () => {
-        const includedFile = path.join(tempDir, 'warn.zlt');
-        fs.writeFileSync(includedFile, '---Title: Bad YAML\n---');
-
-        const mainFile = path.join(tempDir, 'main.zlt');
-        const lexer = new Lexer(`{{include ${includedFile}}}`);
-        const tokens = lexer.tokenize();
-        const parser = new Parser(tokens, mainFile);
-        parser.parse();
-
-        expect(parser.warnings.length).toBeGreaterThan(0);
-        expect(parser.warnings[0].message).toContain('Unknown metadata');
       });
     });
   });

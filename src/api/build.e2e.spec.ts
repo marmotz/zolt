@@ -209,6 +209,19 @@ $items = ["Apple", "Banana", "Cherry"]
       expect(ulCount).toBe(1);
       expect(liCount).toBe(3);
     });
+
+    test('should NOT confuse ${$var} or ${{$var}} with math formulas', async () => {
+      const zolt = `
+$price = 100
+- Price: \${$price}
+- Double: \${{\$price * 2}}
+`;
+      const html = await buildString(zolt);
+
+      expect(html).toContain('Price: $100');
+      expect(html).toContain('Double: $200');
+      expect(html).not.toContain('katex');
+    });
   });
 
   describe('superscript and subscript', () => {

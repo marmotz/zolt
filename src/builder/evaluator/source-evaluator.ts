@@ -1,13 +1,20 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { ContentProcessor } from './content-processor';
 import { ExpressionEvaluator } from './expression-evaluator';
 
 export class SourceEvaluator {
   private evaluator: ExpressionEvaluator;
   private contentProcessor: ContentProcessor;
+  private filePath: string;
+  private includeStack: string[];
+  private readonly MAX_INCLUDE_DEPTH = 10;
 
-  constructor(evaluator: ExpressionEvaluator) {
+  constructor(evaluator: ExpressionEvaluator, filePath: string = 'unknown', includeStack: string[] = []) {
     this.evaluator = evaluator;
     this.contentProcessor = new ContentProcessor(evaluator);
+    this.filePath = filePath;
+    this.includeStack = includeStack;
   }
 
   evaluate(source: string): string {
@@ -30,18 +37,25 @@ export class SourceEvaluator {
       const line = lines[i];
       const trimmed = line.trim();
 
-      // Skip file metadata at the very beginning
+      // Handle file metadata (frontmatter) at the very beginning
       if (!fileMetadataProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
-        result.push(line);
+        const metadataLines: string[] = [];
+        metadataLines.push(line);
         i++;
         while (i < lines.length && lines[i].trim() !== '---') {
-          result.push(lines[i]);
+          metadataLines.push(lines[i]);
           i++;
         }
         if (i < lines.length) {
-          result.push(lines[i]);
+          metadataLines.push(lines[i]);
           i++;
         }
+
+        // Process metadata to extract variables
+        this.processMetadata(metadataLines);
+
+        // Keep metadata in the output for the Parser to handle properly later
+        result.push(...metadataLines);
         fileMetadataProcessed = true;
         continue;
       }
@@ -76,6 +90,12 @@ export class SourceEvaluator {
           result.push(this.evaluate(blockLines.join('\n')));
         }
         i = nextIndex;
+      } else if (trimmed.startsWith(':::include')) {
+        const rawPath = trimmed.substring(10).trim();
+        const includePath = this.contentProcessor.processContent(rawPath);
+        const expanded = this.evaluateInclude(includePath);
+        result.push(expanded);
+        i++;
       } else if (trimmed.startsWith(':::comment')) {
         const { nextIndex } = this.collectBlock(lines, i);
         i = nextIndex;
@@ -90,6 +110,59 @@ export class SourceEvaluator {
     return result.join('\n');
   }
 
+  private processMetadata(lines: string[]): void {
+    if (lines.length < 2) return;
+
+    // Simple YAML-like parser for frontmatter
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed === '---') continue;
+
+      const match = trimmed.match(/^([a-zA-Z_]\w*)\s*:\s*(.*)$/);
+      if (match) {
+        const key = match[1];
+        const value = match[2].trim();
+
+        // Use the evaluator to parse the value (handle numbers, booleans, strings)
+        this.evaluator.setVariable(key, this.evaluator.parseValue(value));
+      }
+    }
+  }
+
+  private evaluateInclude(includePath: string): string {
+    const currentIncludeStack = [...this.includeStack];
+
+    if (this.filePath !== 'unknown') {
+      const absoluteFilePath = path.resolve(this.filePath);
+      if (!currentIncludeStack.includes(absoluteFilePath)) {
+        currentIncludeStack.push(absoluteFilePath);
+      }
+    }
+
+    if (currentIncludeStack.length >= this.MAX_INCLUDE_DEPTH) {
+      return `:::error Max inclusion depth reached: ${this.MAX_INCLUDE_DEPTH}:::`;
+    }
+
+    const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
+    const targetPath = path.resolve(currentDir, includePath);
+
+    if (currentIncludeStack.includes(targetPath)) {
+      return `:::error Circular inclusion detected: ${includePath}:::`;
+    }
+
+    if (!fs.existsSync(targetPath)) {
+      return `:::error Included file not found: ${includePath}:::`;
+    }
+
+    try {
+      const content = fs.readFileSync(targetPath, 'utf8');
+      const childEvaluator = new SourceEvaluator(this.evaluator, targetPath, currentIncludeStack);
+      return childEvaluator.evaluate(content);
+    } catch (err: any) {
+      return `:::error Failed to process include: ${includePath} (${err.message}):::`;
+    }
+  }
+
   private collectBlock(lines: string[], startIndex: number): { blockLines: string[]; nextIndex: number } {
     const blockLines: string[] = [];
     let i = startIndex + 1;
@@ -100,6 +173,8 @@ export class SourceEvaluator {
       const trimmed = line.trim();
 
       if (trimmed.startsWith(':::') && trimmed.length > 3 && !trimmed.startsWith('::::')) {
+        // Only increment depth for blocks that require a matching :::
+        // (if, foreach, details, tabs, etc.)
         depth++;
       } else if (trimmed === ':::') {
         depth--;
@@ -131,9 +206,9 @@ export class SourceEvaluator {
     for (let i = 0; i < collection.length; i++) {
       const item = collection[i];
 
-      const childEvaluator = this.evaluator.createChildScope();
-      childEvaluator.setVariable(foreachInfo.iterator, item);
-      childEvaluator.setVariable('foreach', {
+      const childScope = this.evaluator.createChildScope();
+      childScope.setVariable(foreachInfo.iterator, item);
+      childScope.setVariable('foreach', {
         index: i,
         index1: i + 1,
         first: i === 0,
@@ -142,8 +217,8 @@ export class SourceEvaluator {
         odd: i % 2 === 1,
       });
 
-      const childEvaluatorWrapper = new SourceEvaluator(childEvaluator);
-      results.push(childEvaluatorWrapper.evaluate(blockContent));
+      const childEvaluator = new SourceEvaluator(childScope, this.filePath, this.includeStack);
+      results.push(childEvaluator.evaluate(blockContent));
     }
 
     return results.join('\n');

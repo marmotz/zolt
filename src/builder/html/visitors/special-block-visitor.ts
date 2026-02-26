@@ -1,4 +1,3 @@
-import { InlineParser } from '../../../parser/inline-parser';
 import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
 import { slugify, toAlpha, toRoman } from '../utils/string-utils';
 
@@ -9,14 +8,11 @@ export class SpecialBlockVisitor {
   public hasMermaid: boolean = false;
 
   constructor(
-    private build: (node: ASTNode) => string,
     private joinChildren: (nodes: ASTNode[]) => string,
     private renderAllAttributes: (attrs?: any) => string,
-    private inlineParser: InlineParser,
     private evaluator: any,
     private processInlineContent: (text: string) => string,
-    private currentHeadings: HeadingNode[],
-    private mergeAdjacentLists: (results: string[]) => string
+    private currentHeadings: HeadingNode[]
   ) {}
 
   public reset(): void {
@@ -27,14 +23,6 @@ export class SpecialBlockVisitor {
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
-    if (node.blockType.startsWith('if ')) {
-      return this.visitIfBlock(node);
-    }
-
-    if (node.blockType.startsWith('foreach ')) {
-      return this.visitForeachBlock(node);
-    }
-
     if (node.blockType === 'tabs') {
       return this.visitTabsBlock(node);
     }
@@ -83,98 +71,6 @@ export class SpecialBlockVisitor {
     html += `${childrenHtml}\n</div>`;
 
     return html;
-  }
-
-  private visitIfBlock(node: TripleColonBlockNode): string {
-    let condition = node.blockType.substring(3).trim();
-
-    // Support multiple {{ }} or {$ } in the same condition string
-    condition = condition.replace(/\{\{\s*(.+?)\s*}}/g, (_, expr) => {
-      try {
-        const val = this.evaluator.evaluate(expr);
-
-        return String(val);
-      } catch {
-        return 'false';
-      }
-    });
-
-    condition = condition.replace(/\{\$([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*|\[[^\]]+])*)}/g, (_, varPath) => {
-      try {
-        const val = this.evaluator.evaluate('$' + varPath);
-
-        return String(val);
-      } catch {
-        return 'null';
-      }
-    });
-
-    // Strip outer braces if it's a single block: { condition }
-    if (condition.startsWith('{') && condition.endsWith('}')) {
-      condition = condition.slice(1, -1).trim();
-    }
-
-    try {
-      const result = this.evaluator.evaluate(condition);
-      if (this.evaluator.isTruthy(result)) {
-        return this.joinChildren(node.children);
-      }
-    } catch (e) {
-      console.warn(`Failed to evaluate condition: ${condition}`, e);
-    }
-
-    return '';
-  }
-
-  private visitForeachBlock(node: TripleColonBlockNode): string {
-    const foreachExpr = node.blockType.substring(8).trim();
-    // Support foreach {$item in $items} or foreach {$items as $item}
-    // and handle complex paths like $user.roles or $dict[$key]
-    const match = foreachExpr.match(/^\{\s*(\$?[a-zA-Z_][\w.$\[\]]*)\s+(?:as|in)\s+\$([a-zA-Z_]\w*)\s*}$/);
-
-    if (!match) {
-      console.warn(`Invalid foreach expression: ${foreachExpr}`);
-
-      return '';
-    }
-
-    let collectionPath = match[1];
-    if (!collectionPath.startsWith('$')) collectionPath = '$' + collectionPath;
-    const iteratorName = match[2];
-
-    try {
-      const collection = this.evaluator.evaluate(collectionPath);
-      if (!Array.isArray(collection)) {
-        return '';
-      }
-
-      const results: string[] = [];
-      const originalIteratorValue = this.evaluator.getVariable(iteratorName);
-      const originalForeachValue = this.evaluator.getVariable('foreach');
-
-      collection.forEach((item, index) => {
-        this.evaluator.setVariable(iteratorName, item);
-        this.evaluator.setVariable('foreach', {
-          index,
-          index1: index + 1,
-          first: index === 0,
-          last: index === collection.length - 1,
-          even: index % 2 === 0,
-          odd: index % 2 === 1,
-        });
-        results.push(this.joinChildren(node.children));
-      });
-
-      // Restore original variables
-      this.evaluator.setVariable(iteratorName, originalIteratorValue);
-      this.evaluator.setVariable('foreach', originalForeachValue);
-
-      return this.mergeAdjacentLists(results);
-    } catch (e) {
-      console.warn(`Failed to evaluate collection: ${collectionPath}`, e);
-
-      return '';
-    }
   }
 
   private visitTabsBlock(node: TripleColonBlockNode): string {

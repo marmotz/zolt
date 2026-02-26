@@ -64,8 +64,8 @@ export class ExpressionEvaluator {
       }
     }
 
-    const num = parseFloat(trimmed);
-    if (!isNaN(num)) {
+    const num = Number(trimmed);
+    if (!isNaN(num) && trimmed !== '') {
       return num;
     }
 

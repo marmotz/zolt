@@ -78,14 +78,11 @@ export class HTMLBuilder implements Builder {
     this.tableVisitor = new TableVisitor(joinChildrenBound, renderAttrsBound);
 
     this.specialBlockVisitor = new SpecialBlockVisitor(
-      buildBound,
       joinChildrenBound,
       renderAttrsBound,
-      this.inlineParser,
       this.evaluator,
       processInlineContentBound,
-      this.currentHeadings,
-      this.mergeAdjacentLists.bind(this)
+      this.currentHeadings
     );
   }
 

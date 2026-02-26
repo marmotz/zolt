@@ -1,8 +1,21 @@
-import { describe, expect, test } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { ExpressionEvaluator } from './expression-evaluator';
 import { SourceEvaluator } from './source-evaluator';
 
 describe('SourceEvaluator', () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zolt-source-evaluator-test-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
   test('should pass through regular content', () => {
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator);
@@ -107,5 +120,83 @@ Hello {$name}`;
 
     const result = sourceEvaluator.evaluate(input);
     expect(result).toContain('Hello World');
+  });
+
+  test('should process frontmatter and extract variables', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator);
+
+    const input = `---
+title: Frontmatter Title
+author: "Zolt Expert"
+count: 42
+---
+# {$title}
+By {$author} ({$count})`;
+
+    const result = sourceEvaluator.evaluate(input);
+    expect(result).toContain('---');
+    expect(result).toContain('title: Frontmatter Title');
+    expect(result).toContain('# Frontmatter Title');
+    expect(result).toContain('By Zolt Expert (42)');
+  });
+
+  test('should handle :::include', () => {
+    const includedPath = path.join(tempDir, 'included.zlt');
+    fs.writeFileSync(includedPath, 'Included content with {$name}');
+
+    const evaluator = new ExpressionEvaluator();
+    evaluator.setVariable('name', 'Zolt');
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const input = `Main
+:::include included.zlt
+End`;
+
+    const result = sourceEvaluator.evaluate(input);
+    expect(result).toContain('Main');
+    expect(result).toContain('Included content with Zolt');
+    expect(result).toContain('End');
+  });
+
+  test('should handle recursive inclusions', () => {
+    const fileB = path.join(tempDir, 'fileB.zlt');
+    fs.writeFileSync(fileB, 'Content B');
+
+    const fileA = path.join(tempDir, 'fileA.zlt');
+    fs.writeFileSync(fileA, ':::include fileB.zlt');
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const result = sourceEvaluator.evaluate(':::include fileA.zlt');
+    expect(result).toContain('Content B');
+  });
+
+  test('should detect circular inclusions', () => {
+    const fileA = path.join(tempDir, 'fileA.zlt');
+    const fileB = path.join(tempDir, 'fileB.zlt');
+
+    fs.writeFileSync(fileA, ':::include fileB.zlt');
+    fs.writeFileSync(fileB, ':::include fileA.zlt');
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const result = sourceEvaluator.evaluate(':::include fileA.zlt');
+    expect(result).toContain('Circular inclusion detected');
+  });
+
+  test('should handle max inclusion depth', () => {
+    // Create a chain of inclusions
+    for (let i = 0; i < 12; i++) {
+      fs.writeFileSync(path.join(tempDir, `file${i}.zlt`), `:::include file${i + 1}.zlt`);
+    }
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const result = sourceEvaluator.evaluate(':::include file0.zlt');
+    expect(result).toContain('Max inclusion depth reached');
   });
 });

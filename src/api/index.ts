@@ -1,6 +1,7 @@
 import { readFile, stat, writeFile } from 'fs/promises';
 import { Builder } from '../builder/builder';
 import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
+import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
@@ -37,11 +38,28 @@ export interface LintWarning {
   code: string;
 }
 
-export async function buildString(content: string, options?: BuildOptions): Promise<string> {
+export function getExpandedContent(
+  content: string,
+  options?: BuildOptions,
+  extraVariables?: Record<string, any>
+): string {
   const initialVariables: Record<string, any> = {
     ...options?.projectMetadata,
     ...options?.variables,
+    ...extraVariables,
   };
+
+  const evaluator = new ExpressionEvaluator();
+  for (const [key, value] of Object.entries(initialVariables)) {
+    evaluator.setVariable(key, value);
+  }
+
+  const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath);
+  return sourceEvaluator.evaluate(content);
+}
+
+export async function buildString(content: string, options?: BuildOptions): Promise<string> {
+  const extraVariables: Record<string, any> = {};
 
   if (options?.filePath) {
     try {
@@ -50,26 +68,23 @@ export async function buildString(content: string, options?: BuildOptions): Prom
         created: fileStats.birthtime,
         modified: fileStats.mtime,
       });
-      initialVariables.created = dateVars.created;
-      initialVariables.modified = dateVars.modified;
+      extraVariables.created = dateVars.created;
+      extraVariables.modified = dateVars.modified;
     } catch {
       // File stats unavailable, leave variables empty
     }
   }
 
-  const evaluator = new ExpressionEvaluator();
-  for (const [key, value] of Object.entries(initialVariables)) {
-    evaluator.setVariable(key, value);
-  }
+  const expandedContent = getExpandedContent(content, options, extraVariables);
 
-  const lexer = new Lexer(content);
+  // Phase 2: Lexing & Parsing the expanded "pure Zolt"
+  const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
 
   const parser = new Parser(tokens, options?.filePath, options?.globalAbbreviations);
   const ast = parser.parse();
 
   // If we have global abbreviations from the parser, update the options object
-  // so they can be passed to subsequent calls.
   if (options && options.globalAbbreviations) {
     const currentGlobals = parser.getGlobalAbbreviations();
     if (currentGlobals) {
@@ -79,15 +94,12 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     }
   }
 
-  // The parser now extracts the file metadata. We should ensure the evaluator
-  // has those variables before the builder starts.
-  if (ast.fileMetadata) {
-    for (const [key, value] of Object.entries(ast.fileMetadata.data)) {
-      evaluator.setVariable(key, value);
-    }
-  }
+  const mergedVariables: Record<string, any> = {
+    ...options?.projectMetadata,
+    ...options?.variables,
+    ...extraVariables,
+  };
 
-  const mergedVariables = { ...initialVariables };
   if (ast.fileMetadata) {
     Object.assign(mergedVariables, ast.fileMetadata.data);
   }
@@ -117,11 +129,13 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
 
 export function extractAllAssets(
   content: string,
-  projectMetadata?: Record<string, any>
+  projectMetadata?: Record<string, any>,
+  filePath?: string
 ): { zltLinks: string[]; otherAssets: string[] } {
-  const lexer = new Lexer(content);
+  const expandedContent = getExpandedContent(content, { projectMetadata, filePath });
+  const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
-  const parser = new Parser(tokens, undefined, undefined);
+  const parser = new Parser(tokens, filePath);
   const ast = parser.parse();
 
   const zltLinks: string[] = [];
@@ -224,11 +238,12 @@ export async function lint(filePath: string): Promise<LintResult> {
 
   try {
     const content = await readFile(filePath, 'utf-8');
+    const expandedContent = getExpandedContent(content, { filePath });
 
-    const lexer = new Lexer(content);
+    const lexer = new Lexer(expandedContent);
     const tokens = lexer.tokenize();
 
-    const parser = new Parser(tokens, filePath, undefined);
+    const parser = new Parser(tokens, filePath);
     parser.parse();
 
     // Collect warnings from parser

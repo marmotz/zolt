@@ -312,6 +312,8 @@
 - [x] Basic code blocks with triple backticks
 - [x] Language-specific code blocks - PARTIAL (parsed but not highlighted)
 - [x] Code block attributes: `{title=value}`, `{highlight=N-M}`, `{start=N}`
+- [ ] Syntaxic coloring
+- [ ] Add a button to copy code
 
 ### Mathematics (LaTeX)
 

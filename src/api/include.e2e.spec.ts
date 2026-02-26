@@ -2,9 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { HTMLBuilder } from '../builder/html/builder';
-import { Lexer } from '../lexer/lexer';
-import { Parser } from '../parser/parser';
+import { buildString } from './index';
 
 describe('Include E2E', () => {
   let tempDir: string;
@@ -22,15 +20,9 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, '# Included Content\n\nThis is from the included file.');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = 'Main Title\n\n{{include included.zlt}}';
+    const mainContent = 'Main Title\n\n:::include included.zlt';
 
-    const lexer = new Lexer(mainContent);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, mainFile);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-    // Using visitDocument to only check the rendered body content
-    const html = builder.visitDocument(doc);
+    const html = await buildString(mainContent, { filePath: mainFile });
 
     expect(html).toContain('id="included-content"');
     expect(html).toContain('Included Content');
@@ -42,17 +34,12 @@ describe('Include E2E', () => {
     fs.writeFileSync(file3, 'Final Content');
 
     const file2 = path.join(tempDir, 'file2.zlt');
-    fs.writeFileSync(file2, '{{include file3.zlt}}');
+    fs.writeFileSync(file2, ':::include file3.zlt');
 
     const file1 = path.join(tempDir, 'file1.zlt');
-    const content1 = 'Start\n\n{{include file2.zlt}}';
+    const content1 = 'Start\n\n:::include file2.zlt';
 
-    const lexer = new Lexer(content1);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, file1);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-    const html = builder.visitDocument(doc);
+    const html = await buildString(content1, { filePath: file1 });
 
     expect(html).toContain('<p>Start</p>');
     expect(html).toContain('<p>Final Content</p>');
@@ -62,16 +49,10 @@ describe('Include E2E', () => {
     const fileA = path.join(tempDir, 'fileA.zlt');
     const fileB = path.join(tempDir, 'fileB.zlt');
 
-    fs.writeFileSync(fileA, '{{include fileB.zlt}}');
-    fs.writeFileSync(fileB, '{{include fileA.zlt}}');
+    fs.writeFileSync(fileA, ':::include fileB.zlt');
+    fs.writeFileSync(fileB, ':::include fileA.zlt');
 
-    const lexer = new Lexer('{{include fileA.zlt}}');
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, path.join(tempDir, 'main.zlt'));
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-
-    const html = builder.visitDocument(doc);
+    const html = await buildString(':::include fileA.zlt', { filePath: path.join(tempDir, 'main.zlt') });
     expect(html).toContain('Circular inclusion detected');
   });
 
@@ -80,14 +61,9 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, 'Hello {$name}!');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '$name = "Zolt"\n\n{{include vars.zlt}}';
+    const mainContent = '$name = "Zolt"\n\n:::include vars.zlt';
 
-    const lexer = new Lexer(mainContent);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, mainFile);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-    const html = builder.buildDocument(doc);
+    const html = await buildString(mainContent, { filePath: mainFile });
 
     expect(html).toContain('Hello Zolt!');
   });
@@ -97,14 +73,9 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, '## Section from Include');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '[[toc]]\n\n# Main Title\n\n{{include content.zlt}}';
+    const mainContent = '[[toc]]\n\n# Main Title\n\n:::include content.zlt';
 
-    const lexer = new Lexer(mainContent);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, mainFile);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-    const html = builder.visitDocument(doc);
+    const html = await buildString(mainContent, { filePath: mainFile });
 
     expect(html).toContain('Main Title');
     expect(html).toContain('Section from Include');
@@ -116,17 +87,45 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, ':::tabs\n:::tab [Tab 1]\nContent 1\n:::tab [Tab 2]\nContent 2\n:::\n');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '# Test\n\n{{include blocks.zlt}}';
+    const mainContent = '# Test\n\n:::include blocks.zlt';
 
-    const lexer = new Lexer(mainContent);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens, mainFile);
-    const doc = parser.parse();
-    const builder = new HTMLBuilder();
-    const html = builder.visitDocument(doc);
+    const html = await buildString(mainContent, { filePath: mainFile });
 
     expect(html).toContain('zolt-tabs');
     expect(html).toContain('Tab 1');
     expect(html).toContain('Content 2');
+  });
+
+  test('should handle loops that include files', async () => {
+    const itemA = path.join(tempDir, 'itemA.zlt');
+    fs.writeFileSync(itemA, 'Content for A');
+
+    const itemB = path.join(tempDir, 'itemB.zlt');
+    fs.writeFileSync(itemB, 'Content for B');
+
+    const mainFile = path.join(tempDir, 'main.zlt');
+    const mainContent = `
+$items = ["itemA.zlt", "itemB.zlt"]
+:::foreach {$items as $file}
+### File: {$file}
+:::include {$file}
+:::
+`;
+    // Note: Variable expansion in :::include is supported because SourceEvaluator
+    // processes the line before evaluating it if it's not a block.
+    // Wait, SourceEvaluator.evaluate currently takes trimmed.substring(10).trim() for path.
+    // It doesn't evaluate the path as an expression yet!
+
+    // Let's check SourceEvaluator.ts again.
+    // if (trimmed.startsWith(':::include')) { const includePath = trimmed.substring(10).trim(); ... }
+
+    // I should probably improve SourceEvaluator to evaluate the include path too!
+
+    const html = await buildString(mainContent, { filePath: mainFile });
+
+    expect(html).toContain('File: itemA.zlt');
+    expect(html).toContain('Content for A');
+    expect(html).toContain('File: itemB.zlt');
+    expect(html).toContain('Content for B');
   });
 });
