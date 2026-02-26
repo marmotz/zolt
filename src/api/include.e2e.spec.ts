@@ -110,4 +110,26 @@ describe('Include E2E', () => {
     expect(html).toContain('Section from Include');
     expect(html).toContain('class="zolt-toc"');
   });
+
+  test('should handle nested blocks in included files', async () => {
+    const includedFile = path.join(tempDir, 'blocks.zlt');
+    fs.writeFileSync(
+      includedFile,
+      ':::tabs\n:::tab [Tab 1]\nContent 1\n:::tab [Tab 2]\nContent 2\n:::\n'
+    );
+
+    const mainFile = path.join(tempDir, 'main.zlt');
+    const mainContent = '# Test\n\n{{include blocks.zlt}}';
+
+    const lexer = new Lexer(mainContent);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens, mainFile);
+    const doc = parser.parse();
+    const builder = new HTMLBuilder();
+    const html = builder.visitDocument(doc);
+
+    expect(html).toContain('zolt-tabs');
+    expect(html).toContain('Tab 1');
+    expect(html).toContain('Content 2');
+  });
 });

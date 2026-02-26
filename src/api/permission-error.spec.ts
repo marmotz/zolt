@@ -36,12 +36,8 @@ describe('Include Permission Errors', () => {
     const doc = parser.parse();
     const builder = new HTMLBuilder();
     
-    // Note: fs.existsSync might return false if we don't have permission to the file.
-    // Let's see how it behaves.
     const html = builder.visitDocument(doc);
 
-    // If it fails with "File not found", it's because existsSync returned false.
-    // If it fails with "Permission denied", it's because readFileSync threw EACCES.
     expect(html).toContain('Permission denied');
   });
 

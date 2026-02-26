@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { Token, TokenType } from '../lexer/token-types';
 import { BlockquoteParser } from './block-parsers/blockquote-parser';
 import { CodeBlockParser } from './block-parsers/code-block-parser';
@@ -12,7 +14,15 @@ import { TripleColonParser } from './block-parsers/triple-colon-parser';
 import { DefinitionCollector } from './definition-collector';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
-import { ASTNode, DocumentNode, FootnoteDefinitionNode, FrontmatterNode, VariableDefinitionNode } from './types';
+import {
+  ASTNode,
+  DocumentNode,
+  FootnoteDefinitionNode,
+  FrontmatterNode,
+  IncludeNode,
+  VariableDefinitionNode,
+} from './types';
+import { Lexer } from '../lexer/lexer';
 
 export class Parser {
   private tokens: Token[];
@@ -22,6 +32,8 @@ export class Parser {
   private inlineParser: InlineParser;
   private footnoteIds: Set<string> = new Set();
   public warnings: { line: number; column: number; message: string; code: string }[] = [];
+  private includeStack: string[];
+  private readonly MAX_INCLUDE_DEPTH = 10;
 
   private definitionCollector: DefinitionCollector;
   private tableParser: TableParser;
@@ -36,11 +48,17 @@ export class Parser {
   private paragraphParser: ParagraphParser;
   private initialGlobalAbbreviations: Map<string, string>;
 
-  constructor(tokens: Token[], filePath?: string, initialGlobalAbbreviations?: Map<string, string>) {
+  constructor(
+    tokens: Token[],
+    filePath?: string,
+    initialGlobalAbbreviations?: Map<string, string>,
+    includeStack: string[] = []
+  ) {
     this.tokens = tokens;
     this.pos = 0;
     this.currentToken = tokens[0];
     this.filePath = filePath || 'unknown';
+    this.includeStack = includeStack;
     this.initialGlobalAbbreviations = initialGlobalAbbreviations || new Map();
     this.inlineParser = new InlineParser();
     this.inlineParser.setWarningCallback((message, code) => {
@@ -199,6 +217,88 @@ export class Parser {
 
   private match(...types: TokenType[]): boolean {
     return types.includes(this.currentToken.type);
+  }
+
+  private handleInclude(): IncludeNode {
+    const token = this.expect(TokenType.INCLUDE);
+    const includePath = token.value;
+    const currentIncludeStack = [...this.includeStack];
+
+    if (this.filePath !== 'unknown') {
+      const absoluteFilePath = path.resolve(this.filePath);
+      if (!currentIncludeStack.includes(absoluteFilePath)) {
+        currentIncludeStack.push(absoluteFilePath);
+      }
+    }
+
+    if (currentIncludeStack.length >= this.MAX_INCLUDE_DEPTH) {
+      const errorMsg = `Max inclusion depth reached: ${this.MAX_INCLUDE_DEPTH}`;
+      this.warn(errorMsg, 'MAX_INCLUDE_DEPTH', token);
+      return {
+        type: 'Include',
+        path: includePath,
+        children: [],
+        error: errorMsg,
+      };
+    }
+
+    const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
+    const targetPath = path.resolve(currentDir, includePath);
+
+    if (currentIncludeStack.includes(targetPath)) {
+      const errorMsg = `Circular inclusion detected: ${includePath}`;
+      this.warn(errorMsg, 'CIRCULAR_INCLUSION', token);
+      return {
+        type: 'Include',
+        path: includePath,
+        children: [],
+        error: errorMsg,
+      };
+    }
+
+    if (!fs.existsSync(targetPath)) {
+      const errorMsg = `Included file not found: ${includePath}`;
+      this.warn(errorMsg, 'FILE_NOT_FOUND', token);
+      return {
+        type: 'Include',
+        path: includePath,
+        children: [],
+        error: errorMsg,
+      };
+    }
+
+    try {
+      const content = fs.readFileSync(targetPath, 'utf8');
+      const lexer = new Lexer(content);
+      const tokens = lexer.tokenize();
+      const parser = new Parser(tokens, targetPath, this.initialGlobalAbbreviations, currentIncludeStack);
+      const doc = parser.parse();
+
+      // Collect warnings from sub-parser
+      for (const warning of parser.warnings) {
+        this.warnings.push(warning);
+      }
+
+      return {
+        type: 'Include',
+        path: includePath,
+        children: doc.children,
+      };
+    } catch (err: any) {
+      let errorMsg = `Failed to process include: ${includePath}`;
+      if (err.code === 'EACCES') {
+        errorMsg = `Permission denied for included file: ${includePath}`;
+        this.warn(errorMsg, 'PERMISSION_DENIED', token);
+      } else {
+        this.warn(`${errorMsg} (${err.message})`, 'INCLUDE_ERROR', token);
+      }
+      return {
+        type: 'Include',
+        path: includePath,
+        children: [],
+        error: errorMsg,
+      };
+    }
   }
 
   private parseVariableDefinition(): VariableDefinitionNode {
@@ -385,11 +485,7 @@ export class Parser {
       return this.specialBlockParser.parseMathBlock(this.expect.bind(this));
     }
     if (this.match(TokenType.INCLUDE)) {
-      const token = this.expect(TokenType.INCLUDE);
-      return {
-        type: 'Include',
-        path: token.value,
-      };
+      return this.handleInclude();
     }
 
     if (this.match(TokenType.INDENTATION)) {

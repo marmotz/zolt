@@ -121,6 +121,8 @@ export interface ExpressionNode {
 export interface IncludeNode {
   type: 'Include';
   path: string;
+  children: ASTNode[];
+  error?: string;
 }
 
 export interface FootnoteNode {

@@ -1,8 +1,4 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Lexer } from '../../lexer/lexer';
 import { InlineParser } from '../../parser/inline-parser';
-import { Parser } from '../../parser/parser';
 import { ASTNode, DocumentNode, IncludeNode } from '../../parser/types';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
@@ -22,9 +18,7 @@ export class HTMLBuilder implements Builder {
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
   private currentHeadings: any[] = [];
-  private includeStack: string[] = [];
   private currentFilePath: string = 'unknown';
-  private readonly MAX_INCLUDE_DEPTH = 10;
 
   private blockVisitor: BlockVisitor;
   private inlineVisitor: InlineVisitor;
@@ -165,9 +159,8 @@ export class HTMLBuilder implements Builder {
       this.inlineParser.setFootnotes(node.footnoteIds);
     }
     this.currentFilePath = node.sourceFile || 'unknown';
-    this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
-    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
+    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children));
 
     const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
@@ -197,9 +190,8 @@ export class HTMLBuilder implements Builder {
       this.inlineParser.setFootnotes(node.footnoteIds);
     }
     this.currentFilePath = node.sourceFile || 'unknown';
-    this.includeStack = [this.currentFilePath];
     this.currentHeadings.length = 0;
-    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children, this.currentFilePath));
+    this.currentHeadings.push(...this.findAllHeadingsRecursive(node.children));
 
     const contentHtml = this.documentRenderer.renderDocumentContent(
       node,
@@ -255,35 +247,19 @@ export class HTMLBuilder implements Builder {
     return '';
   }
 
-  private findAllHeadingsRecursive(nodes: ASTNode[], currentPath: string, depth: number = 0): any[] {
+  private findAllHeadingsRecursive(nodes: ASTNode[]): any[] {
     const headings: any[] = [];
-    if (depth >= this.MAX_INCLUDE_DEPTH) return headings;
 
     for (const node of nodes) {
       if (node.type === 'Heading') {
         headings.push(node);
       } else if (node.type === 'Include') {
         const includeNode = node as IncludeNode;
-        const currentDir = currentPath !== 'unknown' ? path.dirname(currentPath) : process.cwd();
-        const targetPath = path.resolve(currentDir, includeNode.path);
-
-        if (fs.existsSync(targetPath)) {
-          try {
-            const content = fs.readFileSync(targetPath, 'utf8');
-            const lexer = new Lexer(content);
-            const tokens = lexer.tokenize();
-            const parser = new Parser(tokens, targetPath);
-            const doc = parser.parse();
-            headings.push(...this.findAllHeadingsRecursive(doc.children, targetPath, depth + 1));
-          } catch (err: any) {
-            if (err.code === 'EACCES') {
-              console.warn(`[Include Warning] Permission denied while collecting headings: ${targetPath}`);
-            }
-            // Silently ignore errors during heading collection
-          }
+        if (includeNode.children) {
+          headings.push(...this.findAllHeadingsRecursive(includeNode.children));
         }
       } else if ('children' in node && Array.isArray(node.children)) {
-        headings.push(...this.findAllHeadingsRecursive(node.children as ASTNode[], currentPath, depth));
+        headings.push(...this.findAllHeadingsRecursive(node.children as ASTNode[]));
       }
     }
     return headings;
@@ -306,52 +282,11 @@ export class HTMLBuilder implements Builder {
   }
 
   visitInclude(node: IncludeNode): string {
-    if (this.includeStack.length >= this.MAX_INCLUDE_DEPTH) {
-      console.warn(`[Include Error] Max inclusion depth reached: ${this.MAX_INCLUDE_DEPTH}`);
-      return `<div class="error">Error: Max inclusion depth reached</div>`;
+    if (node.error) {
+      return `<div class="error">Error: ${node.error}</div>`;
     }
 
-    const currentDir = this.currentFilePath !== 'unknown' ? path.dirname(this.currentFilePath) : process.cwd();
-    const targetPath = path.resolve(currentDir, node.path);
-
-    if (this.includeStack.includes(targetPath)) {
-      console.warn(`[Include Error] Circular inclusion detected: ${targetPath}`);
-      return `<div class="error">Error: Circular inclusion detected: ${node.path}</div>`;
-    }
-
-    if (!fs.existsSync(targetPath)) {
-      console.warn(`[Include Error] File not found: ${targetPath}`);
-      return `<div class="error">Error: Included file not found: ${node.path}</div>`;
-    }
-
-    try {
-      const content = fs.readFileSync(targetPath, 'utf8');
-      const lexer = new Lexer(content);
-      const tokens = lexer.tokenize();
-      const parser = new Parser(tokens, targetPath);
-      const doc = parser.parse();
-
-      // Track the stack for recursion
-      const previousPath = this.currentFilePath;
-      this.currentFilePath = targetPath;
-      this.includeStack.push(targetPath);
-
-      // Render the children of the included document
-      const result = this.joinChildren(doc.children);
-
-      // Restore the stack
-      this.includeStack.pop();
-      this.currentFilePath = previousPath;
-
-      return result;
-    } catch (err: any) {
-      if (err.code === 'EACCES') {
-        console.warn(`[Include Error] Permission denied: ${targetPath}`);
-        return `<div class="error">Error: Permission denied for included file: ${node.path}</div>`;
-      }
-      console.error(`[Include Error] Failed to process ${targetPath}: ${err.message}`);
-      return `<div class="error">Error: Failed to process include: ${node.path}</div>`;
-    }
+    return this.joinChildren(node.children);
   }
 
   visitAbbreviationDefinition(): string {
@@ -471,6 +406,14 @@ export class HTMLBuilder implements Builder {
           return true;
         }
       }
+
+      // Recherche dans les inclusions (Parser-side inclusions)
+      if (node.type === 'Include' && (node as IncludeNode).children) {
+        if (this.hasNodeType((node as IncludeNode).children, type, extraCheck)) {
+          return true;
+        }
+      }
+
       // Recherche dans les lignes de tableaux
       if (node.type === 'Table') {
         if (node.header && this.hasNodeType([node.header], type, extraCheck)) return true;
