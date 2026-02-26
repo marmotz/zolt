@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { unlinkSync, writeFileSync } from 'fs';
 import { buildString } from './index';
 
 describe('Code Blocks E2E', () => {
@@ -46,5 +47,46 @@ describe('Code Blocks E2E', () => {
     const html = await buildString(content);
     expect(html).toContain('{$var}');
     expect(html).not.toContain('>1<');
+  });
+
+  it('should NOT replace variables in code blocks when document is injected into a layout', async () => {
+    const layoutPath = 'layout-code-block-test.zlt';
+    writeFileSync(layoutPath, ':::content:::');
+
+    try {
+      const content = `---\nlayout: "./${layoutPath}"\ntitle: "Home"\n---\n\n# Test\n\n\`\`\`zolt\n# {$title}\n\`\`\``;
+      const html = await buildString(content);
+
+      expect(html).toContain('{$title}');
+      expect(html).not.toContain('# Home');
+    } finally {
+      try {
+        unlinkSync(layoutPath);
+      } catch (e) {}
+    }
+  });
+
+  it('should NOT replace expressions in code blocks when document is injected into a layout', async () => {
+    const layoutPath = 'layout-expr-test.zlt';
+    writeFileSync(layoutPath, ':::content:::');
+
+    try {
+      const content = `---\nlayout: "./${layoutPath}"\n---\n\n\`\`\`zolt\n{{ 1 + 1 }}\n\`\`\``;
+      const html = await buildString(content);
+
+      // Check that delimiters are present (they might be in separate spans)
+      expect(html).toContain('{{');
+      expect(html).toContain('}}');
+      expect(html).toContain('1');
+
+      // Ensure the result of calculation (2) didn't replace the expression.
+      // In Shiki, 2 would be inside a span.
+      // We check that we don't have something like <span>2</span> replacing the whole expr.
+      expect(html).not.toMatch(/>2<\/span>/);
+    } finally {
+      try {
+        unlinkSync(layoutPath);
+      } catch (e) {}
+    }
   });
 });
