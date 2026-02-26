@@ -1,4 +1,4 @@
-# Zolt v0.2 - Implementation Todo List
+# Zolt v0.3 - Implementation Todo List
 
 ## 1. Core Parser & Lexer
 

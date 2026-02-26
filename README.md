@@ -2,7 +2,7 @@
 
 _Zolt : The high-voltage successor to Markdown_
 
-![Zolt Version](https://img.shields.io/badge/version-0.2-blue)
+![Zolt Version](https://img.shields.io/badge/version-0.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-draft-orange)
 
@@ -164,7 +164,7 @@ zolt build examples/abbreviations.zlt --watch
 
 ### Specification
 
-The complete Zolt v0.2 specification is available in [spec.md](spec.md).
+The complete Zolt v0.3 specification is available in [spec.md](spec.md).
 
 ### Examples
 

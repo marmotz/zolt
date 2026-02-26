@@ -81,7 +81,7 @@ const doc: Document = {
 ```
 
 & $ zolt --version
-& zolt v0.2.0 (High-Voltage)
+& zolt v0.3.0 (High-Voltage)
 
 ### Visualisations
 :::chart

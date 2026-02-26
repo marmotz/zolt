@@ -1,4 +1,4 @@
-# 📘 Spécification Complète : Zolt v0.2
+# 📘 Spécification Complète : Zolt v0.3
 
 _Zolt : The high-voltage successor to Markdown_
 
@@ -1260,7 +1260,7 @@ Les valeurs sont résolues dans cet ordre (la dernière écrase les précédente
 ```yaml
 site_name: "Documentation Zolt"
 author: "Zolt Team"
-version: "0.2.0"
+version: "0.3.0"
 theme: "professional"
 ```
 
@@ -2535,7 +2535,7 @@ Pour développer un parseur Zolt :
 
 ---
 
-**Version de la spécification :** 0.2
+**Version de la spécification :** 0.3
 **Dernière mise à jour :** 2026-02-18
 **Statut :** Draft
 
