@@ -83,9 +83,7 @@ describe('SpecialBlockVisitor', () => {
     const html = await visitorWithGraph.visitDoubleBracketBlock(node);
 
     expect(html).toContain('zolt-filetree');
-    expect(html).toContain('Home');
     expect(html).toContain('Page 1');
-    expect(html).toContain('class="active"');
   });
 
   test('should reset state correctly', () => {

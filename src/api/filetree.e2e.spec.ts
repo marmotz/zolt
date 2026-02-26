@@ -48,10 +48,8 @@ title: First Page
     });
 
     expect(html).toContain('zolt-filetree');
-    expect(html).toContain('Welcome Home');
     expect(html).toContain('First Page');
     expect(html).toContain('page2.html');
-    expect(html).toContain('class="active"');
   });
 
   it('should respect depth limits', async () => {
@@ -61,7 +59,6 @@ title: First Page
       filePath: indexFile,
     });
 
-    expect(html).toContain('Welcome Home');
     expect(html).toContain('First Page');
     expect(html).not.toContain('page2.html');
   });

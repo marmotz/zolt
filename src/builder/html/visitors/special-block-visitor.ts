@@ -1,4 +1,5 @@
 import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
+import { ProjectNode } from '../../../utils/project-graph';
 import { slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class SpecialBlockVisitor {
@@ -16,7 +17,7 @@ export class SpecialBlockVisitor {
     private evaluator: any,
     private processInlineContent: (text: string) => Promise<string>,
     private currentHeadings: HeadingNode[],
-    private projectGraph?: any,
+    private projectGraph?: ProjectNode[],
     private currentFilePath?: string
   ) {}
 
@@ -178,23 +179,43 @@ export class SpecialBlockVisitor {
     const to = parseInt(node.attributes?.to || '99');
     const depth = parseInt(node.attributes?.depth || '99');
 
-    const html = this.renderFileTreeNode(this.projectGraph, 0, from, to, depth);
+    const html = this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth);
     const customClass = node.attributes?.class || '';
 
     return `<nav class="zolt-filetree${customClass ? ' ' + customClass : ''}">\n${html}\n</nav>`;
   }
 
-  private renderFileTreeNode(node: any, currentDepth: number, from: number, to: number, maxDepth: number): string {
+  private renderFileTreeNodes(
+    nodes: ProjectNode[],
+    currentDepth: number,
+    from: number,
+    to: number,
+    maxDepth: number
+  ): string {
     if (currentDepth > to || currentDepth > maxDepth) return '';
+    if (!nodes || nodes.length === 0) return '';
 
-    let html = '';
+    const html = nodes.map((n: ProjectNode) => this.renderFileTreeNode(n, currentDepth, from, to, maxDepth)).join('');
+
+    return `<ul>\n${html}</ul>`;
+  }
+
+  private renderFileTreeNode(
+    node: ProjectNode,
+    currentDepth: number,
+    from: number,
+    to: number,
+    maxDepth: number
+  ): string {
+    if (currentDepth > to || currentDepth > maxDepth) return '';
 
     const isVisible = currentDepth >= from;
     const isActive = this.currentFilePath && node.absPath.includes(this.currentFilePath);
     const activeClass = isActive ? ' class="active"' : '';
 
+    let html = '';
+
     if (isVisible) {
-      // Basic relative link handling
       const link = node.path.replace(/\.zlt$/, '.html');
       html += `<li${activeClass}><a href="${link}">${this.escapeHtml(node.title)}</a>`;
     }
@@ -211,10 +232,6 @@ export class SpecialBlockVisitor {
 
     if (isVisible) {
       html += '</li>\n';
-    }
-
-    if (isVisible && currentDepth === from) {
-      return `<ul>\n${html}</ul>`;
     }
 
     return html;

@@ -17,7 +17,7 @@ export interface BuildOptions {
   assetResolver?: (path: string) => string;
   globalAbbreviations?: Map<string, string>;
   entryPoint?: string;
-  projectGraph?: ProjectNode;
+  projectGraph?: ProjectNode[];
 }
 
 export interface LintResult {
@@ -111,7 +111,8 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   let projectGraph = options?.projectGraph;
   if (!projectGraph && options?.entryPoint) {
     const builder = new ProjectGraphBuilder(options.entryPoint);
-    projectGraph = builder.build() || undefined;
+    const result = builder.build();
+    projectGraph = result ? result : undefined;
   }
 
   let builder: Builder;

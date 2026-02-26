@@ -10,61 +10,88 @@ export interface ProjectNode {
 }
 
 export class ProjectGraphBuilder {
-  private visited = new Set<string>();
-  private entryPoint: string = '';
+  private readonly entryPoint: string = '';
 
   constructor(entryPoint: string) {
     this.entryPoint = path.resolve(entryPoint);
   }
 
-  public build(): ProjectNode | null {
+  public build(): ProjectNode[] | null {
     if (!fs.existsSync(this.entryPoint)) {
       return null;
     }
-    return this.scan(this.entryPoint);
+
+    return this.buildGraph();
   }
 
-  private scan(currentPath: string): ProjectNode {
-    const absPath = path.resolve(currentPath);
-    this.visited.add(absPath);
-
-    const content = fs.readFileSync(absPath, 'utf-8');
-    const rawMetadata = FileMetadataUtils.extractRaw(content);
-    const metadata = rawMetadata ? FileMetadataUtils.parse(rawMetadata) : {};
-    const title = metadata.title || path.basename(absPath, '.zlt');
-
-    const children: ProjectNode[] = [];
-    const dir = path.dirname(absPath);
-
-    // Simple regex to find links and includes
-    // 1. [text](link.zlt)
-    // 2. :::include link.zlt
-    const links = new Set<string>();
-
-    // Remove code blocks to avoid false positives
+  private getLinks(content: string, dir: string): string[] {
+    const links: string[] = [];
     const cleanContent = content.replace(/```[\s\S]*?```/g, '');
-
     const linkRegex = /\[.*?]\(([^)]+\.zlt)\)|:::include\s+(\S+)/g;
     let match;
     while ((match = linkRegex.exec(cleanContent)) !== null) {
       const link = match[1] || match[2];
       if (link && link.endsWith('.zlt') && !link.startsWith('http')) {
-        links.add(link);
+        const absPath = path.resolve(dir, link);
+        if (fs.existsSync(absPath)) {
+          links.push(absPath);
+        }
+      }
+    }
+    return links;
+  }
+
+  private getTitle(absPath: string): string {
+    const content = fs.readFileSync(absPath, 'utf-8');
+    const rawMetadata = FileMetadataUtils.extractRaw(content);
+    const metadata = rawMetadata ? FileMetadataUtils.parse(rawMetadata) : {};
+    return metadata.title || path.basename(absPath, '.zlt');
+  }
+
+  private buildGraph(): ProjectNode[] {
+    const entryContent = fs.readFileSync(this.entryPoint, 'utf-8');
+    const entryDir = path.dirname(this.entryPoint);
+    const entryMetadata = FileMetadataUtils.extractRaw(entryContent)
+      ? FileMetadataUtils.parse(FileMetadataUtils.extractRaw(entryContent)!)
+      : {};
+    const entryTitle = entryMetadata.title || path.basename(this.entryPoint, '.zlt');
+
+    const processedPaths = new Set<string>();
+    processedPaths.add(this.entryPoint);
+
+    const nodes = this.scanNodes(this.entryPoint, processedPaths);
+    nodes.unshift({
+      path: path.relative(entryDir, this.entryPoint),
+      absPath: this.entryPoint,
+      title: entryTitle,
+      children: [],
+    });
+
+    return nodes;
+  }
+
+  private scanNodes(currentPath: string, processedPaths: Set<string>): ProjectNode[] {
+    const absPath = path.resolve(currentPath);
+    const dir = path.dirname(absPath);
+    const links = this.getLinks(fs.readFileSync(absPath, 'utf-8'), dir);
+    const nodes: ProjectNode[] = [];
+
+    for (const linkPath of links) {
+      if (!processedPaths.has(linkPath)) {
+        processedPaths.add(linkPath);
+        const absPath = path.resolve(linkPath);
+        nodes.push({
+          path: path.relative(path.dirname(this.entryPoint), absPath),
+          absPath,
+          title: this.getTitle(absPath),
+          children: [],
+        });
       }
     }
 
-    for (const link of links) {
-      const childPath = path.resolve(dir, link);
-      if (fs.existsSync(childPath) && !this.visited.has(childPath)) {
-        children.push(this.scan(childPath));
-      }
-    }
-
-    return {
-      path: path.relative(path.dirname(this.entryPoint), absPath),
-      absPath,
-      title,
-      children,
-    };
+    return nodes.map((node) => ({
+      ...node,
+      children: this.scanNodes(node.absPath, processedPaths),
+    }));
   }
 }

@@ -1,6 +1,7 @@
 import { createHighlighter, type Highlighter } from 'shiki';
 import { InlineParser } from '../../parser/inline-parser';
 import { ASTNode, DocumentNode } from '../../parser/types';
+import { ProjectNode } from '../../utils/project-graph';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
@@ -28,13 +29,13 @@ export class HTMLBuilder implements Builder {
   private specialBlockVisitor: SpecialBlockVisitor;
   private documentRenderer: DocumentRenderer;
   private highlighter?: Highlighter;
-  private projectGraph?: any;
+  private projectGraph?: ProjectNode[];
   private currentFilePath?: string;
 
   constructor(
     initialVariables?: InitialVariables,
     private assetResolver?: (path: string) => string,
-    projectGraph?: any,
+    projectGraph?: ProjectNode[],
     currentFilePath?: string
   ) {
     this.projectGraph = projectGraph;
