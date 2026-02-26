@@ -14,7 +14,9 @@ export class SpecialBlockVisitor {
     private renderAllAttributes: (attrs?: any) => string,
     private evaluator: any,
     private processInlineContent: (text: string) => string,
-    private currentHeadings: HeadingNode[]
+    private currentHeadings: HeadingNode[],
+    private projectGraph?: any,
+    private currentFilePath?: string
   ) {}
 
   public reset(): void {
@@ -157,9 +159,63 @@ export class SpecialBlockVisitor {
     if (node.blockType === 'toc') {
       return this.visitToc(node);
     }
+    if (node.blockType === 'filetree') {
+      return this.visitFileTree(node);
+    }
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
+  }
+
+  private visitFileTree(node: DoubleBracketBlockNode): string {
+    if (!this.projectGraph) {
+      return '<div class="zolt-filetree-error">Project graph not available. Please specify an entry point.</div>';
+    }
+
+    const from = parseInt(node.attributes?.from || '0');
+    const to = parseInt(node.attributes?.to || '99');
+    const depth = parseInt(node.attributes?.depth || '99');
+
+    const html = this.renderFileTreeNode(this.projectGraph, 0, from, to, depth);
+    const customClass = node.attributes?.class || '';
+
+    return `<nav class="zolt-filetree${customClass ? ' ' + customClass : ''}">\n${html}\n</nav>`;
+  }
+
+  private renderFileTreeNode(node: any, currentDepth: number, from: number, to: number, maxDepth: number): string {
+    if (currentDepth > to || currentDepth > maxDepth) return '';
+
+    let html = '';
+
+    const isVisible = currentDepth >= from;
+    const isActive = this.currentFilePath && node.absPath.includes(this.currentFilePath);
+    const activeClass = isActive ? ' class="active"' : '';
+
+    if (isVisible) {
+      // Basic relative link handling
+      const link = node.path.replace(/\.zlt$/, '.html');
+      html += `<li${activeClass}><a href="${link}">${this.escapeHtml(node.title)}</a>`;
+    }
+
+    if (node.children.length > 0 && currentDepth < to && currentDepth < maxDepth) {
+      const childrenHtml = node.children
+        .map((child: any) => this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth))
+        .join('');
+
+      if (childrenHtml) {
+        html += `\n<ul>\n${childrenHtml}</ul>\n`;
+      }
+    }
+
+    if (isVisible) {
+      html += '</li>\n';
+    }
+
+    if (isVisible && currentDepth === from) {
+      return `<ul>\n${html}</ul>`;
+    }
+
+    return html;
   }
 
   private visitToc(node: DoubleBracketBlockNode): string {

@@ -27,7 +27,9 @@ export class HTMLBuilder implements Builder {
 
   constructor(
     initialVariables?: InitialVariables,
-    private assetResolver?: (path: string) => string
+    private assetResolver?: (path: string) => string,
+    private projectGraph?: any,
+    private currentFilePath?: string
   ) {
     this.evaluator = new ExpressionEvaluator();
     if (initialVariables) {
@@ -82,7 +84,9 @@ export class HTMLBuilder implements Builder {
       renderAttrsBound,
       this.evaluator,
       processInlineContentBound,
-      this.currentHeadings
+      this.currentHeadings,
+      this.projectGraph,
+      this.currentFilePath
     );
   }
 

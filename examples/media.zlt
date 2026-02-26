@@ -1,3 +1,6 @@
+---
+title: "Media Management"
+---
 # Media Management Examples in Zolt
 
 Zolt uses distinct prefixes to identify different types of media, allowing the parser to generate the correct HTML tags automatically.

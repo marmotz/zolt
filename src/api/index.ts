@@ -6,6 +6,7 @@ import { HTMLBuilder } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
+import { ProjectGraphBuilder, ProjectNode } from '../utils/project-graph';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
@@ -15,6 +16,8 @@ export interface BuildOptions {
   filePath?: string;
   assetResolver?: (path: string) => string;
   globalAbbreviations?: Map<string, string>;
+  entryPoint?: string;
+  projectGraph?: ProjectNode;
 }
 
 export interface LintResult {
@@ -104,10 +107,17 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     Object.assign(mergedVariables, ast.fileMetadata.data);
   }
 
+  // Handle project graph for [[filetree]]
+  let projectGraph = options?.projectGraph;
+  if (!projectGraph && options?.entryPoint) {
+    const builder = new ProjectGraphBuilder(options.entryPoint);
+    projectGraph = builder.build() || undefined;
+  }
+
   let builder: Builder;
 
   if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder(mergedVariables, options?.assetResolver);
+    builder = new HTMLBuilder(mergedVariables, options?.assetResolver, projectGraph, options?.filePath);
   } else {
     throw new Error(`Unsupported output type: ${options.type}`);
   }

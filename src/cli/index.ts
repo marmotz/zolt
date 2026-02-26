@@ -49,7 +49,8 @@ async function buildFileWithDeps(
   visited: Set<string>,
   baseInputDir: string,
   customOutputFile?: string,
-  projectMetadata: Record<string, any> = {}
+  projectMetadata: Record<string, any> = {},
+  entryPoint?: string
 ): Promise<Set<string>> {
   const absoluteInput = resolve(inputFile);
   const touchedFiles = new Set<string>();
@@ -91,7 +92,7 @@ async function buildFileWithDeps(
     return newRelativePathForHtml.replace(/\\/g, '/');
   };
 
-  await buildFile(absoluteInput, outputFile, { type, assetResolver, projectMetadata });
+  await buildFile(absoluteInput, outputFile, { type, assetResolver, projectMetadata, entryPoint });
   console.log(`${pc.green('Built:')} ${outputFile}`);
 
   const inputDir = dirname(absoluteInput);
@@ -142,7 +143,8 @@ async function buildFileWithDeps(
           visited,
           baseInputDir,
           undefined,
-          projectMetadata
+          projectMetadata,
+          entryPoint
         );
         for (const dep of subDeps) {
           touchedFiles.add(dep);
@@ -344,6 +346,7 @@ async function performBuild(files: string[], output: string | undefined, type: '
   }
 
   const projectMetadata = await loadProjectMetadata(baseInputDir);
+  const entryPoint = files.length > 0 ? resolve(files[0]) : undefined;
 
   if (files.length === 1) {
     const inputFile = files[0];
@@ -360,7 +363,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
           visited,
           baseInputDir,
           undefined,
-          projectMetadata
+          projectMetadata,
+          entryPoint
         );
         for (const f of touched) allTouchedFiles.add(f);
 
@@ -376,7 +380,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
           visited,
           baseInputDir,
           undefined,
-          projectMetadata
+          projectMetadata,
+          entryPoint
         );
         for (const f of touched) allTouchedFiles.add(f);
 
@@ -397,7 +402,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
       visited,
       baseInputDir,
       resolvedOutputFile,
-      projectMetadata
+      projectMetadata,
+      entryPoint
     );
     for (const f of touched) allTouchedFiles.add(f);
   } else {
@@ -419,7 +425,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
         visited,
         baseInputDir,
         undefined,
-        projectMetadata
+        projectMetadata,
+        entryPoint
       );
       for (const f of touched) allTouchedFiles.add(f);
     }

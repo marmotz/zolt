@@ -52,11 +52,45 @@ describe('SpecialBlockVisitor', () => {
     expect(visitor.visitTripleColonBlock(footer)).toContain('class="zolt-sidebar-footer"');
   });
 
+  test('should render filetree', () => {
+    const graph = {
+      path: 'index.zlt',
+      absPath: '/root/index.zlt',
+      title: 'Home',
+      children: [
+        {
+          path: 'page1.zlt',
+          absPath: '/root/page1.zlt',
+          title: 'Page 1',
+          children: [],
+        },
+      ],
+    };
+
+    const visitorWithGraph = new SpecialBlockVisitor(
+      () => '',
+      () => '',
+      { getVariable: () => null },
+      (text: string) => text,
+      [],
+      graph,
+      '/root/index.zlt'
+    );
+
+    const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree', attributes: {} };
+    const html = visitorWithGraph.visitDoubleBracketBlock(node);
+
+    expect(html).toContain('zolt-filetree');
+    expect(html).toContain('Home');
+    expect(html).toContain('Page 1');
+    expect(html).toContain('class="active"');
+  });
+
   test('should reset state correctly', () => {
     visitor.hasSidebar = true;
     visitor.sidebarSide = 'right';
     visitor.reset();
     expect(visitor.hasSidebar).toBe(false);
-    expect(visitor.sidebarSide).toBe('left');
+    expect(visitor.sidebarSide as string).toBe('left');
   });
 });

@@ -170,6 +170,51 @@ export const BASE_CSS = `
   .zolt-toc-number { margin-right: 0.5rem; }
   .zolt-heading-number { margin-right: 0.5rem; }
 
+  /* --- FILETREE --- */
+  .zolt-filetree ul {
+    list-style: none;
+    padding-left: 1.2rem;
+    margin: 0.5rem 0;
+  }
+  
+  .zolt-filetree > ul {
+    padding-left: 0;
+  }
+  
+  .zolt-filetree li {
+    margin: 0.2rem 0;
+    line-height: 1.4;
+  }
+  
+  .zolt-filetree a {
+    color: var(--zlt-color-text);
+    text-decoration: none;
+    display: block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  
+  .zolt-filetree a:hover {
+    background: var(--zlt-color-primary-soft);
+    color: var(--zlt-color-primary);
+  }
+  
+  .zolt-filetree li.active > a {
+    background: var(--zlt-color-primary);
+    color: white;
+    font-weight: bold;
+  }
+  
+  .zolt-filetree-error {
+    color: var(--zlt-color-error);
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 1rem;
+    border: 1px dashed var(--zlt-color-error);
+    border-radius: 4px;
+  }
+
   .zolt-chart {
     margin: 2.5rem 0;
     background: var(--zlt-color-bg);

@@ -1,3 +1,6 @@
+---
+title: "Page d'Accueil"
+---
 {{include header.zlt}}
 
 {{include navigation.zlt}}

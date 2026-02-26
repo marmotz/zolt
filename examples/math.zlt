@@ -1,3 +1,6 @@
+---
+title: "Mathematical Formulas"
+---
 # Mathematical Formulas in Zolt
 
 Zolt integrates KaTeX for high-performance mathematical rendering. You can use LaTeX syntax for both inline and block formulas.
