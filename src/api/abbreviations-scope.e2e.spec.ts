@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { unlink, writeFile } from 'fs/promises';
-import { HTMLBuilder } from '../builder/html/builder';
 import { buildFileToString, buildString } from './index';
 
 describe('API: Abbreviations Scope', () => {

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Lexer } from '../lexer/lexer';
 import { Token, TokenType } from '../lexer/token-types';
 import { BlockquoteParser } from './block-parsers/blockquote-parser';
 import { CodeBlockParser } from './block-parsers/code-block-parser';
@@ -22,7 +23,6 @@ import {
   IncludeNode,
   VariableDefinitionNode,
 } from './types';
-import { Lexer } from '../lexer/lexer';
 
 export class Parser {
   private tokens: Token[];

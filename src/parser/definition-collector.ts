@@ -7,12 +7,15 @@ export class DefinitionCollector {
   private globalAbbreviations: Map<string, string> = new Map();
 
   public static clearGlobalAbbreviations(): void {
-    // This method is now effectively a no-op for the static case, 
-    // but we'll keep it for API compatibility if needed, 
+    // This method is now effectively a no-op for the static case,
+    // but we'll keep it for API compatibility if needed,
     // or we can remove it if we update all callers.
   }
 
-  public collect(tokens: Token[], initialGlobalAbbreviations?: Map<string, string>): {
+  public collect(
+    tokens: Token[],
+    initialGlobalAbbreviations?: Map<string, string>
+  ): {
     abbreviations: Map<string, string>;
     linkReferences: Map<string, string>;
     globalAbbreviations: Map<string, string>;

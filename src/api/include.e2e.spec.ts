@@ -113,10 +113,7 @@ describe('Include E2E', () => {
 
   test('should handle nested blocks in included files', async () => {
     const includedFile = path.join(tempDir, 'blocks.zlt');
-    fs.writeFileSync(
-      includedFile,
-      ':::tabs\n:::tab [Tab 1]\nContent 1\n:::tab [Tab 2]\nContent 2\n:::\n'
-    );
+    fs.writeFileSync(includedFile, ':::tabs\n:::tab [Tab 1]\nContent 1\n:::tab [Tab 2]\nContent 2\n:::\n');
 
     const mainFile = path.join(tempDir, 'main.zlt');
     const mainContent = '# Test\n\n{{include blocks.zlt}}';

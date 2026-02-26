@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, mock } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -23,7 +23,7 @@ describe('Include Permission Errors', () => {
     const includedFile = path.join(tempDir, 'secret.zlt');
     fs.writeFileSync(includedFile, 'Secret content');
 
-    // On Linux, we can change permissions. 
+    // On Linux, we can change permissions.
     // 0000 should deny all access.
     fs.chmodSync(includedFile, 0);
 
@@ -35,7 +35,7 @@ describe('Include Permission Errors', () => {
     const parser = new Parser(tokens, mainFile);
     const doc = parser.parse();
     const builder = new HTMLBuilder();
-    
+
     const html = builder.visitDocument(doc);
 
     expect(html).toContain('Permission denied');
@@ -56,7 +56,7 @@ describe('Include Permission Errors', () => {
 
   test('should handle file not found during linting', async () => {
     const missingFile = path.join(tempDir, 'missing.zlt');
-    
+
     const result = await lint(missingFile);
 
     expect(result.valid).toBe(false);
