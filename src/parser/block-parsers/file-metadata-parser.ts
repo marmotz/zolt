@@ -1,24 +1,8 @@
 import { Token, TokenType } from '../../lexer/token-types';
-import { FileMetadataUtils } from '../../utils/file-metadata';
+import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../../utils/file-metadata';
 import { FileMetadataNode } from '../types';
 
 export class FileMetadataParser {
-  private static readonly KNOWN_KEYS = new Set([
-    'title',
-    'author',
-    'date',
-    'version',
-    'tags',
-    'description',
-    'keywords',
-    'robots',
-    'image',
-    'lang',
-    'toc',
-    'theme',
-    'color-scheme',
-  ]);
-
   public parseFileMetadata(
     expect: (type: TokenType) => Token,
     reportWarning: (message: string, line: number, column: number, code: string) => void
@@ -32,7 +16,7 @@ export class FileMetadataParser {
       const match = lines[i].match(/^([a-zA-Z0-9_-]+)\s*:/);
       if (match) {
         const key = match[1];
-        if (!FileMetadataParser.KNOWN_KEYS.has(key)) {
+        if (!KNOWN_METADATA_KEYS.has(key)) {
           reportWarning(`Unknown metadata field: "${key}"`, token.line + i, 1, 'UNKNOWN_METADATA');
         }
       }

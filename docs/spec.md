@@ -1225,7 +1225,8 @@ Contenu avec notes[^1] et[^2].
 
 ### 5.6 Métadonnées de fichier
 
-Les métadonnées de fichier permet de définir des métadonnées au début du fichier en utilisant la syntaxe YAML.
+Les métadonnées de fichier permettent de définir des informations spécifiques au document au début du fichier en
+utilisant la syntaxe YAML.
 
 #### Syntaxe
 
@@ -1234,25 +1235,38 @@ Les métadonnées de fichier permet de définir des métadonnées au début du f
 title: 'Titre du Document'
 author: 'Jean Dupont'
 date: 2026-02-18
-version: 1.0
-tags: [ zolt, markdown, documentation ]
-description: 'Description courte du document'
 ---
 ```
 
 #### Variables Automatiques
 
-Les métadonnées de fichier sont accessibles comme des variables :
+Les métadonnées de fichier sont accessibles comme des variables : `{$title}`, `{$author}`, etc.
 
+### 5.7 Métadonnées de Projet (zolt.project.yaml)
+
+Le Zolt supporte une configuration globale via un fichier `zolt.project.yaml` placé à la racine du projet. Ces
+métadonnées sont injectées comme variables globales dans tous les fichiers lors de la génération.
+
+#### Hiérarchie de Surcharge
+
+Les valeurs sont résolues dans cet ordre (la dernière écrase les précédentes) :
+
+1. **Métadonnées de Projet** (`zolt.project.yaml`)
+2. **Métadonnées de Fichier** (Bloc YAML en haut de fichier)
+3. **Variables Locales** (Définies via `$var = value`)
+
+#### Exemple de `zolt.project.yaml`
+
+```yaml
+site_name: "Documentation Zolt"
+author: "Zolt Team"
+version: "0.2.0"
+theme: "professional"
 ```
-# {$title}
 
-Auteur : {$author}
-Date : {$date}
-Version : v{$version}
-```
+### 5.8 Métadonnées Supportées
 
-#### Métadonnées Supportées
+Le tableau ci-dessous répertorie les métadonnées reconnues par le moteur Zolt. Les métadonnées inconnues sont ignorées.
 
 | Champ          | Type          | Description                         |
 |----------------|---------------|-------------------------------------|
@@ -1267,7 +1281,7 @@ Version : v{$version}
 | `image`        | string        | Image de partage (Open Graph)       |
 | `lang`         | string        | Code langue (fr, en, etc.)          |
 | `toc`          | boolean       | Afficher la TOC automatiquement     |
-| `theme`        | string        | Thème de rendu (voir ci-dessous)    |
+| `theme`        | string        | Thème de rendu                      |
 | `color-scheme` | string        | `auto`, `light`, `dark`             |
 
 #### Thèmes Disponibles
@@ -1298,7 +1312,7 @@ color-scheme: "dark"
 
 #### Exemple Complet
 
-```yaml
+```zolt
 ---
 title: "Guide Zolt Complet"
 author: "Équipe Zolt"
@@ -1311,14 +1325,14 @@ theme: "professional"
 
 # {$title}
 
-  **Auteur :** {$author}
-  **Date :** {$date}
-  **Version :** v{$version}
+**Auteur :** {$author}
+**Date :** {$date}
+**Version :** v{$version}
 
 Tags: { { String.join($tags, ", ") } }
 ```
 
-### 5.7 Dates Automatiques
+### 5.9 Dates Automatiques
 
 Le Zolt fournit des variables automatiques pour les dates de fichier.
 
@@ -1449,7 +1463,7 @@ Dernière mise à jour : {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
 :::
 ```
 
-### 5.8 Abbréviations
+### 5.10 Abbréviations
 
 Les abbréviations permettent de définir des explications pour des termes techniques.
 
@@ -1516,7 +1530,7 @@ C'est similaire au système des variables :
 HTML{abbr="HyperText Markup Language" class=tech-term}
 ```
 
-### 5.9 Table des Matières (TOC)
+### 5.11 Table des Matières (TOC)
 
 La table des matières peut être générée automatiquement et insérée n'importe où dans le document.
 
@@ -1572,7 +1586,7 @@ La table des matières peut être générée automatiquement et insérée n'impo
 ### Problématique # Incluse (niveau 3)
 ```
 
-### 5.10 Boucles
+### 5.12 Boucles
 
 Les boucles permettent d'itérer sur des tableaux de données pour générer du contenu dynamique.
 
@@ -1668,7 +1682,7 @@ $products = {
 :::
 ```
 
-### 5.11 Inclusion de Fichiers
+### 5.13 Inclusion de Fichiers
 
 L'inclusion de fichiers permet de réutiliser du contenu commun à plusieurs documents, comme des en-têtes, pieds de page,
 ou sections récurrentes.

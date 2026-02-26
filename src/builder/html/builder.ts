@@ -38,7 +38,7 @@ export class HTMLBuilder implements Builder {
       }
     }
     this.attributeRenderer = new AttributeRenderer(this.evaluator);
-    this.documentRenderer = new DocumentRenderer(this.evaluator);
+    this.documentRenderer = new DocumentRenderer(this.evaluator, this.assetResolver);
 
     const buildBound = this.build.bind(this);
     const joinChildrenBound = this.joinChildren.bind(this);

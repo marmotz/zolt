@@ -3,6 +3,22 @@ export interface FileMetadata {
   modified: Date;
 }
 
+export const KNOWN_METADATA_KEYS = new Set([
+  'title',
+  'author',
+  'date',
+  'version',
+  'tags',
+  'description',
+  'keywords',
+  'robots',
+  'image',
+  'lang',
+  'toc',
+  'theme',
+  'color-scheme',
+]);
+
 export function createFileDateVariables(metadata: FileMetadata): { created: string; modified: string } {
   return {
     created: metadata.created.toISOString(),

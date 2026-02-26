@@ -11,7 +11,10 @@ export interface DocumentRendererOptions {
 }
 
 export class DocumentRenderer {
-  constructor(private evaluator: ExpressionEvaluator) {}
+  constructor(
+    private evaluator: ExpressionEvaluator,
+    private assetResolver?: (path: string) => string
+  ) {}
 
   public renderDocument(
     node: DocumentNode,
@@ -40,28 +43,28 @@ export class DocumentRenderer {
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
-    const lang = node.fileMetadata?.data?.lang || 'en';
-    const title = node.fileMetadata?.data?.title || 'Document';
-    const description = node.fileMetadata?.data?.description || '';
-    const author = node.fileMetadata?.data?.author || '';
+    const lang = this.getMetadata('lang', 'en');
+    const title = this.getMetadata('title', 'Document');
+    const description = this.getMetadata('description');
+    const author = this.getMetadata('author');
 
+    const rawKeywords = this.getMetadata('keywords', null);
+    const rawTags = this.getMetadata('tags', null);
     let keywords = '';
-    const rawKeywords = node.fileMetadata?.data?.keywords;
-    const rawTags = node.fileMetadata?.data?.tags;
 
     if (Array.isArray(rawKeywords)) {
       keywords = rawKeywords.join(', ');
-    } else if (typeof rawKeywords === 'string') {
+    } else if (typeof rawKeywords === 'string' && rawKeywords !== '') {
       keywords = rawKeywords;
     } else if (Array.isArray(rawTags)) {
       keywords = rawTags.join(', ');
     }
 
-    const robots = node.fileMetadata?.data?.robots || '';
-    const ogImage = node.fileMetadata?.data?.image || '';
+    const robots = this.getMetadata('robots');
+    const ogImage = this.getMetadata('image');
 
-    const theme = this.evaluator.getVariable('theme') || 'default';
-    const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
+    const theme = this.getMetadata('theme', 'default');
+    const colorScheme = this.getMetadata('color-scheme', 'auto');
     const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
 
     const mathCss = options.hasMath
@@ -116,28 +119,28 @@ ${mermaidScript}
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
-    const lang = node.fileMetadata?.data?.lang || 'en';
-    const title = node.fileMetadata?.data?.title || 'Document';
-    const description = node.fileMetadata?.data?.description || '';
-    const author = node.fileMetadata?.data?.author || '';
+    const lang = this.getMetadata('lang', 'en');
+    const title = this.getMetadata('title', 'Document');
+    const description = this.getMetadata('description');
+    const author = this.getMetadata('author');
 
+    const rawKeywords = this.getMetadata('keywords', null);
+    const rawTags = this.getMetadata('tags', null);
     let keywords = '';
-    const rawKeywords = node.fileMetadata?.data?.keywords;
-    const rawTags = node.fileMetadata?.data?.tags;
 
     if (Array.isArray(rawKeywords)) {
       keywords = rawKeywords.join(', ');
-    } else if (typeof rawKeywords === 'string') {
+    } else if (typeof rawKeywords === 'string' && rawKeywords !== '') {
       keywords = rawKeywords;
     } else if (Array.isArray(rawTags)) {
       keywords = rawTags.join(', ');
     }
 
-    const robots = node.fileMetadata?.data?.robots || '';
-    const ogImage = node.fileMetadata?.data?.image || '';
+    const robots = this.getMetadata('robots');
+    const ogImage = this.getMetadata('image');
 
-    const theme = this.evaluator.getVariable('theme') || 'default';
-    const colorScheme = this.evaluator.getVariable('color-scheme') || 'auto';
+    const theme = this.getMetadata('theme', 'default');
+    const colorScheme = this.getMetadata('color-scheme', 'auto');
     const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
 
     const mathCss = options.hasMath
@@ -175,6 +178,19 @@ ${chartScript}
 ${mermaidScript}
 </body>
 </html>`;
+  }
+
+  private getMetadata(key: string, defaultValue: any = ''): any {
+    let val = this.evaluator.getVariable(key);
+    val = val !== null && val !== undefined ? val : defaultValue;
+
+    if (key === 'image' && typeof val === 'string' && val && this.assetResolver) {
+      if (!val.startsWith('http://') && !val.startsWith('https://') && !val.startsWith('/')) {
+        return this.assetResolver(val);
+      }
+    }
+
+    return val;
   }
 
   private escapeHtml(text: string): string {

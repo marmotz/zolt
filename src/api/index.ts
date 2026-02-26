@@ -9,6 +9,7 @@ import { createFileDateVariables } from '../utils/file-metadata';
 export interface BuildOptions {
   type?: 'html' | 'pdf';
   variables?: Record<string, any>;
+  projectMetadata?: Record<string, any>;
   fileMetadata?: boolean;
   filePath?: string;
   assetResolver?: (path: string) => string;
@@ -37,7 +38,10 @@ export interface LintWarning {
 }
 
 export async function buildString(content: string, options?: BuildOptions): Promise<string> {
-  const initialVariables: Record<string, any> = { ...options?.variables };
+  const initialVariables: Record<string, any> = {
+    ...options?.projectMetadata,
+    ...options?.variables,
+  };
 
   if (options?.filePath) {
     try {
@@ -111,7 +115,10 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
   return buildString(content, { ...options, filePath });
 }
 
-export function extractAllAssets(content: string): { zltLinks: string[]; otherAssets: string[] } {
+export function extractAllAssets(
+  content: string,
+  projectMetadata?: Record<string, any>
+): { zltLinks: string[]; otherAssets: string[] } {
   const lexer = new Lexer(content);
   const tokens = lexer.tokenize();
   const parser = new Parser(tokens, undefined, undefined);
@@ -120,30 +127,40 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
   const zltLinks: string[] = [];
   const otherAssets: string[] = [];
 
+  const checkHref = (href: string) => {
+    if (!href) {
+      return;
+    }
+    if (
+      href.startsWith('http://') ||
+      href.startsWith('https://') ||
+      href.startsWith('#') ||
+      href.startsWith('mailto:')
+    ) {
+      return;
+    }
+
+    if (href.endsWith('.zlt')) {
+      zltLinks.push(href);
+    } else {
+      otherAssets.push(href);
+    }
+  };
+
+  // Check project metadata
+  if (projectMetadata && projectMetadata.image) {
+    checkHref(projectMetadata.image);
+  }
+
+  // Check file metadata
+  if (ast.fileMetadata && ast.fileMetadata.data && ast.fileMetadata.data.image) {
+    checkHref(ast.fileMetadata.data.image);
+  }
+
   const visit = (node: any) => {
     if (!node) {
       return;
     }
-
-    const checkHref = (href: string) => {
-      if (!href) {
-        return;
-      }
-      if (
-        href.startsWith('http://') ||
-        href.startsWith('https://') ||
-        href.startsWith('#') ||
-        href.startsWith('mailto:')
-      ) {
-        return;
-      }
-
-      if (href.endsWith('.zlt')) {
-        zltLinks.push(href);
-      } else {
-        otherAssets.push(href);
-      }
-    };
 
     switch (node.type) {
       case 'Link':
@@ -183,20 +200,20 @@ export function extractAllAssets(content: string): { zltLinks: string[]; otherAs
   };
 }
 
-export function extractZltLinks(content: string): string[] {
-  return extractAllAssets(content).zltLinks;
+export function extractZltLinks(content: string, projectMetadata?: Record<string, any>): string[] {
+  return extractAllAssets(content, projectMetadata).zltLinks;
 }
 
-export async function getLinkedFiles(inputPath: string): Promise<string[]> {
+export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
-  const { zltLinks } = extractAllAssets(content);
+  const { zltLinks } = extractAllAssets(content, projectMetadata);
 
   return zltLinks;
 }
 
-export async function getAssetFiles(inputPath: string): Promise<string[]> {
+export async function getAssetFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
-  const { otherAssets } = extractAllAssets(content);
+  const { otherAssets } = extractAllAssets(content, projectMetadata);
 
   return otherAssets;
 }

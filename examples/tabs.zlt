@@ -107,19 +107,19 @@ It can also include:
 
 :::tabs
 :::tab [Desktop View]
-![Desktop Screenshot](desktop.png){width=100%}
+![Desktop Screenshot](img1.png){width=100%}
 
 Desktop version with full functionality.
 :::
 
 :::tab [Mobile View]
-![Mobile Screenshot](mobile.png){width=100%}
+![Mobile Screenshot](img2.png){width=100%}
 
 Optimized mobile experience.
 :::
 
 :::tab [Tablet View]
-![Tablet Screenshot](tablet.png){width=100%}
+![Tablet Screenshot](img3.png){width=100%}
 
 Tablet-optimized layout.
 :::

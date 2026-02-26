@@ -1,12 +1,46 @@
 #!/usr/bin/env bun
 
 import { watch as watchFile } from 'fs';
-import { copyFile, mkdir, stat } from 'fs/promises';
+import { copyFile, mkdir, readFile, stat } from 'fs/promises';
 import { basename, dirname, join, relative, resolve } from 'path';
 import pc from 'picocolors';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
+import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../utils/file-metadata';
+
+async function loadProjectMetadata(baseInputDir: string): Promise<Record<string, any>> {
+  const projectFile = join(baseInputDir, 'zolt.project.yaml');
+  let data: Record<string, any> = {};
+
+  try {
+    const content = await readFile(projectFile, 'utf-8');
+    data = FileMetadataUtils.parse(content);
+    console.log(`${pc.cyan('Info:')} Loaded project metadata from ${projectFile}`);
+  } catch {
+    // If not in baseInputDir, try current working directory
+    if (baseInputDir !== process.cwd()) {
+      try {
+        const cwdProjectFile = join(process.cwd(), 'zolt.project.yaml');
+        const content = await readFile(cwdProjectFile, 'utf-8');
+        data = FileMetadataUtils.parse(content);
+        console.log(`${pc.cyan('Info:')} Loaded project metadata from ${cwdProjectFile}`);
+      } catch {
+        // No project file found
+      }
+    }
+  }
+
+  // Filter keys
+  const filtered: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (KNOWN_METADATA_KEYS.has(key)) {
+      filtered[key] = value;
+    }
+  }
+
+  return filtered;
+}
 
 async function buildFileWithDeps(
   inputFile: string,
@@ -14,7 +48,8 @@ async function buildFileWithDeps(
   type: 'html' | 'pdf',
   visited: Set<string>,
   baseInputDir: string,
-  customOutputFile?: string
+  customOutputFile?: string,
+  projectMetadata: Record<string, any> = {}
 ): Promise<Set<string>> {
   const absoluteInput = resolve(inputFile);
   const touchedFiles = new Set<string>();
@@ -56,13 +91,13 @@ async function buildFileWithDeps(
     return newRelativePathForHtml.replace(/\\/g, '/');
   };
 
-  await buildFile(absoluteInput, outputFile, { type, assetResolver });
+  await buildFile(absoluteInput, outputFile, { type, assetResolver, projectMetadata });
   console.log(`${pc.green('Built:')} ${outputFile}`);
 
   const inputDir = dirname(absoluteInput);
 
   // Handle other assets (images, etc.)
-  const assets = await getAssetFiles(absoluteInput);
+  const assets = await getAssetFiles(absoluteInput, projectMetadata);
   for (const asset of assets) {
     const fullAssetPath = resolve(inputDir, asset);
     const assetPathRelativeToBase = relative(baseInputDir, fullAssetPath);
@@ -92,7 +127,7 @@ async function buildFileWithDeps(
   }
 
   // Handle linked .zlt files recursively
-  const linkedFiles = await getLinkedFiles(absoluteInput);
+  const linkedFiles = await getLinkedFiles(absoluteInput, projectMetadata);
 
   for (const linkedFile of linkedFiles) {
     const fullLinkedPath = resolve(inputDir, linkedFile);
@@ -100,7 +135,15 @@ async function buildFileWithDeps(
     try {
       const linkedStat = await stat(fullLinkedPath);
       if (linkedStat.isFile()) {
-        const subDeps = await buildFileWithDeps(fullLinkedPath, outputDir, type, visited, baseInputDir);
+        const subDeps = await buildFileWithDeps(
+          fullLinkedPath,
+          outputDir,
+          type,
+          visited,
+          baseInputDir,
+          undefined,
+          projectMetadata
+        );
         for (const dep of subDeps) {
           touchedFiles.add(dep);
         }
@@ -300,6 +343,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
     }
   }
 
+  const projectMetadata = await loadProjectMetadata(baseInputDir);
+
   if (files.length === 1) {
     const inputFile = files[0];
     let outputFile = output;
@@ -308,7 +353,15 @@ async function performBuild(files: string[], output: string | undefined, type: '
       // If output has no extension, assume it's a directory
       if (!output.endsWith('.html') && !output.endsWith('.pdf')) {
         await mkdir(output, { recursive: true });
-        const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
+        const touched = await buildFileWithDeps(
+          resolve(inputFile),
+          output,
+          type,
+          visited,
+          baseInputDir,
+          undefined,
+          projectMetadata
+        );
         for (const f of touched) allTouchedFiles.add(f);
 
         return allTouchedFiles;
@@ -316,7 +369,15 @@ async function performBuild(files: string[], output: string | undefined, type: '
 
       const outputStat = await stat(output).catch(() => null);
       if (outputStat?.isDirectory()) {
-        const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
+        const touched = await buildFileWithDeps(
+          resolve(inputFile),
+          output,
+          type,
+          visited,
+          baseInputDir,
+          undefined,
+          projectMetadata
+        );
         for (const f of touched) allTouchedFiles.add(f);
 
         return allTouchedFiles;
@@ -335,7 +396,8 @@ async function performBuild(files: string[], output: string | undefined, type: '
       type,
       visited,
       baseInputDir,
-      resolvedOutputFile
+      resolvedOutputFile,
+      projectMetadata
     );
     for (const f of touched) allTouchedFiles.add(f);
   } else {
@@ -350,7 +412,15 @@ async function performBuild(files: string[], output: string | undefined, type: '
     }
 
     for (const inputFile of files) {
-      const touched = await buildFileWithDeps(resolve(inputFile), output, type, visited, baseInputDir);
+      const touched = await buildFileWithDeps(
+        resolve(inputFile),
+        output,
+        type,
+        visited,
+        baseInputDir,
+        undefined,
+        projectMetadata
+      );
       for (const f of touched) allTouchedFiles.add(f);
     }
   }
@@ -365,7 +435,25 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
   let buildTimeout: any = null;
   let isBuilding = false;
 
+  // Find zolt.project.yaml to watch it
+  let baseInputDir = '';
+  if (files.length > 0) {
+    const absoluteFiles = files.map((f) => resolve(f));
+    baseInputDir = dirname(absoluteFiles[0]);
+    for (let i = 1; i < absoluteFiles.length; i++) {
+      while (!absoluteFiles[i].startsWith(baseInputDir) && baseInputDir !== '/') {
+        baseInputDir = dirname(baseInputDir);
+      }
+    }
+  }
+  const projectFile = resolve(baseInputDir, 'zolt.project.yaml');
+  const cwdProjectFile = resolve(process.cwd(), 'zolt.project.yaml');
+
   const updateWatchers = (touchedFiles: Set<string>) => {
+    // Add project metadata files to touched files so they are watched
+    touchedFiles.add(projectFile);
+    touchedFiles.add(cwdProjectFile);
+
     // Files that are currently being watched but are no longer in the dependency graph
     for (const [filePath, watcher] of watchers) {
       if (!touchedFiles.has(filePath)) {
