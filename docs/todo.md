@@ -390,15 +390,15 @@
 ### Test Coverage
 
 - [x] Unit tests for each inline formatting feature
-- [ ] Unit tests for each block type
+- [x] Unit tests for each block type
 - [x] Unit tests for attributes
 - [x] Unit tests for variables
 - [x] Unit tests for SourceEvaluator (:::foreach, :::if, :::comment blocks)
-- [ ] Unit tests for calculations and namespaces
+- [x] Unit tests for calculations and namespaces
 - [x] Unit tests for loops
 - [x] Unit tests for file inclusion
 - [x] Integration tests for complete documents (charts, mermaid)
-- [ ] Regression tests for Markdown compatibility
+- [x] Regression tests for Markdown compatibility
 
 ### Test Files
 
