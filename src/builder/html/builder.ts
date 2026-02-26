@@ -4,6 +4,7 @@ import { ASTNode, DocumentNode } from '../../parser/types';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
+import { zoltLanguage } from './shiki/zolt';
 import { AttributeRenderer } from './utils/attribute-renderer';
 import { parseLineRanges } from './utils/line-range-parser';
 import { BlockVisitor } from './visitors/block-visitor';
@@ -104,6 +105,7 @@ export class HTMLBuilder implements Builder {
       this.highlighter = await createHighlighter({
         themes: ['github-dark'],
         langs: [
+          zoltLanguage,
           'javascript',
           'typescript',
           'python',
@@ -289,6 +291,9 @@ export class HTMLBuilder implements Builder {
     const code = node.content || '';
     const attributes = node.attributes || {};
 
+    const supportedLangs = highlighter.getLoadedLanguages();
+    const effectiveLang = supportedLangs.includes(lang) ? lang : 'text';
+
     const title = attributes.title;
     const highlightRange = attributes.highlight;
     const startLine = parseInt(attributes.start || '1', 10);
@@ -296,7 +301,7 @@ export class HTMLBuilder implements Builder {
     const highlightedLines = parseLineRanges(highlightRange);
 
     const html = highlighter.codeToHtml(code, {
-      lang,
+      lang: effectiveLang,
       theme: 'github-dark',
       transformers: [
         {

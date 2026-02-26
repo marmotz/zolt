@@ -254,6 +254,18 @@ describe('HTMLBuilder', () => {
     expect(html).toContain('const');
   });
 
+  test('should build code block with zolt language', async () => {
+    const node: CodeBlockNode = {
+      type: 'CodeBlock',
+      language: 'zolt',
+      content: '# Heading\n**bold** text',
+    };
+
+    const html = await builder.build(node);
+    expect(html).toContain('zolt-code-block');
+    expect(html).toContain('shiki');
+  });
+
   test('should build document with wrapper', async () => {
     const node: DocumentNode = {
       type: 'Document',

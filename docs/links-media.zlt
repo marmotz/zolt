@@ -1,0 +1,264 @@
+---
+title: "Links & Media"
+description: "Add hyperlinks, images, videos, audio, and embedded content"
+---
+
+# Links & Media
+
+Zolt uses distinct prefixes to identify different media types, allowing the parser to generate correct HTML automatically.
+
+---
+
+## Links
+
+### Basic Links
+
+```zolt
+[Zolt Documentation](https://zolt.marmotz.dev)
+[GitHub](https://github.com/marmotz/zolt)
+```
+
+### Links with Attributes
+
+```zolt
+[External Link](https://example.com){target=_blank rel=noopener}
+[Styled Link](page.html){color=blue font-weight=bold}
+```
+
+### Reference Links
+
+Avoid repeating URLs by defining references:
+
+```zolt
+Check out [Zolt][zolt] and [GitHub][github].
+
+[zolt]: https://zolt.marmotz.dev
+[github]: https://github.com/marmotz/zolt
+```
+
+### Internal Links (Cross-references)
+
+Link to document sections using `@`:
+
+```zolt
+See the [Introduction](@intro) for details.
+Go to [Advanced Features[Back to top](@advanced).
+](@top)
+```
+
+### Anchor Links
+
+Link to specific elements with anchors:
+
+```zolt
+Jump to [Lists section](#lists).
+[Return to summary](#summary)
+```
+
+### Links with Variables
+
+```zolt
+$site_url = "https://example.com"
+
+Visit [our website]({$site_url}).
+```
+
+---
+
+## Media Prefixes
+
+Zolt uses unique prefixes for each media type:
+
+| Prefix | Type | HTML Tag | Usage |
+|--------|------|----------|-------|
+| `!` | Image | `<img>` | Static images (jpg, png, gif, svg) |
+| `!!` | Video | `<video>` | Video files (mp4, webm, ogg) |
+| `??` | Audio | `<audio>` | Audio files (mp3, wav, ogg) |
+| `@@` | Embed | `<iframe>` | External embeds (YouTube, Vimeo) |
+| `&&` | File | `<a>` | Downloadable files (pdf, doc, zip) |
+
+---
+
+## Images
+
+### Basic Image
+
+```zolt
+![Alt text](image.jpg)
+```
+
+### Image with Attributes
+
+```zolt
+![Logo](logo.png){width=200px align=center}
+![Photo](photo.jpg){w=300 h=200 shadow=true}
+```
+
+### Image Attributes
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `w`, `width` | Width | `{w=200}` |
+| `h`, `height` | Height | `{h=150}` |
+| `shadow` | Add shadow | `{shadow=true}` |
+| `align` | Alignment | `{align=center}` |
+| `float` | CSS float | `{float=right}` |
+
+### Example
+
+```zolt
+![Screenshot](screenshot.png){width=600px align=center}
+```
+
+---
+
+## Videos
+
+### Local Video
+
+```zolt
+!![Demo Video](video.mp4)
+```
+
+### YouTube/Vimeo
+
+```zolt
+!![Tutorial](https://www.youtube.com/embed/dQw4w9WgXcQ)
+```
+
+### Video Attributes
+
+```zolt
+!![Loop Video](video.mp4){autoplay loop muted}
+```
+
+| Attribute | Description |
+|-----------|-------------|
+| `autoplay` | Start automatically |
+| `loop` | Repeat when finished |
+| `muted` | Start muted |
+
+---
+
+## Audio
+
+```zolt
+??[Podcast Episode](episode.mp3)
+```
+
+### With Controls
+
+```zolt
+??[Music Track](music.mp3){controls}
+```
+
+---
+
+## Embeds (iFrames)
+
+Embed external content like YouTube, Vimeo, or maps:
+
+```zolt
+@@[YouTube Video](https://www.youtube.com/embed/xxx)
+@@[Vimeo Video](https://vimeo.com/xxx)
+```
+
+### Responsive Embeds
+
+```zolt
+@@[Presentation](https://slides.example.com/embed/xxx){width=100%}
+```
+
+---
+
+## Downloadable Files
+
+Create download links with `&&`:
+
+```zolt
+&&[Download PDF](manual.pdf)
+&&[Get the Guide](guide.pdf){download=true}
+```
+
+### With Icon
+
+```zolt
+&&[User Manual](manual.pdf)
+```
+
+---
+
+## Media in Columns
+
+Combine media with column layouts:
+
+```zolt
+:::columns
+:::column
+![Photo 1](photo1.jpg){width=100%}
+Caption for photo 1.
+:::
+
+:::column
+![Photo 2](photo2.jpg){width=100%}
+Caption for photo 2.
+:::
+:::
+```
+
+---
+
+## Complete Examples
+
+### Article with Media
+
+```zolt
+# Product Launch
+
+![Product Image](product.jpg){w=400 float=right}
+
+The new product features include:
+
+- Feature one
+- Feature two
+- Feature three
+
+Watch the [demo video](@demo) for more details.
+
+&&[Download Brochure](brochure.pdf)
+```
+
+### Gallery
+
+```zolt
+:::columns
+:::column
+![Image 1](gallery1.jpg){width=100%}
+:::
+
+:::column
+![Image 2](gallery2.jpg){width=100%}
+:::
+
+:::column
+![Image 3](gallery3.jpg){width=100%}
+:::
+:::
+```
+
+---
+
+## Best Practices
+
+1. **Always include alt text** for accessibility
+2. **Use appropriate attributes** for sizing and layout
+3. **Consider performance** with large media files
+4. **Use local references** when possible for portability
+
+---
+
+## Next Steps
+
+- [Tables](tables.zlt) — Learn about grid tables
+- [Blocks](blocks.zlt) — Use tabs, accordions, columns
+- [Variables](variables.zlt) — Use variables for reusable content

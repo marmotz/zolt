@@ -1,0 +1,225 @@
+---
+title: "Basic Syntax"
+description: "Learn text formatting, inline styles, and typography in Zolt"
+---
+
+# Basic Syntax
+
+This guide covers the fundamental text formatting and typography features in Zolt.
+
+---
+
+## Text Formatting
+
+Zolt supports several inline text formatting options:
+
+| Symbol | Rendered | Description |
+|--------|----------|-------------|
+| `**text**` | **bold** | Bold text |
+| `//text//` | *italic* | Italic text (replaces `*` to avoid list conflicts) |
+| `__text__` | <u>underline</u> | Native underline |
+| `~~text~~` | ~~strikethrough~~ | Strikethrough text |
+| `^{text}` | <sup>superscript</sup> | Superscript (supports nesting) |
+| `_{text}` | <sub>subscript</sub> | Subscript (supports nesting) |
+| `==text==` | <mark>highlight</mark> | Native highlight |
+
+### Examples
+
+```zolt
+**Bold text**
+//Italic text//
+__Underlined text~~
+~~Strikethrough~~
+^{superscript}
+_{subscript}
+==highlighted==
+```
+
+Result:
+- **Bold text**
+- *Italic text*
+- <u>Underlined text</u>
+- ~~Strikethrough~~
+- <sup>superscript</sup>
+- <sub>subscript</sub>
+- <mark>highlighted</mark>
+
+---
+
+## Inline Styles
+
+Apply CSS-like attributes to text spans using the `||text||{attr}` syntax.
+
+### Syntax
+
+```
+||text to style||{attribute=value}
+```
+
+### Examples
+
+```zolt
+This is ||important||{color=red} text.
+
+This is ||highlighted||{background=yellow}.
+
+This is ||bold and blue||{font-weight=bold color=blue}.
+```
+
+### Common Attributes
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `color` | Text color | `{color=red}` |
+| `background` | Background color | `{background=yellow}` |
+| `font-weight` | Font weight | `{font-weight=bold}` |
+| `font-size` | Font size | `{font-size=1.5em}` |
+| `font-style` | Font style | `{font-style=italic}` |
+| `border` | Border | `{border=1px solid black}` |
+
+### Practical Examples
+
+```zolt
+||Warning:||{color=red font-weight=bold} This action cannot be undone.
+
+||NEW||{background=blue color=white padding=2px 8px border-radius=12px}
+
+||$variable||{font-family=monospace background=#F3F4F6}
+```
+
+---
+
+## Character Escaping
+
+Display literal special characters using the backslash `\` character.
+
+### Common Escapes
+
+| Syntax | Result |
+|--------|--------|
+| `\[text\]` | [text] |
+| `\{text\}` | {text} |
+| `\|\|text\|\|` | ||text|| |
+| `\-` | - (not a list item) |
+| `\.` | . (not a list) |
+| `\\` | \ (literal backslash) |
+
+### Examples
+
+```zolt
+This is not a \[link\]
+
+This is not bold \*text\*
+
+Use the function \`print()\`
+
+Literal pipe: \|
+
+Literal backslash: \\
+```
+
+---
+
+## Comments
+
+Add notes that won't appear in the rendered output.
+
+### Inline Comments
+
+```zolt
+This is visible %% this is hidden %% text.
+```
+
+### Block Comments
+
+```zolt
+:::comment
+This entire block
+is a comment
+and won't appear
+in the output.
+:::
+```
+
+---
+
+## Horizontal Rules
+
+Create visual separators between sections.
+
+### Syntax
+
+```zolt
+---    (standard)
+***    (thick)
+___    (thin)
+```
+
+### With Attributes
+
+```zolt
+---{color=red style=dashed}
+
+***{color=blue}
+
+___ {width=50% align=center}
+```
+
+---
+
+## Headings
+
+Create document structure with headings.
+
+### Syntax
+
+```zolt
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+```
+
+### Heading Attributes
+
+Add IDs, classes, and numbering:
+
+```zolt
+## Introduction{#intro}
+
+## Chapter 1{numbered}
+
+## Appendix{numbered=false}
+```
+
+### Automatic Numbering
+
+Enable global numbering:
+
+```zolt
+$numbering = true
+$numbering_style = "decimal"
+```
+
+Available styles: `decimal`, `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`
+
+---
+
+## Processing Order
+
+The parser processes elements in this order:
+
+1. Variables `{$var}`
+2. Blocks `[[...]]` and `:::`
+3. Inline formatting (bold, italic, etc.)
+4. Attributes `{}` applied to the element on the left
+
+---
+
+## Next Steps
+
+- [Lists](lists.zlt) — Learn about bullet, numbered, and task lists
+- [Links & Media](links-media.zlt) — Add links and media content
+- [Variables](variables.zlt) — Use variables for reusable content

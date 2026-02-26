@@ -1,0 +1,114 @@
+---
+title: "Zolt Documentation"
+description: "The complete reference guide for Zolt, the high-voltage successor to Markdown"
+author: "Zolt Contributors"
+version: 0.3.0
+theme: technical
+lang: en
+---
+
+# Zolt Documentation
+
+**Zolt** is a lightweight markup language designed to be fully readable as plain text while offering the semantic power of HTML5 and the precision of LaTeX. It combines the simplicity of Markdown with advanced features for professional documentation.
+
+---
+
+## Quick Start
+
+New to Zolt? Start here:
+
+1. [Basic Syntax](basic-syntax.zlt) — Learn text formatting, typography, and inline styles
+2. [Lists](lists.zlt) — Bullet, numbered, task, and definition lists
+3. [Links & Media](links-media.zlt) — Hyperlinks, images, videos, and audio
+
+---
+
+## Feature Overview
+
+Zolt extends Markdown with powerful features:
+
+| Feature | Syntax | Description |
+|---------|--------|-------------|
+| **Text Formatting** | `**bold**`, `//italic//`, `__underline__` | Enhanced inline formatting |
+| **Attributes** | `{color=red}` | Apply styles to any element |
+| **Variables** | `$var = "value"` | Reusable content values |
+| **Calculations** | `{{ 10 + 5 }}` | Mathematical expressions |
+| **Tables** | `[[table]]...[[/table]]` | Advanced grid tables |
+| **Charts** | `:::chart` | Built-in data visualization |
+| **Blocks** | `:::info`, `:::tabs` | Semantic containers |
+
+---
+
+## Documentation Sections
+
+### Getting Started
+
+- [Basic Syntax](basic-syntax.zlt) — Text formatting, inline styles, and typography
+- [Lists](lists.zlt) — All types of lists with nesting and attributes
+- [Links & Media](links-media.zlt) — External links, internal references, images, videos
+
+### Content Structure
+
+- [Tables](tables.zlt) — Grid tables with cell merging
+- [Semantic Blocks](blocks.zlt) — Tabs, accordions, columns, and callouts
+
+### Dynamic Content
+
+- [Variables & Calculations](variables.zlt) — Variables, expressions, and math functions
+- [Advanced Features](advanced.zlt) — Loops, conditionals, charts, and diagrams
+- [Metadata](metadata.zlt) — File metadata, themes, and configuration
+
+---
+
+## Why Zolt?
+
+### Design Philosophy
+
+- **Zero HTML**: Everything achievable in HTML/CSS has native Zolt syntax
+- **Strict but Flexible**: Syntax errors don't break documents but generate warnings
+- **Extensibility**: Use "Triple Colon" `:::` for advanced features
+- **Backward Compatibility**: Classic `.md` files work in Zolt parsers
+
+### Key Benefits
+
+- Create interactive, professional documents as quickly as taking notes
+- Files remain simple `.txt` with superior structural intelligence
+- Easy maintenance through variables and dynamic references
+
+---
+
+## Code Example
+
+```zolt
+---
+title: "My Document"
+author: "Jane Doe"
+---
+
+# {$title}
+
+This document demonstrates **Zolt** features:
+
+- Variables: Welcome to {$author}'s guide
+- Calculations: Total: {{ $price * $quantity }}
+- Formatting: ||Important text||{color=red}
+
+:::info [Note]
+This is an informational block with native syntax.
+:::
+```
+
+---
+
+## Related Resources
+
+- [Official Website](https://zolt.marmotz.dev)
+- [GitHub Repository](https://github.com/marmotz/zolt)
+
+---
+
+## Document Information
+
+- **Version:** {$version}
+- **Last Updated:** {{ Date.format($modified, "Mmmm DD, YYYY") }}
+- **Language:** English

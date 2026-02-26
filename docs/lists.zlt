@@ -1,0 +1,185 @@
+---
+title: "Lists"
+description: "Create bullet lists, numbered lists, task lists, and definition lists in Zolt"
+---
+
+# Lists
+
+Zolt supports multiple list types with consistent syntax and attributes.
+
+---
+
+## Bullet Lists
+
+Create unordered lists using `-` prefix:
+
+```zolt
+- First item
+- Second item
+- Third item
+```
+
+### Nested Lists
+
+Indent with 2 spaces or 1 tab:
+
+```zolt
+- Main item 1
+  - Sub-item 1.1
+  - Sub-item 1.2
+- Main item 2
+  - Sub-item 2.1
+    - Sub-item 2.1.1
+```
+
+---
+
+## Numbered Lists
+
+Create ordered lists with numbers:
+
+```zolt
+1. First step
+2. Second step
+3. Third step
+```
+
+The parser handles numbering automatically:
+
+```zolt
+1. Step one
+1. Step two
+1. Step three
+```
+
+All render as 1, 2, 3.
+
+---
+
+## Task Lists (Checkboxes)
+
+Create interactive task lists:
+
+```zolt
+- [ ] Task to do
+- [x] Completed task
+- [ ] Another task{color=red}
+```
+
+### Examples
+
+```zolt
+- [x] Write documentation
+- [x] Add examples
+- [ ] Review content
+- [ ] Publish
+```
+
+---
+
+## Definition Lists
+
+Define terms using `:` prefix:
+
+```zolt
+: HTML
+:   HyperText Markup Language, the standard markup language
+:   for documents designed to be displayed in a web browser.
+
+: CSS
+:   Cascading Style Sheets, a style sheet language used
+:   for describing the presentation of a document.
+```
+
+### Result
+
+: HTML
+:   HyperText Markup Language, the standard markup language for documents designed to be displayed in a web browser.
+
+: CSS
+:   Cascading Style Sheets, a style sheet language used for describing the presentation of a document.
+
+---
+
+## Plain Lists
+
+Display items without bullets or numbers using `+`:
+
+```zolt
++ First element
++ Second element
++ Third element
+```
+
+Useful for inline lists without visual markers.
+
+---
+
+## List Attributes
+
+Apply attributes to list items:
+
+```zolt
+- Normal item
+- Important item{color=red font-weight=bold}
+- Highlighted item{background=yellow}
+- Custom styled item{.my-class}
+```
+
+---
+
+## Complex Examples
+
+### Mixed List Types
+
+```zolt
+- Fruits
+  - Apple
+  - Banana
+  1. Imported
+  2. Local
+- Vegetables
+  - [x] Carrots
+  - [ ] Tomatoes
+```
+
+### Shopping List
+
+```zlt
+- [ ] Fruits
+  - [x] Apples
+  - [ ] Bananas
+- [ ] Vegetables
+  - [ ] Carrots
+  - [x] Tomatoes
+```
+
+### Glossary
+
+```zolt
+: API
+:   Application Programming Interface
+
+: DOM
+:   Document Object Model
+
+: JSON
+:   JavaScript Object Notation
+```
+
+---
+
+## Best Practices
+
+1. **Consistency**: Use the same list type within a section
+2. **Nesting**: Use 2 spaces or 1 tab (don't mix)
+3. **Attributes**: Use attributes to highlight important items
+4. **Definitions**: Use definition lists for glossaries and terminology
+
+---
+
+## Next Steps
+
+- [Tables](tables.zlt) — Learn about grid tables
+- [Links & Media](links-media.zlt) — Add links and media
+- [Blocks](blocks.zlt) — Use tabs and accordions

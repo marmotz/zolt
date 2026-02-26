@@ -1,0 +1,313 @@
+---
+title: "Advanced Features"
+description: "Loops, conditionals, charts, and data visualization in Zolt"
+---
+
+# Advanced Features
+
+Zolt provides powerful advanced features including loops, conditionals, and built-in charts.
+
+---
+
+## Loops (foreach)
+
+Iterate over arrays to generate dynamic content.
+
+### Basic Loop
+
+```zolt
+$items = ["Apple", "Banana", "Cherry"]
+
+:::foreach {$items as $item}
+- {$item}
+:::
+```
+
+### Loop with Index
+
+```zolt
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+:::foreach {$products as $product}
+{$foreach.index1}. {$product.name}: ${{$product.price}}
+:::
+```
+
+---
+
+## Loop Variables
+
+Access loop metadata:
+
+| Variable | Description |
+|----------|-------------|
+| `{$foreach.index}` | Current index (0-based) |
+| `{$foreach.index1}` | Current index (1-based) |
+| `{$foreach.first}` | `true` if first element |
+| `{$foreach.last}` | `true` if last element |
+| `{$foreach.even}` | `true` if index is even |
+| `{$foreach.odd}` | `true` if index is odd |
+
+### Examples
+
+```zolt
+:::foreach {$products as $product}
+:::if {$foreach.first}
+### Featured: {$product.name}
+:::
+:::if {$foreach.last}
+### Last Item: {$product.name}
+:::
+:::
+```
+
+---
+
+## Conditionals (if)
+
+Display content based on conditions.
+
+### Basic Condition
+
+```zolt
+:::if {$enabled}
+This shows when enabled is true.
+:::
+```
+
+### With Else
+
+```zolt
+:::if {$enabled}
+Content A
+:::
+:::if {!$enabled}
+Content B
+:::
+```
+
+### Complex Conditions
+
+```zolt
+:::if {$count > 10}
+Many items!
+:::
+:::if {$count > 0 && $count <= 10}
+Few items.
+:::
+:::if {$count == 0}
+No items.
+:::
+```
+
+---
+
+## Charts
+
+Create data visualizations with native chart support.
+
+### Line Chart
+
+```zolt
+:::chart
+:::chart-line {title="Monthly Sales"}
+January: 100
+February: 150
+March: 200
+April: 250
+:::
+:::
+```
+
+### Bar Chart
+
+```zolt
+:::chart
+:::chart-bar {title="Product Sales"}
+Product A: 150
+Product B: 200
+Product C: 175
+:::
+:::
+```
+
+### Pie Chart
+
+```zolt
+:::chart
+:::chart-pie {title="Market Share"}
+Company A: 35
+Company B: 25
+Company C: 20
+Others: 20
+:::
+:::
+```
+
+### Area Chart
+
+```zolt
+:::chart
+:::chart-area {title="Traffic"}
+Morning: 120
+Afternoon: 200
+Evening: 180
+Night: 50
+:::
+:::
+```
+
+---
+
+## Chart Attributes
+
+### Container Attributes
+
+```zolt
+:::chart {width=100% height=400px}
+:::
+```
+
+| Attribute | Description |
+|-----------|-------------|
+| `width` | Container width |
+| `height` | Container height |
+| `layout` | `horizontal` or `vertical` |
+
+### Chart Attributes
+
+```zolt
+:::chart-line {title="Title" color-scheme=cool legend=true grid=true}
+:::
+```
+
+| Attribute | Description |
+|-----------|-------------|
+| `title` | Chart title |
+| `color-scheme` | Color palette (cool, warm, pastel) |
+| `legend` | Show legend |
+| `grid` | Show grid |
+
+---
+
+## Multiple Charts
+
+```zolt
+:::chart {layout=horizontal}
+:::chart-line {title="Revenue"}
+2020: 50000
+2021: 75000 100000
+
+2022::::
+
+:::chart-bar {title="Expenses"}
+2020: 30000
+2021: 35000
+2022: 40000
+:::
+:::
+```
+
+---
+
+## Practical Examples
+
+### Dynamic Product List
+
+```zolt
+$products = [
+  {name: "Laptop", price: 999, in_stock: true},
+  {name: "Mouse", price: 29, in_stock: true},
+  {name: "Keyboard", price: 79, in_stock: false}
+]
+
+:::foreach {$products as $product}
+:::if {$product.in_stock}
+- **{$product.name}** - ${{$product.price}} ✅
+:::
+:::if {!$product.in_stock}
+- {$product.name} - Out of stock ❌
+:::
+:::
+```
+
+### Sales Report
+
+```zolt
+:::chart
+:::chart-line {title="Revenue Trend" legend=true grid=true}
+January: 45000
+February: 52000
+March: 61000
+April: 58000
+May: 72000
+:::
+
+:::chart-bar {title="By Category"}
+Electronics: 120000
+Clothing: 80000
+Home: 65000
+:::
+:::
+```
+
+### Conditional Styling
+
+```zolt
+$products = [
+  {name: "Basic", price: 29},
+  {name: "Premium", price: 99}
+]
+
+:::foreach {$products as $product}
+:::if {$product.price > 50}
+- {$product.name}: ${{$product.price}} {.premium}
+:::
+:::if {$product.price <= 50}
+- {$product.name}: ${{$product.price}}
+:::
+:::
+```
+
+---
+
+## Complete Example
+
+```zolt
+$months = ["Jan", "Feb", "Mar", "Apr"]
+$sales = [100, 150, 200, 180]
+
+## Sales Report
+
+Total: {{ List.sum($sales) }}
+Average: {{ Math.round(List.avg($sales)) }}
+
+:::chart
+:::chart-line {title="Monthly Sales" color-scheme=blue grid=true}
+:::foreach {$months as $month}
+{$month}: {$sales[$foreach.index]}
+:::
+:::
+:::
+```
+
+---
+
+## Best Practices
+
+1. **Check data** before using in loops
+2. **Use descriptive** variable names
+3. **Limit complexity** in charts
+4. **Test conditions** thoroughly
+
+---
+
+## Next Steps
+
+- [Metadata](metadata.zlt) — File and project configuration
+- [Basic Syntax](basic-syntax.zlt) — Formatting reference
+- [Links & Media](links-media.zlt) — Media handling

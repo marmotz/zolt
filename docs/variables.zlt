@@ -1,0 +1,258 @@
+---
+title: "Variables & Calculations"
+description: "Use variables, expressions, and built-in functions in Zolt"
+---
+
+# Variables & Calculations
+
+Zolt provides powerful variable and calculation features for dynamic content.
+
+---
+
+## Variables
+
+### Local Variables
+
+Define variables at the top of your file:
+
+```zolt
+$version = "2.0.0"
+$author = "Jane Doe"
+$count = 42
+$enabled = true
+```
+
+### Using Variables
+
+Reference variables with `{$variable}`:
+
+```zolt
+Welcome to {$author}'s guide.
+Version: {$version}
+Items: {$count}
+```
+
+### Global Variables
+
+Use `$$` prefix for project-wide variables:
+
+```zolt
+$$site_name = "My Website"
+$$company = "Acme Corp"
+```
+
+---
+
+## Arrays and Objects
+
+### Arrays
+
+```zolt
+$fruits = ["Apple", "Banana", "Cherry"]
+
+$fruits[0]  # Apple
+$fruits[1]  # Banana
+```
+
+### Objects
+
+```zolt
+$user = {name: "Alice", age: 30, city: "NYC"}
+
+$user.name   # Alice
+$user.age    # 30
+```
+
+### Arrays of Objects
+
+```zolt
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+$products[0].name   # Laptop
+```
+
+---
+
+## Calculations
+
+### Basic Math
+
+```zolt
+{{ 10 + 5 }}     # 15
+{{ 20 - 8 }}     # 12
+{{ 3 * 4 }}      # 12
+{{ 15 / 3 }}     # 5
+{{ 10 % 3 }}     # 1
+{{ 2 ^ 8 }}      # 256 (power)
+```
+
+### Operator Precedence
+
+```zolt
+{{ 3 + 2 * 5 }}      # 13 (multiplication first)
+{{ (3 + 2) * 5 }}    # 25 (parentheses override)
+{{ 2 ^ 3 ^ 2 }}      # 512 (right associative)
+```
+
+---
+
+## Namespace Functions
+
+### Math Namespace
+
+```zolt
+{{ Math.floor(3.7) }}     # 3
+{{ Math.ceil(3.2) }}      # 4
+{{ Math.round(3.5) }}     # 4
+{{ Math.abs(-5) }}        # 5
+{{ Math.min(10, 5) }}     # 5
+{{ Math.max(10, 5) }}     # 10
+{{ Math.pow(2, 8) }}     # 256
+{{ Math.sqrt(16) }}       # 4
+```
+
+### List Namespace
+
+```zolt
+$numbers = [10, 20, 30, 40, 50]
+
+{{ List.length($numbers) }}   # 5
+{{ List.first($numbers) }}    # 10
+{{ List.last($numbers) }}     # 50
+{{ List.sum($numbers) }}      # 150
+{{ List.avg($numbers) }}      # 30
+{{ List.count($numbers) }}    # 5 (alias of length)
+```
+
+### String Namespace
+
+```zolt
+{{ String.upper("hello") }}           # HELLO
+{{ String.lower("HELLO") }}           # hello
+{{ String.length("text") }}            # 4
+{{ String.trim("  text  ") }}         # text
+{{ String.replace("hello", "l", "r") }}  # herro
+```
+
+---
+
+## Practical Examples
+
+### Shopping Cart
+
+```zolt
+$item_price = 29.99
+$quantity = 3
+$tax_rate = 0.08
+
+Subtotal: {{ $item_price * $quantity }}
+Tax: {{ $item_price * $quantity * $tax_rate }}
+Total: {{ $item_price * $quantity * (1 + $tax_rate) }}
+```
+
+### Statistics
+
+```zolt
+$scores = [85, 92, 78, 95, 88]
+
+Average: {{ Math.round(List.avg($scores)) }}
+Highest: {{ List.max($scores) }}
+Lowest: {{ List.min($scores) }}
+Sum: {{ List.sum($scores) }}
+```
+
+### Temperature Conversion
+
+```zolt
+$celsius = 25
+
+Fahrenheit: {{ $celsius * 9/5 + 32 }}°F
+Kelvin: {{ $celsius + 273.15 }}K
+```
+
+---
+
+## Ternary Operator
+
+Conditional values inline:
+
+```zolt
+Status: {$enabled ? "Active" : "Inactive"}
+Level: {{ $count > 10 ? "High" : "Low" }}
+```
+
+---
+
+## Date Functions
+
+### Automatic Date Variables
+
+```zolt
+Created: {$created}
+Modified: {$modified}
+```
+
+### Date.format()
+
+```zolt
+{{ Date.format($created, "DD/MM/YYYY") }}
+{{ Date.format($modified, "YYYY-MM-DD") }}
+```
+
+### Date Functions
+
+```zolt
+{{ Date.now() }}
+{{ Date.timestamp($created) }}
+{{ Date.msTimestamp($created) }}
+```
+
+---
+
+## Combining Features
+
+### In Tables
+
+```zolt
+$items = [
+  {name: "Widget", qty: 5, price: 19.99},
+  {name: "Gadget", qty: 3, price: 29.99}
+]
+
+| Item | Qty | Price | Total |
+| :--- | ---: | ---: | ---: |
+:::foreach {$items as $item}
+| {$item.name} | {$item.qty} | ${{$item.price}} | ${{$item.qty * $item.price}} |
+:::
+```
+
+### With Conditionals
+
+```zolt
+:::if {$enabled}
+## Feature Enabled
+
+Welcome to the premium section!
+:::
+```
+
+---
+
+## Best Practices
+
+1. **Define variables** at the top of documents
+2. **Use descriptive names** (`$product_price` not `$p`)
+3. **Test calculations** especially complex expressions
+4. **Use functions** for formatting (Date, String)
+
+---
+
+## Next Steps
+
+- [Advanced](advanced.zlt) — Loops and charts
+- [Metadata](metadata.zlt) — File configuration
+- [Basic Syntax](basic-syntax.zlt) — Formatting reference

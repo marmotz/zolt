@@ -1,0 +1,308 @@
+---
+title: "Semantic Blocks"
+description: "Create tabs, accordions, columns, and callouts with native Zolt syntax"
+---
+
+# Semantic Blocks
+
+Zolt uses the "Triple Colon" syntax `:::` for semantic containers like alerts, tabs, accordions, and columns.
+
+---
+
+## Callouts (Info Boxes)
+
+Display important information with styled containers.
+
+### Types
+
+```zolt
+:::info [Information]
+This is an informational message.
+:::
+
+:::warning [Warning]
+This is a warning message.
+:::
+
+:::error [Error]
+This is an error message.
+:::
+
+:::success [Success]
+This is a success message.
+:::
+
+:::note [Note]
+This is a note.
+:::
+
+:::abstract [Abstract]
+This is an abstract summary.
+:::
+```
+
+### With Attributes
+
+```zolt
+:::info [Custom Title]{background=light-blue}
+Styled callout with custom attributes.
+:::
+```
+
+---
+
+## Accordions (Details)
+
+Create collapsible content sections.
+
+### Basic Syntax
+
+```zolt
+:::details [Click to expand]
+Hidden content that appears when clicked.
+:::
+```
+
+### With Attributes
+
+```zolt
+:::details [Open by default]{open=true}
+This content is visible by default.
+:::
+```
+
+### Example
+
+```zolt
+:::details [Installation Steps]
+1. Download the installer
+2. Run the executable
+3. Follow the wizard
+:::
+
+:::details [Configuration Options]
+- Option A
+- Option B
+- Option C
+:::
+```
+
+---
+
+## Tabs
+
+Organize content into tabbed sections.
+
+### Basic Syntax
+
+```zolt
+:::tabs
+:::tab [Tab One]
+Content of the first tab.
+:::
+
+:::tab [Tab Two]
+Content of the second tab.
+:::
+
+:::tab [Tab Three]
+Content of the third tab.
+:::
+:::
+```
+
+### With Default Tab
+
+```zolt
+:::tabs {default=Python}
+:::tab [JavaScript]
+console.log("Hello");
+:::
+
+:::tab [Python]
+print("Hello")
+:::
+:::
+```
+
+### With Active Tab
+
+```zolt
+:::tabs
+:::tab [Step 1]
+First step content.
+:::
+
+:::tab [Step 2] {active=true}
+Second step content (shown by default).
+:::
+:::
+```
+
+---
+
+## Columns
+
+Create multi-column layouts.
+
+### Basic Columns
+
+```zolt
+:::columns
+:::column
+First column content.
+:::
+
+:::column
+Second column content.
+:::
+:::
+```
+
+### Column Widths
+
+```zolt
+:::columns
+:::column {width=70%}
+Main content (70% width).
+:::
+
+:::column {width=30%}
+Sidebar content (30% width).
+:::
+:::
+```
+
+### Three Columns
+
+```zolt
+:::columns {cols=3}
+:::column
+**Left Column**
+Content here.
+:::
+
+:::column
+**Center Column**
+Content here.
+:::
+
+:::column
+**Right Column**
+Content here.
+:::
+:::
+```
+
+---
+
+## Combined Example
+
+```zolt
+:::columns
+:::column {width=60%}
+### Main Content
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+:::details [Learn more]
+Additional details that can be expanded.
+:::
+:::
+
+:::column {width=40%}
+### Sidebar
+
+- [Link 1](@link1)
+- [Link 2](@link2)
+- [Link 3](@link3)
+
+:::info [Note]
+Important sidebar information.
+:::
+:::
+:::
+```
+
+---
+
+## Comment Block
+
+Add hidden comments:
+
+```zolt
+:::comment
+This entire block is hidden from output.
+Useful for TODO notes and internal documentation.
+:::
+```
+
+---
+
+## Mermaid Diagrams
+
+Create diagrams using Mermaid syntax:
+
+```zolt
+:::mermaid
+graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Result 1]
+    B -->|No| D[Result 2]
+:::
+```
+
+### Flowchart
+
+```zolt
+:::mermaid
+flowchart LR
+    A[Input] --> B[Process]
+    B --> C[Output]
+:::
+
+### Sequence Diagram
+
+```zolt
+:::mermaid
+sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    A->>B: Hello Bob!
+>>A: Hi    B-- Alice!
+:::
+```
+
+### Class Diagram
+
+```zolt
+:::mermaid
+classDiagram
+    class Animal {
+        +String name
+        +makeSound()
+    }
+    class Dog {
+        +bark()
+    }
+    Animal <|-- Dog
+:::
+```
+
+---
+
+## Best Practices
+
+1. **Use appropriate types** for callouts (warning vs error)
+2. **Keep accordions concise** for user experience
+3. **Limit tabs** to 3-5 for usability
+4. **Use columns** for side-by-side comparisons
+5. **Test layouts** across different screen sizes
+
+---
+
+## Next Steps
+
+- [Variables](variables.zlt) — Use variables with blocks
+- [Advanced](advanced.zlt) — Charts and loops
+- [Metadata](metadata.zlt) — Document configuration

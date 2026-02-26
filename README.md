@@ -164,7 +164,7 @@ zolt build examples/abbreviations.zlt --watch
 
 ### Specification
 
-The complete Zolt v0.2 specification is available in [spec.md](docs/spec.md).
+The complete Zolt v0.2 specification is available in [spec.md](spec.md).
 
 ### Examples
 
@@ -345,7 +345,7 @@ MIT License - see LICENSE file for details
 
 ## 📞 Support
 
-- **Documentation:** [spec.md](docs/spec.md)
+- **Documentation:** [spec.md](spec.md)
 - **Examples:** [`examples/`](examples)
 - **Issues:** [GitHub Issues](https://github.com/marmotz/zolt/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/marmotz/zolt/discussions)
@@ -354,4 +354,4 @@ MIT License - see LICENSE file for details
 
 _Zolt : The high-voltage successor to Markdown_
 
-For detailed specifications, see [spec.md](docs/spec.md).
+For detailed specifications, see [spec.md](spec.md).

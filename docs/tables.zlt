@@ -1,0 +1,204 @@
+---
+title: "Tables"
+description: "Create advanced grid tables with cell merging and complex layouts"
+---
+
+# Tables
+
+Zolt supports powerful grid tables with cell merging, headers, and alignment.
+
+---
+
+## Basic Syntax
+
+Wrap table content between `[[table]]` and `[[/table]]`:
+
+```zolt
+[[table]]
+| Column 1 | Column 2 | Column 3 |
+| :--- | :--- | :--- |
+| Data 1 | Data 2 | Data 3 |
+| Data 4 | Data 5 | Data 6 |
+[[/table]]
+```
+
+### Explanation
+
+- `[[table]]` — Start the table
+- `| ... |` — Table rows
+- `| :--- |` — Header row separator
+- `[[/table]]` — End the table
+
+---
+
+## Header Cells
+
+Mark header cells with `[h]`:
+
+```zolt
+[[table]]
+| [h] Name | [h] Age | [h] City |
+| :--- | :--- | :--- |
+| Alice | 30 | New York |
+| Bob | 25 | London |
+[[/table]]
+```
+
+### Result
+
+| [h] Name | [h] Age | [h] City |
+| :--- | :--- | :--- |
+| Alice | 30 | New York |
+| Bob | 25 | London |
+
+---
+
+## Cell Alignment
+
+Control alignment with separator position:
+
+| Syntax | Alignment |
+|--------|-----------|
+| `:---` | Left |
+| `:---:` | Center |
+| `---:` | Right |
+
+### Examples
+
+```zolt
+[[table]]
+| Left | Center | Right |
+| :--- | :---: | ---: |
+| Data | Data | Data |
+[[/table]]
+```
+
+---
+
+## Cell Merging
+
+### Horizontal Merge ( colspan)
+
+```zolt
+[[table]]
+| [h] Header | [h] Header |
+| :--- | :--- |
+| [colspan=2] Merged Cell | 
+| Cell 1 | Cell 2 |
+[[/table]]
+```
+
+### Vertical Merge (rowspan)
+
+```zolt
+[[table]]
+| [h] Header | [h] Data |
+| :--- | :--- |
+| [rowspan=2] Merged | Row 1 |
+| | Row 2 |
+| Normal | Data |
+[[/table]]
+```
+
+---
+
+## Complex Example
+
+```zolt
+[[table id=sales]]
+| [h] Category | [h] Q1 | [h] Q2 | [h] Q3 | [h] Q4 |
+| :--- | :---: | :---: | :---: | :---: |
+| [rowspan=2] Electronics | $50K | $60K | $70K | $80K |
+| | 45% | 50% | 55% | 60% |
+| Clothing | $30K | $35K | $40K | $45K |
+| [colspan=2] [h] Total | $80K | $95K | $110K | $125K |
+[[/table]]
+```
+
+---
+
+## Table Attributes
+
+Add IDs and classes:
+
+```zolt
+[[table id=data-table class=striped]]
+| Header |
+| :--- |
+| Data |
+[[/table]]
+```
+
+---
+
+## Styling Inside Tables
+
+Apply inline styles to table content:
+
+```zolt
+[[table]]
+| Normal | [h] Header | Important{color=red} |
+| :--- | :--- | :--- |
+| Data 1 | Data 2 | Data 3{font-weight=bold} |
+[[/table]]
+```
+
+---
+
+## Use Cases
+
+### Financial Report
+
+```zolt
+[[table id=financials]]
+| [h] Item | [h] 2024 | [h] 2025 | [h] Change |
+| :--- | ---: | ---: | ---: |
+| Revenue | $1,000,000 | $1,250,000 | +25%{color=green} |
+| Expenses | $750,000 | $800,000 | +7%{color=orange} |
+| [colspan=2] [h] Profit | $250,000 | $450,000 | +80%{color=green font-weight=bold} |
+[[/table]]
+```
+
+### Technical Specification
+
+```zolt
+[[table id=specs]]
+| [h] Component | [h] Specification | [h] Notes |
+| :--- | :--- | :--- |
+| [rowspan=2] CPU | 3.2 GHz | 8-core |
+| | Apple M2 | ARM-based |
+| Memory | 16GB | Unified |
+| Storage | 512GB | SSD |
+[[/table]]
+```
+
+### Comparison Table
+
+```zolt
+[[table id=comparison]]
+| [h] Feature | [h] Basic | [h] Pro | [h] Enterprise |
+| :--- | :---: | :---: | :---: |
+| Users | 1 | 10 | Unlimited |
+| Storage | 5GB | 100GB | 1TB |
+| Support | Email | Priority | Dedicated |
+| Price | Free | $29/mo | $99/mo |
+[[/table]]
+```
+
+---
+
+## Best Practices
+
+1. **Always use headers** `[h]` for the first row
+2. **Keep tables readable** with proper alignment
+3. **Use IDs** for linking and styling
+4. **Merge wisely** don't over-complicate
+5. **Test rendering** especially with complex merges
+
+---
+
+## Next Steps
+
+- [Variables](variables.zlt) — Use variables in tables
+- [Blocks](blocks.zlt) — Combine tables with other blocks
+- [Advanced](advanced.zlt) — Charts and data visualization

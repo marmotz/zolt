@@ -1,0 +1,275 @@
+---
+title: "Metadata & Configuration"
+description: "File metadata, project settings, and theme configuration"
+---
+
+# Metadata & Configuration
+
+Zolt supports YAML metadata for document configuration and project-level settings.
+
+---
+
+## File Metadata
+
+Define document properties at the top of your file using YAML syntax.
+
+### Basic Syntax
+
+```yaml
+---
+title: "Document Title"
+author: "Jane Doe"
+date: 2026-02-18
+---
+```
+
+### Accessing Metadata
+
+```zolt
+---
+title: "My Document"
+author: "John Smith"
+---
+
+# {$title}
+
+Written by {$author}
+```
+
+---
+
+## Supported Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Document title |
+| `author` | string | Author name |
+| `date` | date | Creation date |
+| `version` | string/number | Document version |
+| `tags` | array | List of tags |
+| `description` | string | Short description |
+| `keywords` | array/string | SEO keywords |
+| `robots` | string | Robots directive |
+| `image` | string | Open Graph image |
+| `lang` | string | Language code |
+| `toc` | boolean | Auto-generate TOC |
+| `theme` | string | Theme name |
+| `color-scheme` | string | Light/dark mode |
+
+---
+
+## Complete Example
+
+```yaml
+---
+title: "Technical Documentation"
+author: "Engineering Team"
+date: 2026-02-18
+version: 2.0.0
+tags: [documentation, api, technical]
+description: "Complete API reference guide"
+keywords: [api, documentation, reference]
+toc: true
+theme: technical
+color-scheme: auto
+---
+```
+
+---
+
+## Themes
+
+Zolt includes built-in themes:
+
+| Theme | Description |
+|-------|-------------|
+| `default` | Modern and balanced |
+| `professional` | Serif typography, sober colors |
+| `technical` | Monospace, high contrast |
+| `playful` | Rounded borders, vibrant colors |
+
+### Using Themes
+
+```yaml
+---
+title: "My Document"
+theme: professional
+---
+```
+
+---
+
+## Color Scheme
+
+Control light/dark mode:
+
+| Value | Description |
+|-------|-------------|
+| `auto` | Follow system preference |
+| `light` | Force light mode |
+| `dark` | Force dark mode |
+
+```yaml
+---
+title: "Dark Theme Document"
+theme: professional
+color-scheme: dark
+---
+```
+
+---
+
+## Project Configuration
+
+Create `zolt.project.yaml` in your project root for project-wide settings.
+
+### Example
+
+```yaml
+site_name: "My Documentation"
+author: "Documentation Team"
+version: 1.0.0
+theme: technical
+layout: _layout.zlt
+```
+
+### Settings
+
+| Setting | Description |
+|---------|-------------|
+| `site_name` | Site title |
+| `author` | Default author |
+| `version` | Project version |
+| `theme` | Default theme |
+| `layout` | Layout template |
+
+---
+
+## Automatic Variables
+
+Zolt provides automatic date variables:
+
+```zolt
+Created: {$created}
+Modified: {$modified}
+```
+
+These return ISO 8601 timestamps.
+
+### Formatting Dates
+
+```zolt
+{{ Date.format($created, "DD/MM/YYYY") }}
+{{ Date.format($modified, "YYYY-MM-DD") }}
+```
+
+---
+
+## Table of Contents
+
+Generate a TOC automatically:
+
+```zolt
+[[toc]]
+```
+
+### With Options
+
+```zolt
+[[toc {depth=3}]]
+[[toc {from=2 to=4}]]
+[[toc {numbered=true}]]
+```
+
+| Attribute | Description | Default |
+|-----------|-------------|---------|
+| `depth` | Maximum depth (1-6) | 3 |
+| `from` | Start level | 1 |
+| `to` | End level | 6 |
+| `numbered` | Include numbers | false |
+
+---
+
+## Abbreviations
+
+Define abbreviations for technical terms.
+
+### Inline
+
+```zolt
+HTML{abbr="HyperText Markup Language"} is the web language.
+```
+
+### Local Definitions
+
+```zolt
+*[HTML]: HyperText Markup Language
+*[CSS]: Cascading Style Sheets
+*[JS]: JavaScript
+
+HTML and CSS are essential.
+```
+
+### Global Definitions
+
+```zolt
+**[API]: Application Programming Interface
+**[URL]: Uniform Resource Locator
+```
+
+---
+
+## Footnotes
+
+Add references with footnotes.
+
+### Basic Footnote
+
+```zolt
+This has a footnote[^1].
+
+[^1]: This is the footnote content.
+```
+
+### Multiple Footnotes
+
+```zolt
+Concept A[^note] and Concept B[^note].
+
+[^note]: Shared explanation.
+```
+
+### Styled Footnotes
+
+```zolt
+Important note[^important].
+
+[^important]: Critical information.{color=red}
+```
+
+---
+
+## Best Practices
+
+1. **Use metadata** for document-level settings
+2. **Choose appropriate themes** for your content
+3. **Set color-scheme** for consistent rendering
+4. **Use abbreviations** consistently
+
+---
+
+## Summary
+
+- File metadata controls individual documents
+- Project config affects all files
+- Themes customize visual appearance
+- Automatic variables provide dates and more
+- TOC and abbreviations enhance navigation
+
+---
+
+## Next Steps
+
+- [Basic Syntax](basic-syntax.zlt) — Formatting reference
+- [Tables](tables.zlt) — Advanced table features
+- [Index](index.zlt) — Back to documentation index
