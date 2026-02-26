@@ -8,6 +8,8 @@ export interface DocumentRendererOptions {
   hasCharts: boolean;
   hasMermaid: boolean;
   hasMath: boolean;
+  hasSidebar: boolean;
+  sidebarSide: 'left' | 'right';
 }
 
 export class DocumentRenderer {
@@ -43,6 +45,17 @@ export class DocumentRenderer {
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
+    let finalContent = childrenHtml;
+    if (options.hasSidebar) {
+      const sidebarRegex = /<aside[^>]*class="[^"]*zolt-sidebar[^"]*"[^>]*>([\s\S]*?)<\/aside>/;
+      const match = childrenHtml.match(sidebarRegex);
+      if (match) {
+        const sidebarHtml = match[0];
+        const remainingHtml = childrenHtml.replace(sidebarHtml, '');
+        finalContent = `${sidebarHtml}\n<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
+      }
+    }
+
     const lang = this.getMetadata('lang', 'en');
     const title = this.getMetadata('title', 'Document');
     const description = this.getMetadata('description');
@@ -65,7 +78,14 @@ export class DocumentRenderer {
 
     const theme = this.getMetadata('theme', 'default');
     const colorScheme = this.getMetadata('color-scheme', 'auto');
-    const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
+    const bodyClasses = [
+      `theme-${theme}`,
+      `color-scheme-${colorScheme}`,
+      options.hasSidebar ? 'has-sidebar' : '',
+      options.hasSidebar ? `sidebar-${options.sidebarSide}` : '',
+    ]
+      .filter((c) => c !== '')
+      .join(' ');
 
     const mathCss = options.hasMath
       ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
@@ -95,7 +115,7 @@ ${DEFAULT_CSS}
   </style>
 </head>
 <body class="${bodyClasses}">
-${childrenHtml}
+${finalContent}
 ${tabsScript}
 ${anchorScript}
 ${chartScript}
@@ -119,6 +139,17 @@ ${mermaidScript}
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
+    let finalContent = contentHtml;
+    if (options.hasSidebar) {
+      const sidebarRegex = /<aside[^>]*class="[^"]*zolt-sidebar[^"]*"[^>]*>([\s\S]*?)<\/aside>/;
+      const match = contentHtml.match(sidebarRegex);
+      if (match) {
+        const sidebarHtml = match[0];
+        const remainingHtml = contentHtml.replace(sidebarHtml, '');
+        finalContent = `${sidebarHtml}\n<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
+      }
+    }
+
     const lang = this.getMetadata('lang', 'en');
     const title = this.getMetadata('title', 'Document');
     const description = this.getMetadata('description');
@@ -141,7 +172,14 @@ ${mermaidScript}
 
     const theme = this.getMetadata('theme', 'default');
     const colorScheme = this.getMetadata('color-scheme', 'auto');
-    const bodyClasses = [`theme-${theme}`, `color-scheme-${colorScheme}`].join(' ');
+    const bodyClasses = [
+      `theme-${theme}`,
+      `color-scheme-${colorScheme}`,
+      options.hasSidebar ? 'has-sidebar' : '',
+      options.hasSidebar ? `sidebar-${options.sidebarSide}` : '',
+    ]
+      .filter((c) => c !== '')
+      .join(' ');
 
     const mathCss = options.hasMath
       ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
@@ -171,7 +209,7 @@ ${DEFAULT_CSS}
   </style>
 </head>
 <body class="${bodyClasses}">
-${contentHtml}
+${finalContent}
 ${tabsScript}
 ${anchorScript}
 ${chartScript}

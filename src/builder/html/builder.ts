@@ -170,6 +170,8 @@ export class HTMLBuilder implements Builder {
       hasCharts: this.hasNodeType(node.children, 'Chart'),
       hasMermaid: this.hasNodeType(node.children, 'Mermaid'),
       hasMath: this.hasNodeType(node.children, 'Math'),
+      hasSidebar: this.specialBlockVisitor.hasSidebar,
+      sidebarSide: this.specialBlockVisitor.sidebarSide,
     };
 
     return this.documentRenderer.renderDocumentWithContent(

@@ -6,6 +6,8 @@ export class SpecialBlockVisitor {
   public hasTabs: boolean = false;
   public hasCharts: boolean = false;
   public hasMermaid: boolean = false;
+  public hasSidebar: boolean = false;
+  public sidebarSide: 'left' | 'right' = 'left';
 
   constructor(
     private joinChildren: (nodes: ASTNode[]) => string,
@@ -20,6 +22,8 @@ export class SpecialBlockVisitor {
     this.hasTabs = false;
     this.hasCharts = false;
     this.hasMermaid = false;
+    this.hasSidebar = false;
+    this.sidebarSide = 'left';
   }
 
   visitTripleColonBlock(node: TripleColonBlockNode): string {
@@ -29,6 +33,25 @@ export class SpecialBlockVisitor {
 
     if (node.blockType === 'tab') {
       return this.visitTabBlock(node);
+    }
+
+    if (node.blockType === 'sidebar') {
+      this.hasSidebar = true;
+      const side = node.attributes?.side === 'right' ? 'right' : 'left';
+      this.sidebarSide = side;
+      const attrs = this.renderAllAttributes(node.attributes);
+      const childrenHtml = this.joinChildren(node.children);
+      return `<aside${attrs} class="zolt-sidebar zolt-sidebar-${side}" data-type="sidebar">\n${childrenHtml}\n</aside>`;
+    }
+
+    if (
+      node.blockType === 'sidebar-header' ||
+      node.blockType === 'sidebar-content' ||
+      node.blockType === 'sidebar-footer'
+    ) {
+      const attrs = this.renderAllAttributes(node.attributes);
+      const childrenHtml = this.joinChildren(node.children);
+      return `<div${attrs} class="zolt-${node.blockType}">\n${childrenHtml}\n</div>`;
     }
 
     const childrenHtml = this.joinChildren(node.children);

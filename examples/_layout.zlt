@@ -1,3 +1,16 @@
-[[toc]]
+:::sidebar
+:::sidebar-header
+![Logo Zolt](../resources/logo.png)
+:::
 
-:::content
+:::sidebar-content
+List of doc files
+:::
+
+:::sidebar-footer
++ Zolt v{$version}
++ Last update : {{ Date.format(Date.now(), "DD/MM/YYYY HH:mm:ss") }}
+:::
+:::
+
+:::content:::

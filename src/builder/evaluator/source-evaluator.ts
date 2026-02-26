@@ -177,8 +177,6 @@ export class SourceEvaluator {
     try {
       const layoutContent = fs.readFileSync(targetPath, 'utf8');
 
-      // We use the same evaluator so that variables from the document are preserved.
-      // We pass contentToInject so it can be replaced where :::content is.
       const layoutEvaluator = new SourceEvaluator(
         this.evaluator,
         targetPath,
@@ -189,29 +187,29 @@ export class SourceEvaluator {
       );
       const expandedLayout = layoutEvaluator.evaluate(layoutContent);
 
-      // expandedLayout already contains layout's metadata at the top if it has any.
-      // We want to merge documentMetadataLines into it.
-      if (documentMetadataLines.length > 0) {
-        // If layout has metadata, they are at the beginning.
-        if (expandedLayout.startsWith('---\n')) {
-          const secondDashIndex = expandedLayout.indexOf('\n---', 4);
-          if (secondDashIndex !== -1) {
-            const layoutMetadataContent = expandedLayout.substring(4, secondDashIndex);
-            const layoutBody = expandedLayout.substring(secondDashIndex + 4);
+      let layoutMetadata: string[] = [];
+      let layoutBody = expandedLayout;
 
-            // Merge: Document metadata after Layout metadata so they override.
-            // We strip '---' from documentMetadataLines if they are there.
-            const cleanDocMetadata = documentMetadataLines.filter((l) => l.trim() !== '---').join('\n');
-
-            return `---\n${layoutMetadataContent}\n${cleanDocMetadata}\n---${layoutBody}`;
+      if (expandedLayout.startsWith('---')) {
+        const secondDashIndex = expandedLayout.indexOf('---', 3);
+        if (secondDashIndex !== -1) {
+          const endOfSecondDash = expandedLayout.indexOf('\n', secondDashIndex);
+          const metadataContent = expandedLayout.substring(expandedLayout.indexOf('\n') + 1, secondDashIndex).trim();
+          if (metadataContent) {
+            layoutMetadata = metadataContent.split('\n');
           }
+          layoutBody = expandedLayout.substring(endOfSecondDash !== -1 ? endOfSecondDash + 1 : secondDashIndex + 3);
         }
-
-        // If layout has no metadata, just prepend document metadata.
-        return documentMetadataLines.join('\n') + '\n' + expandedLayout;
       }
 
-      return expandedLayout;
+      const docMetadata = documentMetadataLines.filter((l) => l.trim() !== '---');
+      const mergedMetadata = [...layoutMetadata, ...docMetadata];
+
+      if (mergedMetadata.length > 0) {
+        return `---\n${mergedMetadata.join('\n')}\n---${layoutBody}`;
+      }
+
+      return layoutBody;
     } catch (err: any) {
       const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
       return `${metadata}:::error Failed to process layout: ${layoutPath} (${err.message}):::\n${contentToInject}`;

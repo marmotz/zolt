@@ -15,7 +15,14 @@ describe('DocumentRenderer', () => {
     };
     const html = renderer.renderDocument(
       node,
-      { hasTabs: false, hasCharts: false, hasMermaid: false, hasMath: false },
+      {
+        hasTabs: false,
+        hasCharts: false,
+        hasMermaid: false,
+        hasMath: false,
+        hasSidebar: false,
+        sidebarSide: 'left',
+      },
       () => '',
       () => ''
     );
@@ -33,7 +40,14 @@ describe('DocumentRenderer', () => {
     };
     const html = renderer.renderDocument(
       node,
-      { hasTabs: true, hasCharts: true, hasMermaid: true, hasMath: true },
+      {
+        hasTabs: true,
+        hasCharts: true,
+        hasMermaid: true,
+        hasMath: true,
+        hasSidebar: false,
+        sidebarSide: 'left',
+      },
       () => '',
       () => ''
     );
@@ -41,5 +55,33 @@ describe('DocumentRenderer', () => {
     expect(html).toContain('.zolt-tabs');
     expect(html).toContain('chart.js');
     expect(html).toContain('mermaid');
+  });
+
+  test('should wrap content when sidebar is present', () => {
+    const node: DocumentNode = {
+      type: 'Document',
+      children: [],
+      sourceFile: 'test.zlt',
+    };
+    const contentHtml = '<aside class="zolt-sidebar zolt-sidebar-left">Sidebar</aside><h1>Main Content</h1>';
+
+    const html = renderer.renderDocumentWithContent(
+      node,
+      contentHtml,
+      {
+        hasTabs: false,
+        hasCharts: false,
+        hasMermaid: false,
+        hasMath: false,
+        hasSidebar: true,
+        sidebarSide: 'left',
+      },
+      () => ''
+    );
+
+    expect(html).toContain('class="theme-default color-scheme-auto has-sidebar sidebar-left"');
+    expect(html).toContain('<main class="zolt-main-content">');
+    expect(html).toContain('<div class="zolt-content-container">');
+    expect(html).toContain('<h1>Main Content</h1>');
   });
 });

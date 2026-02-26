@@ -214,6 +214,89 @@ export const BASE_CSS = `
     80% { background-color: #fffdba; }
     100% { background-color: transparent; }
   }
+
+  /* --- SIDEBAR --- */
+  body.has-sidebar {
+    max-width: none;
+    margin: 0;
+    display: flex;
+    padding: 0;
+    min-height: 100vh;
+  }
+  
+  body.sidebar-left { flex-direction: row; }
+  body.sidebar-right { flex-direction: row-reverse; }
+
+  .zolt-sidebar {
+    width: var(--zlt-sidebar-width, 280px);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: var(--zlt-color-block-bg);
+    border-right: 1px solid var(--zlt-color-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  
+  body.sidebar-right .zolt-sidebar {
+    border-right: none;
+    border-left: 1px solid var(--zlt-color-border);
+  }
+
+  .zolt-sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--zlt-color-border-soft, var(--zlt-color-border));
+    flex-shrink: 0;
+  }
+  
+  .zolt-sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--zlt-color-border-soft, var(--zlt-color-border));
+    flex-shrink: 0;
+    font-size: 0.9em;
+    color: var(--zlt-color-text-soft);
+  }
+  
+  .zolt-sidebar-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .zolt-sidebar img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .zolt-main-content {
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    width: 100%;
+  }
+
+  .zolt-content-container {
+    max-width: var(--zlt-max-width, 800px);
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    body.has-sidebar {
+      flex-direction: column;
+    }
+    .zolt-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      border-right: none;
+      border-bottom: 1px solid var(--zlt-color-border);
+    }
+    body.sidebar-right .zolt-sidebar {
+      border-left: none;
+    }
+  }
 `;
 
 export const THEMES_CSS = `
