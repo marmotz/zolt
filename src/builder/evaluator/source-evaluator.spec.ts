@@ -202,7 +202,7 @@ End`;
 
   test('should handle layout injection', () => {
     const layoutPath = path.join(tempDir, 'layout.zlt');
-    fs.writeFileSync(layoutPath, 'Header\n:::content\nFooter');
+    fs.writeFileSync(layoutPath, 'Header\n:::content:::\nFooter');
 
     const evaluator = new ExpressionEvaluator();
     evaluator.setVariable('layout', 'layout.zlt');
@@ -220,7 +220,7 @@ End`;
 title: Layout Title
 theme: dark
 ---
-:::content`
+:::content:::`
     );
 
     const evaluator = new ExpressionEvaluator();
@@ -243,9 +243,9 @@ Content`;
     expect(result).toContain('Content');
   });
 
-  test('should replace multiple :::content tags (if present)', () => {
+  test('should replace multiple :::content::: tags (if present)', () => {
     const layoutPath = path.join(tempDir, 'layout.zlt');
-    fs.writeFileSync(layoutPath, 'Content 1: :::content\nContent 2: :::content');
+    fs.writeFileSync(layoutPath, 'Content 1: :::content:::\nContent 2: :::content:::');
 
     const evaluator = new ExpressionEvaluator();
     evaluator.setVariable('layout', 'layout.zlt');

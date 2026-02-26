@@ -106,8 +106,8 @@ export class SourceEvaluator {
       }
 
       let processedLine = line;
-      if (this.contentToInject !== undefined && processedLine.includes(':::content')) {
-        processedLine = processedLine.replace(/:::content/g, this.contentToInject);
+      if (this.contentToInject !== undefined && processedLine.includes(':::content:::')) {
+        processedLine = processedLine.replace(/:::content:::/g, this.contentToInject);
       }
 
       const trimmedProcessed = processedLine.trim();

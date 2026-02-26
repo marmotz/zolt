@@ -15,7 +15,7 @@ theme: dark
 ---
 <div class="layout">
 # Layout Header
-:::content
+:::content:::
 # Layout Footer
 </div>`
     );
@@ -67,7 +67,7 @@ layout: test-layout.zlt
 title: Default Layout Title
 ---
 # Welcome to {$title}
-:::content`
+:::content:::`
     );
 
     const content = `---
@@ -81,7 +81,7 @@ Content here`;
   });
 
   it('should use layout from project metadata', async () => {
-    fs.writeFileSync(layoutPath, '# Project Layout\n:::content');
+    fs.writeFileSync(layoutPath, '# Project Layout\n:::content:::');
 
     const content = '# Hello from Doc';
     const projectMetadata = { layout: 'test-layout.zlt' };
@@ -93,7 +93,7 @@ Content here`;
 
   it('should not apply layout to included files', async () => {
     const layout2Path = path.resolve(process.cwd(), 'test-layout-2.zlt');
-    fs.writeFileSync(layout2Path, 'LAYOUT 2\n:::content');
+    fs.writeFileSync(layout2Path, 'LAYOUT 2\n:::content:::');
 
     const includePath = path.resolve(process.cwd(), 'test-include-with-layout.zlt');
     fs.writeFileSync(includePath, `---\nlayout: test-layout-2.zlt\n---\nIncluded with layout`);

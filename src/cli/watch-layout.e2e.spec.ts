@@ -23,7 +23,7 @@ describe('CLI Watch Layout', () => {
     const layoutFile = join(testDir, 'layout.zlt');
     const outputFile = join(testDir, 'index.html');
 
-    await writeFile(layoutFile, 'LAYOUT V1\n:::content');
+    await writeFile(layoutFile, 'LAYOUT V1\n:::content:::');
     await writeFile(inputFile, '---\nlayout: layout.zlt\n---\n# Content');
 
     const proc = spawn('bun', ['run', CLI_SRC, 'build', inputFile, '-o', outputFile, '--watch'], {
@@ -52,7 +52,7 @@ describe('CLI Watch Layout', () => {
       expect(initialHtml).toContain('LAYOUT V1');
 
       // Change layout file
-      await writeFile(layoutFile, 'LAYOUT V2\n:::content');
+      await writeFile(layoutFile, 'LAYOUT V2\n:::content:::');
 
       // Wait for rebuild
       await new Promise<void>((resolve, reject) => {
