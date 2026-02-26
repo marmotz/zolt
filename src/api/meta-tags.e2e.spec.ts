@@ -97,4 +97,17 @@ og_description: "OG Specific Description"
     expect(html).toContain('<meta name="twitter:title" content="OG Specific Title">');
     expect(html).toContain('<meta name="twitter:description" content="OG Specific Description">');
   });
+
+  it('should make image URL absolute if url is provided', async () => {
+    const content = `---
+title: "Absolute Image"
+url: "https://zolt.marmotz.dev"
+image: "assets/img.png"
+---
+# Hello`;
+    const html = await buildString(content);
+
+    expect(html).toContain('<meta property="og:image" content="https://zolt.marmotz.dev/assets/img.png">');
+    expect(html).toContain('<meta name="twitter:image" content="https://zolt.marmotz.dev/assets/img.png">');
+  });
 });

@@ -121,9 +121,19 @@ ${CODE_COPY_SCRIPT}
     const siteName = this.getMetadata('site_name') || title;
     const ogTitle = this.getMetadata('og_title') || title;
     const ogDescription = this.getMetadata('og_description') || description;
-    const ogImage = this.getMetadata('image');
+    let ogImage = this.getMetadata('image');
     const ogType = this.getMetadata('og_type', 'website');
     const ogUrl = this.getMetadata('url');
+
+    // Make image URL absolute if base URL exists
+    if (ogImage && typeof ogImage === 'string' && ogUrl && typeof ogUrl === 'string') {
+      if (!ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
+        const base = String(ogUrl).endsWith('/') ? String(ogUrl).slice(0, -1) : String(ogUrl);
+        const img = String(ogImage).startsWith('/') ? String(ogImage) : '/' + String(ogImage);
+        ogImage = base + img;
+      }
+    }
+
     const ogImageWidth = this.getMetadata('og_image_width');
     const ogImageHeight = this.getMetadata('og_image_height');
     const twitterSite = this.getMetadata('twitter_site');
