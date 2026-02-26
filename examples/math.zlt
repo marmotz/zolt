@@ -21,8 +21,8 @@ Complex equations with alignment (using standard LaTeX environments):
 
 $$
 \begin{aligned}
-(a+b)^2 &= (a+b)(a+b) 
-        &= a^2 + ab + ba + b^2 
+(a+b)^2 &= (a+b)(a+b) \\
+        &= a^2 + ab + ba + b^2 \\
         &= a^2 + 2ab + b^2
 \end{aligned}
 $$
@@ -44,7 +44,7 @@ $$ {color=red}
 The standard normal distribution probability density function:
 
 $$
-f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}ight)^2}
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
 $$
 
 ### Physics
@@ -54,14 +54,12 @@ Maxwell's Equations:
 :::columns
 :::column
 $$
-
-abla \cdot \mathbf{E} = \frac{ho}{\varepsilon_0}
+\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}
 $$
 :::
 :::column
 $$
-
-abla \cdot \mathbf{B} = 0
+\nabla \cdot \mathbf{B} = 0
 $$
 :::
 :::
@@ -69,14 +67,12 @@ $$
 :::columns
 :::column
 $$
-
-abla 	imes \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}
+\nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}
 $$
 :::
 :::column
 $$
-
-abla 	imes \mathbf{B} = \mu_0\left(\mathbf{J} + \varepsilon_0\frac{\partial \mathbf{E}}{\partial t}ight)
+\nabla \times \mathbf{B} = \mu_0\left(\mathbf{J} + \varepsilon_0\frac{\partial \mathbf{E}}{\partial t}\right)
 $$
 :::
 :::
@@ -85,7 +81,7 @@ $$
 
 | Function | Identity |
 | :--- | :--- |
-| Sine | $\sin^2	heta + \cos^2^theta = 1$ |
-| Tangent | $	an	heta = \frac{\sin	heta}{\cos	heta}$ |
+| Sine | $\sin^2\theta + \cos^2\theta = 1$ |
+| Tangent | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ |
 
 [← Back to Examples Index](index.zlt)
