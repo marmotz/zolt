@@ -228,12 +228,22 @@ export async function lint(filePath: string): Promise<LintResult> {
   } catch (error) {
     const line = error instanceof Error && 'line' in error ? (error as { line: number }).line : 1;
     const column = error instanceof Error && 'column' in error ? (error as { column: number }).column : 1;
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    let code = 'PARSE_ERROR';
+
+    if (error && typeof error === 'object' && 'code' in error) {
+      if (error.code === 'EACCES') {
+        code = 'PERMISSION_ERROR';
+      } else if (error.code === 'ENOENT') {
+        code = 'FILE_NOT_FOUND';
+      }
+    }
 
     errors.push({
       line,
       column,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      code: 'PARSE_ERROR',
+      message,
+      code,
     });
 
     return {

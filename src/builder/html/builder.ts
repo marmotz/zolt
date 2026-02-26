@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Lexer } from '../../lexer/lexer';
 import { InlineParser } from '../../parser/inline-parser';
 import { Parser } from '../../parser/parser';
-import { AbbreviationDefinitionNode, ASTNode, DocumentNode, IncludeNode } from '../../parser/types';
+import { ASTNode, DocumentNode, IncludeNode } from '../../parser/types';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
@@ -17,7 +17,6 @@ type InitialVariables = Record<string, number | string | boolean | null | undefi
 
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
-  private abbreviationDefinitions: Map<string, string> = new Map();
   private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: any }> = new Map();
   private footnoteReferences: { id: string; refId: string }[] = [];
   private evaluator: ExpressionEvaluator;
@@ -137,7 +136,7 @@ export class HTMLBuilder implements Builder {
       case 'Attributes':
         return '';
       case 'AbbreviationDefinition':
-        return this.visitAbbreviationDefinition(node as AbbreviationDefinitionNode);
+        return this.visitAbbreviationDefinition();
       case 'FootnoteDefinition':
         return this.visitFootnoteDefinition(node as any);
       case 'Frontmatter':
@@ -276,7 +275,10 @@ export class HTMLBuilder implements Builder {
             const parser = new Parser(tokens, targetPath);
             const doc = parser.parse();
             headings.push(...this.findAllHeadingsRecursive(doc.children, targetPath, depth + 1));
-          } catch (err) {
+          } catch (err: any) {
+            if (err.code === 'EACCES') {
+              console.warn(`[Include Warning] Permission denied while collecting headings: ${targetPath}`);
+            }
             // Silently ignore errors during heading collection
           }
         }
@@ -343,12 +345,16 @@ export class HTMLBuilder implements Builder {
 
       return result;
     } catch (err: any) {
+      if (err.code === 'EACCES') {
+        console.warn(`[Include Error] Permission denied: ${targetPath}`);
+        return `<div class="error">Error: Permission denied for included file: ${node.path}</div>`;
+      }
       console.error(`[Include Error] Failed to process ${targetPath}: ${err.message}`);
       return `<div class="error">Error: Failed to process include: ${node.path}</div>`;
     }
   }
 
-  visitAbbreviationDefinition(node: AbbreviationDefinitionNode): string {
+  visitAbbreviationDefinition(): string {
     return '';
   }
 

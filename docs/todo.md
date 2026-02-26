@@ -315,8 +315,8 @@
 
 ### Mathematics (LaTeX)
 
-- [ ] Inline math `$ formula $`
-- [ ] Block math `$$ formula $$`
+- [x] Inline math `$ formula $`
+- [x] Block math `$$ formula $$`
 
 ### Diagrams
 
@@ -374,7 +374,7 @@
 - [x] File not found errors for includes
 - [x] Inclusion loop detection errors
 - [x] Max depth exceeded errors
-- [ ] Permission denied errors
+- [x] Permission denied errors
 
 ## 17. HTML Generation
 
@@ -414,6 +414,14 @@
 - [x] Document attribute system (done in spec.md and README.md)
 - [x] Document all syntax features (done in spec.md)
 - [x] Create migration guide from Markdown (done in README.md)
+
+### Documentation creator
+
+- [ ] Rename frontmatter to metadata
+- [ ] Project metadata file
+- [ ] new layout metadata to set layout of current file (in file metadata) or globally (in project metadata file)
+- [ ] new sidebar markup to define sidebar structure
+- [ ] new filetree markup to display file tree based on the dependencies of the input file
 
 ## 20. Performance & Optimization
 
