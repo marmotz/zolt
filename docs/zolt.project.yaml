@@ -2,7 +2,7 @@ title: Zolt documentation
 author: Marmotz
 version: 0.3.0
 theme: technical
-image: ../resources/logo.png
+image: ../resources/icon.png
 layout: _layout.zlt
 icon_png: "assets/favicons/favicon-96x96.png"
 icon_svg: "assets/favicons/favicon.svg"

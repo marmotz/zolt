@@ -79,7 +79,6 @@ Zolt comes with powerful features:
 - **Zero HTML**: Everything achievable in HTML/CSS has native Zolt syntax
 - **Strict but Flexible**: Syntax errors don't break documents but generate warnings
 - **Extensibility**: Use "Triple Colon" `:::` for advanced features
-- **Backward Compatibility**: Classic `.md` files work in Zolt parsers
 
 ### Key Benefits
 
