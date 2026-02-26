@@ -42,4 +42,36 @@ author: "Specific Author"
     const html = await buildString(content, { projectMetadata });
     expect(html).toContain('Site: My Project by Specific Author');
   });
+
+  it('should concatenate project title with file title using " - " separator', async () => {
+    const content = `---
+title: "Home"
+---
+# Welcome`;
+    const projectMetadata = { title: 'Zolt documentation' };
+    const html = await buildString(content, { projectMetadata });
+    expect(html).toContain('<title>Zolt documentation - Home</title>');
+  });
+
+  it('should use only project title when file has no title', async () => {
+    const content = `# Welcome`;
+    const projectMetadata = { title: 'Zolt documentation' };
+    const html = await buildString(content, { projectMetadata });
+    expect(html).toContain('<title>Zolt documentation</title>');
+  });
+
+  it('should use only file title when project has no title', async () => {
+    const content = `---
+title: "Home"
+---
+# Welcome`;
+    const html = await buildString(content, {});
+    expect(html).toContain('<title>Home</title>');
+  });
+
+  it('should use default title when neither project nor file has title', async () => {
+    const content = `# Welcome`;
+    const html = await buildString(content, {});
+    expect(html).toContain('<title>Document</title>');
+  });
 });

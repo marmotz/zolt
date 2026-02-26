@@ -107,6 +107,10 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     Object.assign(mergedVariables, ast.fileMetadata.data);
   }
 
+  if (options?.projectMetadata?.title) {
+    mergedVariables.projectTitle = options.projectMetadata.title;
+  }
+
   // Handle project graph for [[filetree]]
   let projectGraph = options?.projectGraph;
   if (!projectGraph && options?.entryPoint) {

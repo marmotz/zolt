@@ -9,19 +9,42 @@ import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../utils/file-metadata';
 
+const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
+
+async function findProjectFile(baseDir: string): Promise<string | null> {
+  for (const filename of PROJECT_FILENAMES) {
+    const filePath = join(baseDir, filename);
+    try {
+      await stat(filePath);
+
+      return filePath;
+    } catch {
+      // File doesn't exist, try next
+    }
+  }
+
+  return null;
+}
+
 async function loadProjectMetadata(baseInputDir: string): Promise<Record<string, any>> {
-  const projectFile = join(baseInputDir, 'zolt.project.yaml');
+  const projectFile = await findProjectFile(baseInputDir);
   let data: Record<string, any> = {};
 
-  try {
-    const content = await readFile(projectFile, 'utf-8');
-    data = FileMetadataUtils.parse(content);
-    console.log(`${pc.cyan('Info:')} Loaded project metadata from ${projectFile}`);
-  } catch {
-    // If not in baseInputDir, try current working directory
-    if (baseInputDir !== process.cwd()) {
+  if (projectFile) {
+    try {
+      const content = await readFile(projectFile, 'utf-8');
+      data = FileMetadataUtils.parse(content);
+      console.log(`${pc.cyan('Info:')} Loaded project metadata from ${projectFile}`);
+    } catch {
+      // Ignore read errors
+    }
+  }
+
+  // If not found in baseInputDir, try current working directory
+  if (Object.keys(data).length === 0 && baseInputDir !== process.cwd()) {
+    const cwdProjectFile = await findProjectFile(process.cwd());
+    if (cwdProjectFile) {
       try {
-        const cwdProjectFile = join(process.cwd(), 'zolt.project.yaml');
         const content = await readFile(cwdProjectFile, 'utf-8');
         data = FileMetadataUtils.parse(content);
         console.log(`${pc.cyan('Info:')} Loaded project metadata from ${cwdProjectFile}`);
@@ -453,13 +476,17 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
       }
     }
   }
-  const projectFile = resolve(baseInputDir, 'zolt.project.yaml');
-  const cwdProjectFile = resolve(process.cwd(), 'zolt.project.yaml');
+  const projectFile = await findProjectFile(baseInputDir);
+  const cwdProjectFile = await findProjectFile(process.cwd());
 
   const updateWatchers = (touchedFiles: Set<string>) => {
     // Add project metadata files to touched files so they are watched
-    touchedFiles.add(projectFile);
-    touchedFiles.add(cwdProjectFile);
+    if (projectFile) {
+      touchedFiles.add(projectFile);
+    }
+    if (cwdProjectFile) {
+      touchedFiles.add(cwdProjectFile);
+    }
 
     // Files that are currently being watched but are no longer in the dependency graph
     for (const [filePath, watcher] of watchers) {

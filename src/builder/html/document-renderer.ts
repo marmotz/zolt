@@ -57,7 +57,7 @@ export class DocumentRenderer {
     }
 
     const lang = this.getMetadata('lang', 'en');
-    const title = this.getMetadata('title', 'Document');
+    const title = this.getDocumentTitle();
     const description = this.getMetadata('description');
     const author = this.getMetadata('author');
 
@@ -152,7 +152,7 @@ ${CODE_COPY_SCRIPT}
     }
 
     const lang = this.getMetadata('lang', 'en');
-    const title = this.getMetadata('title', 'Document');
+    const title = this.getDocumentTitle();
     const description = this.getMetadata('description');
     const author = this.getMetadata('author');
 
@@ -231,6 +231,17 @@ ${CODE_COPY_SCRIPT}
     }
 
     return val;
+  }
+
+  private getDocumentTitle(): string {
+    const projectTitle = this.evaluator.getVariable('projectTitle');
+    const fileTitle = this.evaluator.getVariable('title');
+
+    if (projectTitle && fileTitle && String(projectTitle) !== String(fileTitle)) {
+      return `${String(projectTitle)} - ${String(fileTitle)}`;
+    }
+
+    return String(fileTitle || projectTitle || 'Document');
   }
 
   private escapeHtml(text: string): string {
