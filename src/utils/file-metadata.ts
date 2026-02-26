@@ -23,6 +23,15 @@ export const KNOWN_METADATA_KEYS = new Set([
   'icon_ico',
   'icon_apple',
   'manifest',
+  'site_name',
+  'og_title',
+  'og_description',
+  'og_type',
+  'url',
+  'og_image_width',
+  'og_image_height',
+  'twitter_site',
+  'twitter_creator',
 ]);
 
 export function createFileDateVariables(metadata: FileMetadata): { created: string; modified: string } {

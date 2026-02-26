@@ -40,42 +40,41 @@ export class DocumentRenderer {
 
     const childrenHtml = buildChildren(children);
 
+    return this.renderFullHtml(childrenHtml, options);
+  }
+
+  public renderDocumentWithContent(
+    node: DocumentNode,
+    contentHtml: string,
+    options: DocumentRendererOptions,
+    visitFileMetadata: (node: any) => string
+  ): string {
+    if (node.fileMetadata) {
+      visitFileMetadata(node.fileMetadata);
+    }
+
+    return this.renderFullHtml(contentHtml, options);
+  }
+
+  private renderFullHtml(bodyContent: string, options: DocumentRendererOptions): string {
     const tabsScript = options.hasTabs ? TABS_SCRIPT : '';
     const anchorScript = ANCHOR_SCRIPT;
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
 
-    let finalContent = childrenHtml;
+    let finalContent = bodyContent;
     if (options.hasSidebar) {
       const sidebarRegex = /<aside[^>]*class="[^"]*zolt-sidebar[^"]*"[^>]*>([\s\S]*?)<\/aside>/;
-      const match = childrenHtml.match(sidebarRegex);
+      const match = bodyContent.match(sidebarRegex);
       if (match) {
         const sidebarHtml = match[0];
-        const remainingHtml = childrenHtml.replace(sidebarHtml, '');
+        const remainingHtml = bodyContent.replace(sidebarHtml, '');
         finalContent = `${sidebarHtml}\n<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
       }
     }
 
     const lang = this.getMetadata('lang', 'en');
     const title = this.getDocumentTitle();
-    const description = this.getMetadata('description');
-    const author = this.getMetadata('author');
-
-    const rawKeywords = this.getMetadata('keywords', null);
-    const rawTags = this.getMetadata('tags', null);
-    let keywords = '';
-
-    if (Array.isArray(rawKeywords)) {
-      keywords = rawKeywords.join(', ');
-    } else if (typeof rawKeywords === 'string' && rawKeywords !== '') {
-      keywords = rawKeywords;
-    } else if (Array.isArray(rawTags)) {
-      keywords = rawTags.join(', ');
-    }
-
-    const robots = this.getMetadata('robots');
-    const ogImage = this.getMetadata('image');
-
     const theme = this.getMetadata('theme', 'default');
     const colorScheme = this.getMetadata('color-scheme', 'auto');
     const bodyClasses = [
@@ -91,33 +90,8 @@ export class DocumentRenderer {
       ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
       : '';
 
-    let metaTags = '';
-    if (description) metaTags += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
-    if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
-    if (keywords) metaTags += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
-    if (robots) metaTags += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
-
-    // Open Graph
-    metaTags += `  <meta property="og:title" content="${this.escapeHtml(String(title))}">\n`;
-    if (description)
-      metaTags += `  <meta property="og:description" content="${this.escapeHtml(String(description))}">\n`;
-    if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
-    metaTags += `  <meta property="og:type" content="website">\n`;
-
-    const iconPng = this.getMetadata('icon_png');
-    const iconSvg = this.getMetadata('icon_svg');
-    const iconIco = this.getMetadata('icon_ico');
-    const iconApple = this.getMetadata('icon_apple');
-    const manifest = this.getMetadata('manifest');
-
-    let linkTags = '';
-    if (iconPng)
-      linkTags += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
-    if (iconSvg) linkTags += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
-    if (iconIco) linkTags += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
-    if (iconApple)
-      linkTags += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
-    if (manifest) linkTags += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+    const metaTags = this.generateAllMetaTags(title);
+    const linkTags = this.generateLinkTags();
 
     return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -140,36 +114,20 @@ ${CODE_COPY_SCRIPT}
 </html>`;
   }
 
-  public renderDocumentWithContent(
-    node: DocumentNode,
-    contentHtml: string,
-    options: DocumentRendererOptions,
-    visitFileMetadata: (node: any) => string
-  ): string {
-    if (node.fileMetadata) {
-      visitFileMetadata(node.fileMetadata);
-    }
-
-    const tabsScript = options.hasTabs ? TABS_SCRIPT : '';
-    const anchorScript = ANCHOR_SCRIPT;
-    const chartScript = options.hasCharts ? CHART_SCRIPT : '';
-    const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
-
-    let finalContent = contentHtml;
-    if (options.hasSidebar) {
-      const sidebarRegex = /<aside[^>]*class="[^"]*zolt-sidebar[^"]*"[^>]*>([\s\S]*?)<\/aside>/;
-      const match = contentHtml.match(sidebarRegex);
-      if (match) {
-        const sidebarHtml = match[0];
-        const remainingHtml = contentHtml.replace(sidebarHtml, '');
-        finalContent = `${sidebarHtml}\n<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
-      }
-    }
-
-    const lang = this.getMetadata('lang', 'en');
-    const title = this.getDocumentTitle();
+  private generateAllMetaTags(title: string): string {
     const description = this.getMetadata('description');
     const author = this.getMetadata('author');
+    const robots = this.getMetadata('robots');
+    const siteName = this.getMetadata('site_name') || title;
+    const ogTitle = this.getMetadata('og_title') || title;
+    const ogDescription = this.getMetadata('og_description') || description;
+    const ogImage = this.getMetadata('image');
+    const ogType = this.getMetadata('og_type', 'website');
+    const ogUrl = this.getMetadata('url');
+    const ogImageWidth = this.getMetadata('og_image_width');
+    const ogImageHeight = this.getMetadata('og_image_height');
+    const twitterSite = this.getMetadata('twitter_site');
+    const twitterCreator = this.getMetadata('twitter_creator');
 
     const rawKeywords = this.getMetadata('keywords', null);
     const rawTags = this.getMetadata('tags', null);
@@ -183,71 +141,59 @@ ${CODE_COPY_SCRIPT}
       keywords = rawTags.join(', ');
     }
 
-    const robots = this.getMetadata('robots');
-    const ogImage = this.getMetadata('image');
-
-    const theme = this.getMetadata('theme', 'default');
-    const colorScheme = this.getMetadata('color-scheme', 'auto');
-    const bodyClasses = [
-      `theme-${theme}`,
-      `color-scheme-${colorScheme}`,
-      options.hasSidebar ? 'has-sidebar' : '',
-      options.hasSidebar ? `sidebar-${options.sidebarSide}` : '',
-    ]
-      .filter((c) => c !== '')
-      .join(' ');
-
-    const mathCss = options.hasMath
-      ? '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">\n'
-      : '';
-
-    let metaTags = '';
-    if (description) metaTags += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
-    if (author) metaTags += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
-    if (keywords) metaTags += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
-    if (robots) metaTags += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
+    let meta = '';
+    // Standard Meta
+    if (description) meta += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
+    if (author) meta += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
+    if (keywords) meta += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
+    if (robots) meta += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
 
     // Open Graph
-    metaTags += `  <meta property="og:title" content="${this.escapeHtml(String(title))}">\n`;
-    if (description)
-      metaTags += `  <meta property="og:description" content="${this.escapeHtml(String(description))}">\n`;
-    if (ogImage) metaTags += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
-    metaTags += `  <meta property="og:type" content="website">\n`;
+    if (siteName) meta += `  <meta property="og:site_name" content="${this.escapeHtml(String(siteName))}">\n`;
+    meta += `  <meta property="og:type" content="${this.escapeHtml(String(ogType))}">\n`;
+    meta += `  <meta property="og:title" content="${this.escapeHtml(String(ogTitle))}">\n`;
+    if (ogDescription)
+      meta += `  <meta property="og:description" content="${this.escapeHtml(String(ogDescription))}">\n`;
+    if (ogUrl) meta += `  <meta property="og:url" content="${this.escapeHtml(String(ogUrl))}">\n`;
+    if (ogImage) {
+      meta += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
+      if (ogImageWidth)
+        meta += `  <meta property="og:image:width" content="${this.escapeHtml(String(ogImageWidth))}">\n`;
+      if (ogImageHeight)
+        meta += `  <meta property="og:image:height" content="${this.escapeHtml(String(ogImageHeight))}">\n`;
+    }
 
+    // Twitter
+    const twitterCard = ogImage ? 'summary_large_image' : 'summary';
+    meta += `  <meta name="twitter:card" content="${twitterCard}">\n`;
+    if (twitterSite) meta += `  <meta name="twitter:site" content="${this.escapeHtml(String(twitterSite))}">\n`;
+    if (twitterCreator)
+      meta += `  <meta name="twitter:creator" content="${this.escapeHtml(String(twitterCreator))}">\n`;
+    meta += `  <meta name="twitter:title" content="${this.escapeHtml(String(ogTitle))}">\n`;
+    if (ogDescription)
+      meta += `  <meta name="twitter:description" content="${this.escapeHtml(String(ogDescription))}">\n`;
+    if (ogImage) meta += `  <meta name="twitter:image" content="${this.escapeHtml(String(ogImage))}">\n`;
+
+    return meta;
+  }
+
+  private generateLinkTags(): string {
     const iconPng = this.getMetadata('icon_png');
     const iconSvg = this.getMetadata('icon_svg');
     const iconIco = this.getMetadata('icon_ico');
     const iconApple = this.getMetadata('icon_apple');
     const manifest = this.getMetadata('manifest');
 
-    let linkTags = '';
+    let links = '';
     if (iconPng)
-      linkTags += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
-    if (iconSvg) linkTags += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
-    if (iconIco) linkTags += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
+      links += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
+    if (iconSvg) links += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
+    if (iconIco) links += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
     if (iconApple)
-      linkTags += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
-    if (manifest) linkTags += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+      links += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
+    if (manifest) links += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
 
-    return `<!DOCTYPE html>
-<html lang="${lang}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-${metaTags}${linkTags}  <title>${title}</title>
-${mathCss}  <style>
-${DEFAULT_CSS}
-  </style>
-</head>
-<body class="${bodyClasses}">
-${finalContent}
-${tabsScript}
-${anchorScript}
-${chartScript}
-${mermaidScript}
-${CODE_COPY_SCRIPT}
-</body>
-</html>`;
+    return links;
   }
 
   private getMetadata(key: string, defaultValue: any = ''): any {

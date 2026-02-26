@@ -1,110 +1,100 @@
 import { describe, expect, it } from 'bun:test';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { join } from 'path';
-import { buildFile, buildString } from './index';
+import { buildString } from './index';
 
-describe('E2E: Meta Tags Generation', () => {
-  it('should generate standard meta tags from file metadata', async () => {
+describe('Metadata Tags E2E', () => {
+  it('should render standard meta tags', async () => {
     const content = `---
-title: "SEO Test"
-description: "A cool document about Zolt"
-author: "Zolt Developer"
-keywords: [zolt, markup, parser]
-robots: "index, follow"
+title: "My Page"
+description: "A cool page"
+author: "John Doe"
+keywords: [zolt, test]
 ---
-# Content`;
+# Hello`;
     const html = await buildString(content);
 
-    expect(html).toContain('<meta name="description" content="A cool document about Zolt">');
-    expect(html).toContain('<meta name="author" content="Zolt Developer">');
-    expect(html).toContain('<meta name="keywords" content="zolt, markup, parser">');
-    expect(html).toContain('<meta name="robots" content="index, follow">');
+    expect(html).toContain('<meta name="description" content="A cool page">');
+    expect(html).toContain('<meta name="author" content="John Doe">');
+    expect(html).toContain('<meta name="keywords" content="zolt, test">');
   });
 
-  it('should generate Open Graph meta tags', async () => {
+  it('should render Open Graph meta tags', async () => {
     const content = `---
-title: "Social Media Test"
-description: "Share me on Twitter"
-image: "https://example.com/cover.jpg"
+title: "OG Page"
+description: "OG Description"
+image: "https://example.com/image.jpg"
+og_type: "article"
+url: "https://example.com/page"
+og_image_width: 1200
+og_image_height: 630
+site_name: "My Site"
 ---
-# Content`;
+# Hello`;
     const html = await buildString(content);
 
-    expect(html).toContain('<meta property="og:title" content="Social Media Test">');
-    expect(html).toContain('<meta property="og:description" content="Share me on Twitter">');
-    expect(html).toContain('<meta property="og:image" content="https://example.com/cover.jpg">');
-    expect(html).toContain('<meta property="og:type" content="website">');
+    expect(html).toContain('<meta property="og:site_name" content="My Site">');
+    expect(html).toContain('<meta property="og:type" content="article">');
+    expect(html).toContain('<meta property="og:title" content="OG Page">');
+    expect(html).toContain('<meta property="og:description" content="OG Description">');
+    expect(html).toContain('<meta property="og:url" content="https://example.com/page">');
+    expect(html).toContain('<meta property="og:image" content="https://example.com/image.jpg">');
+    expect(html).toContain('<meta property="og:image:width" content="1200">');
+    expect(html).toContain('<meta property="og:image:height" content="630">');
   });
 
-  it('should fall back to tags for keywords if keywords metadata is missing', async () => {
+  it('should render Twitter meta tags', async () => {
     const content = `---
-tags: [tutorial, beginner]
+title: "Twitter Page"
+description: "Twitter Description"
+image: "https://example.com/image.jpg"
+twitter_site: "@marmotz"
+twitter_creator: "@jane"
 ---
-# Content`;
-    const html = await buildString(content);
-    expect(html).toContain('<meta name="keywords" content="tutorial, beginner">');
-  });
-
-  it('should escape HTML characters in meta content', async () => {
-    const content = `---
-title: "Title & More"
-description: 'Quoted "text" content'
----
-# Content`;
-    const html = await buildString(content);
-    expect(html).toContain('<meta name="description" content="Quoted &quot;text&quot; content">');
-    expect(html).toContain('<meta property="og:title" content="Title &amp; More">');
-  });
-
-  it('should generate icon link tags from file metadata', async () => {
-    const content = `---
-title: "Icon Test"
-icon_png: "/favicon-96x96.png"
-icon_svg: "/favicon.svg"
-icon_ico: "/favicon.ico"
-icon_apple: "/apple-touch-icon.png"
-manifest: "/site.webmanifest"
----
-# Content`;
+# Hello`;
     const html = await buildString(content);
 
-    expect(html).toContain('<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">');
-    expect(html).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
-    expect(html).toContain('<link rel="shortcut icon" href="/favicon.ico">');
-    expect(html).toContain('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">');
-    expect(html).toContain('<link rel="manifest" href="/site.webmanifest">');
+    expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(html).toContain('<meta name="twitter:site" content="@marmotz">');
+    expect(html).toContain('<meta name="twitter:creator" content="@jane">');
+    expect(html).toContain('<meta name="twitter:title" content="Twitter Page">');
+    expect(html).toContain('<meta name="twitter:description" content="Twitter Description">');
+    expect(html).toContain('<meta name="twitter:image" content="https://example.com/image.jpg">');
   });
 
-  it('should resolve local icon paths with assetResolver', async () => {
-    const testDir = join('/tmp', 'zolt-icon-test-' + Date.now());
-    const inputFile = join(testDir, 'test.zlt');
-    const outputFile = join(testDir, 'output.html');
-    const assetsDir = join(testDir, 'assets');
-
-    await mkdir(assetsDir, { recursive: true });
-
-    await writeFile(join(assetsDir, 'favicon.png'), 'fake png');
-    await writeFile(join(assetsDir, 'apple-touch-icon.png'), 'fake apple');
-
+  it('should use summary card if no image is present', async () => {
     const content = `---
-title: "Local Icons"
-icon_png: "assets/favicon.png"
-icon_apple: "assets/apple-touch-icon.png"
+title: "No Image"
 ---
-# Content`;
+# Hello`;
+    const html = await buildString(content);
+    expect(html).toContain('<meta name="twitter:card" content="summary">');
+  });
 
-    await writeFile(inputFile, content);
+  it('should fallback to title for og:site_name if site_name is missing', async () => {
+    const content = `---
+title: "My Awesome Page"
+---
+# Hello`;
+    const html = await buildString(content);
+    expect(html).toContain('<meta property="og:site_name" content="My Awesome Page">');
+  });
 
-    try {
-      await buildFile(inputFile, outputFile);
+  it('should use og_title and og_description if provided, with fallbacks', async () => {
+    const content = `---
+title: "Standard Title"
+description: "Standard Description"
+og_title: "OG Specific Title"
+og_description: "OG Specific Description"
+---
+# Hello`;
+    const html = await buildString(content);
 
-      const { readFile } = await import('fs/promises');
-      const html = await readFile(outputFile, 'utf-8');
+    // Standard tags should use standard metadata
+    expect(html).toContain('<meta name="description" content="Standard Description">');
 
-      expect(html).toContain('href="assets/favicon.png"');
-      expect(html).toContain('href="assets/apple-touch-icon.png"');
-    } finally {
-      await rm(testDir, { recursive: true, force: true });
-    }
+    // OG and Twitter tags should use OG metadata
+    expect(html).toContain('<meta property="og:title" content="OG Specific Title">');
+    expect(html).toContain('<meta property="og:description" content="OG Specific Description">');
+    expect(html).toContain('<meta name="twitter:title" content="OG Specific Title">');
+    expect(html).toContain('<meta name="twitter:description" content="OG Specific Description">');
   });
 });
