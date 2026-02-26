@@ -220,7 +220,7 @@ export class SpecialBlockVisitor {
       html += `<li${activeClass}><a href="${link}">${this.escapeHtml(node.title)}</a>`;
     }
 
-    if (node.children.length > 0 && currentDepth < to && currentDepth < maxDepth) {
+    if (node.children.length > 0 && currentDepth < to && currentDepth + 1 < maxDepth) {
       const childrenHtml = node.children
         .map((child: any) => this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth))
         .join('');

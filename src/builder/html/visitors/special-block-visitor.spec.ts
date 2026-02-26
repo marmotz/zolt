@@ -75,7 +75,7 @@ describe('SpecialBlockVisitor', () => {
       { getVariable: () => null },
       async (text: string) => text,
       [],
-      graph,
+      [graph as any],
       '/root/index.zlt'
     );
 
