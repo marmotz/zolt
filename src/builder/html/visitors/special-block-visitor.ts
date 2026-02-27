@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
 import { ProjectNode } from '../../../utils/project-graph';
 import { slugify, toAlpha, toRoman } from '../utils/string-utils';
@@ -229,7 +230,14 @@ export class SpecialBlockVisitor {
     let html = '';
 
     if (isVisible) {
-      const link = node.path.replace(/\.zlt$/, '.html');
+      let link = node.path.replace(/\.zlt$/, '.html');
+
+      if (this.currentFilePath) {
+        const currentDir = path.dirname(this.currentFilePath);
+        const relativePath = path.relative(currentDir, node.absPath);
+        link = relativePath.replace(/\.zlt$/, '.html').replace(/\\/g, '/');
+      }
+
       html += `<li${activeClass}><a href="${link}">${this.escapeHtml(node.title)}</a>`;
     }
 

@@ -76,4 +76,36 @@ title: First Page
 
     expect(bodyContent).toContain('<li class="active"><a href="page1.html">First Page</a>');
   });
+
+  it('should render correct relative links when in a sub-directory', async () => {
+    const subDir = path.join(testDir, 'sub');
+    if (!fs.existsSync(subDir)) fs.mkdirSync(subDir);
+    const subPageFile = path.join(subDir, 'subpage.zlt');
+
+    fs.writeFileSync(
+      subPageFile,
+      `---
+title: Sub Page
+---
+[[filetree]]`
+    );
+
+    // Update index to link to subpage
+    fs.writeFileSync(indexFile, fs.readFileSync(indexFile, 'utf-8') + `\n[Sub](sub/subpage.zlt)`);
+
+    const content = fs.readFileSync(subPageFile, 'utf-8');
+    const html = await buildString(content, {
+      entryPoint: indexFile,
+      filePath: subPageFile,
+    });
+
+    // When in sub/subpage.html:
+    // index.html should be ../index.html
+    // page1.html should be ../page1.html
+    // subpage.html should be subpage.html
+
+    expect(html).toContain('href="../index.html"');
+    expect(html).toContain('href="../page1.html"');
+    expect(html).toContain('href="subpage.html"');
+  });
 });
