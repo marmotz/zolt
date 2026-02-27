@@ -21,8 +21,8 @@ you MUST follow when working on this repository.
 ### Build
 
 - Full build for all target platforms: `bun run build`
-- Platform-specific executable builds are also available: `bun run build:linux`, `bun run build:macos-x64`,
-  `bun run build:macos-arm64`, `bun run build:windows`.
+- Platform-specific executable builds are also available: `bun run build:bin:linux`, `bun run build:bin:macos-x64`,
+  `bun run build:bin:macos-arm64`, `bun run build:bin:windows`.
 
 ### Testing (Crucial for Agents)
 

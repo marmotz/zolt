@@ -2,8 +2,8 @@
 
 _Zolt : The high-voltage successor to Markdown_
 
-![Zolt Version](https://img.shields.io/badge/version-0.3-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Zolt Version](https://img.shields.io/badge/version-0.1-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-draft-orange)
 
 **Zolt** is a modern markup language that combines the simplicity of Markdown with the power of professional
@@ -164,7 +164,7 @@ zolt build examples/abbreviations.zlt --watch
 
 ### Specification
 
-The complete Zolt v0.3 specification is available in [spec.md](spec.md).
+The complete Zolt specification is available in [spec.md](spec.md).
 
 ### Examples
 

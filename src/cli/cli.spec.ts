@@ -4,7 +4,7 @@ import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { version } from '../../package.json';
 
-const CLI = './dist/zolt-linux-x64';
+const CLI = './dist/bin/zolt-linux-x64';
 const VERSION = `zolt v${version}`;
 
 describe('CLI', () => {

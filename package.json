@@ -1,8 +1,16 @@
 {
-  "name": "zolt",
-  "version": "0.3.0",
-  "author": "Zolt Team",
-  "main": "./dist/index.js",
+  "name": "@marmotz/zolt",
+  "version": "0.1.0",
+  "author": {
+    "name": "Marmotz",
+    "email": "contact@marmotz.dev",
+    "url": "https://github.com/marmotz"
+  },
+  "main": "./dist/lib/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "github:marmotz/zolt",
   "devDependencies": {
     "@types/bun": "latest",
     "@types/katex": "^0.16.8",
@@ -13,7 +21,7 @@
     "typescript": "^5.9.3"
   },
   "bin": {
-    "zolt": "./dist/cli/index.js"
+    "zolt": "./dist/cli/zolt"
   },
   "description": "Zolt - The high-voltage successor to Markdown",
   "keywords": [
@@ -25,27 +33,37 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "bun run build:linux && bun run build:macos-x64 && bun run build:macos-arm64 && bun run build:windows",
-    "build:linux": "bun build src/cli.ts --outfile dist/zolt-linux-x64 --target bun-x64-linux --compile",
-    "build:macos-x64": "bun build src/cli.ts --outfile dist/zolt-macos-x64 --target bun-x64-macos --compile",
-    "build:macos-arm64": "bun build src/cli.ts --outfile dist/zolt-macos-arm64 --target bun-aarch64-macos --compile",
-    "build:windows": "bun build src/cli.ts --outfile dist/zolt-windows-x64.exe --target bun-x64-windows --compile",
-    "build-doc": "rm -rf html && mkdir html && bun dev build docs/index.zlt -o html",
-    "dev": "bun run src/cli/index.ts",
+    "build": "rm -rf dist && bun run build:lib && bun run build:cli && bun run build:bin",
+    "build:lib": "rm -rf dist/lib && bun x tsc",
+    "build:bin": "rm -rf dist/bin && bun run build:bin:linux && bun run build:bin:macos-x64 && bun run build:bin:macos-arm64 && bun run build:bin:windows",
+    "build:bin:linux": "mkdir -p dist/bin && rm -f dist/bin/zolt-linux-x64 && bun build src/cli.ts --outfile dist/bin/zolt-linux-x64 --target bun-x64-linux --compile",
+    "build:bin:macos-x64": "mkdir -p dist/bin && rm -f dist/bin/zolt-macos-x64 && bun build src/cli.ts --outfile dist/bin/zolt-macos-x64 --target bun-x64-macos --compile",
+    "build:bin:macos-arm64": "mkdir -p dist/bin && rm -f dist/bin/zolt-macos-arm64 && bun build src/cli.ts --outfile dist/bin/zolt-macos-arm64 --target bun-aarch64-macos --compile",
+    "build:bin:windows": "mkdir -p dist/bin && rm -f dist/bin/zolt-windows-x64.exe && bun build src/cli.ts --outfile dist/bin/zolt-windows-x64.exe --target bun-x64-windows --compile",
+    "build:cli": "mkdir -p dist/cli && rm -f dist/cli/zolt && bun build src/cli.ts --outfile dist/cli/zolt --target node && chmod +x dist/cli/zolt",
+    "build:docs": "rm -rf dist/docs && mkdir -p dist/docs && bun dev build docs/index.zlt -o dist/docs",
+    "dev": "bun run src/cli.ts",
     "test": "bun test",
     "type-check": "bun x tsc --noEmit",
-    "prepublish": "bun run build",
+    "prepublishOnly": "rm -rf dist && bun run build:lib && bun run build:cli",
     "format": "bun x prettier --write src",
     "lint": "bun x prettier --check src",
     "update:minor": "bunx npm-check-updates -i -t minor",
     "update:latest": "bunx npm-check-updates -i -t latest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "bun scripts/release.ts"
   },
   "lint-staged": {
     "src/**/*.ts": "prettier --write"
   },
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/lib/index.d.ts",
+  "files": [
+    "dist/lib",
+    "dist/cli",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "katex": "^0.16.33",
     "picocolors": "^1.1.1",
