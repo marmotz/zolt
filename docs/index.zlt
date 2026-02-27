@@ -15,6 +15,7 @@ It combines the simplicity of Markdown with advanced features for professional d
 
 New to Zolt? Start here:
 
+1. [Installation & Usage](installation.zlt) — How to install and use the CLI
 1. [Basic Syntax](basic-syntax.zlt) — Learn text formatting, typography, and inline styles
 1. [Lists](lists.zlt) — Bullet, numbered, task, and definition lists
 1. [Links & Media](links-media.zlt) — Hyperlinks, images, videos, and audio
@@ -41,6 +42,7 @@ Zolt comes with powerful features:
 
 ### Getting Started
 
+- [Installation & Usage](installation.zlt) — Installation and CLI guide
 - [Basic Syntax](basic-syntax.zlt) — Text formatting, inline styles, and typography
 - [Lists](lists.zlt) — All types of lists with nesting and attributes
 - [Links & Media](links-media.zlt) — External links, internal references, images, videos
