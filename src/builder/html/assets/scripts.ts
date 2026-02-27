@@ -326,7 +326,7 @@ export const FILETREE_SCRIPT = `
     document.addEventListener('DOMContentLoaded', function() {
       var activeLink = document.querySelector('.zolt-filetree li.active');
       if (activeLink) {
-        activeLink.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        activeLink.scrollIntoView({ block: 'center', behavior: 'auto' });
       }
     });
   </script>`;
