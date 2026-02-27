@@ -134,6 +134,12 @@ export class SourceEvaluator {
         const expanded = this.evaluateInclude(includePath);
         result.push(expanded);
         i++;
+      } else if (trimmedProcessed.startsWith('{{include') && trimmedProcessed.endsWith('}}')) {
+        const rawPath = trimmedProcessed.substring(9, trimmedProcessed.length - 2).trim();
+        const includePath = this.contentProcessor.processContent(rawPath);
+        const expanded = this.evaluateInclude(includePath);
+        result.push(expanded);
+        i++;
       } else if (trimmedProcessed.startsWith(':::comment')) {
         const { nextIndex } = this.collectBlock(lines, i);
         i = nextIndex;
@@ -170,9 +176,9 @@ export class SourceEvaluator {
     }
 
     const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
-    const targetPath = path.resolve(currentDir, layoutPath);
+    const targetPath = this.findLayout(currentDir, layoutPath);
 
-    if (!fs.existsSync(targetPath)) {
+    if (!targetPath) {
       const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
       return `${metadata}:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
     }
@@ -219,6 +225,26 @@ export class SourceEvaluator {
     }
   }
 
+  private findLayout(startDir: string, layoutPath: string): string | null {
+    let currentDir = startDir;
+
+    while (true) {
+      const targetPath = path.resolve(currentDir, layoutPath);
+      if (fs.existsSync(targetPath)) {
+        return targetPath;
+      }
+
+      const parentDir = path.dirname(currentDir);
+      if (parentDir === currentDir) {
+        // We've reached the root directory
+        break;
+      }
+      currentDir = parentDir;
+    }
+
+    return null;
+  }
+
   private processMetadata(lines: string[]): void {
     if (lines.length < 2) return;
 
@@ -263,14 +289,14 @@ export class SourceEvaluator {
     }
 
     const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
-    const targetPath = path.resolve(currentDir, includePath);
+    const targetPath = this.findInclude(currentDir, includePath);
+
+    if (!targetPath) {
+      return `:::error Included file not found: ${includePath}:::`;
+    }
 
     if (currentIncludeStack.includes(targetPath)) {
       return `:::error Circular inclusion detected: ${includePath}:::`;
-    }
-
-    if (!fs.existsSync(targetPath)) {
-      return `:::error Included file not found: ${includePath}:::`;
     }
 
     try {
@@ -287,6 +313,25 @@ export class SourceEvaluator {
     } catch (err: any) {
       return `:::error Failed to process include: ${includePath} (${err.message}):::`;
     }
+  }
+
+  private findInclude(startDir: string, includePath: string): string | null {
+    let currentDir = startDir;
+
+    while (true) {
+      const targetPath = path.resolve(currentDir, includePath);
+      if (fs.existsSync(targetPath)) {
+        return targetPath;
+      }
+
+      const parentDir = path.dirname(currentDir);
+      if (parentDir === currentDir) {
+        break;
+      }
+      currentDir = parentDir;
+    }
+
+    return null;
   }
 
   private collectBlock(lines: string[], startIndex: number): { blockLines: string[]; nextIndex: number } {

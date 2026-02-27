@@ -63,7 +63,30 @@ describe('Footnotes HTML Rendering', () => {
 
     expect(html).toContain('Ref 1 <sup><a href="#fn-reuse" id="fnref-reuse">[1]</a></sup>');
     expect(html).toContain('Ref 2 <sup><a href="#fn-reuse" id="fnref-reuse-1">[1]</a></sup>');
-    expect(html).toContain(' <a href="#fnref-reuse" class="footnote-backref" aria-label="Back to content">↩</a>');
+    expect(html).toContain('<a href="#fnref-reuse" class="footnote-backref" aria-label="Back to content">↩</a>');
     expect(html).toContain(' <a href="#fnref-reuse-1" class="footnote-backref" aria-label="Back to content">↩-2</a>');
+  });
+
+  test('should handle multi-reference backlink placement inside last paragraph', async () => {
+    const doc = {
+      type: 'Document',
+      children: [
+        { type: 'Paragraph', children: [{ type: 'Footnote', id: 'multi' }] },
+        { type: 'Paragraph', children: [{ type: 'Footnote', id: 'multi' }] },
+        {
+          type: 'FootnoteDefinition',
+          id: 'multi',
+          children: [{ type: 'Paragraph', children: [{ type: 'Text', content: 'Multi ref content' }] }],
+        },
+      ],
+      sourceFile: 'test.zlt',
+    } as any;
+
+    const builder = new HTMLBuilder({});
+    const html = await builder.buildDocument(doc);
+
+    expect(html).toContain(
+      '<li id="fn-multi" class="footnote-item"><p>Multi ref content <a href="#fnref-multi" class="footnote-backref" aria-label="Back to content">↩</a> <a href="#fnref-multi-1" class="footnote-backref" aria-label="Back to content">↩-2</a></p></li>'
+    );
   });
 });

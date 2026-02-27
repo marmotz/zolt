@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { watch as watchFile } from 'fs';
+import { existsSync, watch as watchFile } from 'fs';
 import { copyFile, mkdir, readFile, stat } from 'fs/promises';
 import { basename, dirname, join, relative, resolve } from 'path';
 import pc from 'picocolors';
@@ -153,8 +153,26 @@ async function buildFileWithDeps(
   // Handle linked .zlt files recursively
   const linkedFiles = await getLinkedFiles(absoluteInput, projectMetadata);
 
+  const findBubblingFile = (startDir: string, fileName: string): string | null => {
+    let currentDir = startDir;
+    while (true) {
+      const fullPath = resolve(currentDir, fileName);
+      if (existsSync(fullPath)) return fullPath;
+      const parentDir = dirname(currentDir);
+      if (parentDir === currentDir) break;
+      currentDir = parentDir;
+    }
+    return null;
+  };
+
   for (const linkedFile of linkedFiles) {
-    const fullLinkedPath = resolve(inputDir, linkedFile);
+    let fullLinkedPath: string;
+    if (linkedFile.startsWith('_layout') || linkedFile.startsWith('_template')) {
+      const bubbledPath = findBubblingFile(inputDir, linkedFile);
+      fullLinkedPath = bubbledPath || resolve(inputDir, linkedFile);
+    } else {
+      fullLinkedPath = resolve(inputDir, linkedFile);
+    }
 
     try {
       const linkedStat = await stat(fullLinkedPath);

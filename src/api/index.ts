@@ -1,4 +1,6 @@
+import * as fs from 'fs';
 import { readFile, stat, writeFile } from 'fs/promises';
+import * as path from 'path';
 import { Builder } from '../builder/builder';
 import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
 import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
@@ -156,6 +158,18 @@ export function extractAllAssets(
   const zltLinks: string[] = [];
   const otherAssets: string[] = [];
 
+  const bubblingFileExists = (dir: string, fileName: string): boolean => {
+    let currentDir = dir;
+    while (true) {
+      const fullPath = path.resolve(currentDir, fileName);
+      if (fs.existsSync(fullPath)) return true;
+      const parentDir = path.dirname(currentDir);
+      if (parentDir === currentDir) break;
+      currentDir = parentDir;
+    }
+    return false;
+  };
+
   const checkHref = (href: string) => {
     if (!href) {
       return;
@@ -170,6 +184,13 @@ export function extractAllAssets(
     }
 
     if (href.endsWith('.zlt')) {
+      // If we have a filePath, check if the file exists using bubbling if it's a layout-like file
+      if (filePath && (href.startsWith('_layout') || href.startsWith('_template'))) {
+        if (bubblingFileExists(path.dirname(filePath), href)) {
+          zltLinks.push(href);
+          return;
+        }
+      }
       zltLinks.push(href);
     } else {
       otherAssets.push(href);

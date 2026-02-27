@@ -255,4 +255,46 @@ Content`;
     expect(result).toContain('Content 1: My Content');
     expect(result).toContain('Content 2: My Content');
   });
+
+  test('should handle bubbling layout resolution', () => {
+    // Create structure: tempDir/_layout.zlt, tempDir/sub/main.zlt
+    const layoutPath = path.join(tempDir, '_layout.zlt');
+    fs.writeFileSync(layoutPath, 'Header\n:::content:::\nFooter');
+
+    const subDir = path.join(tempDir, 'sub');
+    fs.mkdirSync(subDir);
+
+    const evaluator = new ExpressionEvaluator();
+    evaluator.setVariable('layout', '_layout.zlt');
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(subDir, 'main.zlt'), [], undefined, false, true);
+
+    const result = sourceEvaluator.evaluate('My Content');
+    expect(result).toBe('Header\nMy Content\nFooter');
+  });
+
+  test('should handle bubbling include resolution', () => {
+    // Create structure: tempDir/_template.zlt, tempDir/sub/main.zlt
+    const templatePath = path.join(tempDir, '_template.zlt');
+    fs.writeFileSync(templatePath, 'Template Content');
+
+    const subDir = path.join(tempDir, 'sub');
+    fs.mkdirSync(subDir);
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(subDir, 'main.zlt'));
+
+    const result = sourceEvaluator.evaluate(':::include _template.zlt');
+    expect(result).toContain('Template Content');
+  });
+
+  test('should handle {{include}} syntax on a single line', () => {
+    const includedPath = path.join(tempDir, 'included.zlt');
+    fs.writeFileSync(includedPath, 'Included content');
+
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const result = sourceEvaluator.evaluate('{{include included.zlt}}');
+    expect(result).toContain('Included content');
+  });
 });
