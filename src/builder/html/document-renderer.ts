@@ -4,6 +4,7 @@ import {
   ANCHOR_SCRIPT,
   CHART_SCRIPT,
   CODE_COPY_SCRIPT,
+  FILETREE_SCRIPT,
   MERMAID_SCRIPT,
   SIDEBAR_SCRIPT,
   TABS_SCRIPT,
@@ -113,11 +114,12 @@ ${DEFAULT_CSS}
 </head>
 <body class="${bodyClasses}">
 ${finalContent}
-${tabsScript}
+${TABS_SCRIPT}
 ${anchorScript}
 ${chartScript}
 ${mermaidScript}
 ${sidebarScript}
+${FILETREE_SCRIPT}
 ${CODE_COPY_SCRIPT}
 </body>
 </html>`;

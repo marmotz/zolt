@@ -175,6 +175,18 @@ export const BASE_CSS = `
   .zolt-heading-number { margin-right: 0.5rem; }
 
   /* --- FILETREE --- */
+  .zolt-filetree {
+    overflow-y: auto;
+    max-height: 80vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--zlt-color-border) transparent;
+  }
+
+  .zolt-sidebar .zolt-filetree {
+    max-height: none;
+    overflow-y: visible;
+  }
+
   .zolt-filetree ul {
     list-style: none;
     padding-left: 1.2rem;

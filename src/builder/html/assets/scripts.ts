@@ -320,3 +320,13 @@ export const SIDEBAR_SCRIPT = `
       });
     });
   </script>`;
+
+export const FILETREE_SCRIPT = `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var activeLink = document.querySelector('.zolt-filetree li.active');
+      if (activeLink) {
+        activeLink.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+  </script>`;
