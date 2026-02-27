@@ -42,6 +42,7 @@
     "build:bin:windows": "mkdir -p dist/bin && rm -f dist/bin/zolt-windows-x64.exe && bun build src/cli.ts --outfile dist/bin/zolt-windows-x64.exe --target bun-x64-windows --compile",
     "build:cli": "mkdir -p dist/cli && rm -f dist/cli/zolt && bun build src/cli.ts --outfile dist/cli/zolt --target node && chmod +x dist/cli/zolt",
     "build:docs": "rm -rf dist/docs && mkdir -p dist/docs && bun dev build docs/index.zlt -o dist/docs",
+    "build:examples": "rm -rf html && mkdir -p html && bun dev build examples/index.zlt -o html",
     "dev": "bun run src/cli.ts",
     "test": "bun test",
     "type-check": "bun x tsc --noEmit",

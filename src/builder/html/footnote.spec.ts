@@ -14,9 +14,9 @@ describe('Footnotes HTML Rendering', () => {
     const builder = new HTMLBuilder();
     const html = await builder.buildDocument(doc);
 
-    expect(html).toContain('<sup><a href="#fn:1" id="fnref:1">[1]</a></sup>');
+    expect(html).toContain('<sup><a href="#fn-1" id="fnref-1">[1]</a></sup>');
     expect(html).toContain(
-      '<li id="fn-1" class="footnote-item"><p>Note content</p><a href="#fnref-1" class="footnote-backref" aria-label="Back to content">↩</a></li>'
+      '<li id="fn-1" class="footnote-item"><p>Note content <a href="#fnref-1" class="footnote-backref" aria-label="Back to content">↩</a></p></li>'
     );
   });
 
@@ -61,9 +61,9 @@ describe('Footnotes HTML Rendering', () => {
     const builder = new HTMLBuilder();
     const html = await builder.buildDocument(doc);
 
-    expect(html).toContain('Ref 1 <sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup>');
-    expect(html).toContain('Ref 2 <sup><a href="#fn:reuse" id="fnref:reuse:1">[1]</a></sup>');
-    expect(html).toContain('<a href="#fnref-reuse" class="footnote-backref" aria-label="Back to content">↩</a>');
-    expect(html).toContain('<a href="#fnref-reuse:1" class="footnote-backref" aria-label="Back to content">↩-2</a>');
+    expect(html).toContain('Ref 1 <sup><a href="#fn-reuse" id="fnref-reuse">[1]</a></sup>');
+    expect(html).toContain('Ref 2 <sup><a href="#fn-reuse" id="fnref-reuse-1">[1]</a></sup>');
+    expect(html).toContain(' <a href="#fnref-reuse" class="footnote-backref" aria-label="Back to content">↩</a>');
+    expect(html).toContain(' <a href="#fnref-reuse-1" class="footnote-backref" aria-label="Back to content">↩-2</a>');
   });
 });

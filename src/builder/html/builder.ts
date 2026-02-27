@@ -59,7 +59,7 @@ export class HTMLBuilder implements Builder {
 
     const registerFootnoteRef = (id: string) => {
       const count = this.footnoteReferences.filter((ref) => ref.id === id).length;
-      const refId = count === 0 ? id : `${id}:${count}`;
+      const refId = count === 0 ? id : `${id}-${count}`;
       this.footnoteReferences.push({ id, refId });
 
       const uniqueIds = Array.from(new Set(this.footnoteReferences.map((ref) => ref.id)));
@@ -246,18 +246,34 @@ export class HTMLBuilder implements Builder {
       const def = this.footnoteDefinitions.get(id);
       if (!def) continue;
 
-      const content = def.children ? await this.joinInlineChildren(def.children) : '';
-      const attrs = this.attributeRenderer.renderAllAttributes(def.attributes);
-
       const relevantRefs = this.footnoteReferences.filter((ref) => ref.id === id);
       const backlinks = relevantRefs
         .map((ref, idx) => {
           const suffix = idx === 0 ? '' : `-${idx + 1}`;
-          return `<a href="#fnref-${ref.refId}" class="footnote-backref" aria-label="Back to content">↩${suffix}</a>`;
+          return ` <a href="#fnref-${ref.refId}" class="footnote-backref" aria-label="Back to content">↩${suffix}</a>`;
         })
         .join('');
 
-      html += `<li id="fn-${id}"${attrs} class="footnote-item">${content}${backlinks}</li>\n`;
+      let content = '';
+      if (def.children && def.children.length > 0) {
+        const lastChild = def.children[def.children.length - 1];
+        if (lastChild.type === 'Paragraph') {
+          const otherChildrenHtml = await this.joinInlineChildren(def.children.slice(0, -1));
+          const lastChildHtml = await this.build(lastChild);
+          if (lastChildHtml.endsWith('</p>')) {
+            content = otherChildrenHtml + lastChildHtml.replace(/<\/p>$/, `${backlinks}</p>`);
+          } else {
+            content = otherChildrenHtml + lastChildHtml + backlinks;
+          }
+        } else {
+          content = (await this.joinInlineChildren(def.children)) + backlinks;
+        }
+      } else {
+        content = backlinks;
+      }
+
+      const attrs = this.attributeRenderer.renderAllAttributes(def.attributes);
+      html += `<li id="fn-${id}"${attrs} class="footnote-item">${content}</li>\n`;
     }
 
     html += '</ol>\n</section>\n';

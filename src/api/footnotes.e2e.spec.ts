@@ -6,7 +6,7 @@ describe('API: Footnotes', () => {
     const content = 'Text[^1]\n\n[^1]: Note content';
     const html = await buildString(content);
 
-    expect(html).toContain('<a href="#fn:1" id="fnref:1">[1]</a>');
+    expect(html).toContain('<a href="#fn-1" id="fnref-1">[1]</a>');
     expect(html).toContain('id="fn-1"');
     expect(html).toContain('class="footnote-item"');
   });
@@ -15,10 +15,10 @@ describe('API: Footnotes', () => {
     const content = 'Ref 1[^reuse], Ref 2[^reuse]\n\n[^reuse]: Shared note';
     const html = await buildString(content);
 
-    expect(html).toContain('Ref 1 <sup><a href="#fn:reuse" id="fnref:reuse">[1]</a></sup> ,');
-    expect(html).toContain('Ref 2 <sup><a href="#fn:reuse" id="fnref:reuse:1">[1]</a></sup>');
+    expect(html).toContain('Ref 1 <sup><a href="#fn-reuse" id="fnref-reuse">[1]</a></sup> ,');
+    expect(html).toContain('Ref 2 <sup><a href="#fn-reuse" id="fnref-reuse-1">[1]</a></sup>');
     expect(html).toContain('href="#fnref-reuse"');
-    expect(html).toContain('href="#fnref-reuse:1"');
+    expect(html).toContain('href="#fnref-reuse-1"');
   });
 
   it('should support attributes on footnote definitions (standalone)', async () => {

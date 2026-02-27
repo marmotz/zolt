@@ -98,7 +98,7 @@ export class InlineVisitor {
     const { index, refId } = this.registerFootnoteRef(node.id);
     const attrs = this.renderAllAttributes(node.attributes);
 
-    return `<sup><a href="#fn:${node.id}" id="fnref:${refId}"${attrs}>[${index}]</a></sup>`;
+    return `<sup><a href="#fn-${node.id}" id="fnref-${refId}"${attrs}>[${index}]</a></sup>`;
   }
 
   async visitBold(node: BoldNode): Promise<string> {
