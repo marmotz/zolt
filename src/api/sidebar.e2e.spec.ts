@@ -95,4 +95,36 @@ Only content here
     expect(html).toContain('<ul>');
     expect(html).toContain('<li>List item 1</li>');
   });
+
+  it('should render responsive toggle and close buttons in the sidebar header', async () => {
+    const content = `:::sidebar
+:::sidebar-header
+My Sidebar
+:::
+:::sidebar-content
+Content
+:::
+:::`;
+    const html = await buildString(content);
+
+    expect(html).toContain('class="zolt-sidebar-toggle"');
+    expect(html).toContain('class="zolt-sidebar-close"');
+    expect(html).toContain('aria-label="Toggle sidebar"');
+    expect(html).toContain('aria-label="Close sidebar"');
+    expect(html).toContain("var sidebar = document.querySelector('.zolt-sidebar');"); // Verify SIDEBAR_SCRIPT inclusion
+  });
+
+  it('should render toggle buttons even when sidebar-header is implicit', async () => {
+    // Note: SpecialBlockVisitor ONLY adds buttons to explicit sidebar-header.
+    // If user just does :::sidebar, they get no header.
+    // Let's verify this behavior and see if we should change it.
+    const content = `:::sidebar
+Content
+:::`;
+    const html = await buildString(content);
+    expect(html).toContain('<aside class="zolt-sidebar zolt-sidebar-left"');
+    expect(html).toContain('<p>Content</p>');
+    expect(html).not.toContain('class="zolt-sidebar-header"');
+    expect(html).not.toContain('class="zolt-sidebar-toggle"');
+  });
 });

@@ -48,7 +48,13 @@ describe('SpecialBlockVisitor', () => {
       children: [{ type: 'Text', content: 'Footer' } as any],
     };
 
-    expect(await visitor.visitTripleColonBlock(header)).toContain('class="zolt-sidebar-header"');
+    const headerHtml = await visitor.visitTripleColonBlock(header);
+    expect(headerHtml).toContain('class="zolt-sidebar-header"');
+    expect(headerHtml).toContain('class="zolt-sidebar-toggle"');
+    expect(headerHtml).toContain('class="zolt-sidebar-close"');
+    expect(headerHtml).toContain('aria-label="Toggle sidebar"');
+    expect(headerHtml).toContain('aria-label="Close sidebar"');
+
     expect(await visitor.visitTripleColonBlock(content)).toContain('class="zolt-sidebar-content"');
     expect(await visitor.visitTripleColonBlock(footer)).toContain('class="zolt-sidebar-footer"');
   });

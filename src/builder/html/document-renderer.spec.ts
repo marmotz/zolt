@@ -57,6 +57,52 @@ describe('DocumentRenderer', () => {
     expect(html).toContain('mermaid');
   });
 
+  test('should include sidebar script when hasSidebar is true', async () => {
+    const node: DocumentNode = {
+      type: 'Document',
+      children: [],
+      sourceFile: 'test.zlt',
+    };
+    const html = renderer.renderDocument(
+      node,
+      {
+        hasTabs: false,
+        hasCharts: false,
+        hasMermaid: false,
+        hasMath: false,
+        hasSidebar: true,
+        sidebarSide: 'left',
+      },
+      () => '',
+      () => ''
+    );
+
+    expect(html).toContain("sidebar.classList.toggle('is-open')");
+  });
+
+  test('should NOT include sidebar script when hasSidebar is false', async () => {
+    const node: DocumentNode = {
+      type: 'Document',
+      children: [],
+      sourceFile: 'test.zlt',
+    };
+    const html = renderer.renderDocument(
+      node,
+      {
+        hasTabs: false,
+        hasCharts: false,
+        hasMermaid: false,
+        hasMath: false,
+        hasSidebar: false,
+        sidebarSide: 'left',
+      },
+      () => '',
+      () => ''
+    );
+
+    expect(html).not.toContain("sidebar.classList.toggle('is-open')");
+  });
+
   test('should wrap content when sidebar is present', async () => {
     const node: DocumentNode = {
       type: 'Document',

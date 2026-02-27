@@ -1,6 +1,13 @@
 import { ASTNode, DocumentNode, HeadingNode } from '../../parser/types';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
-import { ANCHOR_SCRIPT, CHART_SCRIPT, CODE_COPY_SCRIPT, MERMAID_SCRIPT, TABS_SCRIPT } from './assets/scripts';
+import {
+  ANCHOR_SCRIPT,
+  CHART_SCRIPT,
+  CODE_COPY_SCRIPT,
+  MERMAID_SCRIPT,
+  SIDEBAR_SCRIPT,
+  TABS_SCRIPT,
+} from './assets/scripts';
 import { DEFAULT_CSS } from './assets/styles';
 
 export interface DocumentRendererOptions {
@@ -61,6 +68,7 @@ export class DocumentRenderer {
     const anchorScript = ANCHOR_SCRIPT;
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
+    const sidebarScript = options.hasSidebar ? SIDEBAR_SCRIPT : '';
 
     let finalContent = bodyContent;
     if (options.hasSidebar) {
@@ -109,6 +117,7 @@ ${tabsScript}
 ${anchorScript}
 ${chartScript}
 ${mermaidScript}
+${sidebarScript}
 ${CODE_COPY_SCRIPT}
 </body>
 </html>`;

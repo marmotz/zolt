@@ -331,19 +331,99 @@ export const BASE_CSS = `
     margin: 0 auto;
   }
 
+  .zolt-sidebar-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--zlt-color-text-soft);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zolt-sidebar-toggle svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .zolt-sidebar-close {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--zlt-color-text-soft);
+  }
+
+  .zolt-sidebar-close svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
   @media (max-width: 768px) {
     body.has-sidebar {
       flex-direction: column;
     }
+    
     .zolt-sidebar {
       width: 100%;
       height: auto;
-      position: relative;
+      position: sticky;
+      top: 0;
       border-right: none;
       border-bottom: 1px solid var(--zlt-color-border);
+      z-index: 1000;
     }
+
     body.sidebar-right .zolt-sidebar {
       border-left: none;
+    }
+
+    .zolt-sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--zlt-color-block-bg);
+    }
+
+    .zolt-sidebar-toggle {
+      display: flex;
+    }
+
+    .zolt-sidebar-content,
+    .zolt-sidebar-footer {
+      display: none;
+    }
+
+    /* Full screen drawer when open */
+    .zolt-sidebar.is-open {
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--zlt-color-bg);
+    }
+
+    .zolt-sidebar.is-open .zolt-sidebar-content,
+    .zolt-sidebar.is-open .zolt-sidebar-footer {
+      display: block;
+    }
+
+    .zolt-sidebar.is-open .zolt-sidebar-toggle {
+      display: none;
+    }
+
+    .zolt-sidebar.is-open .zolt-sidebar-close {
+      display: flex;
+    }
+
+    .zolt-main-content {
+      padding: 1.5rem;
+    }
+
+    body.sidebar-is-open {
+      overflow: hidden;
     }
   }
 

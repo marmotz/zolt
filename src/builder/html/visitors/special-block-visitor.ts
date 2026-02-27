@@ -55,6 +55,19 @@ export class SpecialBlockVisitor {
     ) {
       const attrs = this.renderAllAttributes(node.attributes);
       const childrenHtml = await this.joinChildren(node.children);
+
+      if (node.blockType === 'sidebar-header') {
+        const toggleButton = `
+  <button class="zolt-sidebar-toggle" aria-label="Toggle sidebar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>`;
+        const closeButton = `
+  <button class="zolt-sidebar-close" aria-label="Close sidebar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  </button>`;
+        return `<div${attrs} class="zolt-sidebar-header">\n${childrenHtml}\n${toggleButton}\n${closeButton}\n</div>`;
+      }
+
       return `<div${attrs} class="zolt-${node.blockType}">\n${childrenHtml}\n</div>`;
     }
 

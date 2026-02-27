@@ -286,3 +286,37 @@ export const CODE_COPY_SCRIPT = `
       });
     });
   </script>`;
+
+export const SIDEBAR_SCRIPT = `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var sidebar = document.querySelector('.zolt-sidebar');
+      var toggle = document.querySelector('.zolt-sidebar-toggle');
+      var close = document.querySelector('.zolt-sidebar-close');
+      
+      if (!sidebar) return;
+
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          sidebar.classList.toggle('is-open');
+          document.body.classList.toggle('sidebar-is-open');
+        });
+      }
+
+      if (close) {
+        close.addEventListener('click', function() {
+          sidebar.classList.remove('is-open');
+          document.body.classList.remove('sidebar-is-open');
+        });
+      }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(event) {
+        var isClickInside = sidebar.contains(event.target) || (toggle && toggle.contains(event.target));
+        if (!isClickInside && sidebar.classList.contains('is-open')) {
+          sidebar.classList.remove('is-open');
+          document.body.classList.remove('sidebar-is-open');
+        }
+      });
+    });
+  </script>`;
