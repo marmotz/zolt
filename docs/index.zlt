@@ -115,10 +115,11 @@ This is an informational block with native syntax.
 - [Official Website](https://zolt.marmotz.dev)
 - [GitHub Repository](https://github.com/marmotz/zolt)
 
----
+:::columns
+:::column
+:::
 
-## Document Information
-
-- **Version:** {$version}
-- **Last Updated:** {{ Date.format($modified, "Mmmm DD, YYYY") }}
-- **Language:** English
+:::column {align=right}
+[Installation & Usage →](installation.zlt)
+:::
+:::

@@ -156,3 +156,13 @@ yarn dlx @marmotz/zolt build hello.zlt -o hello.html
 ```
 :::
 :::
+
+:::columns
+:::column
+[← Home](index.zlt)
+:::
+
+:::column {align=right}
+[Basic Syntax →](basic-syntax.zlt)
+:::
+:::
