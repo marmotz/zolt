@@ -15,13 +15,13 @@ Zolt supports several inline text formatting options:
 
 | Symbol | Rendered | Description |
 |--------|----------|-------------|
-| `**text**` | **bold** | Bold text |
-| `//text//` | *italic* | Italic text (replaces `*` to avoid list conflicts) |
-| `__text__` | <u>underline</u> | Native underline |
-| `~~text~~` | ~~strikethrough~~ | Strikethrough text |
-| `^{text}` | <sup>superscript</sup> | Superscript (supports nesting) |
-| `_{text}` | <sub>subscript</sub> | Subscript (supports nesting) |
-| `==text==` | <mark>highlight</mark> | Native highlight |
+| `**bold**` | **bold** | Bold text |
+| `//text//` | //italic// | Italic text |
+| `underline` | <u>underline</u> | Native underline |
+| `~~strikethrough~~` | ~~strikethrough~~ | Strikethrough text |
+| `^{superscript}` | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}} |
+| `_{subscript}` | this is _{subscript} | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}} |
+| `==highlight==` | ==highlight== | Native highlight |
 
 ---
 
@@ -63,6 +63,7 @@ This is ||bold and blue||{font-weight=bold color=blue}.
 | `font-size` | Font size | `{font-size=1.5em}` |
 | `font-style` | Font style | `{font-style=italic}` |
 | `border` | Border | `{border=1px solid black}` |
+| `border-radius` | Border radius | `{border-radius=10px}` |
 
 ### Practical Examples
 

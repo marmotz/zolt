@@ -2,12 +2,12 @@ export const TABS_SCRIPT = `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.zolt-tabs').forEach(function(tabsContainer) {
-        var buttons = tabsContainer.querySelectorAll('.zolt-tab-button');
-        var panels = tabsContainer.querySelectorAll('.zolt-tab-panel');
+        const buttons = tabsContainer.querySelectorAll('.zolt-tab-button');
+        const panels = tabsContainer.querySelectorAll('.zolt-tab-panel');
         
         buttons.forEach(function(button) {
           button.addEventListener('click', function() {
-            var tabIndex = this.getAttribute('data-tab-index');
+            const tabIndex = this.getAttribute('data-tab-index');
             
             buttons.forEach(function(btn) {
               btn.classList.remove('active');
@@ -29,7 +29,7 @@ export const TABS_SCRIPT = `
 export const ANCHOR_SCRIPT = `
   <script>
     window.addEventListener('hashchange', function() {
-      var target = document.querySelector(':target');
+      const target = document.querySelector(':target');
       if (target) {
         target.style.animation = 'none';
         target.offsetHeight; // trigger reflow
@@ -42,7 +42,7 @@ export const CHART_SCRIPT = `
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var defaultColors = [
+      const defaultColors = [
         'rgba(54, 162, 235, 0.8)',
         'rgba(255, 99, 132, 0.8)',
         'rgba(255, 206, 86, 0.8)',
@@ -55,7 +55,7 @@ export const CHART_SCRIPT = `
         'rgba(210, 199, 199, 0.8)'
       ];
 
-      var schemes = {
+      const schemes = {
         cool: ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(83, 102, 255, 0.8)'],
         warm: ['rgba(255, 99, 132, 0.8)', 'rgba(255, 159, 64, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(255, 99, 71, 0.8)'],
         pastel: ['rgba(255, 179, 186, 0.8)', 'rgba(186, 255, 201, 0.8)', 'rgba(186, 225, 255, 0.8)', 'rgba(255, 255, 186, 0.8)'],
@@ -69,24 +69,25 @@ export const CHART_SCRIPT = `
       function parseValue(v) {
         if (typeof v === 'number') return v;
         if (typeof v === 'string') {
-          var cleaned = v.replace(/[^\d.-]/g, '');
-          var num = parseFloat(cleaned);
+          const cleaned = v.replace(/[^\\d.-]/g, '');
+          const num = parseFloat(cleaned);
+          
           return isNaN(num) ? v : num;
         }
         return v;
       }
 
       document.querySelectorAll('.zolt-chart').forEach(function(chartContainer) {
-        var seriesElements = chartContainer.querySelectorAll('.zolt-chart-series');
+        const seriesElements = chartContainer.querySelectorAll('.zolt-chart-series');
         if (seriesElements.length === 0) return;
 
-        var layout = chartContainer.getAttribute('data-layout');
-        var containerScheme = chartContainer.getAttribute('data-scheme') || chartContainer.getAttribute('scheme');
-        var containerStacked = chartContainer.getAttribute('data-stacked') === 'true' || chartContainer.getAttribute('stacked') === 'true';
-        var containerLegend = chartContainer.getAttribute('data-legend') === 'true' || chartContainer.getAttribute('legend') === 'true';
-        var containerGrid = chartContainer.getAttribute('data-grid') === 'true' || chartContainer.getAttribute('grid') === 'true';
+        const layout = chartContainer.getAttribute('data-layout');
+        const containerScheme = chartContainer.getAttribute('data-scheme') || chartContainer.getAttribute('scheme');
+        const containerStacked = chartContainer.getAttribute('data-stacked') === 'true' || chartContainer.getAttribute('stacked') === 'true';
+        const containerLegend = chartContainer.getAttribute('data-legend') === 'true' || chartContainer.getAttribute('legend') === 'true';
+        const containerGrid = chartContainer.getAttribute('data-grid') === 'true' || chartContainer.getAttribute('grid') === 'true';
 
-        var chartTitle = chartContainer.getAttribute('data-title') || 
+        const chartTitle = chartContainer.getAttribute('data-title') || 
                          chartContainer.getAttribute('title') || 
                          (seriesElements.length === 1 ? seriesElements[0].getAttribute('data-title') : '') || 
                          '';
@@ -97,7 +98,7 @@ export const CHART_SCRIPT = `
           chartContainer.style.gap = '1rem';
           chartContainer.style.flexWrap = 'wrap';
           if (chartTitle) {
-            var titleEl = document.createElement('div');
+            const titleEl = document.createElement('div');
             titleEl.className = 'block-title';
             titleEl.textContent = chartTitle;
             titleEl.style.width = '100%';
@@ -105,31 +106,31 @@ export const CHART_SCRIPT = `
           }
           
           seriesElements.forEach(function(seriesEl, idx) {
-            var chartType = seriesEl.getAttribute('data-chart-type') || 'line';
-            var dataAttr = seriesEl.getAttribute('data-data');
+            const chartType = seriesEl.getAttribute('data-chart-type') || 'line';
+            const dataAttr = seriesEl.getAttribute('data-data');
             if (!dataAttr) return;
-            var data = JSON.parse(dataAttr);
+            const data = JSON.parse(dataAttr);
             
-            var wrapper = document.createElement('div');
+            const wrapper = document.createElement('div');
             wrapper.style.flex = '1 1 300px';
             wrapper.style.minWidth = '0';
-            var canvas = document.createElement('canvas');
+            const canvas = document.createElement('canvas');
             wrapper.appendChild(canvas);
             chartContainer.appendChild(wrapper);
             
-            var label = seriesEl.getAttribute('data-label') || seriesEl.getAttribute('data-title') || 'Dataset';
-            var scheme = seriesEl.getAttribute('data-scheme') || seriesEl.getAttribute('scheme') || containerScheme;
-            var palette = getPalette(scheme);
-            var color = seriesEl.getAttribute('data-color') || palette[idx % palette.length];
-            var showLegend = seriesEl.getAttribute('data-legend') === 'true' || containerLegend;
-            var showGrid = seriesEl.getAttribute('data-grid') === 'true' || containerGrid;
-            var isStacked = seriesEl.getAttribute('data-stacked') === 'true' || seriesEl.getAttribute('stacked') === 'true' || containerStacked;
+            const label = seriesEl.getAttribute('data-label') || seriesEl.getAttribute('data-title') || 'Dataset';
+            const scheme = seriesEl.getAttribute('data-scheme') || seriesEl.getAttribute('scheme') || containerScheme;
+            const palette = getPalette(scheme);
+            const color = seriesEl.getAttribute('data-color') || palette[idx % palette.length];
+            const showLegend = seriesEl.getAttribute('data-legend') === 'true' || containerLegend;
+            const showGrid = seriesEl.getAttribute('data-grid') === 'true' || containerGrid;
+            const isStacked = seriesEl.getAttribute('data-stacked') === 'true' || seriesEl.getAttribute('stacked') === 'true' || containerStacked;
 
-            var isPieOrDoughnut = chartType === 'pie' || chartType === 'doughnut';
-            var chartData = data.map(function(d) { return parseValue(d.value); });
-            var backgroundColors = isPieOrDoughnut ? palette.slice(0, data.length) : color;
+            const isPieOrDoughnut = chartType === 'pie' || chartType === 'doughnut';
+            const chartData = data.map(function(d) { return parseValue(d.value); });
+            const backgroundColors = isPieOrDoughnut ? palette.slice(0, data.length) : color;
 
-            var options = {
+            const options = {
               responsive: true,
               plugins: {
                 title: {
@@ -169,29 +170,29 @@ export const CHART_SCRIPT = `
             });
           });
         } else {
-          var mainChartType = seriesElements[0].getAttribute('data-chart-type') || 'line';
-          var isPieOrDoughnut = mainChartType === 'pie' || mainChartType === 'doughnut';
-          var datasets = [];
-          var labels = null;
+          const mainChartType = seriesElements[0].getAttribute('data-chart-type') || 'line';
+          const isPieOrDoughnut = mainChartType === 'pie' || mainChartType === 'doughnut';
+          const datasets = [];
+          let labels = null;
           
-          var isStacked = containerStacked || Array.prototype.some.call(seriesElements, function(el) { 
+          const isStacked = containerStacked || Array.prototype.some.call(seriesElements, function(el) { 
             return el.getAttribute('data-stacked') === 'true' || el.getAttribute('stacked') === 'true'; 
           });
 
           seriesElements.forEach(function(seriesEl, idx) {
-            var dataAttr = seriesEl.getAttribute('data-data');
+            const dataAttr = seriesEl.getAttribute('data-data');
             if (!dataAttr) return;
-            var data = JSON.parse(dataAttr);
+            const data = JSON.parse(dataAttr);
             
             if (!labels) {
               labels = data.map(function(d) { return d.label; });
             }
             
-            var type = seriesEl.getAttribute('data-chart-type') || mainChartType;
-            var label = seriesEl.getAttribute('data-label') || seriesEl.getAttribute('data-title') || 'Dataset ' + (datasets.length + 1);
-            var scheme = seriesEl.getAttribute('data-scheme') || seriesEl.getAttribute('scheme') || containerScheme;
-            var palette = getPalette(scheme);
-            var color = seriesEl.getAttribute('data-color') || palette[idx % palette.length];
+            const type = seriesEl.getAttribute('data-chart-type') || mainChartType;
+            const label = seriesEl.getAttribute('data-label') || seriesEl.getAttribute('data-title') || 'Dataset ' + (datasets.length + 1);
+            const scheme = seriesEl.getAttribute('data-scheme') || seriesEl.getAttribute('scheme') || containerScheme;
+            const palette = getPalette(scheme);
+            const color = seriesEl.getAttribute('data-color') || palette[idx % palette.length];
             
             datasets.push({
               type: type === 'area' ? 'line' : type,
@@ -203,14 +204,14 @@ export const CHART_SCRIPT = `
             });
           });
 
-          var canvas = document.createElement('canvas');
+          const canvas = document.createElement('canvas');
           chartContainer.insertBefore(canvas, chartContainer.firstChild);
           
-          var firstSeries = seriesElements[0];
-          var showLegend = containerLegend || firstSeries.getAttribute('data-legend') === 'true' || datasets.length > 1 || isPieOrDoughnut;
-          var showGrid = containerGrid || firstSeries.getAttribute('data-grid') === 'true';
+          const firstSeries = seriesElements[0];
+          const showLegend = containerLegend || firstSeries.getAttribute('data-legend') === 'true' || datasets.length > 1 || isPieOrDoughnut;
+          const showGrid = containerGrid || firstSeries.getAttribute('data-grid') === 'true';
 
-          var options = {
+          const options = {
             responsive: true,
             plugins: {
               title: {
@@ -251,7 +252,7 @@ export const MERMAID_SCRIPT = `
   <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var isDark = document.body.classList.contains('color-scheme-dark') || 
+      const isDark = document.body.classList.contains('color-scheme-dark') || 
                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
                     !document.body.classList.contains('color-scheme-light'));
       
@@ -269,11 +270,11 @@ export const CODE_COPY_SCRIPT = `
     document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.zolt-copy-button').forEach(function(button) {
         button.addEventListener('click', function() {
-          var codeBlock = this.closest('.zolt-code-block');
-          var code = codeBlock.querySelector('code').innerText;
+          const codeBlock = this.closest('.zolt-code-block');
+          const code = codeBlock.querySelector('code').innerText;
           
           navigator.clipboard.writeText(code).then(function() {
-            var originalText = button.innerText;
+            const originalText = button.innerText;
             button.innerText = 'Copié !';
             button.classList.add('copied');
             
@@ -290,9 +291,9 @@ export const CODE_COPY_SCRIPT = `
 export const SIDEBAR_SCRIPT = `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var sidebar = document.querySelector('.zolt-sidebar');
-      var toggle = document.querySelector('.zolt-sidebar-toggle');
-      var close = document.querySelector('.zolt-sidebar-close');
+      const sidebar = document.querySelector('.zolt-sidebar');
+      const toggle = document.querySelector('.zolt-sidebar-toggle');
+      const close = document.querySelector('.zolt-sidebar-close');
       
       if (!sidebar) return;
 
@@ -312,7 +313,7 @@ export const SIDEBAR_SCRIPT = `
 
       // Close sidebar when clicking outside on mobile
       document.addEventListener('click', function(event) {
-        var isClickInside = sidebar.contains(event.target) || (toggle && toggle.contains(event.target));
+        const isClickInside = sidebar.contains(event.target) || (toggle && toggle.contains(event.target));
         if (!isClickInside && sidebar.classList.contains('is-open')) {
           sidebar.classList.remove('is-open');
           document.body.classList.remove('sidebar-is-open');
@@ -324,9 +325,14 @@ export const SIDEBAR_SCRIPT = `
 export const FILETREE_SCRIPT = `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var activeLink = document.querySelector('.zolt-filetree li.active');
-      if (activeLink) {
-        activeLink.scrollIntoView({ block: 'center', behavior: 'auto' });
-      }
+      setTimeout(function() {
+        const activeLink = document.querySelector('.zolt-filetree li.active');
+        if (activeLink) {
+          activeLink.scrollIntoView({ 
+            block: 'center', 
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
     });
   </script>`;

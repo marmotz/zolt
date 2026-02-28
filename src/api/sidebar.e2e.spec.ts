@@ -111,7 +111,7 @@ Content
     expect(html).toContain('class="zolt-sidebar-close"');
     expect(html).toContain('aria-label="Toggle sidebar"');
     expect(html).toContain('aria-label="Close sidebar"');
-    expect(html).toContain("var sidebar = document.querySelector('.zolt-sidebar');"); // Verify SIDEBAR_SCRIPT inclusion
+    expect(html).toContain("const sidebar = document.querySelector('.zolt-sidebar');"); // Verify SIDEBAR_SCRIPT inclusion
   });
 
   it('should render toggle buttons even when sidebar-header is implicit', async () => {
