@@ -1,0 +1,55 @@
+---
+title: "Contributing"
+description: "How to build Zolt from source and contribute to the project"
+---
+
+# Contributing to Zolt
+
+If you want to build Zolt yourself, fix bugs, or contribute new features, follow these steps.
+
+## 🛠️ Installation from Source
+
+To build Zolt from source, you will need **Bun**.
+
+### Prerequisites
+
+- **Bun**: [Install Bun](https://bun.sh/) (Required for building only)
+
+### Steps
+
+1. **Fork and clone the repository**:
+   If you intend to contribute, start by [forking the Zolt repository](https://github.com/marmotz/zolt/fork) on GitHub. Then clone your fork (replace `YOUR_USERNAME` with your actual username):
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/zolt.git
+   cd zolt
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   bun install
+   ```
+
+3. **Build the CLI**:
+   ```bash
+   bun run build
+   ```
+
+The executables will be available in the `dist/` directory.
+
+## 🧪 Running Tests
+
+Before submitting a Pull Request, please ensure all tests pass:
+
+```bash
+bun test
+```
+
+## 🧹 Code Quality
+
+We use Prettier for code formatting. You can format your code using:
+
+```bash
+bun run format
+```
+
+Thank you for contributing to Zolt!

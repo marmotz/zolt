@@ -260,16 +260,16 @@ ${pc.bold('Commands:')}
     Show version information
 
 ${pc.bold('Options:')}
-  ${opt('--help')}, ${opt('-h')}             Show this help message
+  ${opt('-h')}, ${opt('--help')}                Show this help message
+  ${opt('-v')}, ${opt('--version')}             Show version information
 
 ${pc.bold('Lint Options:')}
-  ${opt('--format')} ${arg('<json|text>')}   Output format ${dim('(default: text)')}
-  ${opt('--fix')}                  Auto-fix fixable issues
+  ${opt('-f')}, ${opt('--format')} ${arg('<text|json>')}  Output format ${dim('(default: text)')}
 
 ${pc.bold('Build Options:')}
-  ${opt('-o')}, ${opt('--output')} ${arg('<path>')}    Output file or directory
-  ${opt('-t')}, ${opt('--type')}   ${arg('<html>')}    Output type ${dim('(default: html)')}
-  ${opt('-w')}, ${opt('--watch')}            Watch for file changes and rebuild
+  ${opt('-o')}, ${opt('--output')} ${arg('<path>')}       Output file or directory
+  ${opt('-t')}, ${opt('--type')}   ${arg('<html|pdf>')}   Output type ${dim('(default: html)')}
+  ${opt('-w')}, ${opt('--watch')}               Watch for file changes and rebuild
 
 ${pc.bold('Examples:')}
   ${dim('$')} zolt ${cmd('lint')} document.zlt
@@ -287,10 +287,6 @@ async function handleLint(args: string[]) {
         type: 'string',
         default: 'text',
         short: 'f',
-      },
-      fix: {
-        type: 'boolean',
-        default: false,
       },
     },
     allowPositionals: true,

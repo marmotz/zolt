@@ -21,7 +21,7 @@ import {
   VariableNode,
   VideoNode,
 } from '../../../parser/types';
-import { formatValue, transformHref } from '../utils/string-utils';
+import { escapeHtml, formatValue, transformHref } from '../utils/string-utils';
 
 export class InlineVisitor {
   constructor(
@@ -132,7 +132,7 @@ export class InlineVisitor {
   visitCode(node: CodeNode): string {
     const attrs = this.renderAllAttributes(node.attributes);
 
-    return `<code${attrs}>${node.content}</code>`;
+    return `<code${attrs}>${escapeHtml(node.content)}</code>`;
   }
 
   async visitSuperscript(node: SuperscriptNode): Promise<string> {
@@ -323,7 +323,7 @@ export class InlineVisitor {
         return `{$${node.name}}`;
       }
 
-      return formatValue(value);
+      return escapeHtml(formatValue(value));
     } catch {
       return `{$${node.name}}`;
     }
@@ -336,7 +336,7 @@ export class InlineVisitor {
         return `{{${node.expression}}}`;
       }
 
-      return formatValue(value);
+      return escapeHtml(formatValue(value));
     } catch {
       return `{{${node.expression}}}`;
     }
@@ -372,7 +372,7 @@ export class InlineVisitor {
       try {
         const val = this.evaluator.evaluate('$' + name);
 
-        return formatValue(val);
+        return escapeHtml(formatValue(val));
       } catch {
         return `{$${name}}`;
       }

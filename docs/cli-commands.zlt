@@ -1,0 +1,70 @@
+---
+title: "CLI Commands Reference"
+description: "Full reference for Zolt CLI commands and options"
+---
+
+# CLI Commands Reference
+
+The Zolt CLI provides several commands to manage, lint, and build your documents.
+
+---
+
+## 🏗️ `build`
+
+Converts `.zlt` files into HTML or PDF.
+
+```bash
+zolt build <input> [options]
+```
+
+### Options
+
+- `-o, --output <path>`: Specify where the result should be saved:
+  - **No output provided**: Saved in the same directory as the input file (e.g., `zolt build foo/bar.zlt` creates `./foo/bar.html`).
+  - **Path is a file**: Saved exactly to that file (e.g., `zolt build foo/bar.zlt -o result.html` creates `./result.html`).
+  - **Path is a directory**: Saved in that directory using the input filename (e.g., `zolt build foo/bar.zlt -o dist/` creates `./dist/foo/bar.html`).
+- `-w, --watch`: Automatically rebuild when the source file or its dependencies change.
+- `-t, --type <html|pdf>`: Specify the output format (default: `html`).
+
+### Smart Dependency Resolution
+
+Zolt doesn't just build the file you point to. It intelligently analyzes your document's dependencies:
+
+- **Recursive Build**: If your file links to other `.zlt` files (e.g., `[Next Page](next.zlt)`), Zolt will automatically build those files too, preserving your project's structure in the output directory.
+- **Inclusions & Layouts**: All included files (`:::include`) and layouts are tracked and processed.
+- **Asset Management**: Images, videos, and other assets referenced in your documents are automatically copied to the output directory, with their paths adjusted to remain valid in the generated HTML.
+
+This makes it easy to build an entire multi-page documentation site by just pointing to your `index.zlt`.
+
+---
+
+## 🔍 `lint`
+
+Analyzes your Zolt files for syntax errors or warnings.
+
+```bash
+zolt lint <input> [options]
+```
+
+### Options
+
+- `-f, --format <text|json>`: Specify the output format (default: `text`).
+
+### Examples
+
+**Standard linting:**
+```bash
+zolt lint document.zlt
+```
+
+**JSON output:**
+```bash
+zolt lint document.zlt -f json
+```
+
+---
+
+## ⚙️ Global Options
+
+- `-h, --help`: Display help for a command.
+- `-v, --version`: Output the version number.

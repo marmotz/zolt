@@ -47,6 +47,43 @@ describe('InlineVisitor', () => {
     expect(html).toContain('alt="Image for Zolt"');
   });
 
+  describe('HTML Escaping', () => {
+    test('should escape HTML entities in inline code', async () => {
+      const node: any = {
+        type: 'Code',
+        content: '-o, --output <path>',
+        attributes: {},
+      };
+
+      const html = await visitor.visit(node);
+      expect(html).toBe('<code>-o, --output &lt;path&gt;</code>');
+    });
+
+    test('should escape HTML entities in variables', async () => {
+      const node: any = { type: 'Variable', name: 'val' };
+      evaluator.setVariable('val', '<script>alert(1)</script>');
+      const html = await visitor.visit(node);
+      expect(html).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
+    });
+
+    test('should escape HTML entities in expressions', async () => {
+      const node: any = { type: 'Expression', expression: '"&"' };
+      const html = await visitor.visit(node);
+      expect(html).toBe('&amp;');
+    });
+
+    test('should escape HTML entities in attributes via evaluateString', async () => {
+      const node: any = {
+        type: 'Image',
+        src: '{$url}',
+        alt: 'Alt',
+      };
+      evaluator.setVariable('url', 'image.jpg?q="quoted"');
+      const html = await visitor.visitImage(node);
+      expect(html).toContain('src="image.jpg?q=&quot;quoted&quot;"');
+    });
+  });
+
   describe('Remote URL Protection', () => {
     test('should NOT mangle remote image URLs', async () => {
       const node: any = {

@@ -1,90 +1,110 @@
 ---
 title: "Installation & Usage"
-description: "How to install and use the Zolt CLI"
+description: "How to install and use Zolt"
 ---
 
 # Installation & Usage
 
-Zolt can be used either as a standalone binary (no dependencies required) or installed from source using Bun.
+Zolt can be used in two primary ways: as a **Command Line Interface (CLI)** or as a **library** integrated into your TypeScript/JavaScript projects.
+
+## 🛠️ 1. Using the CLI
+
+The CLI is the easiest way to build your Zolt documents. You can run it immediately using a package runner (npx, bunx, etc.).
+
+### Quick Start with Package Runners
+
+If you have a JavaScript package manager installed, you can build a Zolt file without installing anything globally:
+
+:::tabs
+:::tab [bun]
+```bash
+bunx @marmotz/zolt build your-file.zlt -o output.html
+```
+:::
+
+:::tab [npm]
+```bash
+npx @marmotz/zolt build your-file.zlt -o output.html
+```
+:::
+
+:::tab [pnpm]
+```bash
+pnpm dlx @marmotz/zolt build your-file.zlt -o output.html
+```
+:::
+
+:::tab [yarn]
+```bash
+yarn dlx @marmotz/zolt build your-file.zlt -o output.html
+```
+:::
+:::
+
+### CLI Commands Reference
+
+For a complete list of commands and options, see the [CLI Commands Reference](cli-commands.zlt).
 
 ---
 
-## 🚀 Quick Start (Standalone Binary)
+## 📦 2. Programmatic Usage (API)
 
-If you have downloaded a pre-compiled version of Zolt for your operating system, you don't need to install anything else.
+You can integrate Zolt directly into your Node.js applications by using it as a library.
 
-1. **Download** the binary for your platform (`zolt-linux`, `zolt-macos`, or `zolt-windows.exe`).
-2. **Make it executable** (on Linux/macOS):
-   ```bash
-   chmod +x zolt-linux
-   ```
-3. **Run it**:
-   ```bash
-   ./zolt-linux --version
-   ```
+### Installation
 
----
+Install the package in your project:
 
-## 🛠️ Installation from Source
-
-If you want to build Zolt yourself or contribute to the project, you will need **Bun**.
-
-### Prerequisites
-
-- **Bun**: [Install Bun](https://bun.sh/) (Required for building only)
-
-### Steps
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/marmotz/zolt.git
-   cd zolt
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   bun install
-   ```
-
-3. **Build the CLI**:
-   ```bash
-   bun run build
-   ```
-
-The executables will be available in the `dist/` directory.
-
----
-
-## CLI Usage
-
-The Zolt CLI provides commands for linting and building your documents.
-
-### Linting
-
-Analyze a `.zlt` file for syntax errors or warnings:
-
+:::tabs
+:::tab [bun]
 ```bash
-zolt lint your-file.zlt
+bun add @marmotz/zolt
 ```
+:::
 
-Use the `--watch` (or `-w`) flag to automatically re-lint when the file changes:
-
+:::tab [npm]
 ```bash
-zolt lint your-file.zlt --watch
+npm install --save @marmotz/zolt
 ```
+:::
 
-### Building
-
-Convert a `.zlt` file to HTML:
-
+:::tab [pnpm]
 ```bash
-zolt build your-file.zlt -o output.html
+pnpm add @marmotz/zolt
 ```
+:::
 
-**Options:**
+:::tab [yarn]
+```bash
+yarn add @marmotz/zolt
+```
+:::
+:::
 
-- `-o, --output <file>`: Specify the output file path.
-- `-w, --watch`: Automatically rebuild when the source file changes.
+### Usage
+
+Import the high-level functions to build Zolt content programmatically:
+
+```typescript
+import { buildFile, buildString, buildFileToString } from '@marmotz/zolt';
+
+// Option A: Build a file to a specific output path
+await buildFile('input.zlt', 'output.html', {
+  variables: { author: 'Zolt User' }
+});
+
+// Option B: Build a string and get the resulting HTML
+const html = await buildString('# Hello {$name}', {
+  variables: { name: 'World' }
+});
+
+console.log(html); // "<h1>Hello World</h1>"
+
+// Option C: Build a file and get the resulting HTML as a string
+const htmlFromFile = await buildFileToString('input.zlt', {
+  variables: { author: 'Zolt User' }
+});
+```
 
 ---
 
@@ -111,6 +131,28 @@ Current date: {$created}
 
 Then build it:
 
+:::tabs
+:::tab [bunx]
 ```bash
-zolt build hello.zlt -o hello.html
+bunx @marmotz/zolt build hello.zlt -o hello.html
 ```
+:::
+
+:::tab [npx]
+```bash
+npx @marmotz/zolt build hello.zlt -o hello.html
+```
+:::
+
+:::tab [pnpm]
+```bash
+pnpm dlx @marmotz/zolt build hello.zlt -o hello.html
+```
+:::
+
+:::tab [yarn]
+```bash
+yarn dlx @marmotz/zolt build hello.zlt -o hello.html
+```
+:::
+:::

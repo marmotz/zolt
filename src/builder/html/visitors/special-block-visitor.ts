@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
 import { ProjectNode } from '../../../utils/project-graph';
-import { slugify, toAlpha, toRoman } from '../utils/string-utils';
+import { escapeHtml, slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class SpecialBlockVisitor {
   private tabsCounter: number = 0;
@@ -181,7 +181,7 @@ export class SpecialBlockVisitor {
     }
     const attrs = this.renderAllAttributes(node.attributes);
 
-    return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${node.content}</div>`;
+    return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${escapeHtml(node.content)}</div>`;
   }
 
   private async visitFileTree(node: DoubleBracketBlockNode): Promise<string> {
@@ -238,7 +238,7 @@ export class SpecialBlockVisitor {
         link = relativePath.replace(/\.zlt$/, '.html').replace(/\\/g, '/');
       }
 
-      html += `<li${activeClass}><a href="${link}">${this.escapeHtml(node.title)}</a>`;
+      html += `<li${activeClass}><a href="${link}">${escapeHtml(node.title)}</a>`;
     }
 
     if (node.children.length > 0 && currentDepth < to && currentDepth + 1 < maxDepth) {
@@ -401,9 +401,9 @@ export class SpecialBlockVisitor {
     const attrs = this.renderAllAttributes(Object.keys(filteredAttrs).length > 0 ? filteredAttrs : undefined);
 
     const seriesTitle = series.title || series.attributes?.title;
-    const titleAttr = seriesTitle ? ` data-title="${this.escapeHtml(String(seriesTitle))}"` : '';
+    const titleAttr = seriesTitle ? ` data-title="${escapeHtml(String(seriesTitle))}"` : '';
     const schemeAttr = series.attributes?.['color-scheme']
-      ? ` data-scheme="${this.escapeHtml(String(series.attributes['color-scheme'] as string))}"`
+      ? ` data-scheme="${escapeHtml(String(series.attributes['color-scheme'] as string))}"`
       : '';
     const legendAttr = series.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
     const gridAttr = series.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
@@ -417,18 +417,6 @@ export class SpecialBlockVisitor {
   visitMermaid(node: any): string {
     this.hasMermaid = true;
 
-    return `<div class="zolt-mermaid">\n  <div class="mermaid">${this.escapeHtml(node.content)}</div>\n</div>`;
-  }
-
-  private escapeHtml(text: string): string {
-    const map: Record<string, string> = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    };
-
-    return text.replace(/[&<>"']/g, (m) => map[m]);
+    return `<div class="zolt-mermaid">\n  <div class="mermaid">${escapeHtml(node.content)}</div>\n</div>`;
   }
 }

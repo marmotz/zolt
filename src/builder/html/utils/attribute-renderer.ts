@@ -1,5 +1,5 @@
 import { Attributes } from '../../../parser/types';
-import { formatValue } from './string-utils';
+import { escapeHtml, formatValue } from './string-utils';
 
 export class AttributeRenderer {
   constructor(private evaluator: any) {}
@@ -155,7 +155,7 @@ export class AttributeRenderer {
       try {
         const val = this.evaluator.evaluate('$' + name);
 
-        return formatValue(val);
+        return escapeHtml(formatValue(val));
       } catch {
         return `{$${name}}`;
       }
