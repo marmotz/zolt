@@ -885,7 +885,7 @@ export class ExpressionEvaluator {
   }
 
   private tryMulDivMod(expr: string): Value | null {
-    return this.tryBinaryOp(expr, /[*\/%]/, (left, op, right) => {
+    return this.tryBinaryOp(expr, /[*/%]/, (left, op, right) => {
       const l = typeof left === 'number' ? left : parseFloat(String(left));
       const r = typeof right === 'number' ? right : parseFloat(String(right));
       if (op === '*') {

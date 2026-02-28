@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { FileMetadataUtils } from '../../utils/file-metadata';
 import { ContentProcessor } from './content-processor';
-import { ExpressionEvaluator } from './expression-evaluator';
+import { ExpressionEvaluator, Value } from './expression-evaluator';
 
 export class SourceEvaluator {
   private evaluator: ExpressionEvaluator;
@@ -259,10 +259,10 @@ export class SourceEvaluator {
       // already set by the document or project metadata.
       if (this.isLayoutProcessing) {
         if (this.evaluator.getVariable(key) === undefined) {
-          this.evaluator.setVariable(key, value);
+          this.evaluator.setVariable(key, value as Value);
         }
       } else {
-        this.evaluator.setVariable(key, value);
+        this.evaluator.setVariable(key, value as Value);
       }
     }
   }

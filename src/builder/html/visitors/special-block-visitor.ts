@@ -195,7 +195,10 @@ export class SpecialBlockVisitor {
     const to = parseInt(node.attributes?.to || '99');
     const depth = parseInt(node.attributes?.depth || '99');
     const showToc =
-      (node.attributes?.toc === 'true' || (node.attributes?.hasOwnProperty('toc') && node.attributes.toc === '')) ??
+      (node.attributes?.toc === 'true' ||
+        (node.attributes &&
+          Object.prototype.hasOwnProperty.call(node.attributes, 'toc') &&
+          node.attributes.toc === '')) ??
       false;
 
     const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc);

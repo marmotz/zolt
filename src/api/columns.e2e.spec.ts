@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildString } from '../index';
+import { buildString } from './index';
 
 describe('Columns E2E', () => {
   test('should build basic columns', async () => {
@@ -66,7 +66,6 @@ Right
 
 ## Outside Heading`;
     const html = await buildString(input);
-    const parts = html.split('</h2>');
     // The columns should be before the Outside Heading
     expect(html.indexOf('triple-colon-block columns')).toBeLessThan(html.indexOf('Outside Heading'));
     // The closing </div> of columns should be before the <h2>

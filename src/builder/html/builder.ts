@@ -1,6 +1,6 @@
 import { createHighlighter, type Highlighter } from 'shiki';
 import { InlineParser } from '../../parser/inline-parser';
-import { ASTNode, DocumentNode } from '../../parser/types';
+import { ASTNode, Attributes, DocumentNode, HeadingNode } from '../../parser/types';
 import { ProjectNode } from '../../utils/project-graph';
 import { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
@@ -13,15 +13,15 @@ import { InlineVisitor } from './visitors/inline-visitor';
 import { SpecialBlockVisitor } from './visitors/special-block-visitor';
 import { TableVisitor } from './visitors/table-visitor';
 
-type InitialVariables = Record<string, number | string | boolean | null | undefined>;
+export type InitialVariables = Record<string, number | string | boolean | null | undefined>;
 
 export class HTMLBuilder implements Builder {
   private inlineParser = new InlineParser();
-  private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: any }> = new Map();
+  private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: Record<string, unknown> }> = new Map();
   private footnoteReferences: { id: string; refId: string }[] = [];
   private evaluator: ExpressionEvaluator;
   private attributeRenderer: AttributeRenderer;
-  private currentHeadings: any[] = [];
+  private currentHeadings: ASTNode[] = [];
 
   private blockVisitor: BlockVisitor;
   private inlineVisitor: InlineVisitor;
@@ -96,7 +96,7 @@ export class HTMLBuilder implements Builder {
       renderAttrsBound,
       this.evaluator,
       processInlineBound,
-      this.currentHeadings,
+      this.currentHeadings as HeadingNode[],
       this.projectGraph,
       this.currentFilePath
     );
@@ -261,7 +261,7 @@ export class HTMLBuilder implements Builder {
         })
         .join('');
 
-      let content = '';
+      let content: string;
       if (def.children && def.children.length > 0) {
         const lastChild = def.children[def.children.length - 1];
         if (lastChild.type === 'Paragraph') {
@@ -279,7 +279,7 @@ export class HTMLBuilder implements Builder {
         content = backlinks;
       }
 
-      const attrs = this.attributeRenderer.renderAllAttributes(def.attributes);
+      const attrs = this.attributeRenderer.renderAllAttributes(def.attributes as Attributes);
       html += `<li id="fn-${id}"${attrs} class="footnote-item">${content}</li>\n`;
     }
 
@@ -288,7 +288,7 @@ export class HTMLBuilder implements Builder {
     return html;
   }
 
-  private hasNodeType(nodes: ASTNode[], type: string, extraCheck?: (node: any) => boolean): boolean {
+  private hasNodeType(nodes: ASTNode[], type: string, extraCheck?: (node: ASTNode) => boolean): boolean {
     for (const node of nodes) {
       if (node.type === type) {
         if (!extraCheck || extraCheck(node)) return true;
@@ -297,24 +297,28 @@ export class HTMLBuilder implements Builder {
         if (this.hasNodeType(node.children as ASTNode[], type, extraCheck)) return true;
       }
       if (node.type === 'Table') {
-        if (this.hasNodeType((node as any).rows, type, extraCheck)) return true;
+        const table = node as any;
+        if (this.hasNodeType(table.rows as ASTNode[], type, extraCheck)) return true;
       }
       if (node.type === 'TableRow') {
-        if (this.hasNodeType((node as any).cells, type, extraCheck)) return true;
+        const row = node as any;
+        if (this.hasNodeType(row.cells as ASTNode[], type, extraCheck)) return true;
       }
       if (node.type === 'TableCell') {
-        if ((node as any).children && this.hasNodeType((node as any).children, type, extraCheck)) return true;
+        const cell = node as any;
+        if (cell.children && this.hasNodeType(cell.children as ASTNode[], type, extraCheck)) return true;
       }
     }
 
     return false;
   }
 
-  private async visitCodeBlock(node: any): Promise<string> {
+  private async visitCodeBlock(node: unknown): Promise<string> {
+    const n = node as Record<string, any>;
     const highlighter = await this.ensureHighlighter();
-    const lang = node.language || 'text';
-    const code = node.content || '';
-    const attributes = node.attributes || {};
+    const lang = n.language || 'text';
+    const code = n.content || '';
+    const attributes = (n.attributes as Record<string, string>) || {};
 
     const supportedLangs = highlighter.getLoadedLanguages();
     const effectiveLang = supportedLangs.includes(lang) ? lang : 'text';
@@ -356,14 +360,11 @@ export class HTMLBuilder implements Builder {
       .map(([key, value]) => `${key}="${value}"`)
       .join(' ');
 
-    let headerHtml = '';
-    if (title || true) {
-      headerHtml = `
-      <div class="zolt-code-header">
-        <span class="zolt-code-title">${title || ''}</span>
-        <button class="zolt-copy-button">Copier</button>
-      </div>`;
-    }
+    const headerHtml = `
+    <div class="zolt-code-header">
+      <span class="zolt-code-title">${title || ''}</span>
+      <button class="zolt-copy-button">Copier</button>
+    </div>`;
 
     return `
     <div class="${containerClasses.join(' ')}"${startStyle}${attrsHtml ? ' ' + attrsHtml : ''}>

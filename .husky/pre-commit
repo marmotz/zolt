@@ -1,2 +1,7 @@
+# 1. Automatically correct the files you commit
 bunx lint-staged
-bun run type-check
+
+# 2. Checks that the ENTIRE project is clean (Global Lint without fix + Types)
+# We use --max-warnings=0 so that it fails if there is any warning remaining
+bun run lint:check
+bun type-check

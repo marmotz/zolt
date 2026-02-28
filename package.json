@@ -17,6 +17,7 @@
     "@types/katex": "^0.16.8",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
@@ -66,7 +67,8 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "prettier --write"
+      "prettier --write",
+      "eslint --fix"
     ]
   },
   "type": "module",

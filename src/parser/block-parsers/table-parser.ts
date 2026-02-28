@@ -242,7 +242,7 @@ export class TableParser {
   }
 
   private isSeparatorRow(rawCells: string[]): boolean {
-    return rawCells.length > 0 && rawCells.every((cell) => /^[ 	]*:?-+:?[ 	]*$/.test(cell));
+    return rawCells.length > 0 && rawCells.every((cell) => /^[ \t]*:?-+:?[ \t]*$/.test(cell));
   }
 
   private parseAlignments(rawCells: string[]): ('left' | 'center' | 'right' | undefined)[] {

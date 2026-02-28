@@ -620,7 +620,7 @@ export async function handleServer(
               </script></body>`
               );
               console.log(
-                `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
+                `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
               );
 
               return new Response(injected, {
@@ -629,7 +629,7 @@ export async function handleServer(
             })
             .catch(() => {
               console.log(
-                `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
+                `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
               );
 
               return new Response('Not Found', { status: 404 });
@@ -639,13 +639,13 @@ export async function handleServer(
         return file.exists().then((exists) => {
           if (!exists) {
             console.log(
-              `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
+              `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
             );
 
             return new Response('Not Found', { status: 404 });
           }
           console.log(
-            `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
+            `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
           );
 
           return new Response(file);

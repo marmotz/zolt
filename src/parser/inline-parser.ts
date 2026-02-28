@@ -830,7 +830,7 @@ export class InlineParser {
         if (keyValueMatch) {
           const key = keyValueMatch[1];
           const afterKey = remaining.slice(keyValueMatch[0].length);
-          let value = '';
+          let value: string;
 
           // Look for next attribute separator (space or comma) followed by a key, shortcut or boolean
           const nextKeyMatch = afterKey.match(/[ ,]([a-zA-Z0-9-]+=|#|\.)/);
@@ -952,7 +952,7 @@ export class InlineParser {
         if (keyValueMatch) {
           const key = keyValueMatch[1];
           const afterKey = remaining.slice(keyValueMatch[0].length);
-          let value = '';
+          let value: string;
 
           const nextKeyMatch = afterKey.match(/ ([a-zA-Z0-9-]+=|#|\.)/);
           if (nextKeyMatch) {

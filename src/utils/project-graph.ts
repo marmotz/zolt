@@ -47,7 +47,9 @@ export class ProjectGraphBuilder {
     const rawMetadata = FileMetadataUtils.extractRaw(content);
     const metadata = rawMetadata ? FileMetadataUtils.parse(rawMetadata) : {};
 
-    return metadata.title || path.basename(absPath, '.zlt');
+    const title = metadata.title;
+
+    return typeof title === 'string' ? title : path.basename(absPath, '.zlt');
   }
 
   private buildGraph(): ProjectNode[] {
@@ -56,7 +58,8 @@ export class ProjectGraphBuilder {
     const entryMetadata = FileMetadataUtils.extractRaw(entryContent)
       ? FileMetadataUtils.parse(FileMetadataUtils.extractRaw(entryContent)!)
       : {};
-    const entryTitle = entryMetadata.title || path.basename(this.entryPoint, '.zlt');
+    const metadataTitle = entryMetadata.title;
+    const entryTitle = typeof metadataTitle === 'string' ? metadataTitle : path.basename(this.entryPoint, '.zlt');
 
     const processedPaths = new Set<string>();
     processedPaths.add(this.entryPoint);

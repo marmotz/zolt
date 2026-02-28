@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import { readFile, stat, writeFile } from 'fs/promises';
 import * as path from 'path';
 import { Builder } from '../builder/builder';
-import { ExpressionEvaluator } from '../builder/evaluator/expression-evaluator';
+import { ExpressionEvaluator, Value } from '../builder/evaluator/expression-evaluator';
 import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
-import { HTMLBuilder } from '../builder/html/builder';
+import { HTMLBuilder, InitialVariables } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
@@ -12,8 +12,8 @@ import { ProjectGraphBuilder, ProjectNode } from '../utils/project-graph';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
-  variables?: Record<string, any>;
-  projectMetadata?: Record<string, any>;
+  variables?: Record<string, unknown>;
+  projectMetadata?: Record<string, unknown>;
   fileMetadata?: boolean;
   filePath?: string;
   assetResolver?: (path: string) => string;
@@ -46,9 +46,9 @@ export interface LintWarning {
 export function getExpandedContent(
   content: string,
   options?: BuildOptions,
-  extraVariables?: Record<string, any>
+  extraVariables?: Record<string, unknown>
 ): string {
-  const initialVariables: Record<string, any> = {
+  const initialVariables: Record<string, unknown> = {
     ...options?.projectMetadata,
     ...options?.variables,
     ...extraVariables,
@@ -56,7 +56,7 @@ export function getExpandedContent(
 
   const evaluator = new ExpressionEvaluator();
   for (const [key, value] of Object.entries(initialVariables)) {
-    evaluator.setVariable(key, value);
+    evaluator.setVariable(key, value as Value);
   }
 
   const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath, [], undefined, false, true);
@@ -65,7 +65,7 @@ export function getExpandedContent(
 }
 
 export async function buildString(content: string, options?: BuildOptions): Promise<string> {
-  const extraVariables: Record<string, any> = {};
+  const extraVariables: Record<string, unknown> = {};
 
   if (options?.filePath) {
     try {
@@ -102,7 +102,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   }
 
   // Phase 3: Final Variable Merging
-  const mergedVariables: Record<string, any> = {
+  const mergedVariables: Record<string, unknown> = {
     ...options?.projectMetadata,
     ...options?.variables,
     ...extraVariables,
@@ -132,7 +132,12 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   // Phase 4: HTML Building
   let builder: Builder;
   if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder(mergedVariables, options?.assetResolver, projectGraph, options?.filePath);
+    builder = new HTMLBuilder(
+      mergedVariables as InitialVariables,
+      options?.assetResolver,
+      projectGraph,
+      options?.filePath
+    );
   } else {
     throw new Error(`Unsupported output type: ${options.type}`);
   }
@@ -154,7 +159,7 @@ export async function buildFileToString(filePath: string, options?: BuildOptions
 
 export function extractAllAssets(
   content: string,
-  projectMetadata?: Record<string, any>,
+  projectMetadata?: Record<string, unknown>,
   filePath?: string
 ): { zltLinks: string[]; otherAssets: string[] } {
   // Expansion is needed to find assets inside includes/layouts
@@ -207,7 +212,7 @@ export function extractAllAssets(
   };
 
   // Check all possible metadata keys for assets
-  const checkMetadata = (data: Record<string, any> | undefined) => {
+  const checkMetadata = (data: Record<string, unknown> | undefined) => {
     if (!data) return;
     const keys = [
       'image',
@@ -234,36 +239,38 @@ export function extractAllAssets(
     checkMetadata(ast.fileMetadata.data);
   }
 
-  const visit = (node: any) => {
-    if (!node) return;
+  const visit = (node: unknown) => {
+    if (!node || typeof node !== 'object') return;
 
-    switch (node.type) {
+    const n = node as Record<string, unknown>;
+
+    switch (n.type) {
       case 'Link':
-        checkHref(node.href);
+        checkHref(n.href);
         break;
       case 'Include':
-        checkHref(node.path);
+        checkHref(n.path);
         break;
       case 'Image':
       case 'Video':
       case 'Audio':
       case 'Embed':
       case 'File':
-        checkHref(node.src || node.href);
+        checkHref(n.src || n.href);
         break;
     }
 
-    if (node.children && Array.isArray(node.children)) {
-      node.children.forEach(visit);
+    if (n.children && Array.isArray(n.children)) {
+      n.children.forEach(visit);
     }
-    if (node.rows && Array.isArray(node.rows)) {
-      node.rows.forEach(visit);
+    if (n.rows && Array.isArray(n.rows)) {
+      n.rows.forEach(visit);
     }
-    if (node.cells && Array.isArray(node.cells)) {
-      node.cells.forEach(visit);
+    if (n.cells && Array.isArray(n.cells)) {
+      n.cells.forEach(visit);
     }
-    if (node.header) {
-      visit(node.header);
+    if (n.header) {
+      visit(n.header);
     }
   };
 
@@ -275,18 +282,18 @@ export function extractAllAssets(
   };
 }
 
-export function extractZltLinks(content: string, projectMetadata?: Record<string, any>): string[] {
+export function extractZltLinks(content: string, projectMetadata?: Record<string, unknown>): string[] {
   return extractAllAssets(content, projectMetadata).zltLinks;
 }
 
-export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
+export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, unknown>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { zltLinks } = extractAllAssets(content, projectMetadata);
 
   return zltLinks;
 }
 
-export async function getAssetFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
+export async function getAssetFiles(inputPath: string, projectMetadata?: Record<string, unknown>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { otherAssets } = extractAllAssets(content, projectMetadata, inputPath);
 
@@ -301,8 +308,8 @@ export async function getAssetFiles(inputPath: string, projectMetadata?: Record<
           const manifest = JSON.parse(manifestContent);
           const manifestDir = path.dirname(asset);
 
-          const checkIcon = (icon: any) => {
-            if (icon && icon.src && typeof icon.src === 'string') {
+          const checkIcon = (icon: unknown) => {
+            if (icon && typeof icon === 'object' && 'src' in icon && typeof icon.src === 'string') {
               if (
                 !icon.src.startsWith('http://') &&
                 !icon.src.startsWith('https://') &&
@@ -319,9 +326,10 @@ export async function getAssetFiles(inputPath: string, projectMetadata?: Record<
             manifest.icons.forEach(checkIcon);
           }
           if (manifest.shortcuts && Array.isArray(manifest.shortcuts)) {
-            manifest.shortcuts.forEach((s: any) => {
-              if (s.icons && Array.isArray(s.icons)) {
-                s.icons.forEach(checkIcon);
+            manifest.shortcuts.forEach((s: unknown) => {
+              const shortcut = s as Record<string, unknown>;
+              if (shortcut.icons && Array.isArray(shortcut.icons)) {
+                shortcut.icons.forEach(checkIcon);
               }
             });
           }

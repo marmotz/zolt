@@ -211,11 +211,7 @@ $items = ["Apple", "Banana", "Cherry"]
     });
 
     test('should NOT confuse ${$var} or ${{$var}} with math formulas', async () => {
-      const zolt = `
-$price = 100
-- Price: \${$price}
-- Double: \${{\$price * 2}}
-`;
+      const zolt = '\n$price = 100\n- Price: ${$price}\n- Double: ${{$price * 2}}\n';
       const html = await buildString(zolt);
 
       expect(html).toContain('Price: $100');

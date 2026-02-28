@@ -99,14 +99,24 @@ you MUST follow when working on this repository.
 3. **Do Not Over-Engineer:** Stick to the established architecture. If a feature needs a new token, add it to
    `TokenType` in `src/lexer/token-types.ts`, implement lexing rules in `src/lexer/lexer.ts`, and then build the parser
    component in `src/parser/`. Do not bypass the Lexer-Parser pipeline.
+
 - **Testing is Mandatory:** Every change needs a corresponding spec. **DO NOT create temporary test files.** When
-   adding a feature or fixing a bug, you MUST add permanent regression tests to the relevant spec file (e.g.,
-   `src/parser/parser.spec.ts`) or create a new permanent spec file if the feature justifies it. Every bug MUST have its
-   own dedicated test case to ensure the issue never recurs.
+  adding a feature or fixing a bug, you MUST add permanent regression tests to the relevant spec file (e.g.,
+  `src/parser/parser.spec.ts`) or create a new permanent spec file if the feature justifies it. Every bug MUST have its
+  own dedicated test case to ensure the issue never recurs.
 - **90% Coverage Requirement:** All files in the `src/` directory MUST have a minimum of **90% code coverage**. A task
-   is NOT considered finished until this threshold is met for all modified or new files.
-- **Verification:** Before claiming a task is done, run `bun test --coverage` and ensure 100% of the tests pass and the coverage requirement is met. Run `bun run format` to clean up the code.
+  is NOT considered finished until this threshold is met for all modified or new files.
+- **Verification:** Before claiming a task is done, run the following commands and ensure they all pass with zero errors
+  or warnings:
+    - `bun run format:fix` (Format the code)
+    - `bun run lint:fix` (Clean up the code)
+    - `bun run type-check` (Must pass with 0 errors)
+    - `bun run lint:check` (Must pass with 0 errors and 0 warnings)
+    - `bun test --coverage` (100% pass and coverage requirement met)
+
 5. **No Placeholders:** Write complete code. Do not leave `// TODO` or `...` inside code blocks unless specifically
    requested by the user.
+6. **No `any` Bypass:** Do not use `any` to bypass type-checking or linting rules. Use proper types, interfaces, or type
+   guards.
 
 Adhere to these rules strictly to maintain the high quality and performance of the Zolt project.
