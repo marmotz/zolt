@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import { spawn } from 'child_process';
 import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { main } from './index';
 
 describe('CLI: Project Metadata (zolt.project.yaml and .yml)', () => {
-  const testDir = join(process.cwd(), 'temp_project_test');
-  const testDirYml = join(process.cwd(), 'temp_project_test_yml');
-  const zoltBin = join(process.cwd(), 'src/cli.ts');
+  const testDir = join(process.cwd(), 'temp_project_test_metadata');
+  const testDirYml = join(process.cwd(), 'temp_project_test_yml_metadata');
 
   it('should load project metadata and process assets', async () => {
     await mkdir(testDir, { recursive: true });
@@ -27,30 +26,27 @@ image: "resources/logo.png"
     await writeFile(join(testDir, 'index.zlt'), zltContent);
     await writeFile(join(testDir, 'resources/logo.png'), 'fake-image-content');
 
-    return new Promise<void>((resolve, reject) => {
-      const proc = spawn('bun', [zoltBin, 'build', join(testDir, 'index.zlt'), '-o', join(testDir, 'dist/')]);
+    // Mock process.argv
+    const originalArgv = process.argv;
+    process.argv = ['bun', 'src/cli.ts', 'build', join(testDir, 'index.zlt'), '-o', join(testDir, 'dist/')];
 
-      proc.on('close', async (code) => {
-        try {
-          expect(code).toBe(0);
-          const output = await Bun.file(join(testDir, 'dist/index.html')).text();
-          expect(output).toContain('Welcome to E2E Test Site');
-          expect(output).toContain('Global site description');
+    try {
+      await main();
 
-          // Check if image was copied
-          const imageExists = await Bun.file(join(testDir, 'dist/resources/logo.png')).exists();
-          expect(imageExists).toBe(true);
+      const output = await Bun.file(join(testDir, 'dist/index.html')).text();
+      expect(output).toContain('Welcome to E2E Test Site');
+      expect(output).toContain('Global site description');
 
-          // Check if URL was resolved in meta tag
-          expect(output).toContain('<meta property="og:image" content="resources/logo.png">');
+      // Check if image was copied
+      const imageExists = await Bun.file(join(testDir, 'dist/resources/logo.png')).exists();
+      expect(imageExists).toBe(true);
 
-          await rm(testDir, { recursive: true, force: true });
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
+      // Check if URL was resolved in meta tag
+      expect(output).toContain('<meta property="og:image" content="resources/logo.png">');
+    } finally {
+      process.argv = originalArgv;
+      await rm(testDir, { recursive: true, force: true });
+    }
   });
 
   it('should load project metadata from .yml extension', async () => {
@@ -69,22 +65,19 @@ description: "Test description from yml"
     await writeFile(join(testDirYml, 'zolt.project.yml'), projectYml);
     await writeFile(join(testDirYml, 'index.zlt'), zltContent);
 
-    return new Promise<void>((resolve, reject) => {
-      const proc = spawn('bun', [zoltBin, 'build', join(testDirYml, 'index.zlt'), '-o', join(testDirYml, 'dist/')]);
+    // Mock process.argv
+    const originalArgv = process.argv;
+    process.argv = ['bun', 'src/cli.ts', 'build', join(testDirYml, 'index.zlt'), '-o', join(testDirYml, 'dist/')];
 
-      proc.on('close', async (code) => {
-        try {
-          expect(code).toBe(0);
-          const output = await Bun.file(join(testDirYml, 'dist/index.html')).text();
-          expect(output).toContain('Welcome to YML Test Site');
-          expect(output).toContain('Test description from yml');
+    try {
+      await main();
 
-          await rm(testDirYml, { recursive: true, force: true });
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
+      const output = await Bun.file(join(testDirYml, 'dist/index.html')).text();
+      expect(output).toContain('Welcome to YML Test Site');
+      expect(output).toContain('Test description from yml');
+    } finally {
+      process.argv = originalArgv;
+      await rm(testDirYml, { recursive: true, force: true });
+    }
   });
 });

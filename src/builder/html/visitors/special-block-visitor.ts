@@ -194,9 +194,8 @@ export class SpecialBlockVisitor {
     const depth = parseInt(node.attributes?.depth || '99');
 
     const html = this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth);
-    const customClass = node.attributes?.class || '';
 
-    return `<nav class="zolt-filetree${customClass ? ' ' + customClass : ''}">\n${html}\n</nav>`;
+    return `<nav class="zolt-filetree">\n${html}\n</nav>`;
   }
 
   private renderFileTreeNodes(

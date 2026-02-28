@@ -20,6 +20,8 @@ export const KNOWN_METADATA_KEYS = new Set([
   'theme',
   'color-scheme',
   'layout',
+  'icon',
+  'favicon',
   'icon_png',
   'icon_svg',
   'icon_ico',

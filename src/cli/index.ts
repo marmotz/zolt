@@ -9,9 +9,9 @@ import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../utils/file-metadata';
 
-const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
+export const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
 
-async function findProjectFile(baseDir: string): Promise<string | null> {
+export async function findProjectFile(baseDir: string): Promise<string | null> {
   for (const filename of PROJECT_FILENAMES) {
     const filePath = join(baseDir, filename);
     try {
@@ -26,7 +26,7 @@ async function findProjectFile(baseDir: string): Promise<string | null> {
   return null;
 }
 
-async function loadProjectMetadata(baseInputDir: string): Promise<Record<string, any>> {
+export async function loadProjectMetadata(baseInputDir: string): Promise<Record<string, any>> {
   const projectFile = await findProjectFile(baseInputDir);
   let data: Record<string, any> = {};
 
@@ -65,7 +65,7 @@ async function loadProjectMetadata(baseInputDir: string): Promise<Record<string,
   return filtered;
 }
 
-async function buildFileWithDeps(
+export async function buildFileWithDeps(
   inputFile: string,
   outputDir: string,
   type: 'html' | 'pdf',
@@ -199,44 +199,7 @@ async function buildFileWithDeps(
   return touchedFiles;
 }
 
-async function main() {
-  const args = process.argv.slice(2);
-
-  if (args.length === 0) {
-    printHelp();
-    process.exit(0);
-  }
-
-  const command = args[0];
-
-  if (command === '-v' || command === '--version') {
-    console.log(`zolt v${version}`);
-    process.exit(0);
-  }
-
-  switch (command) {
-    case 'lint':
-      await handleLint(args.slice(1));
-      break;
-    case 'build':
-      await handleBuild(args.slice(1));
-      break;
-    case 'version':
-      console.log(`zolt v${version}`);
-      break;
-    case 'help':
-    case '--help':
-    case '-h':
-      printHelp();
-      break;
-    default:
-      console.error(`${pc.red('Error:')} Unknown command: ${command}`);
-      printHelp();
-      process.exit(1);
-  }
-}
-
-function printHelp() {
+export function printHelp() {
   const cmd = pc.cyan;
   const opt = pc.magenta;
   const arg = pc.yellow;
@@ -279,7 +242,7 @@ ${pc.bold('Examples:')}
 `);
 }
 
-async function handleLint(args: string[]) {
+export async function handleLint(args: string[]) {
   const { values, positionals } = parseArgs({
     args,
     options: {
@@ -296,7 +259,8 @@ async function handleLint(args: string[]) {
 
   if (files.length === 0) {
     console.error(`${pc.red('Error:')} No files specified for linting`);
-    process.exit(1);
+    if (import.meta.main) process.exit(1);
+    throw new Error('No files specified for linting');
   }
 
   const format = values.format as 'json' | 'text';
@@ -361,10 +325,17 @@ async function handleLint(args: string[]) {
     }
   }
 
-  process.exit(hasErrors ? 1 : 0);
+  if (hasErrors) {
+    if (import.meta.main) process.exit(1);
+    throw new Error('Lint failed');
+  }
 }
 
-async function performBuild(files: string[], output: string | undefined, type: 'html' | 'pdf'): Promise<Set<string>> {
+export async function performBuild(
+  files: string[],
+  output: string | undefined,
+  type: 'html' | 'pdf'
+): Promise<Set<string>> {
   const allTouchedFiles = new Set<string>();
   const visited = new Set<string>();
 
@@ -472,7 +443,7 @@ async function performBuild(files: string[], output: string | undefined, type: '
   return allTouchedFiles;
 }
 
-async function handleWatch(files: string[], output: string | undefined, type: 'html' | 'pdf') {
+export async function handleWatch(files: string[], output: string | undefined, type: 'html' | 'pdf') {
   console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)`);
 
   const watchers = new Map<string, any>();
@@ -563,7 +534,7 @@ async function handleWatch(files: string[], output: string | undefined, type: 'h
   });
 }
 
-async function handleBuild(args: string[]) {
+export async function handleBuild(args: string[]) {
   const { values, positionals } = parseArgs({
     args,
     options: {
@@ -592,7 +563,8 @@ async function handleBuild(args: string[]) {
 
   if (files.length === 0) {
     console.error(`${pc.red('Error:')} No files specified for building`);
-    process.exit(1);
+    if (import.meta.main) process.exit(1);
+    throw new Error('No files specified for building');
   }
 
   if (watch) {
@@ -606,8 +578,51 @@ async function handleBuild(args: string[]) {
     console.log(`\n${pc.green(pc.bold('Build successful!'))}`);
   } catch (error) {
     console.error(`${pc.red('Build error:')}`, error instanceof Error ? error.message : 'Unknown error');
-    process.exit(1);
+    if (import.meta.main) process.exit(1);
+    throw error;
   }
 }
 
-main();
+export async function main() {
+  const args = process.argv.slice(2);
+
+  if (args.length === 0) {
+    printHelp();
+    if (import.meta.main) process.exit(0);
+    return;
+  }
+
+  const command = args[0];
+
+  if (command === '-v' || command === '--version') {
+    console.log(`zolt v${version}`);
+    if (import.meta.main) process.exit(0);
+    return;
+  }
+
+  switch (command) {
+    case 'lint':
+      await handleLint(args.slice(1));
+      break;
+    case 'build':
+      await handleBuild(args.slice(1));
+      break;
+    case 'version':
+      console.log(`zolt v${version}`);
+      break;
+    case 'help':
+    case '--help':
+    case '-h':
+      printHelp();
+      break;
+    default:
+      console.error(`${pc.red('Error:')} Unknown command: ${command}`);
+      printHelp();
+      if (import.meta.main) process.exit(1);
+      throw new Error(`Unknown command: ${command}`);
+  }
+}
+
+if (import.meta.main) {
+  main();
+}

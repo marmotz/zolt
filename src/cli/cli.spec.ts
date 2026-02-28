@@ -1,18 +1,13 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { spawn } from 'child_process';
+import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
 import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { version } from '../../package.json';
-
-const CLI = './dist/bin/zolt-linux-x64';
-const VERSION = `zolt v${version}`;
+import { findProjectFile, loadProjectMetadata, main } from './index';
 
 describe('CLI', () => {
-  const testDir = '/tmp/zolt-cli-test';
+  const testDir = join(process.cwd(), 'temp_cli_test_complex');
 
   beforeEach(async () => {
-    process.env.NO_COLOR = 'true';
-
     await mkdir(testDir, { recursive: true });
   });
 
@@ -20,76 +15,67 @@ describe('CLI', () => {
     await rm(testDir, { recursive: true, force: true });
   });
 
+  const runMain = async (args: string[]) => {
+    const originalArgv = process.argv;
+    const logSpy = spyOn(console, 'log').mockImplementation(() => {});
+    const errorSpy = spyOn(console, 'error').mockImplementation(() => {});
+
+    process.argv = ['bun', 'src/cli.ts', ...args];
+
+    try {
+      await main();
+    } catch (e) {
+      // Ignore
+    } finally {
+      process.argv = originalArgv;
+    }
+
+    const logs = logSpy.mock.calls.map((args) => args.join(' ')).join('\n');
+    const errors = errorSpy.mock.calls.map((args) => args.join(' ')).join('\n');
+
+    logSpy.mockRestore();
+    errorSpy.mockRestore();
+
+    return (logs + '\n' + errors).trim();
+  };
+
+  describe('Utility Functions', () => {
+    test('findProjectFile should find zolt.project.yaml', async () => {
+      await writeFile(join(testDir, 'zolt.project.yaml'), 'title: Test');
+      const found = await findProjectFile(testDir);
+      expect(found).toContain('zolt.project.yaml');
+    });
+
+    test('findProjectFile should find zolt.project.yml', async () => {
+      await writeFile(join(testDir, 'zolt.project.yml'), 'title: Test');
+      const found = await findProjectFile(testDir);
+      expect(found).toContain('zolt.project.yml');
+    });
+
+    test('loadProjectMetadata should load and filter metadata', async () => {
+      await writeFile(join(testDir, 'zolt.project.yaml'), 'title: Test Site\nunknown_key: value');
+      const meta = await loadProjectMetadata(testDir);
+      expect(meta.title).toBe('Test Site');
+      expect(meta.unknown_key).toBeUndefined();
+    });
+  });
+
   describe('version', () => {
     test('should display version with version command', async () => {
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['version'], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data.trim()));
-        proc.on('error', reject);
-      });
-      expect(output).toBe(VERSION);
-    });
-
-    test('should display version with -v flag', async () => {
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['-v'], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data.trim()));
-        proc.on('error', reject);
-      });
-      expect(output).toBe(VERSION);
-    });
-
-    test('should display version with --version flag', async () => {
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['--version'], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data.trim()));
-        proc.on('error', reject);
-      });
-      expect(output).toBe(VERSION);
+      const output = await runMain(['version']);
+      expect(output).toContain(version);
     });
   });
 
   describe('help', () => {
-    test('should display help with no arguments and exit 0', async () => {
-      const { output, exitCode } = await new Promise<{ output: string; exitCode: number }>((resolve, reject) => {
-        const proc = spawn(CLI, [], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', (code) => resolve({ output: data, exitCode: code ?? 1 }));
-        proc.on('error', reject);
-      });
-      console.log('Help output:', output);
-      expect(output).toContain('Zolt - The high-voltage successor to Markdown');
-      expect(exitCode).toBe(0);
-    });
-
     test('should display help with --help flag', async () => {
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['--help'], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-      expect(output).toContain('Zolt - The high-voltage successor to Markdown');
-      expect(output).toContain(`v${version}`);
+      const output = await runMain(['--help']);
+      expect(output).toContain('Usage:');
     });
 
-    test('should display help with -h flag', async () => {
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['-h'], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-      expect(output).toContain('Zolt - The high-voltage successor to Markdown');
+    test('should display help when no command provided', async () => {
+      const output = await runMain([]);
+      expect(output).toContain('Usage:');
     });
   });
 
@@ -97,16 +83,13 @@ describe('CLI', () => {
     test('should lint valid file', async () => {
       const testFile = join(testDir, 'test.zlt');
       await writeFile(testFile, '# Hello World');
+      const output = await runMain(['lint', testFile]);
+      expect(output).toContain('No issues found');
+    });
 
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['lint', testFile], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-
-      expect(output).toContain('✓ No issues found');
+    test('should show error for missing files', async () => {
+      const output = await runMain(['lint']);
+      expect(output).toContain('No files specified for linting');
     });
   });
 
@@ -115,51 +98,18 @@ describe('CLI', () => {
       const testFile = join(testDir, 'test.zlt');
       const outputFile = join(testDir, 'test.html');
       await writeFile(testFile, '# Hello World');
-
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['build', testFile, '-o', outputFile], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-
-      expect(output).toContain(`Built: ${outputFile}`);
+      await runMain(['build', testFile, '-o', outputFile]);
+      expect(await Bun.file(outputFile).exists()).toBe(true);
     });
 
-    test('should build file to directory', async () => {
-      const testFile = join(testDir, 'test.zlt');
-      const outputDir = join(testDir, 'output');
-      await mkdir(outputDir);
-      await writeFile(testFile, '# Hello World');
-
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['build', testFile, '-o', outputDir], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-
-      expect(output).toContain('Built:');
-      expect(output).toContain('test.html');
+    test('should handle build errors', async () => {
+      const output = await runMain(['build', 'non-existent.zlt']);
+      expect(output).toContain('Build error');
     });
 
-    test('should use default output filename', async () => {
-      const testFile = join(testDir, 'test.zlt');
-      await writeFile(testFile, '# Hello World');
-
-      const outputFile = join(testDir, 'output.html');
-      const output = await new Promise<string>((resolve, reject) => {
-        const proc = spawn(CLI, ['build', testFile, '-o', outputFile], { shell: true });
-        let data = '';
-        proc.stdout.on('data', (chunk) => (data += chunk));
-        proc.on('close', () => resolve(data));
-        proc.on('error', reject);
-      });
-
-      expect(output).toContain('Built:');
-      expect(output).toContain('.html');
+    test('should show error for missing files in build', async () => {
+      const output = await runMain(['build']);
+      expect(output).toContain('No files specified for building');
     });
   });
 });

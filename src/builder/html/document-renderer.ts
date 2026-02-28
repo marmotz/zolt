@@ -65,7 +65,6 @@ export class DocumentRenderer {
   }
 
   private renderFullHtml(bodyContent: string, options: DocumentRendererOptions): string {
-    const tabsScript = options.hasTabs ? TABS_SCRIPT : '';
     const anchorScript = ANCHOR_SCRIPT;
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
@@ -203,9 +202,25 @@ ${CODE_COPY_SCRIPT}
     const iconSvg = this.getMetadata('icon_svg');
     const iconIco = this.getMetadata('icon_ico');
     const iconApple = this.getMetadata('icon_apple');
+    const genericIcon = this.getMetadata('icon');
     const manifest = this.getMetadata('manifest');
 
     let links = '';
+
+    // Handle generic icon if specific ones are not provided
+    if (genericIcon && !iconPng && !iconSvg && !iconIco) {
+      const ext = String(genericIcon).split('.').pop()?.toLowerCase();
+      if (ext === 'png') {
+        links += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(genericIcon))}">\n`;
+      } else if (ext === 'svg') {
+        links += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(genericIcon))}">\n`;
+      } else if (ext === 'ico') {
+        links += `  <link rel="icon" type="image/x-icon" href="${this.escapeHtml(String(genericIcon))}">\n`;
+      } else {
+        links += `  <link rel="icon" href="${this.escapeHtml(String(genericIcon))}">\n`;
+      }
+    }
+
     if (iconPng)
       links += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
     if (iconSvg) links += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
@@ -223,6 +238,7 @@ ${CODE_COPY_SCRIPT}
 
     if (
       (key === 'image' ||
+        key === 'icon' ||
         key === 'icon_png' ||
         key === 'icon_svg' ||
         key === 'icon_ico' ||
