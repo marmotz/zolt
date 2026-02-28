@@ -65,19 +65,30 @@ export class DocumentRenderer {
   }
 
   private renderFullHtml(bodyContent: string, options: DocumentRendererOptions): string {
-    const anchorScript = ANCHOR_SCRIPT;
+    const tabsScript = options.hasTabs ? TABS_SCRIPT : '';
     const chartScript = options.hasCharts ? CHART_SCRIPT : '';
     const mermaidScript = options.hasMermaid ? MERMAID_SCRIPT : '';
     const sidebarScript = options.hasSidebar ? SIDEBAR_SCRIPT : '';
 
     let finalContent = bodyContent;
+
+    // Sidebar wrapping logic - essential for Zolt's layout structure
     if (options.hasSidebar) {
+      // Regex to find the rendered sidebar
       const sidebarRegex = /<aside[^>]*class="[^"]*zolt-sidebar[^"]*"[^>]*>([\s\S]*?)<\/aside>/;
       const match = bodyContent.match(sidebarRegex);
+
       if (match) {
         const sidebarHtml = match[0];
-        const remainingHtml = bodyContent.replace(sidebarHtml, '');
-        finalContent = `${sidebarHtml}\n<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
+        // The remaining content is what's left after removing the sidebar
+        let remainingHtml = bodyContent.replace(sidebarHtml, '');
+
+        // If the remaining content is already wrapped in <main>, don't wrap it again
+        if (!remainingHtml.includes('class="zolt-main-content"')) {
+          remainingHtml = `<main class="zolt-main-content">\n  <div class="zolt-content-container">\n    ${remainingHtml}\n  </div>\n</main>`;
+        }
+
+        finalContent = `${sidebarHtml}\n${remainingHtml}`;
       }
     }
 
@@ -113,8 +124,8 @@ ${DEFAULT_CSS}
 </head>
 <body class="${bodyClasses}">
 ${finalContent}
-${TABS_SCRIPT}
-${anchorScript}
+${tabsScript}
+${ANCHOR_SCRIPT}
 ${chartScript}
 ${mermaidScript}
 ${sidebarScript}
@@ -135,7 +146,6 @@ ${CODE_COPY_SCRIPT}
     const ogType = this.getMetadata('og_type', 'website');
     const ogUrl = this.getMetadata('url');
 
-    // Make image URL absolute if base URL exists
     if (ogImage && typeof ogImage === 'string' && ogUrl && typeof ogUrl === 'string') {
       if (!ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
         const base = String(ogUrl).endsWith('/') ? String(ogUrl).slice(0, -1) : String(ogUrl);
@@ -149,26 +159,21 @@ ${CODE_COPY_SCRIPT}
     const twitterSite = this.getMetadata('twitter_site');
     const twitterCreator = this.getMetadata('twitter_creator');
 
-    const rawKeywords = this.getMetadata('keywords', null);
-    const rawTags = this.getMetadata('tags', null);
+    // Handle keywords array
+    const rawKeywords = this.evaluator.getVariable('keywords');
     let keywords = '';
-
     if (Array.isArray(rawKeywords)) {
       keywords = rawKeywords.join(', ');
-    } else if (typeof rawKeywords === 'string' && rawKeywords !== '') {
-      keywords = rawKeywords;
-    } else if (Array.isArray(rawTags)) {
-      keywords = rawTags.join(', ');
+    } else if (rawKeywords) {
+      keywords = String(rawKeywords);
     }
 
     let meta = '';
-    // Standard Meta
     if (description) meta += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
     if (author) meta += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
     if (keywords) meta += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
     if (robots) meta += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
 
-    // Open Graph
     if (siteName) meta += `  <meta property="og:site_name" content="${this.escapeHtml(String(siteName))}">\n`;
     meta += `  <meta property="og:type" content="${this.escapeHtml(String(ogType))}">\n`;
     meta += `  <meta property="og:title" content="${this.escapeHtml(String(ogTitle))}">\n`;
@@ -183,7 +188,6 @@ ${CODE_COPY_SCRIPT}
         meta += `  <meta property="og:image:height" content="${this.escapeHtml(String(ogImageHeight))}">\n`;
     }
 
-    // Twitter
     const twitterCard = ogImage ? 'summary_large_image' : 'summary';
     meta += `  <meta name="twitter:card" content="${twitterCard}">\n`;
     if (twitterSite) meta += `  <meta name="twitter:site" content="${this.escapeHtml(String(twitterSite))}">\n`;
@@ -207,7 +211,6 @@ ${CODE_COPY_SCRIPT}
 
     let links = '';
 
-    // Handle generic icon if specific ones are not provided
     if (genericIcon && !iconPng && !iconSvg && !iconIco) {
       const ext = String(genericIcon).split('.').pop()?.toLowerCase();
       if (ext === 'png') {

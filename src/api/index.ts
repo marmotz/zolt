@@ -76,20 +76,21 @@ export async function buildString(content: string, options?: BuildOptions): Prom
       extraVariables.created = dateVars.created;
       extraVariables.modified = dateVars.modified;
     } catch {
-      // File stats unavailable, leave variables empty
+      // File stats unavailable
     }
   }
 
+  // Phase 1: Expansion (Layouts, Includes, Variables)
   const expandedContent = getExpandedContent(content, options, extraVariables);
 
-  // Phase 2: Lexing & Parsing the expanded "pure Zolt"
+  // Phase 2: Lexing & Parsing
   const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
 
   const parser = new Parser(tokens, options?.filePath, options?.globalAbbreviations);
   const ast = parser.parse();
 
-  // If we have global abbreviations from the parser, update the options object
+  // Update global abbreviations if provided
   if (options && options.globalAbbreviations) {
     const currentGlobals = parser.getGlobalAbbreviations();
     if (currentGlobals) {
@@ -99,30 +100,36 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     }
   }
 
+  // Phase 3: Final Variable Merging
   const mergedVariables: Record<string, any> = {
     ...options?.projectMetadata,
     ...options?.variables,
     ...extraVariables,
   };
 
+  // Merge variables from frontmatter (after expansion, so it includes layout metadata)
   if (ast.fileMetadata) {
     Object.assign(mergedVariables, ast.fileMetadata.data);
   }
 
-  if (options?.projectMetadata?.title) {
+  // Ensure project title is available
+  if (options?.projectMetadata?.title && !mergedVariables.projectTitle) {
     mergedVariables.projectTitle = options.projectMetadata.title;
   }
+  if (options?.projectMetadata?.projectTitle && !mergedVariables.projectTitle) {
+    mergedVariables.projectTitle = options.projectMetadata.projectTitle;
+  }
 
-  // Handle project graph for [[filetree]]
+  // Handle project graph
   let projectGraph = options?.projectGraph;
   if (!projectGraph && options?.entryPoint) {
-    const builder = new ProjectGraphBuilder(options.entryPoint);
-    const result = builder.build();
+    const graphBuilder = new ProjectGraphBuilder(options.entryPoint);
+    const result = graphBuilder.build();
     projectGraph = result ? result : undefined;
   }
 
+  // Phase 4: HTML Building
   let builder: Builder;
-
   if (options?.type === 'html' || !options?.type) {
     builder = new HTMLBuilder(mergedVariables, options?.assetResolver, projectGraph, options?.filePath);
   } else {
@@ -140,7 +147,6 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
-
   return buildString(content, { ...options, filePath });
 }
 
@@ -149,6 +155,7 @@ export function extractAllAssets(
   projectMetadata?: Record<string, any>,
   filePath?: string
 ): { zltLinks: string[]; otherAssets: string[] } {
+  // Expansion is needed to find assets inside includes/layouts
   const expandedContent = getExpandedContent(content, { projectMetadata, filePath });
   const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
@@ -171,9 +178,8 @@ export function extractAllAssets(
   };
 
   const checkHref = (href: string) => {
-    if (!href) {
-      return;
-    }
+    if (!href || typeof href !== 'string') return;
+
     if (
       href.startsWith('http://') ||
       href.startsWith('https://') ||
@@ -184,7 +190,6 @@ export function extractAllAssets(
     }
 
     if (href.endsWith('.zlt')) {
-      // If we have a filePath, check if the file exists using bubbling if it's a layout-like file
       if (filePath && (href.startsWith('_layout') || href.startsWith('_template'))) {
         if (bubblingFileExists(path.dirname(filePath), href)) {
           zltLinks.push(href);
@@ -197,33 +202,22 @@ export function extractAllAssets(
     }
   };
 
-  // Check project metadata
-  if (projectMetadata?.image) checkHref(projectMetadata.image);
-  if (projectMetadata?.icon) checkHref(projectMetadata.icon);
-  if (projectMetadata?.icon_png) checkHref(projectMetadata.icon_png);
-  if (projectMetadata?.icon_svg) checkHref(projectMetadata.icon_svg);
-  if (projectMetadata?.icon_ico) checkHref(projectMetadata.icon_ico);
-  if (projectMetadata?.icon_apple) checkHref(projectMetadata.icon_apple);
-  if (projectMetadata?.manifest) checkHref(projectMetadata.manifest);
-  if (projectMetadata?.layout) checkHref(projectMetadata.layout);
+  // Check all possible metadata keys for assets
+  const checkMetadata = (data: any) => {
+    if (!data) return;
+    const keys = ['image', 'icon', 'icon_png', 'icon_svg', 'icon_ico', 'icon_apple', 'manifest', 'layout', 'sidebar'];
+    for (const key of keys) {
+      if (data[key]) checkHref(data[key]);
+    }
+  };
 
-  // Check file metadata
-  if (ast?.fileMetadata?.data) {
-    const data = ast.fileMetadata.data;
-    if (data.image) checkHref(data.image);
-    if (data.icon) checkHref(data.icon);
-    if (data.icon_png) checkHref(data.icon_png);
-    if (data.icon_svg) checkHref(data.icon_svg);
-    if (data.icon_ico) checkHref(data.icon_ico);
-    if (data.icon_apple) checkHref(data.icon_apple);
-    if (data.manifest) checkHref(data.manifest);
-    if (data.layout) checkHref(data.layout);
+  checkMetadata(projectMetadata);
+  if (ast.fileMetadata) {
+    checkMetadata(ast.fileMetadata.data);
   }
 
   const visit = (node: any) => {
-    if (!node) {
-      return;
-    }
+    if (!node) return;
 
     switch (node.type) {
       case 'Link':
@@ -270,14 +264,12 @@ export function extractZltLinks(content: string, projectMetadata?: Record<string
 export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { zltLinks } = extractAllAssets(content, projectMetadata);
-
   return zltLinks;
 }
 
 export async function getAssetFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { otherAssets } = extractAllAssets(content, projectMetadata);
-
   return otherAssets;
 }
 
@@ -295,7 +287,6 @@ export async function lint(filePath: string): Promise<LintResult> {
     const parser = new Parser(tokens, filePath);
     parser.parse();
 
-    // Collect warnings from parser
     for (const w of parser.warnings) {
       warnings.push(w);
     }
@@ -320,12 +311,7 @@ export async function lint(filePath: string): Promise<LintResult> {
       }
     }
 
-    errors.push({
-      line,
-      column,
-      message,
-      code,
-    });
+    errors.push({ line, column, message, code });
 
     return {
       valid: false,

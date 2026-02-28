@@ -7,22 +7,20 @@ import pc from 'picocolors';
 import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
-import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../utils/file-metadata';
+import { FileMetadataUtils } from '../utils/file-metadata';
 
-export const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
+const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
 
 export async function findProjectFile(baseDir: string): Promise<string | null> {
   for (const filename of PROJECT_FILENAMES) {
     const filePath = join(baseDir, filename);
     try {
       await stat(filePath);
-
       return filePath;
     } catch {
       // File doesn't exist, try next
     }
   }
-
   return null;
 }
 
@@ -54,15 +52,8 @@ export async function loadProjectMetadata(baseInputDir: string): Promise<Record<
     }
   }
 
-  // Filter keys
-  const filtered: Record<string, any> = {};
-  for (const [key, value] of Object.entries(data)) {
-    if (KNOWN_METADATA_KEYS.has(key)) {
-      filtered[key] = value;
-    }
-  }
-
-  return filtered;
+  // We NO LONGER filter keys here to allow custom parameters in layouts/sidebars
+  return data;
 }
 
 export async function buildFileWithDeps(
@@ -569,7 +560,6 @@ export async function handleBuild(args: string[]) {
 
   if (watch) {
     await handleWatch(files, output, type);
-
     return;
   }
 

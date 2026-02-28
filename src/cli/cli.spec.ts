@@ -52,11 +52,11 @@ describe('CLI', () => {
       expect(found).toContain('zolt.project.yml');
     });
 
-    test('loadProjectMetadata should load and filter metadata', async () => {
+    test('loadProjectMetadata should load all metadata without filtering', async () => {
       await writeFile(join(testDir, 'zolt.project.yaml'), 'title: Test Site\nunknown_key: value');
       const meta = await loadProjectMetadata(testDir);
       expect(meta.title).toBe('Test Site');
-      expect(meta.unknown_key).toBeUndefined();
+      expect(meta.unknown_key).toBe('value');
     });
   });
 

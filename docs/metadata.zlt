@@ -1,39 +1,53 @@
 ---
 title: "Metadata & Configuration"
-description: "File metadata, project settings, and theme configuration"
+description: "File metadata, project settings, layouts, and navigation tools"
 ---
 
 # Metadata & Configuration
 
-Zolt supports YAML metadata for document configuration and project-level settings.
+Zolt uses YAML metadata to configure both individual documents and entire projects.
+
+## Understanding Metadata
+
+Metadata allows you to define properties like titles, authors, or themes. In Zolt, metadata can be defined at two levels:
+
+1.  **Project Metadata**: Defined in `zolt.project.yaml` at the root of your project. These settings apply to every file.
+2.  **File Metadata**: Defined at the very top of a `.zlt` file between `---` markers. These settings apply only to that specific file.
+
+### Overriding Hierarchy
+
+File metadata always takes precedence. If a property (like `theme`) is defined in both `zolt.project.yaml` and a file's header, the file-specific value will be used for that document.
 
 ---
 
-## File Metadata
+## Metadata Syntax
 
-Define document properties at the top of your file using YAML syntax.
+### Global: `zolt.project.yaml`
 
-### Basic Syntax
+Create this file in your project root for project-wide settings.
+
+```yaml
+site_name: "My Documentation"
+author: "Documentation Team"
+version: 1.0.0
+theme: technical
+layout: _layout.zlt
+```
+
+### Local: File Header
+
+Define document properties at the top of your file.
 
 ```yaml
 ---
 title: "Document Title"
 author: "Jane Doe"
 date: 2026-02-18
----
-```
-
-### Accessing Metadata
-
-```zolt
----
-title: "My Document"
-author: "John Smith"
+theme: professional
 ---
 
 # {$title}
-
-Written by {$author}
+By {$author}
 ```
 
 ---
@@ -49,136 +63,66 @@ Written by {$author}
 | `tags` | array | List of tags |
 | `description` | string | Short description |
 | `keywords` | array/string | SEO keywords |
-| `robots` | string | Robots directive |
-| `image` | string | Open Graph image |
 | `lang` | string | Language code |
+| `theme` | string | Theme name (`default`, `professional`, `technical`, `playful`) |
+| `color-scheme` | string | `auto`, `light`, or `dark` |
+| `layout` | string | Path to a layout file (e.g., `_layout.zlt`) |
 | `toc` | boolean | Auto-generate TOC |
-| `theme` | string | Theme name |
-| `color-scheme` | string | Light/dark mode |
 
 ---
 
-## Complete Example
+## Layouts & Templates
 
-```yaml
----
-title: "Technical Documentation"
-author: "Engineering Team"
-date: 2026-02-18
-version: 2.0.0
-tags: [documentation, api, technical]
-description: "Complete API reference guide"
-keywords: [api, documentation, reference]
-toc: true
-theme: technical
-color-scheme: auto
----
-```
+Layouts allow you to wrap your content in a common structure (headers, footers, sidebars).
 
----
+### Defining a Layout
 
-## Themes
+A layout is a standard Zolt file that uses the `:::content:::` marker to indicate where the main document content should be injected. You can use existing structural blocks like `:::sidebar` to organize your layout.
 
-Zolt includes built-in themes:
-
-| Theme | Description |
-|-------|-------------|
-| `default` | Modern and balanced |
-| `professional` | Serif typography, sober colors |
-| `technical` | Monospace, high contrast |
-| `playful` | Rounded borders, vibrant colors |
-
-### Using Themes
-
-```yaml
----
-title: "My Document"
-theme: professional
----
-```
-
----
-
-## Color Scheme
-
-Control light/dark mode:
-
-| Value | Description |
-|-------|-------------|
-| `auto` | Follow system preference |
-| `light` | Force light mode |
-| `dark` | Force dark mode |
-
-```yaml
----
-title: "Dark Theme Document"
-theme: professional
-color-scheme: dark
----
-```
-
----
-
-## Project Configuration
-
-Create `zolt.project.yaml` in your project root for project-wide settings.
-
-### Example
-
-```yaml
-site_name: "My Documentation"
-author: "Documentation Team"
-version: 1.0.0
-theme: technical
-layout: _layout.zlt
-```
-
-### Settings
-
-| Setting | Description |
-|---------|-------------|
-| `site_name` | Site title |
-| `author` | Default author |
-| `version` | Project version |
-| `theme` | Default theme |
-| `layout` | Layout template |
-
----
-
-## Automatic Variables
-
-Zolt provides automatic date variables:
+**Example `_layout.zlt`:**
 
 ```zolt
-Created: {$created}
-Modified: {$modified}
+:::sidebar
+:::sidebar-header
+# {$site_name}
+:::
+
+:::sidebar-content
+[[filetree]]
+:::
+:::
+
+# {$title}
+
+:::content:::
+
+---
+© 2026 {$author}
 ```
 
-These return ISO 8601 timestamps.
+### Using a Layout
 
-### Formatting Dates
+Set the `layout` property in your metadata:
 
-```zolt
-{{ Date.format($created, "DD/MM/YYYY") }}
-{{ Date.format($modified, "YYYY-MM-DD") }}
+```yaml
+---
+title: "My Page"
+layout: "_layout.zlt"
+---
 ```
 
 ---
 
-## Table of Contents
+## Navigation & Structure
 
-Generate a TOC automatically:
+Zolt provides built-in components to help users navigate your content.
+
+### Table of Contents (TOC)
+
+Generate a TOC for the current page:
 
 ```zolt
 [[toc]]
-```
-
-### With Options
-
-```zolt
-[[toc {depth=3}]]
-[[toc {from=2 to=4}]]
-[[toc {numbered=true}]]
 ```
 
 | Attribute | Description | Default |
@@ -188,33 +132,66 @@ Generate a TOC automatically:
 | `to` | End level | 6 |
 | `numbered` | Include numbers | false |
 
+### File Tree
+
+Generate a navigation tree based on your project structure:
+
+```zolt
+[[filetree]]
+```
+
+The file tree automatically detects links between your files to build a visual hierarchy.
+
+| Attribute | Description | Default |
+|-----------|-------------|---------|
+| `depth` | Maximum depth | 99 |
+| `from` | Starting depth level | 0 |
+| `to` | Ending depth level | 99 |
+
+**Example with custom depth:**
+```zolt
+[[filetree {depth=2}]]
+```
+
+---
+
+## Automatic Variables
+
+Zolt provides automatic variables that you can use anywhere:
+
+| Variable | Description |
+|----------|-------------|
+| `{$created}` | File creation date (ISO 8601) |
+| `{$modified}` | Last modification date (ISO 8601) |
+
+### Formatting Dates
+
+```zolt
+Created: {{ Date.format($created, "DD/MM/YYYY") }}
+```
+
+See [Variables & Calculations](variables.zlt) for a full list of available date functions.
+
 ---
 
 ## Abbreviations
 
 Define abbreviations for technical terms.
 
-### Inline
+### Inline & Local
 
 ```zolt
-HTML{abbr="HyperText Markup Language"} is the web language.
-```
+HTML{abbr="HyperText Markup Language"}
 
-### Local Definitions
-
-```zolt
-*[HTML]: HyperText Markup Language
 *[CSS]: Cascading Style Sheets
-*[JS]: JavaScript
-
-HTML and CSS are essential.
 ```
 
 ### Global Definitions
 
+Use double asterisks for project-wide abbreviations:
+
 ```zolt
 **[API]: Application Programming Interface
-**[URL]: Uniform Resource Locator
 ```
 
 ---
@@ -223,48 +200,11 @@ HTML and CSS are essential.
 
 Add references with footnotes.
 
-### Basic Footnote
-
 ```zolt
 This has a footnote[^1].
 
 [^1]: This is the footnote content.
 ```
-
-### Multiple Footnotes
-
-```zolt
-Concept A[^note] and Concept B[^note].
-
-[^note]: Shared explanation.
-```
-
-### Styled Footnotes
-
-```zolt
-Important note[^important].
-
-[^important]: Critical information.{color=red}
-```
-
----
-
-## Best Practices
-
-1. **Use metadata** for document-level settings
-2. **Choose appropriate themes** for your content
-3. **Set color-scheme** for consistent rendering
-4. **Use abbreviations** consistently
-
----
-
-## Summary
-
-- File metadata controls individual documents
-- Project config affects all files
-- Themes customize visual appearance
-- Automatic variables provide dates and more
-- TOC and abbreviations enhance navigation
 
 ---
 
