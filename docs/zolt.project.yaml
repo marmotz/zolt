@@ -4,7 +4,7 @@ description: "The complete reference guide for Zolt, the high-voltage successor 
 author: Marmotz
 version: 0.1.0
 theme: technical
-image: ../resources/icon.png
+image: og-image.png
 layout: _layout.zlt
 iconPng: assets/favicons/favicon-96x96.png
 iconSvg: assets/favicons/favicon.svg
