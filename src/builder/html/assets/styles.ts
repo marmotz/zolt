@@ -222,6 +222,31 @@ export const BASE_CSS = `
     font-weight: bold;
   }
   
+  .zolt-filetree-toc {
+    font-size: 0.9em;
+    border-left: 1px solid var(--zlt-color-border);
+    padding-left: 0.2rem;
+  }
+
+  .zolt-filetree-toc ul {
+    margin: 0 !important;
+    padding-left: 0.8rem !important;
+  }
+
+  .zolt-filetree-toc li {
+    margin: 0.1rem 0 !important;
+  }
+
+  .zolt-filetree-toc a {
+    color: var(--zlt-color-text-soft) !important;
+    padding: 0.1rem 0.4rem !important;
+  }
+
+  .zolt-filetree-toc a:hover {
+    background: var(--zlt-color-primary-soft) !important;
+    color: var(--zlt-color-primary) !important;
+  }
+  
   .zolt-filetree-error {
     color: var(--zlt-color-error);
     font-style: italic;
@@ -266,7 +291,6 @@ export const BASE_CSS = `
 
   :target {
     scroll-margin-top: 2rem;
-    background-color: var(--zlt-color-highlight-bg);
     animation: zolt-anchor-highlight 3s ease-out;
   }
 

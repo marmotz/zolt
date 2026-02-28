@@ -7,7 +7,7 @@ description: "How to build Zolt from source and contribute to the project"
 
 If you want to build Zolt yourself, fix bugs, or contribute new features, follow these steps.
 
-## 🛠️ Installation from Source
+## Installation from Source
 
 To build Zolt from source, you will need **Bun**.
 
@@ -36,7 +36,7 @@ To build Zolt from source, you will need **Bun**.
 
 The executables will be available in the `dist/` directory.
 
-## 🧪 Running Tests
+## Running Tests
 
 Before submitting a Pull Request, please ensure all tests pass:
 
@@ -44,7 +44,7 @@ Before submitting a Pull Request, please ensure all tests pass:
 bun test
 ```
 
-## 🧹 Code Quality
+## Code Quality
 
 We use Prettier for code formatting. You can format your code using:
 

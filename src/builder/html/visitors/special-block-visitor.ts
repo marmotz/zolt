@@ -192,38 +192,54 @@ export class SpecialBlockVisitor {
     const from = parseInt(node.attributes?.from || '0');
     const to = parseInt(node.attributes?.to || '99');
     const depth = parseInt(node.attributes?.depth || '99');
+    const showToc =
+      (node.attributes?.toc === 'true' || (node.attributes?.hasOwnProperty('toc') && node.attributes.toc === '')) ??
+      false;
 
-    const html = this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth);
+    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc);
 
     return `<nav class="zolt-filetree">\n${html}\n</nav>`;
   }
 
-  private renderFileTreeNodes(
+  private async renderFileTreeNodes(
     nodes: ProjectNode[],
     currentDepth: number,
     from: number,
     to: number,
-    maxDepth: number
-  ): string {
+    maxDepth: number,
+    showToc: boolean
+  ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) return '';
     if (!nodes || nodes.length === 0) return '';
 
-    const html = nodes.map((n: ProjectNode) => this.renderFileTreeNode(n, currentDepth, from, to, maxDepth)).join('');
+    const htmlParts = [];
+    for (const n of nodes) {
+      htmlParts.push(await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc));
+    }
+    const html = htmlParts.join('');
 
     return `<ul>\n${html}</ul>`;
   }
 
-  private renderFileTreeNode(
+  private async renderFileTreeNode(
     node: ProjectNode,
     currentDepth: number,
     from: number,
     to: number,
-    maxDepth: number
-  ): string {
+    maxDepth: number,
+    showToc: boolean
+  ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) return '';
 
     const isVisible = currentDepth >= from;
-    const isActive = this.currentFilePath && node.absPath.includes(this.currentFilePath);
+    const normCurrent = this.currentFilePath ? path.normalize(this.currentFilePath) : null;
+    const normNode = path.normalize(node.absPath);
+    const isActive = normCurrent === normNode;
+
+    // if (this.currentFilePath && node.absPath.includes('test-project-filetree-toc')) {
+    //   console.log(`Node: ${normNode} vs Current: ${normCurrent} -> isActive: ${isActive}`);
+    // }
+
     const activeClass = isActive ? ' class="active"' : '';
 
     let html = '';
@@ -240,10 +256,17 @@ export class SpecialBlockVisitor {
       html += `<li${activeClass}><a href="${link}">${escapeHtml(node.title)}</a>`;
     }
 
+    if (isActive && showToc && this.currentHeadings.length > 0) {
+      const tocHtml = await this.buildTocTree(this.currentHeadings, 1, false);
+      html += `\n<div class="zolt-filetree-toc">${tocHtml}</div>\n`;
+    }
+
     if (node.children.length > 0 && currentDepth < to && currentDepth + 1 < maxDepth) {
-      const childrenHtml = node.children
-        .map((child: any) => this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth))
-        .join('');
+      const childrenHtmlParts = [];
+      for (const child of node.children) {
+        childrenHtmlParts.push(await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc));
+      }
+      const childrenHtml = childrenHtmlParts.join('');
 
       if (childrenHtml) {
         html += `\n<ul>\n${childrenHtml}</ul>\n`;
