@@ -60,6 +60,16 @@ describe('FileMetadataUtils', () => {
       const data = FileMetadataUtils.parse(raw);
       expect(data.title).toBe('Test');
     });
+
+    it('should parse lowerCamelCase keys as-is', () => {
+      const raw = 'siteName: "Zolt"\nogImageWidth: 1024\nauthor: "Marmotz"';
+      const data = FileMetadataUtils.parse(raw);
+      expect(data).toEqual({
+        siteName: 'Zolt',
+        ogImageWidth: 1024,
+        author: 'Marmotz',
+      });
+    });
   });
 
   describe('parseValue', () => {

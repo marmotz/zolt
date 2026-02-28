@@ -273,7 +273,7 @@ March: 200
 April: 250
 :::
 
-:::chart-bar {title="Sales by Category" color-scheme=warm}
+:::chart-bar {title="Sales by Category" colorScheme=warm}
 Electronics: 450
 Clothing: 320
 Home: 280

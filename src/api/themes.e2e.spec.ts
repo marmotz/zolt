@@ -20,7 +20,7 @@ theme: professional
   it('should apply forced color scheme', async () => {
     const content = `---
 theme: technical
-color-scheme: dark
+colorScheme: dark
 ---
 # Technical Dark`;
     const html = await buildString(content);
@@ -30,7 +30,7 @@ color-scheme: dark
   it('should support the playful theme', async () => {
     const content = `---
 theme: playful
-color-scheme: light
+colorScheme: light
 ---
 # Playful Light`;
     const html = await buildString(content);

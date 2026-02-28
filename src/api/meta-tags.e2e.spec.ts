@@ -22,11 +22,11 @@ keywords: [zolt, test]
 title: "OG Page"
 description: "OG Description"
 image: "https://example.com/image.jpg"
-og_type: "article"
+ogType: "article"
 url: "https://example.com/page"
-og_image_width: 1200
-og_image_height: 630
-site_name: "My Site"
+ogImageWidth: 1200
+ogImageHeight: 630
+siteName: "My Site"
 ---
 # Hello`;
     const html = await buildString(content);
@@ -46,8 +46,8 @@ site_name: "My Site"
 title: "Twitter Page"
 description: "Twitter Description"
 image: "https://example.com/image.jpg"
-twitter_site: "@marmotz"
-twitter_creator: "@jane"
+twitterSite: "@marmotz"
+twitterCreator: "@jane"
 ---
 # Hello`;
     const html = await buildString(content);
@@ -69,7 +69,7 @@ title: "No Image"
     expect(html).toContain('<meta name="twitter:card" content="summary">');
   });
 
-  it('should fallback to title for og:site_name if site_name is missing', async () => {
+  it('should fallback to title for og:site_name if siteName is missing', async () => {
     const content = `---
 title: "My Awesome Page"
 ---
@@ -78,12 +78,12 @@ title: "My Awesome Page"
     expect(html).toContain('<meta property="og:site_name" content="My Awesome Page">');
   });
 
-  it('should use og_title and og_description if provided, with fallbacks', async () => {
+  it('should use ogTitle and ogDescription if provided, with fallbacks', async () => {
     const content = `---
 title: "Standard Title"
 description: "Standard Description"
-og_title: "OG Specific Title"
-og_description: "OG Specific Description"
+ogTitle: "OG Specific Title"
+ogDescription: "OG Specific Description"
 ---
 # Hello`;
     const html = await buildString(content);

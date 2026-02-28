@@ -27,7 +27,7 @@ File metadata always takes precedence. If a property (like `theme`) is defined i
 Create this file in your project root for project-wide settings.
 
 ```yaml
-site_name: "My Documentation"
+siteName: "My Documentation"
 author: "Documentation Team"
 version: 1.0.0
 theme: technical
@@ -65,7 +65,7 @@ By {$author}
 | `keywords` | array/string | SEO keywords |
 | `lang` | string | Language code |
 | `theme` | string | Theme name (`default`, `professional`, `technical`, `playful`) |
-| `color-scheme` | string | `auto`, `light`, or `dark` |
+| `colorScheme` | string | `auto`, `light`, or `dark` |
 | `layout` | string | Path to a layout file (e.g., `_layout.zlt`) |
 | `toc` | boolean | Auto-generate TOC |
 
@@ -84,7 +84,7 @@ A layout is a standard Zolt file that uses the `:::content:::` marker to indicat
 ```zolt
 :::sidebar
 :::sidebar-header
-# {$site_name}
+# {$siteName}
 :::
 
 :::sidebar-content

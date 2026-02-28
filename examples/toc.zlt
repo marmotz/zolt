@@ -40,7 +40,7 @@ Combine multiple attributes:
 ```yaml
 ---
 numbering: true
-numbering_style: decimal
+numberingStyle: decimal
 ---
 ```
 

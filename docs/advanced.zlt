@@ -181,14 +181,14 @@ Night: 50
 ### Chart Attributes
 
 ```zolt
-:::chart-line {title="Title" color-scheme=cool legend=true grid=true}
+:::chart-line {title="Title" colorScheme=cool legend=true grid=true}
 :::
 ```
 
 | Attribute | Description |
 |-----------|-------------|
 | `title` | Chart title |
-| `color-scheme` | Color palette (cool, warm, pastel) |
+| `colorScheme` | Color palette (cool, warm, pastel) |
 | `legend` | Show legend |
 | `grid` | Show grid |
 
@@ -287,7 +287,7 @@ Total: {{ List.sum($sales) }}
 Average: {{ Math.round(List.avg($sales)) }}
 
 :::chart
-:::chart-line {title="Monthly Sales" color-scheme=blue grid=true}
+:::chart-line {title="Monthly Sales" colorScheme=blue grid=true}
 :::foreach {$months as $month}
 {$month}: {$sales[$foreach.index]}
 :::

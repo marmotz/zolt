@@ -37,7 +37,7 @@ Items: {$count}
 Use `$$` prefix for project-wide variables:
 
 ```zolt
-$$site_name = "My Website"
+$$siteName = "My Website"
 $$company = "Acme Corp"
 ```
 

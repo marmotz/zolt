@@ -117,7 +117,7 @@ Les variables globales permettent d'activer la numérotation pour tout le docume
 
 ```
 $numbering = true           # Active la numérotation globale
-$numbering_style = "decimal"# Style : 1, 1.1, 1.1.1 (défaut)
+$numberingStyle = "decimal"# Style : 1, 1.1, 1.1.1 (défaut)
 ```
 
 #### Activation Locale
@@ -156,7 +156,7 @@ Pour désactiver la numérotation sur une section spécifique tout en la gardant
 
 ```
 $numbering = true
-$numbering_style = "decimal"
+$numberingStyle = "decimal"
 
 # Mémoire de Fin d'Études {numbered}
 ## Introduction
@@ -958,7 +958,7 @@ $version = "2.4.1"
 $client_name = "Acme Corp"
 $statut = "En cours"
 $numbering = true
-$numbering_style = "decimal"
+$numberingStyle = "decimal"
 
 ```
 
@@ -970,8 +970,8 @@ Les variables globales utilisent le préfixe `$$` et sont disponibles dans tous 
 
 ```
 
-$$site_name = "Mon Site Web"
-$$company_name = "Acme Corp"
+$$siteName = "Mon Site Web"
+$$companyName = "Acme Corp"
 $$author = "Équipe Zolt"
 $$year = 2026
 
@@ -989,11 +989,11 @@ Les variables globales sont accessibles dans :
 
 # Dans header.zlt
 
-$$site_name = "Mon Site"
+$$siteName = "Mon Site"
 
 # Dans content.zlt (inclus ou lié)
 
-# {$site_name} est disponible ici
+# {$siteName} est disponible ici
 
 ```
 
@@ -1013,7 +1013,7 @@ l'inclure dans tous les fichiers.
 
 # config.zlt
 
-$$site_name = "Mon Site"
+$$siteName = "Mon Site"
 $$author = "Équipe Zolt"
 $$version = "1.0.0"
 
@@ -1021,7 +1021,7 @@ $$version = "1.0.0"
 
 {{include config.zlt}}
 
-# {$site_name} = "Mon Site"
+# {$siteName} = "Mon Site"
 
 ```
 
@@ -1258,7 +1258,7 @@ Les valeurs sont résolues dans cet ordre (la dernière écrase les précédente
 #### Exemple de `zolt.project.yaml`
 
 ```yaml
-site_name: "Documentation Zolt"
+siteName: "Documentation Zolt"
 author: "Zolt Team"
 version: "0.3.0"
 theme: "professional"
@@ -1282,7 +1282,21 @@ Le tableau ci-dessous répertorie les métadonnées reconnues par le moteur Zolt
 | `lang`         | string        | Code langue (fr, en, etc.)          |
 | `toc`          | boolean       | Afficher la TOC automatiquement     |
 | `theme`        | string        | Thème de rendu                      |
-| `color-scheme` | string        | `auto`, `light`, `dark`             |
+| `colorScheme` | string        | `auto`, `light`, `dark`             |
+| `layout`       | string        | Fichier de mise en page             |
+| `ogTitle`     | string        | Titre Open Graph spécifique         |
+| `ogDescription`| string       | Description Open Graph spécifique   |
+| `ogType`      | string        | Type Open Graph (website, article)  |
+| `ogImageWidth`| number       | Largeur de l'image OG               |
+| `ogImageHeight`| number      | Hauteur de l'image OG               |
+| `twitterSite` | string        | Compte Twitter du site              |
+| `twitterCreator`| string      | Compte Twitter du créateur          |
+| `siteName`    | string        | Nom du site (og:site_name)          |
+| `iconPng`     | string        | Icône PNG (32x32, 96x96, etc.)      |
+| `iconSvg`     | string        | Icône SVG                           |
+| `iconIco`     | string        | Icône ICO                           |
+| `iconApple`   | string        | Apple Touch Icon                    |
+| `manifest`     | string        | Web App Manifest                    |
 
 #### Thèmes Disponibles
 
@@ -1296,7 +1310,7 @@ mode) :
 
 #### Schéma de Couleur (Light/Dark Mode)
 
-La métadonnée `color-scheme` permet de contrôler l'apparence du document :
+La métadonnée `colorScheme` permet de contrôler l'apparence du document :
 
 - **`auto`** (par défaut) : Utilise la préférence système de l'utilisateur.
 - **`light`** : Force le mode clair.
@@ -1306,7 +1320,7 @@ La métadonnée `color-scheme` permet de contrôler l'apparence du document :
 ---
 title: "Mon Rapport Dark"
 theme: "professional"
-color-scheme: "dark"
+colorScheme: "dark"
 ---
 ```
 
@@ -1740,14 +1754,14 @@ Les variables définies dans le fichier parent sont accessibles dans les fichier
 
 ```
 # parent.zlt
-$site_name = "Mon Site"
+$siteName = "Mon Site"
 {{include header.zlt}}
 ```
 
 ```
 # header.zlt
-# {$site_name} est accessible ici
-# Bienvenue sur {$site_name}
+# {$siteName} est accessible ici
+# Bienvenue sur {$siteName}
 ```
 
 #### Cas d'Usage Recommandés
@@ -1833,14 +1847,14 @@ Les graphiques utilisent un conteneur principal avec des sous-graphiques individ
 
 ```
 :::chart
-:::chart-line {color-scheme=cool}
+:::chart-line {colorScheme=cool}
 Janvier: 20
 Février: 45
 Mars: 80
 Avril: 100
 :::
 
-:::chart-bar {color-scheme=warm}
+:::chart-bar {colorScheme=warm}
 Produit A: 150
 Produit B: 200
 Produit C: 175
@@ -1877,13 +1891,13 @@ Feb: 120
 #### Attributs des Sous-Graphiques
 
 ```
-:::chart-line {color-scheme=cool title="Évolution" legend=true}
+:::chart-line {colorScheme=cool title="Évolution" legend=true}
 ```
 
 | Attribut       | Description         |
 |----------------|---------------------|
 | `title`        | Titre du graphique  |
-| `color-scheme` | Palette de couleurs |
+| `colorScheme` | Palette de couleurs |
 | `legend`       | Afficher la légende |
 | `grid`         | Afficher la grille  |
 
@@ -1911,7 +1925,7 @@ Gamma: 25%
 # Rapport de Ventes
 
 :::chart
-:::chart-line {title="Évolution mensuelle" color-scheme=blue grid=true}
+:::chart-line {title="Évolution mensuelle" colorScheme=blue grid=true}
 Janvier: 20000
 Février: 25000
 Mars: 23000
@@ -1919,14 +1933,14 @@ Avril: 28000
 Mai: 32000
 :::
 
-:::chart-bar {title="Par catégorie" color-scheme=warm}
+:::chart-bar {title="Par catégorie" colorScheme=warm}
 Électronique: 45000
 Vêtements: 32000
 Alimentation: 28000
 Autres: 15000
 :::
 
-:::chart-pie {title="Répartition canal" color-scheme=pastel}
+:::chart-pie {title="Répartition canal" colorScheme=pastel}
 En ligne: 45%
 Magasin: 35%
 Distributeurs: 20%

@@ -328,7 +328,7 @@ export class SpecialBlockVisitor {
       counters[level]++;
       for (let i = level + 1; i <= 6; i++) counters[i] = 0;
 
-      const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
+      const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
       const numberParts = counters.slice(from, level + 1);
       let numberStr = '';
 
@@ -392,7 +392,7 @@ export class SpecialBlockVisitor {
     const filteredAttrs: Attributes = {};
     if (series.attributes) {
       for (const [key, value] of Object.entries(series.attributes)) {
-        if (key !== 'title' && key !== 'color-scheme' && key !== 'legend' && key !== 'grid' && key !== 'stacked') {
+        if (key !== 'title' && key !== 'colorScheme' && key !== 'legend' && key !== 'grid' && key !== 'stacked') {
           filteredAttrs[key] = value as string;
         }
       }
@@ -401,8 +401,8 @@ export class SpecialBlockVisitor {
 
     const seriesTitle = series.title || series.attributes?.title;
     const titleAttr = seriesTitle ? ` data-title="${escapeHtml(String(seriesTitle))}"` : '';
-    const schemeAttr = series.attributes?.['color-scheme']
-      ? ` data-scheme="${escapeHtml(String(series.attributes['color-scheme'] as string))}"`
+    const schemeAttr = series.attributes?.['colorScheme']
+      ? ` data-scheme="${escapeHtml(String(series.attributes['colorScheme'] as string))}"`
       : '';
     const legendAttr = series.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
     const gridAttr = series.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';

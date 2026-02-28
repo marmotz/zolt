@@ -51,7 +51,7 @@ export class BlockVisitor {
       this.headingCounters[level]++;
       for (let i = level + 1; i <= 6; i++) this.headingCounters[i] = 0;
 
-      const numberingStyle = this.evaluator.getVariable('numbering_style') || 'decimal';
+      const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
       const parts = this.headingCounters.slice(1, level + 1);
 
       if (numberingStyle === 'decimal') {

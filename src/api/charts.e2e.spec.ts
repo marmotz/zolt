@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildString } from '../index';
+import { buildString } from './index';
 
 describe('Charts and Diagrams E2E', () => {
   describe('Mermaid Diagrams', () => {
@@ -75,7 +75,7 @@ Apr: 180
     test('should render line chart with color scheme', async () => {
       const input = `
 :::chart
-:::chart-line {color-scheme=cool}
+:::chart-line {colorScheme=cool}
 Jan: 10
 Feb: 20
 Mar: 30
@@ -279,7 +279,7 @@ Feb: 120
     test('should handle all chart attributes', async () => {
       const input = `
 :::chart
-:::chart-line {title="Évolution" color-scheme=cool legend=true grid=true}
+:::chart-line {title="Évolution" colorScheme=cool legend=true grid=true}
 Jan: 20
 Feb: 35
 Mar: 50
@@ -316,7 +316,7 @@ C: 30
 # Rapport de Ventes
 
 :::chart
-:::chart-line {title="Évolution mensuelle" color-scheme=blue grid=true}
+:::chart-line {title="Évolution mensuelle" colorScheme=blue grid=true}
 Janvier: 20000
 Février: 25000
 Mars: 23000
@@ -324,14 +324,14 @@ Avril: 28000
 Mai: 32000
 :::
 
-:::chart-bar {title="Par catégorie" color-scheme=warm}
+:::chart-bar {title="Par catégorie" colorScheme=warm}
 Électronique: 45000
 Vêtements: 32000
 Alimentation: 28000
 Autres: 15000
 :::
 
-:::chart-pie {title="Répartition canal" color-scheme=pastel}
+:::chart-pie {title="Répartition canal" colorScheme=pastel}
 En ligne: 45%
 Magasin: 35%
 Distributeurs: 20%

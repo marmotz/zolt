@@ -99,13 +99,13 @@ Night: 50
 ### Custom Color Schemes
 
 :::chart
-:::chart-line {color-scheme=cool title="Cool Colors"}
+:::chart-line {colorScheme=cool title="Cool Colors"}
 Jan: 10
 Feb: 20
 Mar: 30
 :::
 
-:::chart-line {color-scheme=warm title="Warm Colors"}
+:::chart-line {colorScheme=warm title="Warm Colors"}
 Jan: 100
 Feb: 200
 Mar: 300
@@ -138,13 +138,13 @@ Mar: 200
 # Revenue Analysis
 
 :::chart {width=100%}
-:::chart-line {title="Revenue Trend" color-scheme=blue}
+:::chart-line {title="Revenue Trend" colorScheme=blue}
 October: 450000
 November: 520000
 December: 610000
 :::
 
-:::chart-bar {title="By Product Line" color-scheme=warm}
+:::chart-bar {title="By Product Line" colorScheme=warm}
 Electronics: 1200000
 Clothing: 800000
 Home & Garden: 650000
@@ -163,7 +163,7 @@ Week 5: 90
 Week 6: 100
 :::
 
-:::chart-bar {title="Tasks by Status" color-scheme=cool}
+:::chart-bar {title="Tasks by Status" colorScheme=cool}
 Completed: 45
 In Progress: 25
 Pending: 20
@@ -183,7 +183,7 @@ Blocked: 10
 20:00: 48
 :::
 
-:::chart-bar {title="Error Rates" color-scheme=warm}
+:::chart-bar {title="Error Rates" colorScheme=warm}
 Critical: 2
 High: 5
 Medium: 12
@@ -245,7 +245,7 @@ Team C: 81
 ### Time Series Data
 
 :::chart
-:::chart-line {title="Temperature Throughout Day" color-scheme=warm}
+:::chart-line {title="Temperature Throughout Day" colorScheme=warm}
 6 AM: 18
 9 AM: 22
 12 PM: 28
@@ -290,12 +290,12 @@ Savings: 10
 ### Social Media Stats
 
 :::chart {stacked=true title="Follower Growth" legend=true }
-:::chart-bar {title="Instagram" color-scheme=warm}
+:::chart-bar {title="Instagram" colorScheme=warm}
 Week 1: 5000
 Week 2: 7500
 Week 3: 10000
 :::
-:::chart-bar {title="Twitter" color-scheme=cool}
+:::chart-bar {title="Twitter" colorScheme=cool}
 Twitter: 2000
 Twitter: 3000
 Twitter: 4500
@@ -305,7 +305,7 @@ Twitter: 4500
 ### Learning Progress
 
 :::chart
-:::chart-area {title="Skills Development" color-scheme=cool}
+:::chart-area {title="Skills Development" colorScheme=cool}
 Week 1: 10
 Week 2: 25
 Week 3: 45

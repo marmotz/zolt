@@ -42,11 +42,11 @@ description: "Everything is fine"
 lang: fr
 toc: true
 theme: professional
-color-scheme: dark
-icon_png: "/favicon.png"
-icon_svg: "/favicon.svg"
-icon_ico: "/favicon.ico"
-icon_apple: "/apple-touch-icon.png"
+colorScheme: dark
+iconPng: "/favicon.png"
+iconSvg: "/favicon.svg"
+iconIco: "/favicon.ico"
+iconApple: "/apple-touch-icon.png"
 manifest: "/site.webmanifest"
 ---
 # Content`;

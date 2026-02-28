@@ -242,7 +242,7 @@ Enable global numbering:
 
 ```zolt
 $numbering = true
-$numbering_style = "decimal"
+$numberingStyle = "decimal"
 ```
 
 Available styles: `decimal`, `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`

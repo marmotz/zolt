@@ -95,7 +95,7 @@ export class DocumentRenderer {
     const lang = this.getMetadata('lang', 'en');
     const title = this.getDocumentTitle();
     const theme = this.getMetadata('theme', 'default');
-    const colorScheme = this.getMetadata('color-scheme', 'auto');
+    const colorScheme = this.getMetadata('colorScheme', 'auto');
     const bodyClasses = [
       `theme-${theme}`,
       `color-scheme-${colorScheme}`,
@@ -139,11 +139,11 @@ ${CODE_COPY_SCRIPT}
     const description = this.getMetadata('description');
     const author = this.getMetadata('author');
     const robots = this.getMetadata('robots');
-    const siteName = this.getMetadata('site_name') || title;
-    const ogTitle = this.getMetadata('og_title') || title;
-    const ogDescription = this.getMetadata('og_description') || description;
+    const siteName = this.getMetadata('siteName') || title;
+    const ogTitle = this.getMetadata('ogTitle') || title;
+    const ogDescription = this.getMetadata('ogDescription') || description;
     let ogImage = this.getMetadata('image');
-    const ogType = this.getMetadata('og_type', 'website');
+    const ogType = this.getMetadata('ogType', 'website');
     const ogUrl = this.getMetadata('url');
 
     if (ogImage && typeof ogImage === 'string' && ogUrl && typeof ogUrl === 'string') {
@@ -154,10 +154,10 @@ ${CODE_COPY_SCRIPT}
       }
     }
 
-    const ogImageWidth = this.getMetadata('og_image_width');
-    const ogImageHeight = this.getMetadata('og_image_height');
-    const twitterSite = this.getMetadata('twitter_site');
-    const twitterCreator = this.getMetadata('twitter_creator');
+    const ogImageWidth = this.getMetadata('ogImageWidth');
+    const ogImageHeight = this.getMetadata('ogImageHeight');
+    const twitterSite = this.getMetadata('twitterSite');
+    const twitterCreator = this.getMetadata('twitterCreator');
 
     // Handle keywords array
     const rawKeywords = this.evaluator.getVariable('keywords');
@@ -202,10 +202,10 @@ ${CODE_COPY_SCRIPT}
   }
 
   private generateLinkTags(): string {
-    const iconPng = this.getMetadata('icon_png');
-    const iconSvg = this.getMetadata('icon_svg');
-    const iconIco = this.getMetadata('icon_ico');
-    const iconApple = this.getMetadata('icon_apple');
+    const iconPng = this.getMetadata('iconPng');
+    const iconSvg = this.getMetadata('iconSvg');
+    const iconIco = this.getMetadata('iconIco');
+    const iconApple = this.getMetadata('iconApple');
     const genericIcon = this.getMetadata('icon');
     const manifest = this.getMetadata('manifest');
 
@@ -242,10 +242,10 @@ ${CODE_COPY_SCRIPT}
     if (
       (key === 'image' ||
         key === 'icon' ||
-        key === 'icon_png' ||
-        key === 'icon_svg' ||
-        key === 'icon_ico' ||
-        key === 'icon_apple' ||
+        key === 'iconPng' ||
+        key === 'iconSvg' ||
+        key === 'iconIco' ||
+        key === 'iconApple' ||
         key === 'manifest') &&
       typeof val === 'string' &&
       val &&
