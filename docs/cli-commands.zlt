@@ -25,6 +25,9 @@ zolt build <input> [options]
   - **Path is a directory**: Saved in that directory using the input filename (e.g., `zolt build foo/bar.zlt -o dist/` creates `./dist/foo/bar.html`).
 - `-w, --watch`: Automatically rebuild when the source file or its dependencies change.
 - `-t, --type <html|pdf>`: Specify the output format (default: `html`).
+- `-s, --server`: Start a development server that serves your built files and automatically reloads the page when changes are detected.
+- `-h, --host <host>`: Specify the host for the development server (default: `127.0.0.1`).
+- `-p, --port <port>`: Specify the port for the development server (default: `1302`).
 
 ### Smart Dependency Resolution
 

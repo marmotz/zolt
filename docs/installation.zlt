@@ -41,6 +41,16 @@ yarn dlx @marmotz/zolt build your-file.zlt -o output.html
 :::
 :::
 
+### Development Server
+
+Zolt includes a built-in development server with automatic page reloading (LiveReload). This is the recommended way to work on your documents:
+
+```bash
+bunx @marmotz/zolt build index.zlt --server
+```
+
+This will build your project, start a server at `http://127.0.0.1:1302`, and automatically rebuild and refresh your browser whenever you save a file.
+
 ### CLI Commands Reference
 
 For a complete list of commands and options, see the [CLI Commands Reference](cli-commands.zlt).

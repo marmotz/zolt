@@ -59,7 +59,7 @@ describe('CLI Watch Layout', () => {
         let output = '';
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Waiting for changes')) {
+          if (output.includes('Watching for changes')) {
             setTimeout(resolve, 1000);
           }
         });

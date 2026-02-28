@@ -177,7 +177,7 @@ export function extractAllAssets(
     return false;
   };
 
-  const checkHref = (href: string) => {
+  const checkHref = (href: unknown) => {
     if (!href || typeof href !== 'string') return;
 
     if (
@@ -203,9 +203,23 @@ export function extractAllAssets(
   };
 
   // Check all possible metadata keys for assets
-  const checkMetadata = (data: any) => {
+  const checkMetadata = (data: Record<string, any> | undefined) => {
     if (!data) return;
-    const keys = ['image', 'icon', 'icon_png', 'icon_svg', 'icon_ico', 'icon_apple', 'manifest', 'layout', 'sidebar'];
+    const keys = [
+      'image',
+      'icon',
+      'icon_png',
+      'icon_svg',
+      'icon_ico',
+      'icon_apple',
+      'iconPng',
+      'iconSvg',
+      'iconIco',
+      'iconApple',
+      'manifest',
+      'layout',
+      'sidebar',
+    ];
     for (const key of keys) {
       if (data[key]) checkHref(data[key]);
     }
@@ -269,8 +283,51 @@ export async function getLinkedFiles(inputPath: string, projectMetadata?: Record
 
 export async function getAssetFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
-  const { otherAssets } = extractAllAssets(content, projectMetadata);
-  return otherAssets;
+  const { otherAssets } = extractAllAssets(content, projectMetadata, inputPath);
+
+  // Parse manifests to find more assets (like icons mentioned inside site.webmanifest)
+  const expandedAssets = [...otherAssets];
+  for (const asset of otherAssets) {
+    if (asset.endsWith('.webmanifest') || asset.endsWith('manifest.json')) {
+      try {
+        const fullPath = path.resolve(path.dirname(inputPath), asset);
+        if (fs.existsSync(fullPath)) {
+          const manifestContent = await readFile(fullPath, 'utf-8');
+          const manifest = JSON.parse(manifestContent);
+          const manifestDir = path.dirname(asset);
+
+          const checkIcon = (icon: any) => {
+            if (icon && icon.src && typeof icon.src === 'string') {
+              if (
+                !icon.src.startsWith('http://') &&
+                !icon.src.startsWith('https://') &&
+                !icon.src.startsWith('data:')
+              ) {
+                // Remove leading slash for path joining
+                const cleanSrc = icon.src.startsWith('/') ? icon.src.slice(1) : icon.src;
+                expandedAssets.push(path.join(manifestDir, cleanSrc));
+              }
+            }
+          };
+
+          if (manifest.icons && Array.isArray(manifest.icons)) {
+            manifest.icons.forEach(checkIcon);
+          }
+          if (manifest.shortcuts && Array.isArray(manifest.shortcuts)) {
+            manifest.shortcuts.forEach((s: any) => {
+              if (s.icons && Array.isArray(s.icons)) {
+                s.icons.forEach(checkIcon);
+              }
+            });
+          }
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+    }
+  }
+
+  return [...new Set(expandedAssets)];
 }
 
 export async function lint(filePath: string): Promise<LintResult> {

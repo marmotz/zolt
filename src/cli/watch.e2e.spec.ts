@@ -58,7 +58,7 @@ describe('CLI Watch', () => {
         let output = '';
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Waiting for changes')) {
+          if (output.includes('Watching for changes')) {
             setTimeout(resolve, 100);
           }
         });
@@ -120,7 +120,7 @@ describe('CLI Watch', () => {
         let output = '';
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Waiting for changes')) {
+          if (output.includes('Watching for changes')) {
             setTimeout(resolve, 100);
           }
         });
@@ -188,7 +188,7 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput += data.toString();
-          if (rebuildOutput.includes('Waiting for changes')) {
+          if (rebuildOutput.includes('Watching for changes')) {
             setTimeout(resolve, 100);
           }
         });
@@ -251,7 +251,7 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput += data.toString();
-          if (rebuildOutput.includes('Waiting for changes')) {
+          if (rebuildOutput.includes('Watching for changes')) {
             setTimeout(resolve, 100);
           }
         });
@@ -270,7 +270,7 @@ describe('CLI Watch', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           rebuildOutput2 += data.toString();
-          if (rebuildOutput2.includes('Waiting for changes')) {
+          if (rebuildOutput2.includes('Watching for changes')) {
             setTimeout(resolve, 200);
           }
         });

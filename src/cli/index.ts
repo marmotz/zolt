@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { serve } from 'bun';
 import { existsSync, watch as watchFile } from 'fs';
 import { copyFile, mkdir, readFile, stat } from 'fs/promises';
 import { basename, dirname, join, relative, resolve } from 'path';
@@ -52,7 +53,6 @@ export async function loadProjectMetadata(baseInputDir: string): Promise<Record<
     }
   }
 
-  // We NO LONGER filter keys here to allow custom parameters in layouts/sidebars
   return data;
 }
 
@@ -64,7 +64,8 @@ export async function buildFileWithDeps(
   baseInputDir: string,
   customOutputFile?: string,
   projectMetadata: Record<string, any> = {},
-  entryPoint?: string
+  entryPoint?: string,
+  assetsToCopy: Map<string, string> = new Map()
 ): Promise<Set<string>> {
   const absoluteInput = resolve(inputFile);
   const touchedFiles = new Set<string>();
@@ -126,19 +127,7 @@ export async function buildFileWithDeps(
       destAssetPath = resolve(outputDir, assetPathRelativeToBase);
     }
 
-    try {
-      const assetStat = await stat(fullAssetPath);
-      if (assetStat.isFile()) {
-        touchedFiles.add(fullAssetPath);
-        await mkdir(dirname(destAssetPath), { recursive: true });
-
-        if (fullAssetPath !== resolve(destAssetPath)) {
-          await copyFile(fullAssetPath, destAssetPath);
-        }
-      }
-    } catch {
-      console.warn(`${pc.yellow('Warning:')} Asset file not found: ${fullAssetPath}`);
-    }
+    assetsToCopy.set(fullAssetPath, destAssetPath);
   }
 
   // Handle linked .zlt files recursively
@@ -176,7 +165,8 @@ export async function buildFileWithDeps(
           baseInputDir,
           undefined,
           projectMetadata,
-          entryPoint
+          entryPoint,
+          assetsToCopy
         );
         for (const dep of subDeps) {
           touchedFiles.add(dep);
@@ -224,12 +214,16 @@ ${pc.bold('Build Options:')}
   ${opt('-o')}, ${opt('--output')} ${arg('<path>')}       Output file or directory
   ${opt('-t')}, ${opt('--type')}   ${arg('<html|pdf>')}   Output type ${dim('(default: html)')}
   ${opt('-w')}, ${opt('--watch')}               Watch for file changes and rebuild
+  ${opt('-s')}, ${opt('--server')}              Start a development server
+  ${opt('-h')}, ${opt('--host')}   ${arg('<host>')}       Development server host ${dim('(default: 127.0.0.1)')}
+  ${opt('-p')}, ${opt('--port')}   ${arg('<port>')}       Development server port ${dim('(default: 1302)')}
 
 ${pc.bold('Examples:')}
   ${dim('$')} zolt ${cmd('lint')} document.zlt
   ${dim('$')} zolt ${cmd('lint')} *.zlt ${opt('--format')} json
   ${dim('$')} zolt ${cmd('build')} document.zlt ${opt('-o')} output.html
   ${dim('$')} zolt ${cmd('build')} *.zlt ${opt('-o')} dist/ ${opt('-t')} html
+  ${dim('$')} zolt ${cmd('build')} document.zlt ${opt('--server')} ${opt('--port')} 3000
 `);
 }
 
@@ -326,17 +320,16 @@ export async function performBuild(
   files: string[],
   output: string | undefined,
   type: 'html' | 'pdf'
-): Promise<Set<string>> {
+): Promise<{ touchedFiles: Set<string>; outputDir: string }> {
   const allTouchedFiles = new Set<string>();
   const visited = new Set<string>();
+  const assetsToCopy = new Map<string, string>();
+  let outputDir = '';
 
-  // Determine the base input directory to preserve structure
   let baseInputDir = '';
   if (files.length > 0) {
     const absoluteFiles = files.map((f) => resolve(f));
     baseInputDir = dirname(absoluteFiles[0]);
-
-    // Find common parent directory
     for (let i = 1; i < absoluteFiles.length; i++) {
       while (!absoluteFiles[i].startsWith(baseInputDir) && baseInputDir !== '/') {
         baseInputDir = dirname(baseInputDir);
@@ -352,96 +345,122 @@ export async function performBuild(
     let outputFile = output;
 
     if (output) {
-      // If output has no extension, assume it's a directory
       if (!output.endsWith('.html') && !output.endsWith('.pdf')) {
-        await mkdir(output, { recursive: true });
+        outputDir = resolve(output);
+        await mkdir(outputDir, { recursive: true });
         const touched = await buildFileWithDeps(
           resolve(inputFile),
-          output,
+          outputDir,
           type,
           visited,
           baseInputDir,
           undefined,
           projectMetadata,
-          entryPoint
+          entryPoint,
+          assetsToCopy
         );
         for (const f of touched) allTouchedFiles.add(f);
-
-        return allTouchedFiles;
-      }
-
-      const outputStat = await stat(output).catch(() => null);
-      if (outputStat?.isDirectory()) {
-        const touched = await buildFileWithDeps(
-          resolve(inputFile),
-          output,
-          type,
-          visited,
-          baseInputDir,
-          undefined,
-          projectMetadata,
-          entryPoint
-        );
-        for (const f of touched) allTouchedFiles.add(f);
-
-        return allTouchedFiles;
       } else {
-        outputFile = output;
+        const outputStat = await stat(output).catch(() => null);
+        if (outputStat?.isDirectory()) {
+          outputDir = resolve(output);
+          const touched = await buildFileWithDeps(
+            resolve(inputFile),
+            outputDir,
+            type,
+            visited,
+            baseInputDir,
+            undefined,
+            projectMetadata,
+            entryPoint,
+            assetsToCopy
+          );
+          for (const f of touched) allTouchedFiles.add(f);
+        } else {
+          outputFile = output;
+        }
       }
     } else {
       outputFile = inputFile.replace(/\.zlt$/, '.html');
     }
 
-    const resolvedOutputFile = resolve(outputFile);
-    const outputDir = dirname(resolvedOutputFile);
-    const touched = await buildFileWithDeps(
-      resolve(inputFile),
-      outputDir,
-      type,
-      visited,
-      baseInputDir,
-      resolvedOutputFile,
-      projectMetadata,
-      entryPoint
-    );
-    for (const f of touched) allTouchedFiles.add(f);
+    if (!outputDir) {
+      const resolvedOutputFile = resolve(outputFile!);
+      outputDir = dirname(resolvedOutputFile);
+      const touched = await buildFileWithDeps(
+        resolve(inputFile),
+        outputDir,
+        type,
+        visited,
+        baseInputDir,
+        resolvedOutputFile,
+        projectMetadata,
+        entryPoint,
+        assetsToCopy
+      );
+      for (const f of touched) allTouchedFiles.add(f);
+    }
   } else {
     if (!output) {
       throw new Error('Output directory required for multiple files');
     }
 
-    await mkdir(output, { recursive: true });
-    const outputStat = await stat(output).catch(() => null);
-    if (!outputStat?.isDirectory()) {
+    outputDir = resolve(output);
+    const existingStat = await stat(outputDir).catch(() => null);
+    if (existingStat && !existingStat.isDirectory()) {
       throw new Error('Output must be a directory for multiple files');
     }
+    await mkdir(outputDir, { recursive: true });
 
     for (const inputFile of files) {
       const touched = await buildFileWithDeps(
         resolve(inputFile),
-        output,
+        outputDir,
         type,
         visited,
         baseInputDir,
         undefined,
         projectMetadata,
-        entryPoint
+        entryPoint,
+        assetsToCopy
       );
       for (const f of touched) allTouchedFiles.add(f);
     }
   }
 
-  return allTouchedFiles;
+  for (const [fullAssetPath, destAssetPath] of assetsToCopy.entries()) {
+    try {
+      const assetStat = await stat(fullAssetPath);
+      if (assetStat.isFile()) {
+        allTouchedFiles.add(fullAssetPath);
+        await mkdir(dirname(destAssetPath), { recursive: true });
+
+        if (fullAssetPath !== resolve(destAssetPath)) {
+          await copyFile(fullAssetPath, destAssetPath);
+          const relSrc = relative(process.cwd(), fullAssetPath);
+          const relDest = relative(process.cwd(), destAssetPath);
+          console.log(`${pc.blue('Copied:')} ${relSrc} ${pc.dim('->')} ${relDest}`);
+        }
+      }
+    } catch (err) {
+      console.warn(`${pc.yellow('Warning:')} Asset file not found: ${fullAssetPath}`);
+    }
+  }
+
+  return { touchedFiles: allTouchedFiles, outputDir };
 }
 
-export async function handleWatch(files: string[], output: string | undefined, type: 'html' | 'pdf') {
-  console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)`);
-
-  const watchers = new Map<string, any>();
-  let buildTimeout: any = null;
+export async function handleWatch(
+  files: string[],
+  output: string | undefined,
+  type: 'html' | 'pdf',
+  onRebuild?: (outputDir: string) => void
+) {
   let isBuilding = false;
+  let buildPending = false;
+  let buildTimeout: any = null;
+  const watchers = new Map<string, any>();
 
-  // Find zolt.project.yaml to watch it
   let baseInputDir = '';
   if (files.length > 0) {
     const absoluteFiles = files.map((f) => resolve(f));
@@ -455,16 +474,36 @@ export async function handleWatch(files: string[], output: string | undefined, t
   const projectFile = await findProjectFile(baseInputDir);
   const cwdProjectFile = await findProjectFile(process.cwd());
 
-  const updateWatchers = (touchedFiles: Set<string>) => {
-    // Add project metadata files to touched files so they are watched
-    if (projectFile) {
-      touchedFiles.add(projectFile);
-    }
-    if (cwdProjectFile) {
-      touchedFiles.add(cwdProjectFile);
+  const rebuild = async () => {
+    if (isBuilding) {
+      buildPending = true;
+      return;
     }
 
-    // Files that are currently being watched but are no longer in the dependency graph
+    isBuilding = true;
+    console.log(`\n${pc.cyan(pc.bold('Change detected, rebuilding...'))}`);
+
+    try {
+      const { touchedFiles: newTouchedFiles, outputDir } = await performBuild(files, output, type);
+      updateWatchers(newTouchedFiles);
+      if (onRebuild) onRebuild(outputDir);
+    } catch (err) {
+      console.error(`${pc.red('Rebuild failed:')}`, err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      isBuilding = false;
+      if (buildPending) {
+        buildPending = false;
+        rebuild();
+      } else {
+        console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)\n`);
+      }
+    }
+  };
+
+  const updateWatchers = (touchedFiles: Set<string>) => {
+    if (projectFile) touchedFiles.add(projectFile);
+    if (cwdProjectFile) touchedFiles.add(cwdProjectFile);
+
     for (const [filePath, watcher] of watchers) {
       if (!touchedFiles.has(filePath)) {
         watcher.close();
@@ -472,28 +511,12 @@ export async function handleWatch(files: string[], output: string | undefined, t
       }
     }
 
-    // New files in the dependency graph
     for (const filePath of touchedFiles) {
       if (!watchers.has(filePath)) {
         try {
           const watcher = watchFile(filePath, () => {
             if (buildTimeout) clearTimeout(buildTimeout);
-            buildTimeout = setTimeout(async () => {
-              if (isBuilding) {
-                return;
-              }
-              isBuilding = true;
-              console.log(`\n${pc.yellow('Change detected, rebuilding...')}`);
-              try {
-                const newTouchedFiles = await performBuild(files, output, type);
-                updateWatchers(newTouchedFiles);
-              } catch (err) {
-                console.error(`${pc.red('Rebuild failed:')}`, err instanceof Error ? err.message : 'Unknown error');
-              } finally {
-                isBuilding = false;
-                console.log(`\n${pc.cyan('Waiting for changes...')}`);
-              }
-            }, 20);
+            buildTimeout = setTimeout(rebuild, 20);
           });
 
           watcher.on('error', () => {
@@ -503,25 +526,134 @@ export async function handleWatch(files: string[], output: string | undefined, t
 
           watchers.set(filePath, watcher);
         } catch {
-          // Ignore files that cannot be watched (e.g., deleted during build)
+          // Ignore
         }
       }
     }
   };
 
   try {
-    const initialTouchedFiles = await performBuild(files, output, type);
+    const { touchedFiles: initialTouchedFiles, outputDir } = await performBuild(files, output, type);
     updateWatchers(initialTouchedFiles);
-    console.log(`\n${pc.cyan('Waiting for changes...')}`);
+    if (onRebuild) onRebuild(outputDir);
+    console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)\n`);
   } catch (err) {
     console.error(`${pc.red('Initial build failed:')}`, err instanceof Error ? err.message : 'Unknown error');
-    updateWatchers(new Set(files.map((f) => resolve(f))));
   }
 
-  // Handle termination
   process.on('SIGINT', () => {
     for (const watcher of watchers.values()) watcher.close();
     process.exit(0);
+  });
+}
+
+export function printServerInfo(files: string[], output: string | undefined, host: string, port: number) {
+  const entryPoint = files.length > 0 ? files[0] : '';
+  const entryBasename = entryPoint.endsWith('.zlt') ? basename(entryPoint.replace(/\.zlt$/, '.html')) : 'index.html';
+  const urlPath = output && (output.endsWith('.html') || output.endsWith('.pdf')) ? basename(output) : entryBasename;
+
+  console.log(`\n${pc.bold(pc.green('Zolt Development Server'))}`);
+  console.log(`${pc.cyan('URL:')} http://${host}:${port}/${urlPath}`);
+  console.log(`${pc.yellow('Notice:')} This server is for development only. Do not use in production.`);
+}
+
+export async function handleServer(
+  files: string[],
+  output: string | undefined,
+  host: string = '127.0.0.1',
+  port: number = 1302
+) {
+  let serverInstance: any = null;
+
+  const startServer = (outputDir: string) => {
+    if (serverInstance) {
+      serverInstance.publish('reload', 'reload');
+      printServerInfo(files, output, host, port);
+      return;
+    }
+
+    serverInstance = serve({
+      port,
+      hostname: host,
+      fetch(req, server) {
+        if (server.upgrade(req)) return;
+
+        const url = new URL(req.url);
+        let pathname = url.pathname;
+        if (pathname === '/') pathname = '/index.html';
+
+        const filePath = join(outputDir, pathname);
+        const file = Bun.file(filePath);
+
+        if (filePath.endsWith('.html')) {
+          return file
+            .text()
+            .then((text) => {
+              const injected = text.replace(
+                '</body>',
+                `<script>
+                (function() {
+                  const ws = new WebSocket('ws://' + location.host);
+                  ws.onmessage = (event) => {
+                    if (event.data === 'reload') {
+                      console.log('Zolt: Rebuild detected, reloading...');
+                      location.reload();
+                    }
+                  };
+                  ws.onclose = () => {
+                    console.log('Zolt: Server disconnected. Retrying connection...');
+                    const retry = setInterval(() => {
+                      const nextWs = new WebSocket('ws://' + location.host);
+                      nextWs.onopen = () => {
+                        clearInterval(retry);
+                        location.reload();
+                      };
+                    }, 1000);
+                  };
+                })();
+              </script></body>`
+              );
+              console.log(
+                `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
+              );
+              return new Response(injected, {
+                headers: { 'Content-Type': 'text/html' },
+              });
+            })
+            .catch(() => {
+              console.log(
+                `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
+              );
+              return new Response('Not Found', { status: 404 });
+            });
+        }
+
+        return file.exists().then((exists) => {
+          if (!exists) {
+            console.log(
+              `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
+            );
+            return new Response('Not Found', { status: 404 });
+          }
+          console.log(
+            `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
+          );
+          return new Response(file);
+        });
+      },
+      websocket: {
+        open(ws) {
+          ws.subscribe('reload');
+        },
+        message() {},
+      },
+    });
+
+    printServerInfo(files, output, host, port);
+  };
+
+  await handleWatch(files, output, 'html', (outputDir) => {
+    startServer(outputDir);
   });
 }
 
@@ -529,20 +661,12 @@ export async function handleBuild(args: string[]) {
   const { values, positionals } = parseArgs({
     args,
     options: {
-      output: {
-        type: 'string',
-        short: 'o',
-      },
-      type: {
-        type: 'string',
-        short: 't',
-        default: 'html',
-      },
-      watch: {
-        type: 'boolean',
-        short: 'w',
-        default: false,
-      },
+      output: { type: 'string', short: 'o' },
+      type: { type: 'string', short: 't', default: 'html' },
+      watch: { type: 'boolean', short: 'w', default: false },
+      server: { type: 'boolean', short: 's', default: false },
+      host: { type: 'string', short: 'h', default: '127.0.0.1' },
+      port: { type: 'string', short: 'p', default: '1302' },
     },
     allowPositionals: true,
   });
@@ -551,11 +675,24 @@ export async function handleBuild(args: string[]) {
   const output = values.output as string | undefined;
   const type = values.type as 'html' | 'pdf';
   const watch = values.watch as boolean;
+  const server = values.server as boolean;
+  const host = values.host as string;
+  const port = parseInt(values.port as string, 10);
 
   if (files.length === 0) {
     console.error(`${pc.red('Error:')} No files specified for building`);
     if (import.meta.main) process.exit(1);
     throw new Error('No files specified for building');
+  }
+
+  if (server) {
+    if (type !== 'html') {
+      console.error(`${pc.red('Error:')} Server mode is only available for HTML output`);
+      if (import.meta.main) process.exit(1);
+      throw new Error('Server mode only available for HTML');
+    }
+    await handleServer(files, output, host, port);
+    return;
   }
 
   if (watch) {
