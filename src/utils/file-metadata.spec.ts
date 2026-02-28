@@ -27,10 +27,38 @@ describe('FileMetadataUtils', () => {
       });
     });
 
-    it('should parse arrays', () => {
-      const raw = 'tags: [tag1, tag2, tag3]';
+    it('should parse arrays with commas inside quoted strings', () => {
+      const raw = 'tags: ["tag1, with comma", "tag2"]';
       const data = FileMetadataUtils.parse(raw);
-      expect(data.tags).toEqual(['tag1', 'tag2', 'tag3']);
+      expect(data.tags).toEqual(['tag1, with comma', 'tag2']);
+    });
+
+    it('should parse multi-line strings with |', () => {
+      const raw = 'description: |\n  Line 1\n  Line 2';
+      const data = FileMetadataUtils.parse(raw);
+      expect(data.description).toBe('Line 1\nLine 2\n');
+    });
+
+    it('should ignore comments', () => {
+      const raw = 'title: "Test" # This is a comment\nauthor: Me # Another comment';
+      const data = FileMetadataUtils.parse(raw);
+      expect(data.title).toBe('Test');
+      expect(data.author).toBe('Me');
+    });
+
+    it('should parse nested objects', () => {
+      const raw = 'author:\n  name: Zolt\n  twitter: "@zolt"';
+      const data = FileMetadataUtils.parse(raw);
+      expect(data.author).toEqual({
+        name: 'Zolt',
+        twitter: '@zolt',
+      });
+    });
+
+    it('should handle robustly the --- delimiters', () => {
+      const raw = '---\ntitle: "Test"\n---';
+      const data = FileMetadataUtils.parse(raw);
+      expect(data.title).toBe('Test');
     });
   });
 

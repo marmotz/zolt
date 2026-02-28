@@ -1,3 +1,5 @@
+import { parse as parseYaml } from 'yaml';
+
 export interface FileMetadata {
   created: Date;
   modified: Date;
@@ -43,53 +45,33 @@ export function createFileDateVariables(metadata: FileMetadata): { created: stri
 
 export class FileMetadataUtils {
   public static parse(content: string): Record<string, any> {
-    const data: Record<string, any> = {};
-    const lines = content.split('\n');
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === '---') continue;
-
-      const match = trimmed.match(/^([a-zA-Z0-9_-]+)\s*:\s*(.*)$/);
-      if (match) {
-        const key = match[1];
-        const rawValue = match[2].trim();
-        data[key] = this.parseValue(rawValue);
+    try {
+      // Remove leading/trailing delimiters if present
+      let cleanContent = content.trim();
+      if (cleanContent.startsWith('---')) {
+        cleanContent = cleanContent.replace(/^---+\n?/, '');
       }
-    }
+      if (cleanContent.endsWith('---')) {
+        cleanContent = cleanContent.replace(/\n?---+\s*$/, '');
+      }
 
-    return data;
+      const data = parseYaml(cleanContent);
+      if (typeof data !== 'object' || data === null) {
+        return {};
+      }
+
+      return data;
+    } catch {
+      return {};
+    }
   }
 
   public static parseValue(value: string): any {
-    if (value === 'true') {
-      return true;
+    try {
+      return parseYaml(value);
+    } catch {
+      return value;
     }
-    if (value === 'false') {
-      return false;
-    }
-    if (value === 'null') {
-      return null;
-    }
-
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      return value.slice(1, -1);
-    }
-
-    if (value.startsWith('[') && value.endsWith(']')) {
-      const inner = value.slice(1, -1).trim();
-      if (!inner) {
-        return [];
-      }
-
-      return inner.split(',').map((v) => this.parseValue(v.trim()));
-    }
-
-    if (!isNaN(Number(value)) && value !== '') {
-      return Number(value);
-    }
-
-    return value;
   }
 
   public static extractRaw(content: string): string | null {

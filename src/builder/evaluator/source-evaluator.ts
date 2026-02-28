@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { FileMetadataUtils } from '../../utils/file-metadata';
 import { ContentProcessor } from './content-processor';
 import { ExpressionEvaluator } from './expression-evaluator';
 
@@ -248,28 +249,18 @@ export class SourceEvaluator {
   private processMetadata(lines: string[]): void {
     if (lines.length < 2) return;
 
-    // Simple YAML-like parser for frontmatter
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed === '---') continue;
+    const content = lines.join('\n');
+    const data = FileMetadataUtils.parse(content);
 
-      const match = trimmed.match(/^([a-zA-Z_]\w*)\s*:\s*(.*)$/);
-      if (match) {
-        const key = match[1];
-        const value = match[2].trim();
-
-        // Use the evaluator to parse the value (handle numbers, booleans, strings)
-        const parsedValue = this.evaluator.parseValue(value);
-
-        // If we are processing a layout, we don't want to override variables
-        // already set by the document or project metadata.
-        if (this.isLayoutProcessing) {
-          if (this.evaluator.getVariable(key) === undefined) {
-            this.evaluator.setVariable(key, parsedValue);
-          }
-        } else {
-          this.evaluator.setVariable(key, parsedValue);
+    for (const [key, value] of Object.entries(data)) {
+      // If we are processing a layout, we don't want to override variables
+      // already set by the document or project metadata.
+      if (this.isLayoutProcessing) {
+        if (this.evaluator.getVariable(key) === undefined) {
+          this.evaluator.setVariable(key, value);
         }
+      } else {
+        this.evaluator.setVariable(key, value);
       }
     }
   }
