@@ -46,6 +46,7 @@ export class SpecialBlockVisitor {
       this.sidebarSide = side;
       const attrs = this.renderAllAttributes(node.attributes);
       const childrenHtml = await this.joinChildren(node.children);
+
       return `<aside${attrs} class="zolt-sidebar zolt-sidebar-${side}" data-type="sidebar">\n${childrenHtml}\n</aside>`;
     }
 
@@ -66,6 +67,7 @@ export class SpecialBlockVisitor {
   <button class="zolt-sidebar-close" aria-label="Close sidebar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
   </button>`;
+
         return `<div${attrs} class="zolt-sidebar-header">\n${childrenHtml}\n${toggleButton}\n${closeButton}\n</div>`;
       }
 

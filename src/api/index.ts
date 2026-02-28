@@ -60,6 +60,7 @@ export function getExpandedContent(
   }
 
   const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath, [], undefined, false, true);
+
   return sourceEvaluator.evaluate(content);
 }
 
@@ -147,6 +148,7 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
+
   return buildString(content, { ...options, filePath });
 }
 
@@ -174,6 +176,7 @@ export function extractAllAssets(
       if (parentDir === currentDir) break;
       currentDir = parentDir;
     }
+
     return false;
   };
 
@@ -193,6 +196,7 @@ export function extractAllAssets(
       if (filePath && (href.startsWith('_layout') || href.startsWith('_template'))) {
         if (bubblingFileExists(path.dirname(filePath), href)) {
           zltLinks.push(href);
+
           return;
         }
       }
@@ -278,6 +282,7 @@ export function extractZltLinks(content: string, projectMetadata?: Record<string
 export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, any>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
   const { zltLinks } = extractAllAssets(content, projectMetadata);
+
   return zltLinks;
 }
 

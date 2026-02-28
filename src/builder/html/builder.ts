@@ -63,6 +63,7 @@ export class HTMLBuilder implements Builder {
       this.footnoteReferences.push({ id, refId });
 
       const uniqueIds = Array.from(new Set(this.footnoteReferences.map((ref) => ref.id)));
+
       return {
         index: uniqueIds.indexOf(id) + 1,
         refId,
@@ -127,6 +128,7 @@ export class HTMLBuilder implements Builder {
         ],
       });
     }
+
     return HTMLBuilder.highlighterPromise;
   }
 
@@ -176,6 +178,7 @@ export class HTMLBuilder implements Builder {
           children: (node as any).children,
           attributes: (node as any).attributes,
         });
+
         return '';
       default:
         // Pour tous les autres types (inline), on passe par l'InlineVisitor
@@ -213,6 +216,7 @@ export class HTMLBuilder implements Builder {
     for (const node of nodes) {
       pieces.push(await this.build(node));
     }
+
     return pieces.join('\n');
   }
 
@@ -221,6 +225,7 @@ export class HTMLBuilder implements Builder {
     for (const node of nodes) {
       pieces.push(await this.build(node));
     }
+
     return pieces.join('');
   }
 
@@ -230,6 +235,7 @@ export class HTMLBuilder implements Builder {
     for (const node of nodes) {
       pieces.push(await this.inlineVisitor.visit(node));
     }
+
     return pieces.join('');
   }
 
@@ -250,6 +256,7 @@ export class HTMLBuilder implements Builder {
       const backlinks = relevantRefs
         .map((ref, idx) => {
           const suffix = idx === 0 ? '' : `-${idx + 1}`;
+
           return ` <a href="#fnref-${ref.refId}" class="footnote-backref" aria-label="Back to content">↩${suffix}</a>`;
         })
         .join('');
@@ -277,6 +284,7 @@ export class HTMLBuilder implements Builder {
     }
 
     html += '</ol>\n</section>\n';
+
     return html;
   }
 

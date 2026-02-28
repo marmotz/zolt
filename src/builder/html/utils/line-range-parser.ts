@@ -21,5 +21,6 @@ export function parseLineRanges(rangeStr: string): Set<number> {
       }
     }
   }
+
   return lines;
 }

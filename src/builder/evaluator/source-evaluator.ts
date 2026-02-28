@@ -181,6 +181,7 @@ export class SourceEvaluator {
 
     if (!targetPath) {
       const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+
       return `${metadata}:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
     }
 
@@ -222,6 +223,7 @@ export class SourceEvaluator {
       return layoutBody;
     } catch (err: any) {
       const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+
       return `${metadata}:::error Failed to process layout: ${layoutPath} (${err.message}):::\n${contentToInject}`;
     }
   }
@@ -300,6 +302,7 @@ export class SourceEvaluator {
         false,
         false
       );
+
       return childEvaluator.evaluate(content);
     } catch (err: any) {
       return `:::error Failed to process include: ${includePath} (${err.message}):::`;

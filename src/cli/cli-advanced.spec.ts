@@ -37,6 +37,7 @@ describe('CLI Advanced', () => {
       errorSpy.mock.calls.map((call) => call.join(' ')).join('\n');
     logSpy.mockRestore();
     errorSpy.mockRestore();
+
     return output;
   };
 

@@ -170,6 +170,7 @@ export class Lexer {
 
   private matchInclude(): boolean {
     const remaining = this.source.slice(this.pos);
+
     return /^{{include\s+[^}]+}}/.test(remaining);
   }
 
@@ -287,6 +288,7 @@ export class Lexer {
 
     if (regex.test(currentLine)) {
       this.state.exitCodeBlock();
+
       return this.readCodeBlockEnd();
     }
 

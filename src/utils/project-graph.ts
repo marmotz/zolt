@@ -38,6 +38,7 @@ export class ProjectGraphBuilder {
         }
       }
     }
+
     return links;
   }
 
@@ -45,6 +46,7 @@ export class ProjectGraphBuilder {
     const content = fs.readFileSync(absPath, 'utf-8');
     const rawMetadata = FileMetadataUtils.extractRaw(content);
     const metadata = rawMetadata ? FileMetadataUtils.parse(rawMetadata) : {};
+
     return metadata.title || path.basename(absPath, '.zlt');
   }
 

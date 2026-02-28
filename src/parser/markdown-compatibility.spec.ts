@@ -6,6 +6,7 @@ function parse(input: string) {
   const lexer = new Lexer(input);
   const tokens = lexer.tokenize();
   const parser = new Parser(tokens);
+
   return parser.parse();
 }
 

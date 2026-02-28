@@ -199,7 +199,7 @@ export class ExpressionEvaluator {
   }
 
   evaluate(expression: string): Value {
-    let trimmed = expression.trim();
+    const trimmed = expression.trim();
 
     if (!trimmed) {
       return null;
@@ -390,7 +390,7 @@ export class ExpressionEvaluator {
   }
 
   private evaluateExpression(expr: string): Value {
-    let trimmed = expr.trim();
+    const trimmed = expr.trim();
 
     if (trimmed.startsWith('(') && this.findMatchingParen(trimmed, 0) === trimmed.length - 1) {
       return this.evaluateExpression(trimmed.slice(1, -1));
@@ -673,6 +673,7 @@ export class ExpressionEvaluator {
     if (!dateStr) return null;
     if (!format) {
       const d = new Date(dateStr);
+
       return isNaN(d.getTime()) ? null : d;
     }
 
@@ -722,6 +723,7 @@ export class ExpressionEvaluator {
       components.mm,
       components.ss
     );
+
     return isNaN(date.getTime()) ? null : date;
   }
 
@@ -766,6 +768,7 @@ export class ExpressionEvaluator {
           break;
       }
     }
+
     return d;
   }
 

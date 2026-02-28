@@ -13,7 +13,7 @@ export class CodeBlockParser {
     warn: (message: string, code: string) => void
   ): CodeBlockNode {
     const startToken = expect(TokenType.CODE_BLOCK_START);
-    let value = startToken.value;
+    const value = startToken.value;
     let attributes: Attributes | undefined;
     const attrMatch = value.match(/\s+\{([^}]+)}$/);
     let language = value;

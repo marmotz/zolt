@@ -17,11 +17,13 @@ export async function findProjectFile(baseDir: string): Promise<string | null> {
     const filePath = join(baseDir, filename);
     try {
       await stat(filePath);
+
       return filePath;
     } catch {
       // File doesn't exist, try next
     }
   }
+
   return null;
 }
 
@@ -104,6 +106,7 @@ export async function buildFileWithDeps(
     }
 
     const newRelativePathForHtml = relative(dirname(outputFile), destAssetAbsolutePath);
+
     return newRelativePathForHtml.replace(/\\/g, '/');
   };
 
@@ -142,6 +145,7 @@ export async function buildFileWithDeps(
       if (parentDir === currentDir) break;
       currentDir = parentDir;
     }
+
     return null;
   };
 
@@ -477,6 +481,7 @@ export async function handleWatch(
   const rebuild = async () => {
     if (isBuilding) {
       buildPending = true;
+
       return;
     }
 
@@ -569,6 +574,7 @@ export async function handleServer(
     if (serverInstance) {
       serverInstance.publish('reload', 'reload');
       printServerInfo(files, output, host, port);
+
       return;
     }
 
@@ -616,6 +622,7 @@ export async function handleServer(
               console.log(
                 `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
               );
+
               return new Response(injected, {
                 headers: { 'Content-Type': 'text/html' },
               });
@@ -624,6 +631,7 @@ export async function handleServer(
               console.log(
                 `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
               );
+
               return new Response('Not Found', { status: 404 });
             });
         }
@@ -633,11 +641,13 @@ export async function handleServer(
             console.log(
               `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
             );
+
             return new Response('Not Found', { status: 404 });
           }
           console.log(
             `${pc.dim(new Date().toLocaleTimeString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
           );
+
           return new Response(file);
         });
       },
@@ -692,11 +702,13 @@ export async function handleBuild(args: string[]) {
       throw new Error('Server mode only available for HTML');
     }
     await handleServer(files, output, host, port);
+
     return;
   }
 
   if (watch) {
     await handleWatch(files, output, type);
+
     return;
   }
 
@@ -716,6 +728,7 @@ export async function main() {
   if (args.length === 0) {
     printHelp();
     if (import.meta.main) process.exit(0);
+
     return;
   }
 
@@ -724,6 +737,7 @@ export async function main() {
   if (command === '-v' || command === '--version') {
     console.log(`zolt v${version}`);
     if (import.meta.main) process.exit(0);
+
     return;
   }
 
