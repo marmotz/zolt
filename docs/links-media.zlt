@@ -22,7 +22,7 @@ Zolt uses distinct prefixes to identify different media types, allowing the pars
 
 ```zolt
 [External Link](https://example.com){target=_blank rel=noopener}
-[Styled Link](page.html){color=blue font-weight=bold}
+[Styled Link](page.html){color=blue fontWeight=bold}
 ```
 
 ### Reference Links

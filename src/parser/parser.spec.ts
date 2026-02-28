@@ -307,13 +307,13 @@ describe('Parser', () => {
   });
 
   test('should parse inline style with multiple attributes', () => {
-    const lexer = new Lexer('||Warning||{color=red font-weight=bold}');
+    const lexer = new Lexer('||Warning||{color=red fontWeight=bold}');
     const tokens = lexer.tokenize();
     const parser = new Parser(tokens);
     const ast = parser.parse();
 
     expect(ast.children[0].type).toBe('Paragraph');
-    expect(getFlatContent(ast.children[0])).toContain('||Warning||{color=red font-weight=bold}');
+    expect(getFlatContent(ast.children[0])).toContain('||Warning||{color=red fontWeight=bold}');
   });
 
   test('should parse standalone inline comment', () => {

@@ -139,7 +139,7 @@ Apply inline styles to table content:
 [[table]]
 | Normal | [h] Header | Important{color=red} |
 | :--- | :--- | :--- |
-| Data 1 | Data 2 | Data 3{font-weight=bold} |
+| Data 1 | Data 2 | Data 3{fontWeight=bold} |
 [[/table]]
 ```
 
@@ -155,7 +155,7 @@ Apply inline styles to table content:
 | :--- | ---: | ---: | ---: |
 | Revenue | $1,000,000 | $1,250,000 | +25%{color=green} |
 | Expenses | $750,000 | $800,000 | +7%{color=orange} |
-| [colspan=2] [h] Profit | $250,000 | $450,000 | +80%{color=green font-weight=bold} |
+| [colspan=2] [h] Profit | $250,000 | $450,000 | +80%{color=green fontWeight=bold} |
 [[/table]]
 ```
 

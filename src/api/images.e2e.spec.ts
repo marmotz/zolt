@@ -115,7 +115,7 @@ describe('API: Images', () => {
   });
 
   test('should not add automatic margin if explicitly provided', async () => {
-    const html = await buildString('![Alt](img.jpg){float=right margin-left=2rem}');
+    const html = await buildString('![Alt](img.jpg){float=right marginLeft=2rem}');
     expect(html).toContain('style="float: right; margin-left: 2rem"');
     expect(html).not.toContain('margin-left: 1rem');
   });

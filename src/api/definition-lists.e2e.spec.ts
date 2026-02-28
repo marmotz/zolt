@@ -62,7 +62,7 @@ describe('API: Definition Lists', () => {
   test('should handle attributes on definition list items', async () => {
     const content = `
 : HTML {color=red}
-:   Language {font-weight=bold}
+:   Language {fontWeight=bold}
     `.trim();
     const html = await buildString(content);
 

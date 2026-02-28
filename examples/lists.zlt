@@ -58,7 +58,7 @@ Definition list using `:` syntax:
 List items with attributes:
 
 - Normal item
-- Important item {color=red font-weight=bold}
+- Important item {color=red fontWeight=bold}
 - Highlighted item {background=yellow}
 - Custom styled item {.my-custom-class}
 

@@ -23,19 +23,31 @@ export class AttributeRenderer {
 
     const cssProps: string[] = [];
     const cssPropertyMap: Record<string, string> = {
-      'font-weight': 'font-weight',
-      'font-size': 'font-size',
-      'font-style': 'font-style',
-      'font-family': 'font-family',
-      'text-decoration': 'text-decoration',
-      'text-align': 'text-align',
+      fontWeight: 'font-weight',
+      fontSize: 'font-size',
+      fontStyle: 'font-style',
+      fontFamily: 'font-family',
+      textDecoration: 'text-decoration',
+      textAlign: 'text-align',
       color: 'color',
       background: 'background',
-      'background-color': 'background-color',
+      backgroundColor: 'background-color',
       border: 'border',
-      'border-radius': 'border-radius',
+      borderRadius: 'border-radius',
+      borderLeft: 'border-left',
+      borderRight: 'border-right',
+      borderTop: 'border-top',
+      borderBottom: 'border-bottom',
       padding: 'padding',
+      paddingLeft: 'padding-left',
+      paddingRight: 'padding-right',
+      paddingTop: 'padding-top',
+      paddingBottom: 'padding-bottom',
       margin: 'margin',
+      marginLeft: 'margin-left',
+      marginRight: 'margin-right',
+      marginTop: 'margin-top',
+      marginBottom: 'margin-bottom',
       display: 'display',
       opacity: 'opacity',
       transform: 'transform',
@@ -44,15 +56,19 @@ export class AttributeRenderer {
       w: 'width',
       h: 'height',
       float: 'float',
-      'margin-left': 'margin-left',
-      'margin-right': 'margin-right',
-      'list-style': 'list-style',
-      'list-style-type': 'list-style-type',
+      listStyle: 'list-style',
+      listStyleType: 'list-style-type',
       shadow: 'box-shadow',
+      verticalAlign: 'vertical-align',
+      whiteSpace: 'white-space',
+      wordBreak: 'word-break',
+      overflow: 'overflow',
+      zIndex: 'z-index',
     };
 
     for (const [key, value] of Object.entries(attrs)) {
-      if (value !== undefined && cssPropertyMap[key]) {
+      if (value !== undefined && (cssPropertyMap[key] || cssPropertyMap[this.camelToKebab(key)])) {
+        const cssKey = cssPropertyMap[key] || cssPropertyMap[this.camelToKebab(key)];
         let processedValue = this.evaluateString(String(value));
 
         if (key === 'shadow' && processedValue === 'true') {
@@ -60,19 +76,16 @@ export class AttributeRenderer {
         }
 
         // Add px to numeric width/height if no unit specified
-        if (
-          (key === 'width' || key === 'height' || key === 'w' || key === 'h') &&
-          /^\d+(\.\d+)?$/.test(processedValue)
-        ) {
+        if ((cssKey === 'width' || cssKey === 'height') && /^\d+(\.\d+)?$/.test(processedValue)) {
           processedValue += 'px';
         }
 
-        cssProps.push(`${cssPropertyMap[key]}: ${processedValue}`);
+        cssProps.push(`${cssKey}: ${processedValue}`);
 
-        if (key === 'float') {
-          if (processedValue === 'right' && !attrs['margin-left'] && !attrs['margin']) {
+        if (cssKey === 'float') {
+          if (processedValue === 'right' && !attrs['marginLeft'] && !attrs['margin-left'] && !attrs['margin']) {
             cssProps.push('margin-left: 1rem');
-          } else if (processedValue === 'left' && !attrs['margin-right'] && !attrs['margin']) {
+          } else if (processedValue === 'left' && !attrs['marginRight'] && !attrs['margin-right'] && !attrs['margin']) {
             cssProps.push('margin-right: 1rem');
           }
         }
@@ -84,19 +97,31 @@ export class AttributeRenderer {
 
   private filterCssProperties(attrs: Attributes): Attributes {
     const cssProps = new Set([
-      'font-weight',
-      'font-size',
-      'font-style',
-      'font-family',
-      'text-decoration',
-      'text-align',
+      'fontWeight',
+      'fontSize',
+      'fontStyle',
+      'fontFamily',
+      'textDecoration',
+      'textAlign',
       'color',
       'background',
-      'background-color',
+      'backgroundColor',
       'border',
-      'border-radius',
+      'borderRadius',
+      'borderLeft',
+      'borderRight',
+      'borderTop',
+      'borderBottom',
       'padding',
+      'paddingLeft',
+      'paddingRight',
+      'paddingTop',
+      'paddingBottom',
       'margin',
+      'marginLeft',
+      'marginRight',
+      'marginTop',
+      'marginBottom',
       'display',
       'opacity',
       'transform',
@@ -105,11 +130,41 @@ export class AttributeRenderer {
       'w',
       'h',
       'float',
+      'listStyle',
+      'listStyleType',
+      'shadow',
+      'verticalAlign',
+      'whiteSpace',
+      'wordBreak',
+      'overflow',
+      'zIndex',
+      // Maintain old ones for backward compatibility if needed, but the goal is to migrate
+      'font-weight',
+      'font-size',
+      'font-style',
+      'font-family',
+      'text-decoration',
+      'text-align',
+      'background-color',
+      'border-radius',
+      'border-left',
+      'border-right',
+      'border-top',
+      'border-bottom',
+      'padding-left',
+      'padding-right',
+      'padding-top',
+      'padding-bottom',
       'margin-left',
       'margin-right',
+      'margin-top',
+      'margin-bottom',
       'list-style',
       'list-style-type',
-      'shadow',
+      'vertical-align',
+      'white-space',
+      'word-break',
+      'z-index',
     ]);
     const filtered: Attributes = {};
     for (const [key, value] of Object.entries(attrs)) {
@@ -138,16 +193,21 @@ export class AttributeRenderer {
 
     for (const [key, value] of Object.entries(attrs)) {
       if (key !== 'id' && key !== 'class' && value !== undefined) {
+        const kebabKey = this.camelToKebab(key);
         if (value === '') {
-          parts.push(key);
+          parts.push(kebabKey);
         } else {
           const processedValue = this.evaluateString(String(value));
-          parts.push(`${key}="${processedValue}"`);
+          parts.push(`${kebabKey}="${processedValue}"`);
         }
       }
     }
 
     return parts.length > 0 ? ' ' + parts.join(' ') : '';
+  }
+
+  private camelToKebab(str: string): string {
+    return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
   }
 
   private evaluateString(text: string): string {

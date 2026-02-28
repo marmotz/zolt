@@ -45,7 +45,7 @@
 - [x] `{#id}` - Unique identifier
 - [x] `{.class}` - CSS classes
 - [x] `{background=value}` - Background color
-- [x] `{font-weight=value}` - Font weight
+- [x] `{fontWeight=value}` - Font weight
 
 ### Attributes on Headings
 

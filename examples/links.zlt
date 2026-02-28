@@ -13,7 +13,7 @@ Simple link syntax:
 
 Styled links:
 - [External link](https://zolt.marmotz.dev){target=_blank rel=noopener}
-- [Important link](https://zolt.marmotz.dev/page.html){color=blue font-weight=bold}
+- [Important link](https://zolt.marmotz.dev/page.html){color=blue fontWeight=bold}
 - [Search Engine](https://google.com){target=_blank}
 
 ## Automatic References

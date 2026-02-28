@@ -58,7 +58,7 @@ Tout élément (titre, image, lien, paragraphe, liste, bloc, texte) peut accepte
 | `{#mon-ancre}`           | Identifiant unique | `Texte avec ancre{#mon-ancre}`      |
 | `{.ma-classe-css}`       | Classes CSS        | `Texte stylé{.ma-classe-css}`       |
 | `{background=soft-blue}` | Couleur de fond    | `Texte surligné{background=yellow}` |
-| `{font-weight=bold}`     | Poids de police    | `Important{font-weight=bold}`       |
+| `{fontWeight=bold}`     | Poids de police    | `Important{fontWeight=bold}`       |
 
 Tout élément inline supporte les attributs :
 
@@ -341,7 +341,7 @@ La définition peut s'étendre sur plusieurs lignes tant qu'elle reste indentée
 
 ```
 - Item normal
-- Item important{color=red font-weight=bold}
+- Item important{color=red fontWeight=bold}
 - Item avec note{.highlight}
 - [ ] Tâche urgente{background=yellow}
 ```
@@ -369,7 +369,7 @@ Le Zolt propose une syntaxe riche pour les liens, avec attributs et références
 ```
 [Lien externe](https://zolt.marmotz.dev){target=_blank rel=noopener}
 [Google](https://google.com){target=_blank}
-[Lien important](page.html){color=blue font-weight=bold}
+[Lien important](page.html){color=blue fontWeight=bold}
 ```
 
 #### Références Automatiques
@@ -530,7 +530,7 @@ Pour appliquer des styles à des groupes de mots au sein d'une phrase, utilisez 
 #### Exemples
 
 ```
-Ceci est ||un texte important||{color=red font-weight=bold} dans une phrase.
+Ceci est ||un texte important||{color=red fontWeight=bold} dans une phrase.
 
 Vous pouvez ||surligner du texte||{background=yellow} ou le ||mettre en bleu||{color=blue}.
 ```
@@ -2323,7 +2323,7 @@ numbering: true
 
 ## 1. Introduction
 
-  Bienvenue dans ce guide complet sur ||Zolt||{color=blue font-weight=bold}, le langage de balisage moderne.
+  Bienvenue dans ce guide complet sur ||Zolt||{color=blue fontWeight=bold}, le langage de balisage moderne.
 
   :::details [Pourquoi Zolt ?]
   Zolt combine la simplicité de Markdown avec la puissance des langages de balisage modernes.

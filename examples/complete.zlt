@@ -24,7 +24,7 @@ theme: professional
 
 ## Introduction
 
-Welcome to this ||comprehensive||{color=blue font-weight=bold} example showcasing all Zolt features!
+Welcome to this ||comprehensive||{color=blue fontWeight=bold} example showcasing all Zolt features!
 
 This document demonstrates every aspect of the Zolt markup language, from basic text formatting to advanced features like loops, calculations, and interactive components.
 

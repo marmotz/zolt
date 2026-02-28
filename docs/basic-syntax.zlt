@@ -42,7 +42,7 @@ This is ||important||{color=red} text.
 
 This is ||highlighted||{background=yellow}.
 
-This is ||bold and blue||{font-weight=bold color=blue}.
+This is ||bold and blue||{fontWeight=bold color=blue}.
 ```
 
 :::info [Result]
@@ -50,7 +50,7 @@ This is ||important||{color=red} text.
 
 This is ||highlighted||{background=yellow}.
 
-This is ||bold and blue||{font-weight=bold color=blue}.
+This is ||bold and blue||{fontWeight=bold color=blue}.
 :::
 
 ### Common Attributes
@@ -59,28 +59,28 @@ This is ||bold and blue||{font-weight=bold color=blue}.
 |-----------|-------------|---------|
 | `color` | Text color | `{color=red}` |
 | `background` | Background color | `{background=yellow}` |
-| `font-weight` | Font weight | `{font-weight=bold}` |
-| `font-size` | Font size | `{font-size=1.5em}` |
-| `font-style` | Font style | `{font-style=italic}` |
+| `fontWeight` | Font weight | `{fontWeight=bold}` |
+| `fontSize` | Font size | `{fontSize=1.5em}` |
+| `fontStyle` | Font style | `{fontStyle=italic}` |
 | `border` | Border | `{border=1px solid black}` |
-| `border-radius` | Border radius | `{border-radius=10px}` |
+| `borderRadius` | Border radius | `{borderRadius=10px}` |
 
 ### Practical Examples
 
 ```zolt
-||Warning:||{color=red font-weight=bold} This action cannot be undone.
+||Warning:||{color=red fontWeight=bold} This action cannot be undone.
 
-||NEW||{background=blue color=white padding=2px 8px border-radius=12px}
+||NEW||{background=blue color=white padding=2px 8px borderRadius=12px}
 
-||$variable||{font-family=monospace background=#F3F4F6}
+||$variable||{fontFamily=monospace background=#F3F4F6}
 ```
 
 :::info [Result]
-||Warning:||{color=red font-weight=bold} This action cannot be undone.
+||Warning:||{color=red fontWeight=bold} This action cannot be undone.
 
-||NEW||{background=blue color=white padding=2px 8px border-radius=12px}
+||NEW||{background=blue color=white padding=2px 8px borderRadius=12px}
 
-||$variable||{font-family=monospace background=#F3F4F6}
+||$variable||{fontFamily=monospace background=#F3F4F6}
 :::
 
 ---

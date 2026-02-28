@@ -812,8 +812,8 @@ export class InlineParser {
 
       const startLen = remaining.length;
 
-      const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
-      const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
+      const quotedMatch = remaining.match(/^([a-zA-Z0-9-]+)="([^"]*)"/);
+      const quotedMatch2 = remaining.match(/^([a-zA-Z0-9-]+)='([^']*)'/);
 
       if (quotedMatch) {
         const key = quotedMatch[1];
@@ -826,14 +826,14 @@ export class InlineParser {
         this.setAttribute(attrs, key, value);
         remaining = remaining.slice(quotedMatch2[0].length);
       } else {
-        const keyValueMatch = remaining.match(/^([a-zA-Z-]+)=/);
+        const keyValueMatch = remaining.match(/^([a-zA-Z0-9-]+)=/);
         if (keyValueMatch) {
           const key = keyValueMatch[1];
           const afterKey = remaining.slice(keyValueMatch[0].length);
           let value = '';
 
           // Look for next attribute separator (space or comma) followed by a key, shortcut or boolean
-          const nextKeyMatch = afterKey.match(/[ ,]([a-zA-Z-]+=|#|\.)/);
+          const nextKeyMatch = afterKey.match(/[ ,]([a-zA-Z0-9-]+=|#|\.)/);
           if (nextKeyMatch) {
             value = afterKey.slice(0, nextKeyMatch.index);
           } else {
@@ -846,7 +846,7 @@ export class InlineParser {
         } else {
           // Handle shortcuts like .class or #id, or boolean attributes
           const shortcutMatch = remaining.match(/^([.#][a-zA-Z0-9_-]+)/);
-          const booleanMatch = remaining.match(/^([a-zA-Z-]+)/);
+          const booleanMatch = remaining.match(/^([a-zA-Z0-9-]+)/);
           if (shortcutMatch) {
             const val = shortcutMatch[1];
             if (val.startsWith('.')) {
@@ -882,10 +882,9 @@ export class InlineParser {
   }
 
   private static setAttribute(attrs: Attributes, key: string, value: string): void {
-    if (key === 'visually-hidden' || key === 'sr-only') {
-      attrs['aria-hidden'] = 'true';
-      attrs['class'] =
-        (attrs['class'] ? attrs['class'] + ' ' : '') + (key === 'sr-only' ? 'sr-only' : 'visually-hidden');
+    if (key === 'visuallyHidden' || key === 'srOnly' || key === 'visuallyHidden' || key === 'srOnly') {
+      attrs['ariaHidden'] = 'true';
+      attrs['class'] = (attrs['class'] ? attrs['class'] + ' ' : '') + (key === 'srOnly' ? 'srOnly' : 'visuallyHidden');
     } else {
       attrs[key] = value;
     }
@@ -935,8 +934,8 @@ export class InlineParser {
     while (remaining.length > 0) {
       remaining = remaining.trimStart();
 
-      const quotedMatch = remaining.match(/^([a-zA-Z-]+)="([^"]*)"/);
-      const quotedMatch2 = remaining.match(/^([a-zA-Z-]+)='([^']*)'/);
+      const quotedMatch = remaining.match(/^([a-zA-Z0-9-]+)="([^"]*)"/);
+      const quotedMatch2 = remaining.match(/^([a-zA-Z0-9-]+)='([^']*)'/);
 
       if (quotedMatch) {
         const key = quotedMatch[1];
@@ -949,13 +948,13 @@ export class InlineParser {
         this.setAttribute(attrs, key, value);
         remaining = remaining.slice(quotedMatch2[0].length);
       } else {
-        const keyValueMatch = remaining.match(/^([a-zA-Z-]+)=/);
+        const keyValueMatch = remaining.match(/^([a-zA-Z0-9-]+)=/);
         if (keyValueMatch) {
           const key = keyValueMatch[1];
           const afterKey = remaining.slice(keyValueMatch[0].length);
           let value = '';
 
-          const nextKeyMatch = afterKey.match(/ ([a-zA-Z-]+=|#|\.)/);
+          const nextKeyMatch = afterKey.match(/ ([a-zA-Z0-9-]+=|#|\.)/);
           if (nextKeyMatch) {
             value = afterKey.slice(0, nextKeyMatch.index);
           } else {
@@ -966,7 +965,7 @@ export class InlineParser {
           remaining = remaining.slice(key.length + 1 + value.length);
         } else {
           // Handle boolean attributes
-          const booleanMatch = remaining.match(/^([a-zA-Z-]+)/);
+          const booleanMatch = remaining.match(/^([a-zA-Z0-9-]+)/);
           if (booleanMatch) {
             const key = booleanMatch[1];
             this.setAttribute(attrs, key, '');

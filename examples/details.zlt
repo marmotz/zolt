@@ -67,7 +67,7 @@ This section contains critical information.
 Please read carefully.
 :::
 
-:::details [Pro Tip] {background=#FEF3C7 border-left=4px solid #F59E0B}
+:::details [Pro Tip] {background=#FEF3C7 borderLeft=4px solid #F59E0B}
 Use keyboard shortcuts to save time!
 Press Ctrl+S to save your work.
 :::
@@ -301,13 +301,13 @@ Final exam covering:
 
 ### Product Features
 
-:::details [Core Features] {border-left=4px solid blue}
+:::details [Core Features] {borderLeft=4px solid blue}
 - Advanced text formatting
 - Rich media support
 - Export capabilities
 :::
 
-:::details [Premium Features] {border-left=4px solid gold background=#FEF3C7}
+:::details [Premium Features] {borderLeft=4px solid gold background=#FEF3C7}
 - Cloud sync
 - Collaboration tools
 - Advanced analytics

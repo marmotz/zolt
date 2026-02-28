@@ -105,7 +105,7 @@ Paragraph with [link](url).
     });
 
     test('should build inline style with multiple attributes', async () => {
-      const html = await buildString('||Warning||{color=red font-weight=bold}');
+      const html = await buildString('||Warning||{color=red fontWeight=bold}');
 
       expect(html).toContain('<span style="color: red; font-weight: bold">Warning</span>');
     });
@@ -135,25 +135,25 @@ Paragraph with [link](url).
     });
 
     test('should build inline style with font-size', async () => {
-      const html = await buildString('||Small||{font-size=0.8em}');
+      const html = await buildString('||Small||{fontSize=0.8em}');
 
       expect(html).toContain('<span style="font-size: 0.8em">Small</span>');
     });
 
     test('should build inline style with text-decoration', async () => {
-      const html = await buildString('||Strikethrough||{text-decoration=line-through}');
+      const html = await buildString('||Strikethrough||{textDecoration=line-through}');
 
       expect(html).toContain('<span style="text-decoration: line-through">Strikethrough</span>');
     });
 
     test('should build inline style with border-radius', async () => {
-      const html = await buildString('||Rounded||{border=1px solid red border-radius=4px}');
+      const html = await buildString('||Rounded||{border=1px solid red borderRadius=4px}');
 
       expect(html).toContain('<span style="border: 1px solid red; border-radius: 4px">Rounded</span>');
     });
 
     test('should build inline style with display block', async () => {
-      const html = await buildString('||Centered||{text-align=center display=block}');
+      const html = await buildString('||Centered||{textAlign=center display=block}');
 
       expect(html).toContain('<span style="text-align: center; display: block">Centered</span>');
     });
