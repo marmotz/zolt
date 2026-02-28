@@ -247,16 +247,17 @@ export class Lexer {
     const line = this.line;
     const column = this.column;
 
-    this.advanceChar();
-    this.advanceChar();
-    this.advanceChar();
+    let delimiter = '';
+    while (this.peekChar() === '`') {
+      delimiter += this.advanceChar();
+    }
 
     let language = '';
     while (!this.isEof() && this.peekChar() !== '\n' && this.peekChar() !== '`') {
       language += this.advanceChar();
     }
 
-    this.state.enterCodeBlock(language.trim());
+    this.state.enterCodeBlock(language.trim(), delimiter);
 
     if (this.peekChar() === '\n') {
       this.advanceChar();
@@ -272,16 +273,20 @@ export class Lexer {
   }
 
   private readCodeBlockContent(): Token {
-    const remaining = this.source.slice(this.pos);
-    const match = remaining.match(/^(\s*)```/);
+    const delimiter = this.state.codeBlockDelimiter || '```';
+    const escapedDelimiter = delimiter.replace(/`/g, '\\`');
+    const regex = new RegExp(`^(\\s*)${escapedDelimiter}(\\s*)$`);
 
-    if (match) {
+    // Check for closing delimiter on its own line
+    let currentLine = '';
+    let i = 0;
+    while (this.pos + i < this.source.length && this.source[this.pos + i] !== '\n') {
+      currentLine += this.source[this.pos + i];
+      i++;
+    }
+
+    if (regex.test(currentLine)) {
       this.state.exitCodeBlock();
-      // Skip the indentation before ```
-      for (let i = 0; i < match[1].length; i++) {
-        this.advanceChar();
-      }
-
       return this.readCodeBlockEnd();
     }
 
@@ -311,11 +316,15 @@ export class Lexer {
     const line = this.line;
     const column = this.column;
 
-    this.advanceChar();
-    this.advanceChar();
-    this.advanceChar();
+    while (!this.isEof() && this.peekChar() === '`') {
+      this.advanceChar();
+    }
 
     while (!this.isEof() && this.peekChar() !== '\n') {
+      this.advanceChar();
+    }
+
+    if (this.peekChar() === '\n') {
       this.advanceChar();
     }
 

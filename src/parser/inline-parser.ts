@@ -205,7 +205,7 @@ export class InlineParser {
     if (this.matchPattern(text, /^\$([^$]+)\$/)) {
       return this.parseMathInline(text);
     }
-    if (this.matchPattern(text, /^`([^`]+)`/)) {
+    if (text.startsWith('`')) {
       return this.parseCode(text);
     }
     if (this.matchPattern(text, /^\[\[include\s+([^\]]+)]]/i)) {
@@ -624,13 +624,54 @@ export class InlineParser {
   }
 
   private parseCode(text: string): { node: ASTNode; remaining: string } | null {
-    const match = this.matchPattern(text, /^`([^`]+)`/);
-    if (!match) {
+    if (!text.startsWith('`')) {
       return null;
     }
 
-    const content = match[1];
-    let remaining = text.slice(match[0].length);
+    let delimiter = '';
+    let i = 0;
+    while (i < text.length && text[i] === '`') {
+      delimiter += '`';
+      i++;
+    }
+
+    let content = '';
+    let found = false;
+
+    while (i < text.length) {
+      if (text.slice(i).startsWith(delimiter)) {
+        // Count how many backticks we have here
+        let j = i;
+        while (j < text.length && text[j] === '`') {
+          j++;
+        }
+        const foundDelimiterLen = j - i;
+
+        if (foundDelimiterLen === delimiter.length) {
+          found = true;
+          break;
+        } else {
+          // It's a different number of backticks, so it's part of the content
+          content += text.slice(i, j);
+          i = j;
+          continue;
+        }
+      }
+      content += text[i];
+      i++;
+    }
+
+    if (!found) {
+      return null;
+    }
+
+    let remaining = text.slice(i + delimiter.length);
+
+    // CommonMark: if content starts and ends with a space, and is not all spaces, trim them
+    if (content.startsWith(' ') && content.endsWith(' ') && content.trim().length > 0) {
+      content = content.slice(1, -1);
+    }
+
     let attributes: Attributes | undefined;
 
     if (remaining.startsWith('{')) {

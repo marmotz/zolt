@@ -424,4 +424,33 @@ describe('InlineParser', () => {
       expect((nodes[0] as LinkNode).href).toBe('https://zolt.example.com');
     });
   });
+
+  describe('Inline Code with variable backticks', () => {
+    test('should parse simple inline code', () => {
+      const nodes = parser.parse('`print()`');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Code');
+      expect((nodes[0] as any).content).toBe('print()');
+    });
+
+    test('should parse nested backticks with double backticks', () => {
+      const nodes = parser.parse('`` ` ```javascript ``');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Code');
+      expect((nodes[0] as any).content).toBe('` ```javascript');
+    });
+
+    test('should parse complex nested backticks', () => {
+      const nodes = parser.parse('``` `` ` `` ```');
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].type).toBe('Code');
+      expect((nodes[0] as any).content).toBe('`` ` ``');
+    });
+
+    test('should handle optional leading/trailing spaces in code span', () => {
+      const nodes = parser.parse('`` `code` ``');
+      expect(nodes).toHaveLength(1);
+      expect((nodes[0] as any).content).toBe('`code`');
+    });
+  });
 });

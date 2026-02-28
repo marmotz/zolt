@@ -27,14 +27,14 @@ Specify the language after the opening backticks:
 
 | Language | Syntax |
 |----------|--------|
-| JavaScript | ` ```javascript ` |
-| Python | ` ```python ` |
-| TypeScript | ` ```typescript ` |
-| HTML | ` ```html ` |
-| CSS | ` ```css ` |
-| JSON | ` ```json ` |
-| Bash | ` ```bash ` |
-| SQL | ` ```sql ` |
+| TypeScript | `` ```typescript `` |
+| JavaScript | `` ```javascript `` |
+| HTML | `` ```html `` |
+| CSS | `` ```css `` |
+| JSON | `` ```json `` |
+| Python | `` ```python `` |
+| Bash | `` ```bash `` |
+| SQL | `` ```sql `` |
 
 ---
 

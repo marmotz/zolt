@@ -119,6 +119,24 @@ describe('Lexer', () => {
     expect(tokens[2].type).toBe(TokenType.CODE_BLOCK_END);
   });
 
+  test('should tokenize nested code blocks with more backticks', () => {
+    const lexer = new Lexer('````zolt\n```js\nconst x = 1\n```\n````');
+    const tokens = lexer.tokenize();
+
+    expect(tokens[0].type).toBe(TokenType.CODE_BLOCK_START);
+    expect(tokens[0].value).toBe('zolt');
+
+    // Each line inside is a CODE_BLOCK token because Lexer is in CODE mode
+    expect(tokens[1].type).toBe(TokenType.CODE_BLOCK);
+    expect(tokens[1].value).toBe('```js');
+    expect(tokens[2].type).toBe(TokenType.CODE_BLOCK);
+    expect(tokens[2].value).toBe('const x = 1');
+    expect(tokens[3].type).toBe(TokenType.CODE_BLOCK);
+    expect(tokens[3].value).toBe('```');
+
+    expect(tokens[4].type).toBe(TokenType.CODE_BLOCK_END);
+  });
+
   test('should tokenize newlines', () => {
     const lexer = new Lexer('Line 1\nLine 2');
     const tokens = lexer.tokenize();

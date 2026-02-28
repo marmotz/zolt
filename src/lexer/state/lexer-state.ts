@@ -4,12 +4,14 @@ export class LexerState {
   mode: LexerMode;
   indentStack: number[];
   codeLanguage: string | null;
+  codeBlockDelimiter: string | null;
   blockDepth: number;
 
   constructor() {
     this.mode = 'BLOCK';
     this.indentStack = [0];
     this.codeLanguage = null;
+    this.codeBlockDelimiter = null;
     this.blockDepth = 0;
   }
 
@@ -29,15 +31,17 @@ export class LexerState {
     this.mode = mode;
   }
 
-  enterCodeBlock(language: string | null): void {
+  enterCodeBlock(language: string | null, delimiter: string = '```'): void {
     this.mode = 'CODE';
     this.codeLanguage = language;
+    this.codeBlockDelimiter = delimiter;
     this.blockDepth++;
   }
 
   exitCodeBlock(): void {
     this.mode = 'BLOCK';
     this.codeLanguage = null;
+    this.codeBlockDelimiter = null;
     this.blockDepth = Math.max(0, this.blockDepth - 1);
   }
 }
