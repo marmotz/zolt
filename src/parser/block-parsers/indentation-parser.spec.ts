@@ -70,7 +70,7 @@ describe('IndentationParser', () => {
       ctx.isEof,
       () => null,
       () => headingParser.parseHeading(ctx.expect),
-      () => codeBlockParser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, ctx.error as any, () => {}),
+      () => codeBlockParser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, () => {}),
       () => specialBlockParser.parseHorizontalRule(ctx.expect),
       () =>
         paragraphParser.parseParagraph(

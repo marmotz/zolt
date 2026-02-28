@@ -50,7 +50,6 @@ export class IndentationParser {
       parseCodeBlock,
       parseHorizontalRule,
       parseParagraph,
-      error,
       warn
     );
     if (firstLineContent) children.push(firstLineContent);
@@ -96,7 +95,6 @@ export class IndentationParser {
           parseCodeBlock,
           parseHorizontalRule,
           parseParagraph,
-          error,
           warn
         );
         if (lineContent) children.push(lineContent);
@@ -124,7 +122,6 @@ export class IndentationParser {
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
     parseParagraph: () => ParagraphNode,
-    error: (message: string, code: string) => never,
     warn: (message: string, code: string) => void
   ): ASTNode | null {
     if (match(TokenType.TECHNICAL_INDENT, TokenType.NEWLINE, TokenType.EOF)) {
@@ -147,7 +144,6 @@ export class IndentationParser {
         skipNewlines,
         isEof,
         parseBlock,
-        error,
         warn
       );
     }

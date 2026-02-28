@@ -44,7 +44,6 @@ export class BlockquoteParser {
       parseCodeBlock,
       parseHorizontalRule,
       parseParagraph,
-      error,
       warn
     );
     if (firstLineContent) children.push(firstLineContent);
@@ -90,7 +89,6 @@ export class BlockquoteParser {
           parseCodeBlock,
           parseHorizontalRule,
           parseParagraph,
-          error,
           warn
         );
         if (lineContent) children.push(lineContent);
@@ -118,7 +116,6 @@ export class BlockquoteParser {
     parseCodeBlock: () => ASTNode,
     parseHorizontalRule: () => ASTNode,
     parseParagraph: () => ParagraphNode,
-    error: (message: string, code: string) => never,
     warn: (message: string, code: string) => void
   ): ASTNode | null {
     if (match(TokenType.BLOCKQUOTE, TokenType.NEWLINE, TokenType.EOF)) {
@@ -141,7 +138,6 @@ export class BlockquoteParser {
         skipNewlines,
         isEof,
         parseBlock,
-        error,
         warn
       );
     }

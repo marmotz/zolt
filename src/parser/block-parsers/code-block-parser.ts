@@ -10,7 +10,6 @@ export class CodeBlockParser {
     match: (...types: TokenType[]) => boolean,
     advance: () => Token,
     isEof: () => boolean,
-    error: (message: string, code: string) => never,
     warn: (message: string, code: string) => void
   ): CodeBlockNode {
     const startToken = expect(TokenType.CODE_BLOCK_START);

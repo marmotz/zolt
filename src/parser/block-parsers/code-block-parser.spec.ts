@@ -34,7 +34,7 @@ const x = 1;
 \`\`\``);
     const tokens = lexer.tokenize();
     const ctx = mockContext(tokens);
-    const node = parser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, ctx.error, ctx.warn);
+    const node = parser.parseCodeBlock(ctx.expect, ctx.match, ctx.advance, ctx.isEof, ctx.warn);
 
     expect(node.type).toBe('CodeBlock');
     expect(node.language).toBe('typescript');

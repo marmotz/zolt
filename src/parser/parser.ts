@@ -15,26 +15,26 @@ import { InlineParser } from './inline-parser';
 import { ASTNode, DocumentNode, FileMetadataNode, FootnoteDefinitionNode, VariableDefinitionNode } from './types';
 
 export class Parser {
-  private tokens: Token[];
+  private readonly tokens: Token[];
   private pos: number;
   private currentToken: Token;
-  private filePath: string;
-  private inlineParser: InlineParser;
+  private readonly filePath: string;
+  private readonly inlineParser: InlineParser;
   private footnoteIds: Set<string> = new Set();
   public warnings: { line: number; column: number; message: string; code: string }[] = [];
 
   private definitionCollector: DefinitionCollector;
   private tableParser: TableParser;
-  private listParser: ListParser;
-  private tripleColonParser: TripleColonParser;
+  private readonly listParser: ListParser;
+  private readonly tripleColonParser: TripleColonParser;
   private fileMetadataParser: FileMetadataParser;
-  private headingParser: HeadingParser;
+  private readonly headingParser: HeadingParser;
   private blockquoteParser: BlockquoteParser;
-  private codeBlockParser: CodeBlockParser;
+  private readonly codeBlockParser: CodeBlockParser;
   private indentationParser: IndentationParser;
-  private specialBlockParser: SpecialBlockParser;
-  private paragraphParser: ParagraphParser;
-  private initialGlobalAbbreviations: Map<string, string>;
+  private readonly specialBlockParser: SpecialBlockParser;
+  private readonly paragraphParser: ParagraphParser;
+  private readonly initialGlobalAbbreviations: Map<string, string>;
 
   constructor(tokens: Token[], filePath?: string, initialGlobalAbbreviations?: Map<string, string>) {
     this.tokens = tokens;
@@ -272,7 +272,6 @@ export class Parser {
         this.match.bind(this),
         this.advance.bind(this),
         this.isEof.bind(this),
-        this.error.bind(this),
         this.warn.bind(this)
       );
     }
@@ -294,7 +293,6 @@ export class Parser {
           this.match.bind(this),
           this.advance.bind(this),
           this.isEof.bind(this),
-          this.error.bind(this),
           this.warn.bind(this)
         ),
         this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
@@ -328,7 +326,6 @@ export class Parser {
           this.match.bind(this),
           this.advance.bind(this),
           this.isEof.bind(this),
-          this.error.bind(this),
           this.warn.bind(this)
         ),
         this.specialBlockParser.parseHorizontalRule.bind(this.specialBlockParser, this.expect.bind(this)),
@@ -352,7 +349,6 @@ export class Parser {
         this.skipNewlines.bind(this),
         this.isEof.bind(this),
         this.parseBlock.bind(this),
-        this.error.bind(this),
         this.warn.bind(this)
       );
     }

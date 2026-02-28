@@ -20,7 +20,6 @@ export class TripleColonParser {
     skipNewlines: () => void,
     isEof: () => boolean,
     parseBlock: () => ASTNode | null,
-    error: (message: string, code: string) => never,
     warn: (message: string, code: string) => void
   ): ASTNode {
     const startToken = expect(TokenType.TRIPLE_COLON_START);
