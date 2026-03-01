@@ -2,7 +2,7 @@ title: "Zolt documentation"
 siteName: "Zolt documentation"
 description: "The complete reference guide for Zolt, the high-voltage successor to Markdown"
 author: "Marmotz"
-version: "0.1.0"
+version: 0.1.0
 theme: "technical"
 image: "og-image.png"
 layout: "_layout.zlt"

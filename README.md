@@ -2,7 +2,7 @@
 
 _Zolt : The high-voltage successor to Markdown_
 
-![Zolt Version](https://img.shields.io/badge/version-0.1-blue)
+![Zolt Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-draft-orange)
 
