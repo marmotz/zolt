@@ -3,7 +3,7 @@ title: "Installation & Usage"
 description: "How to install and use Zolt"
 ---
 
-# Installation & Usagea
+# Installation & Usage
 
 Zolt can be used in two primary ways: as a **Command Line Interface (CLI)** or as a **library** integrated into your TypeScript/JavaScript projects.
 

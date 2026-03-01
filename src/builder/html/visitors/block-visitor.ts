@@ -15,6 +15,7 @@ import { slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class BlockVisitor {
   public headingCounters: number[] = new Array(7).fill(0);
+  public h1Count: number = 0;
 
   constructor(
     _build: (node: ASTNode) => Promise<string>,
@@ -27,6 +28,7 @@ export class BlockVisitor {
 
   public reset(): void {
     this.headingCounters.fill(0);
+    this.h1Count = 0;
   }
 
   async visitHeading(node: HeadingNode): Promise<string> {
@@ -42,30 +44,63 @@ export class BlockVisitor {
       node.attributes = {};
     }
 
-    const isGlobalNumbering = this.evaluator.getVariable('numbering') === true;
-    const isLocalNumbering = node.attributes.numbered === 'true';
-    const isNumberingDisabled = node.attributes.numbered === 'false';
+    const numberingVar = this.evaluator.getVariable('numbering');
+    const isGlobalNumbering = numberingVar === true || (typeof numberingVar === 'string' && numberingVar !== 'false');
+    const isLocalNumbering =
+      node.attributes.numbering === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering !== 'false');
+    const isNumberingDisabled = node.attributes.numbering === 'false';
+
+    // Always increment the counter for every heading to track structure
+    this.headingCounters[level]++;
+    for (let i = level + 1; i <= 6; i++) {
+      this.headingCounters[i] = 0;
+    }
 
     let numberStr = '';
     if ((isGlobalNumbering && !isNumberingDisabled) || isLocalNumbering) {
-      this.headingCounters[level]++;
-      for (let i = level + 1; i <= 6; i++) {
-        this.headingCounters[i] = 0;
+      // Determine style: local attribute takes priority, then global variable
+      let numberingStyle = 'decimal';
+      const localStyle = node.attributes.numbering;
+      const globalStyle = typeof numberingVar === 'string' ? numberingVar : 'decimal';
+
+      const validStyles = ['decimal', 'roman-lower', 'roman-upper', 'alpha-lower', 'alpha-upper'];
+
+      if (localStyle && validStyles.includes(localStyle)) {
+        numberingStyle = localStyle;
+      } else if (globalStyle && validStyles.includes(globalStyle)) {
+        numberingStyle = globalStyle;
       }
 
-      const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
-      const parts = this.headingCounters.slice(1, level + 1);
+      // Rule: If there is only one H1 in the document, we don't number it
+      // and we start numbering from H2 as the first level.
+      const startLevel = this.h1Count === 1 ? 2 : 1;
 
-      if (numberingStyle === 'decimal') {
-        numberStr = `<span class="zolt-heading-number">${parts.join('.')} </span>`;
-      } else if (numberingStyle === 'roman-lower') {
-        numberStr = `<span class="zolt-heading-number">${parts.map((p) => toRoman(p).toLowerCase()).join('.')} </span>`;
-      } else if (numberingStyle === 'roman-upper') {
-        numberStr = `<span class="zolt-heading-number">${parts.map((p) => toRoman(p).toUpperCase()).join('.')} </span>`;
-      } else if (numberingStyle === 'alpha-lower') {
-        numberStr = `<span class="zolt-heading-number">${parts.map((p) => toAlpha(p).toLowerCase()).join('.')} </span>`;
-      } else if (numberingStyle === 'alpha-upper') {
-        numberStr = `<span class="zolt-heading-number">${parts.map((p) => toAlpha(p).toUpperCase()).join('.')} </span>`;
+      if (level >= startLevel) {
+        const parts = this.headingCounters.slice(startLevel, level + 1);
+
+        // If selective numbering is used (not global), skip leading zeros
+        let effectiveParts = parts;
+        if (!isGlobalNumbering) {
+          const firstNonZero = parts.findIndex((p) => p > 0);
+          if (firstNonZero !== -1) {
+            effectiveParts = parts.slice(firstNonZero);
+          }
+        }
+
+        if (effectiveParts.length > 0) {
+          if (numberingStyle === 'decimal') {
+            numberStr = `<span class="zolt-heading-number">${effectiveParts.join('.')} </span>`;
+          } else if (numberingStyle === 'roman-lower') {
+            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toRoman(p).toLowerCase()).join('.')} </span>`;
+          } else if (numberingStyle === 'roman-upper') {
+            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toRoman(p).toUpperCase()).join('.')} </span>`;
+          } else if (numberingStyle === 'alpha-lower') {
+            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toAlpha(p).toLowerCase()).join('.')} </span>`;
+          } else if (numberingStyle === 'alpha-upper') {
+            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toAlpha(p).toUpperCase()).join('.')} </span>`;
+          }
+        }
       }
     }
 
@@ -74,7 +109,9 @@ export class BlockVisitor {
       node.attributes.id = slugify(textContent);
     }
 
-    const attrs = this.renderAllAttributes(node.attributes);
+    const cleanAttributes = { ...node.attributes };
+    delete cleanAttributes.numbering;
+    const attrs = this.renderAllAttributes(cleanAttributes);
 
     return `<h${level}${attrs}>${numberStr}${renderedContent}</h${level}>`;
   }

@@ -113,31 +113,43 @@ Le Zolt permet de numéroter automatiquement les titres de manière hiérarchiqu
 
 #### Activation Globale
 
-Les variables globales permettent d'activer la numérotation pour tout le document :
+Les variables globales (généralement dans le frontmatter) permettent d'activer la numérotation pour tout le document :
 
+```yaml
+---
+numbering: true           # Active la numérotation globale
+numberingStyle: "decimal" # Style : 1, 1.1, 1.1.1 (défaut)
+---
 ```
-$numbering = true           # Active la numérotation globale
-$numberingStyle = "decimal"# Style : 1, 1.1, 1.1.1 (défaut)
-```
+
+#### Règle Intelligente du Titre Principal (H1)
+
+Pour éviter que le titre de la page ne vienne polluer la numérotation structurelle, Zolt applique une règle automatique :
+
+1. **H1 unique :** Si le document ne contient qu'**un seul titre `#`**, celui-ci est considéré comme le titre du document et n'est **pas numéroté**. La numérotation commence alors aux titres de niveau 2 (`##`), qui seront numérotés "1", "2", etc.
+2. **H1 multiples :** Si le document contient **plusieurs titres `#`**, ils sont tous numérotés. Le premier `#` devient "1", et ses sous-titres `##` deviennent "1.1", "1.2", etc.
 
 #### Activation Locale
 
-L'attribut `{numbered}` sur un titre active la numérotation pour ce titre et ses sous-titres :
+L'attribut `{numbering}` sur un titre active la numérotation pour ce titre et sa hiérarchie :
 
+```zolt
+# Mon Document (H1 unique, non numéroté)
+## Introduction {numbering}  # Devient "1. Introduction"
+## Concepts                 # Devient "2. Concepts"
+### Détails                 # Devient "2.1 Détails"
 ```
-# Introduction {numbered}
-## Concepts de base        # Devient 1.1 Concepts de base
-## Architecture            # Devient 1.2 Architecture
-### Composants             # Devient 1.2.1 Composants
-# Conclusion {numbered}    # Devient 2. Conclusion
-```
+
+#### Intégrité Structurelle
+
+Même si un titre n'affiche pas de numéro (parce qu'il n'a pas l'attribut `{numbering}` ou que `numbering=false`), il est **toujours comptabilisé** dans la structure. Cela garantit que les titres numérotés qui suivent conservent une numérotation cohérente avec leur position réelle dans le document.
 
 #### Désactivation Locale
 
 Pour désactiver la numérotation sur une section spécifique tout en la gardant active globalement :
 
-```
-# Annexe {numbered=false}
+```zolt
+# Annexe {numbering=false}
 ## Code source            # Non numéroté
 ## Ressources             # Non numéroté
 ```
@@ -151,42 +163,6 @@ Pour désactiver la numérotation sur une section spécifique tout en la gardant
 | `roman-upper` | Chiffres romains maj | I, II, III       |
 | `alpha-lower` | Lettres minuscules   | a, b, c          |
 | `alpha-upper` | Lettres majuscules   | A, B, C          |
-
-#### Exemples d'Utilisation
-
-```
-$numbering = true
-$numberingStyle = "decimal"
-
-# Mémoire de Fin d'Études {numbered}
-## Introduction
-### Contexte
-### Problématique
-## Méthodologie
-### Collecte de données
-### Analyse
-
-# Bibliographie {numbered=false}
-```
-
-Rendu :
-
--
-    1. Mémoire de Fin d'Études
-
-    - 1.1 Introduction
-        - 1.1.1 Contexte
-        - 1.1.2 Problématique
-    - 1.2 Méthodologie
-        - 1.2.1 Collecte de données
-        - 1.2.2 Analyse
-
-- Bibliographie
-
-#### Comportement par Défaut
-
-Par défaut (sans variable `$numbering`), les titres ne sont pas numérotés. L'ajout de `{numbered}` sur un titre active
-la numérotation hiérarchique à partir de ce point.
 
 ---
 

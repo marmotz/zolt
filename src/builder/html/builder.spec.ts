@@ -592,4 +592,235 @@ describe('HTMLBuilder', () => {
     const html = await builder.build(node as any);
     expect(html).toContain('<br />');
   });
+
+  describe('Heading Numbering', () => {
+    test('should number heading with {numbering} attribute (empty string)', async () => {
+      const node: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Chapter 1' }],
+        attributes: { numbering: '' },
+      };
+
+      const html = await builder.build(node);
+      expect(html).toContain('<span class="zolt-heading-number">1 </span>Chapter 1');
+      expect(html).not.toContain('numbering=""');
+    });
+
+    test('should number heading with {numbering="true"} attribute', async () => {
+      const node: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Chapter 1' }],
+        attributes: { numbering: 'true' },
+      };
+
+      const html = await builder.build(node);
+      expect(html).toContain('<span class="zolt-heading-number">1 </span>Chapter 1');
+      expect(html).not.toContain('numbering="true"');
+    });
+
+    test('should not number heading with {numbering="false"} attribute', async () => {
+      const node: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Chapter 1' }],
+        attributes: { numbering: 'false' },
+      };
+
+      const html = await builder.build(node);
+      expect(html).not.toContain('zolt-heading-number');
+      expect(html).not.toContain('numbering="false"');
+    });
+
+    test('should number nested headings with {numbering}', async () => {
+      const h1: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'One' }],
+        attributes: { numbering: '' },
+      };
+      const h2: HeadingNode = {
+        type: 'Heading',
+        level: 2,
+        children: [{ type: 'Text', content: 'Two' }],
+        attributes: { numbering: '' },
+      };
+
+      const html1 = await builder.build(h1);
+      const html2 = await builder.build(h2);
+
+      expect(html1).toContain('<span class="zolt-heading-number">1 </span>One');
+      expect(html2).toContain('<span class="zolt-heading-number">1.1 </span>Two');
+    });
+
+    test('should number headings globally when $numbering is true', async () => {
+      (builder as any).evaluator.setVariable('numbering', true);
+
+      const h1: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'One' }],
+        attributes: {},
+      };
+      const h2: HeadingNode = {
+        type: 'Heading',
+        level: 2,
+        children: [{ type: 'Text', content: 'Two' }],
+        attributes: {},
+      };
+
+      const html1 = await builder.build(h1);
+      const html2 = await builder.build(h2);
+
+      expect(html1).toContain('<span class="zolt-heading-number">1 </span>One');
+      expect(html2).toContain('<span class="zolt-heading-number">1.1 </span>Two');
+    });
+
+    test('should respect style when $numbering is a style string', async () => {
+      (builder as any).evaluator.setVariable('numbering', 'roman-upper');
+
+      const h1: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'One' }],
+        attributes: {},
+      };
+
+      const html = await builder.build(h1);
+      expect(html).toContain('<span class="zolt-heading-number">I </span>One');
+    });
+
+    test('should skip numbering for headings with {numbering=false} even if global numbering is on', async () => {
+      (builder as any).evaluator.setVariable('numbering', true);
+
+      const h1: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'One' }],
+        attributes: {},
+      };
+      const h2: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Two' }],
+        attributes: { numbering: 'false' },
+      };
+      const h3: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Three' }],
+        attributes: {},
+      };
+
+      const html1 = await builder.build(h1);
+      const html2 = await builder.build(h2);
+      const html3 = await builder.build(h3);
+
+      expect(html1).toContain('<span class="zolt-heading-number">1 </span>One');
+      expect(html2).not.toContain('zolt-heading-number');
+      expect(html3).toContain('<span class="zolt-heading-number">3 </span>Three');
+    });
+
+    test('should show correct number even if preceding headings are not numbered', async () => {
+      // 7 headings level 1 (not numbered)
+      for (let i = 0; i < 7; i++) {
+        await builder.build({
+          type: 'Heading',
+          level: 1,
+          children: [{ type: 'Text', content: `H${i}` }],
+          attributes: {},
+        } as any);
+      }
+
+      // The 8th heading (numbered)
+      const h8: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'The Eighth' }],
+        attributes: { numbering: '' },
+      };
+
+      const html = await builder.build(h8);
+      expect(html).toContain('<span class="zolt-heading-number">8 </span>The Eighth');
+    });
+
+    test('should reset counters between buildDocument calls', async () => {
+      const doc: DocumentNode = {
+        type: 'Document',
+        children: [
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Chapter 1' }],
+            attributes: { numbering: '' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Chapter 2' }],
+            attributes: { numbering: '' },
+          } as any,
+        ],
+      };
+
+      const html1 = await builder.buildDocument(doc);
+      expect(html1).toContain('<h1 id="chapter-1"><span class="zolt-heading-number">1 </span>Chapter 1</h1>');
+      expect(html1).toContain('<h1 id="chapter-2"><span class="zolt-heading-number">2 </span>Chapter 2</h1>');
+
+      const html2 = await builder.buildDocument(doc);
+      expect(html2).toContain('<h1 id="chapter-1"><span class="zolt-heading-number">1 </span>Chapter 1</h1>');
+      expect(html2).toContain('<h1 id="chapter-2"><span class="zolt-heading-number">2 </span>Chapter 2</h1>');
+    });
+
+    test('should NOT number single H1 and start numbering from H2', async () => {
+      const doc: DocumentNode = {
+        type: 'Document',
+        children: [
+          { type: 'Heading', level: 1, children: [{ type: 'Text', content: 'Title' }], attributes: {} } as any,
+          {
+            type: 'Heading',
+            level: 2,
+            children: [{ type: 'Text', content: 'Section 1' }],
+            attributes: { numbering: '' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 2,
+            children: [{ type: 'Text', content: 'Section 2' }],
+            attributes: { numbering: '' },
+          } as any,
+        ],
+      };
+
+      const html = await builder.buildDocument(doc);
+      expect(html).not.toContain('zolt-heading-number">1 </span>Title');
+      expect(html).toContain('<span class="zolt-heading-number">1 </span>Section 1');
+      expect(html).toContain('<span class="zolt-heading-number">2 </span>Section 2');
+    });
+
+    test('should number H1 if there are multiple H1s', async () => {
+      const doc: DocumentNode = {
+        type: 'Document',
+        children: [
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Part 1' }],
+            attributes: { numbering: '' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Part 2' }],
+            attributes: { numbering: '' },
+          } as any,
+        ],
+      };
+
+      const html = await builder.buildDocument(doc);
+      expect(html).toContain('<span class="zolt-heading-number">1 </span>Part 1');
+      expect(html).toContain('<span class="zolt-heading-number">2 </span>Part 2');
+    });
+  });
 });

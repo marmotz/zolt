@@ -1,7 +1,6 @@
 import * as fs from 'node:fs';
 import { readFile, stat, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import type { Builder } from '../builder/builder';
 import { ExpressionEvaluator, type Value } from '../builder/evaluator/expression-evaluator';
 import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 import { HTMLBuilder, type InitialVariables } from '../builder/html/builder';
@@ -47,7 +46,7 @@ export function getExpandedContent(
   content: string,
   options?: BuildOptions,
   extraVariables?: Record<string, unknown>
-): string {
+): { content: string; variables: Record<string, unknown> } {
   const initialVariables: Record<string, unknown> = {
     ...options?.projectMetadata,
     ...options?.variables,
@@ -61,7 +60,12 @@ export function getExpandedContent(
 
   const sourceEvaluator = new SourceEvaluator(evaluator, options?.filePath, [], undefined, false, true);
 
-  return sourceEvaluator.evaluate(content);
+  const expandedContent = sourceEvaluator.evaluate(content);
+
+  return {
+    content: expandedContent,
+    variables: evaluator.getAllVariables(),
+  };
 }
 
 export async function buildString(content: string, options?: BuildOptions): Promise<string> {
@@ -82,7 +86,11 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   }
 
   // Phase 1: Expansion (Layouts, Includes, Variables)
-  const expandedContent = getExpandedContent(content, options, extraVariables);
+  const { content: expandedContent, variables: expandedVariables } = getExpandedContent(
+    content,
+    options,
+    extraVariables
+  );
 
   // Phase 2: Lexing & Parsing
   const lexer = new Lexer(expandedContent);
@@ -105,6 +113,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const mergedVariables: Record<string, unknown> = {
     ...options?.projectMetadata,
     ...options?.variables,
+    ...expandedVariables,
     ...extraVariables,
   };
 
@@ -130,7 +139,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   }
 
   // Phase 4: HTML Building
-  let builder: Builder;
+  let builder: HTMLBuilder;
   if (options?.type === 'html' || !options?.type) {
     builder = new HTMLBuilder(
       mergedVariables as InitialVariables,
@@ -163,7 +172,7 @@ export function extractAllAssets(
   filePath?: string
 ): { zltLinks: string[]; otherAssets: string[] } {
   // Expansion is needed to find assets inside includes/layouts
-  const expandedContent = getExpandedContent(content, { projectMetadata, filePath });
+  const { content: expandedContent } = getExpandedContent(content, { projectMetadata, filePath });
   const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
   const parser = new Parser(tokens, filePath);
@@ -361,7 +370,7 @@ export async function lint(filePath: string): Promise<LintResult> {
 
   try {
     const content = await readFile(filePath, 'utf-8');
-    const expandedContent = getExpandedContent(content, { filePath });
+    const { content: expandedContent } = getExpandedContent(content, { filePath });
 
     const lexer = new Lexer(expandedContent);
     const tokens = lexer.tokenize();

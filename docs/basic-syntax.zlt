@@ -235,29 +235,96 @@ Add IDs, classes, and numbering:
 ```zolt
 ## Introduction{#intro}
 
-## Chapter 1{numbered}
+## Chapter 1{numbering}
 
-## Appendix{numbered=false}
+## Appendix{numbering=false}
+
+## Chapter 2{numbering=roman-upper}
 ```
+
+$numbering = true
 
 :::info [Result]
 ## Introduction{#intro}
 
-## Chapter 1{numbered}
+## Chapter 1{numbering=roman-upper}
 
-## Appendix{numbered=false}
+## Appendix{numbering=false}
 :::
+
+$numbering = false
 
 ### Automatic Numbering
 
-Enable global numbering:
+Enable global numbering in your file metadata (frontmatter):
 
 ```zolt
-$numbering = true
-$numberingStyle = "decimal"
+---
+numbering: true
+---
 ```
 
-Available styles: `decimal`, `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`
+You can also specify a style directly:
+
+```zolt
+---
+numbering: "roman-upper"
+---
+```
+
+#### Selective Numbering
+
+You can toggle numbering mid-document by changing the `$numbering` variable:
+
+```zolt
+# Unnumbered Section
+
+$numbering = true
+
+## Numbered Subsection
+
+$numbering = "alpha-lower"
+
+## Subsection with different style
+
+$numbering = false
+
+## Another Unnumbered Section
+```
+
+:::info [Result]
+# Unnumbered Section
+
+$numbering = true
+
+## Numbered Subsection
+
+$numbering = "alpha-lower"
+
+## Subsection with different style
+
+$numbering = false
+
+## Another Unnumbered Section
+:::
+
+#### Numbering Rules
+
+Zolt uses a smart numbering system for document titles:
+
+1.  **Single H1 Rule**: If your document has only one `# Heading 1`, it is treated as the document title and **will not be numbered**. Numbering will automatically start at `## Heading 2` (e.g., the first H2 will be "1", its first H3 will be "1.1").
+2.  **Multiple H1 Rule**: If your document has more than one `# Heading 1`, all H1s are numbered (e.g., "1", "2"), and sub-headings follow (e.g., "1.1", "1.2").
+3.  **Structural Integrity**: Even if some headings are not numbered (no `{numbering}` attribute or `numbering=false`), they are still counted in the document structure to ensure consistent numbering for subsequent elements.
+
+Available styles: `decimal` (default), `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`
+
+| Style | Example Output |
+|-------|----------------|
+| `decimal` | 1, 1.1, 1.2.1 |
+| `roman-lower` | i, i.i, i.ii.i |
+| `roman-upper` | I, I.I, I.II.I |
+| `alpha-lower` | a, a.a, a.b.a |
+| `alpha-upper` | A, A.A, A.B.A |
 
 ---
 

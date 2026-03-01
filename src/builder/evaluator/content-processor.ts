@@ -48,7 +48,8 @@ export class ContentProcessor {
         if (this.isCompleteValue(varValue)) {
           const value = this.parseOrEvaluateValue(varValue);
           this.evaluator.setVariable(varName, value);
-          resultLines.push('');
+          // Keep the line instead of empty string so Lexer can find it
+          resultLines.push(line);
         } else {
           this.pendingDefinition = { varName, valueStart: varValue, isGlobal: false };
           this.pendingLines = [line];
@@ -60,7 +61,8 @@ export class ContentProcessor {
         if (this.isCompleteValue(varValue)) {
           const value = this.parseOrEvaluateValue(varValue);
           this.evaluator.setVariable(varName, value);
-          resultLines.push('');
+          // Keep the line
+          resultLines.push(line);
         } else {
           this.pendingDefinition = { varName, valueStart: varValue, isGlobal: true };
           this.pendingLines = [line];

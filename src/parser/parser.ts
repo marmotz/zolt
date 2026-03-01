@@ -205,6 +205,23 @@ export class Parser {
     const token = this.advance();
     let content = token.value.trim();
 
+    if (token.type === TokenType.VARIABLE_DEFINITION || token.type === TokenType.GLOBAL_VARIABLE_DEFINITION) {
+      const isGlobal = token.type === TokenType.GLOBAL_VARIABLE_DEFINITION;
+      const colonIndex = content.indexOf(':');
+      if (colonIndex !== -1) {
+        const name = content.substring(0, colonIndex);
+        const value = content.substring(colonIndex + 1);
+
+        return {
+          type: 'VariableDefinition',
+          name,
+          value,
+          isGlobal,
+        };
+      }
+    }
+
+    // Fallback for TEXT tokens starting with $
     // Check if the value is complete (balanced brackets/braces)
     const isComplete = (val: string) => {
       let depth = 0;
@@ -450,6 +467,9 @@ export class Parser {
     }
     if (this.match(TokenType.COMMENT_INLINE)) {
       return this.specialBlockParser.parseCommentInline(this.expect.bind(this));
+    }
+    if (this.match(TokenType.VARIABLE_DEFINITION, TokenType.GLOBAL_VARIABLE_DEFINITION)) {
+      return this.parseVariableDefinition();
     }
 
     if (this.match(TokenType.TEXT)) {

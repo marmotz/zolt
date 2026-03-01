@@ -169,8 +169,13 @@ export class HTMLBuilder implements Builder {
         );
       case 'Indentation':
         return await this.blockVisitor.visitIndentation(node as any);
-      case 'VariableDefinition':
+      case 'VariableDefinition': {
+        const def = node as any;
+        this.evaluator.setVariable(def.name, this.evaluator.parseValue(def.value));
+        // If we are changing numbering settings mid-document, we might want to reset counters?
+        // Actually, let's just let it continue with current counters unless it's a global toggle.
         return '';
+      }
       case 'Include':
         return await this.joinChildren(node.children);
       case 'FootnoteDefinition':
@@ -188,6 +193,8 @@ export class HTMLBuilder implements Builder {
 
   async buildDocument(node: DocumentNode): Promise<string> {
     this.currentHeadings = this.documentRenderer.findAllHeadings(node.children);
+    this.blockVisitor.reset();
+    this.blockVisitor.h1Count = (this.currentHeadings as HeadingNode[]).filter((h) => h.level === 1).length;
     this.specialBlockVisitor.reset();
     (this.specialBlockVisitor as any).currentHeadings = this.currentHeadings;
 

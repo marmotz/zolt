@@ -279,9 +279,9 @@ export class SpecialBlockVisitor {
     const from = parseInt(node.attributes?.from || '0', 10) || 0;
     const to = parseInt(node.attributes?.to || '99', 10) || 99;
     const depth = parseInt(node.attributes?.depth || '99', 10) || 99;
-    const numbered =
-      node.attributes?.numbered === 'true' ||
-      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
+    const numbering =
+      node.attributes?.numbering === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering === '') ||
       false;
     const showToc =
       (node.attributes?.toc === 'true' ||
@@ -301,15 +301,15 @@ export class SpecialBlockVisitor {
       from: getIntAttr(node.attributes?.tocFrom, 1),
       to: getIntAttr(node.attributes?.tocTo, 6),
       depth: getIntAttr(node.attributes?.tocDepth, 3),
-      numbered:
-        node.attributes?.tocNumbered === 'true' ||
-        (node.attributes && Object.hasOwn(node.attributes, 'tocNumbered') && node.attributes.tocNumbered === '') ||
+      numbering:
+        node.attributes?.tocNumbering === 'true' ||
+        (node.attributes && Object.hasOwn(node.attributes, 'tocNumbering') && node.attributes.tocNumbering === '') ||
         false,
       hasTo: !!node.attributes?.tocTo && node.attributes?.tocTo !== '',
       hasDepth: !!node.attributes?.tocDepth && node.attributes?.tocDepth !== '',
     };
 
-    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc, tocOptions, numbered);
+    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc, tocOptions, numbering);
 
     return `<nav class="zolt-filetree">\n${html}\n</nav>`;
   }
@@ -350,7 +350,7 @@ export class SpecialBlockVisitor {
     maxDepth: number,
     showToc: boolean,
     tocOptions: any,
-    numbered: boolean
+    numbering: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) {
       return '';
@@ -361,11 +361,13 @@ export class SpecialBlockVisitor {
 
     const htmlParts = [];
     for (const n of nodes) {
-      htmlParts.push(await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc, tocOptions, numbered));
+      htmlParts.push(
+        await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc, tocOptions, numbering)
+      );
     }
     const html = htmlParts.join('');
 
-    const tag = numbered ? 'ol' : 'ul';
+    const tag = numbering ? 'ol' : 'ul';
 
     return `<${tag}>\n${html}</${tag}>`;
   }
@@ -378,7 +380,7 @@ export class SpecialBlockVisitor {
     maxDepth: number,
     showToc: boolean,
     tocOptions: any,
-    numbered: boolean
+    numbering: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) {
       return '';
@@ -416,7 +418,7 @@ export class SpecialBlockVisitor {
       );
 
       if (filteredHeadings.length > 0) {
-        const tocHtml = await this.buildTocTree(filteredHeadings, tocOptions.from, tocOptions.numbered);
+        const tocHtml = await this.buildTocTree(filteredHeadings, tocOptions.from, tocOptions.numbering);
         html += `\n<div class="zolt-filetree-toc">${tocHtml}</div>\n`;
       }
     }
@@ -425,13 +427,13 @@ export class SpecialBlockVisitor {
       const childrenHtmlParts = [];
       for (const child of node.children) {
         childrenHtmlParts.push(
-          await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc, tocOptions, numbered)
+          await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc, tocOptions, numbering)
         );
       }
       const childrenHtml = childrenHtmlParts.join('');
 
       if (childrenHtml) {
-        const tag = numbered ? 'ol' : 'ul';
+        const tag = numbering ? 'ol' : 'ul';
         html += `\n<${tag}>\n${childrenHtml}</${tag}>\n`;
       }
     }
@@ -456,9 +458,9 @@ export class SpecialBlockVisitor {
     const from = getIntAttr(node.attributes?.from, 1);
     const to = getIntAttr(node.attributes?.to, 6);
     const depth = getIntAttr(node.attributes?.depth, 3);
-    const numbered =
-      node.attributes?.numbered === 'true' ||
-      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
+    const numbering =
+      node.attributes?.numbering === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering === '') ||
       false;
     const customClass = node.attributes?.class || '';
 
@@ -471,14 +473,14 @@ export class SpecialBlockVisitor {
       return '';
     }
 
-    const tocHtml = await this.buildTocTree(filteredHeadings, from, numbered);
+    const tocHtml = await this.buildTocTree(filteredHeadings, from, numbering);
     const classAttr = ` class="zolt-toc${customClass ? ` ${customClass}` : ''}"`;
 
     const cleanAttrs: Attributes = { ...node.attributes };
     delete cleanAttrs.from;
     delete cleanAttrs.to;
     delete cleanAttrs.depth;
-    delete cleanAttrs.numbered;
+    delete cleanAttrs.numbering;
     delete cleanAttrs.class;
 
     const attrs = this.renderAllAttributes(cleanAttrs);
@@ -486,7 +488,7 @@ export class SpecialBlockVisitor {
     return `<nav${attrs}${classAttr}>\n${tocHtml}\n</nav>`;
   }
 
-  private async buildTocTree(headings: HeadingNode[], from: number, numbered: boolean): Promise<string> {
+  private async buildTocTree(headings: HeadingNode[], from: number, numbering: boolean): Promise<string> {
     let html = '<ul>\n';
     const counters: number[] = new Array(7).fill(0);
     let currentDepth = 0;
@@ -509,11 +511,16 @@ export class SpecialBlockVisitor {
         counters[i] = 0;
       }
 
-      const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
+      const numberingVar = this.evaluator.getVariable('numbering');
+      let numberingStyle = 'decimal';
+      if (typeof numberingVar === 'string' && numberingVar !== 'true' && numberingVar !== 'false') {
+        numberingStyle = numberingVar;
+      }
+
       const numberParts = counters.slice(from, level + 1);
       let numberStr = '';
 
-      if (numbered) {
+      if (numbering) {
         let formattedParts: string[] = [];
         if (numberingStyle === 'decimal') {
           formattedParts = numberParts.map((p) => p.toString());

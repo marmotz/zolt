@@ -65,9 +65,9 @@ describe('API: TOC', () => {
     expect(navHtml).not.toContain('H5');
   });
 
-  test('should support numbered attribute', async () => {
+  test('should support numbering attribute', async () => {
     const zolt = `
-[[toc {numbered=true}]]
+[[toc {numbering=true}]]
 
 # Heading 1
 ## Heading 2
@@ -130,7 +130,7 @@ describe('API: TOC', () => {
 
   test('should not render internal attributes in HTML', async () => {
     const zolt = `
-[[toc {from=2 to=4 depth=3 numbered=true}]]
+[[toc {from=2 to=4 depth=3 numbering=true}]]
 
 # H1
 ## H2
@@ -140,6 +140,6 @@ describe('API: TOC', () => {
     expect(html).not.toContain('from="2"');
     expect(html).not.toContain('to="4"');
     expect(html).not.toContain('depth="3"');
-    expect(html).not.toContain('numbered="true"');
+    expect(html).not.toContain('numbering="true"');
   });
 });

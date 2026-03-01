@@ -128,8 +128,66 @@ export class Lexer {
     if (this.matchInclude()) {
       return this.readInclude();
     }
+    if (this.matchVariableDefinition()) {
+      return this.readVariableDefinition();
+    }
 
     return this.readText();
+  }
+
+  private matchVariableDefinition(): boolean {
+    // Variable definitions ($var = val) must start at the beginning of a line
+    if (this.column !== 1) {
+      return false;
+    }
+
+    const remainingLine = this.source.slice(this.pos).split('\n')[0];
+
+    // If it looks like inline math ($...$), priority goes to math
+    if (/^\$[^$]+\$/.test(remainingLine)) {
+      return false;
+    }
+
+    return /^\$\$?[a-zA-Z_][a-zA-Z0-9_]*\s*=/.test(remainingLine);
+  }
+
+  private readVariableDefinition(): Token {
+    const start = this.pos;
+    const line = this.line;
+    const column = this.column;
+
+    let isGlobal = false;
+    if (this.peekChar() === '$') {
+      this.advanceChar();
+      if (this.peekChar() === '$') {
+        this.advanceChar();
+        isGlobal = true;
+      }
+    }
+
+    let varName = '';
+    while (!this.isEof() && /[a-zA-Z0-9_]/.test(this.peekChar())) {
+      varName += this.advanceChar();
+    }
+
+    this.skipWhitespace();
+    if (this.peekChar() === '=') {
+      this.advanceChar();
+    }
+    this.skipWhitespace();
+
+    let value = '';
+    while (!this.isEof() && this.peekChar() !== '\n') {
+      value += this.advanceChar();
+    }
+
+    return {
+      type: isGlobal ? TokenType.GLOBAL_VARIABLE_DEFINITION : TokenType.VARIABLE_DEFINITION,
+      value: `${varName}:${value.trim()}`,
+      line,
+      column,
+      length: this.pos - start,
+    };
   }
 
   private matchFootnoteDef(): boolean {

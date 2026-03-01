@@ -23,6 +23,12 @@ export class ExpressionEvaluator {
     this.variables[name] = value;
   }
 
+  getAllVariables(): Variables {
+    const vars: Variables = this.parentEvaluator ? this.parentEvaluator.getAllVariables() : {};
+
+    return { ...vars, ...this.variables };
+  }
+
   getVariable(name: string): Value {
     if (name in this.variables) {
       return this.variables[name];

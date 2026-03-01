@@ -220,6 +220,86 @@ $items = ["Apple", "Banana", "Cherry"]
       expect(html).toContain('Double: $200');
       expect(html).not.toContain('katex');
     });
+
+    describe('Heading Numbering', () => {
+      test('should NOT number single H1 and start numbering from H2', async () => {
+        const zolt = `
+# Main Title
+## Section 1{numbering}
+## Section 2{numbering}
+`;
+        const html = await buildString(zolt);
+        expect(html).not.toContain('zolt-heading-number">1 </span>Main Title');
+        expect(html).toContain('zolt-heading-number">1 </span>Section 1');
+        expect(html).toContain('zolt-heading-number">2 </span>Section 2');
+      });
+
+      test('should number H1 if there are multiple H1s', async () => {
+        const zolt = `
+# Part 1{numbering}
+# Part 2{numbering}
+`;
+        const html = await buildString(zolt);
+        expect(html).toContain('zolt-heading-number">1 </span>Part 1');
+        expect(html).toContain('zolt-heading-number">2 </span>Part 2');
+      });
+
+      test('should support global numbering with $numbering', async () => {
+        const zolt = `---
+numbering: true
+---
+# Title 1
+# Title 2
+## Section 1
+## Section 2
+`;
+        const html = await buildString(zolt);
+        expect(html).toContain('zolt-heading-number">1 </span>Title 1');
+        expect(html).toContain('zolt-heading-number">2 </span>Title 2');
+        expect(html).toContain('zolt-heading-number">2.1 </span>Section 1');
+      });
+
+      test('should respect $numbering style globally', async () => {
+        const zolt = `---
+numbering: "roman-upper"
+---
+# Title 1
+# Title 2
+## Section
+`;
+        const html = await buildString(zolt);
+        expect(html).toContain('zolt-heading-number">I </span>Title 1');
+        expect(html).toContain('zolt-heading-number">II </span>Title 2');
+        expect(html).toContain('zolt-heading-number">II.I </span>Section');
+      });
+
+      test('should support numbering variable in document body', async () => {
+        const zolt = `
+$numbering = true
+# Title 1
+# Title 2
+## Section 1
+`;
+        const html = await buildString(zolt);
+        expect(html).toContain('zolt-heading-number">1 </span>Title 1');
+        expect(html).toContain('zolt-heading-number">2 </span>Title 2');
+        expect(html).toContain('zolt-heading-number">2.1 </span>Section 1');
+      });
+
+      test('should allow toggling numbering mid-document', async () => {
+        const zolt = `
+# Title 1
+$numbering = true
+# Title 2
+$numbering = false
+# Title 3
+`;
+        const html = await buildString(zolt);
+        expect(html).not.toContain('zolt-heading-number">1 </span>Title 1');
+        expect(html).toContain('zolt-heading-number">2 </span>Title 2');
+        expect(html).not.toContain('zolt-heading-number">3 </span>Title 3');
+      });
+    });
   });
 
   describe('superscript and subscript', () => {
