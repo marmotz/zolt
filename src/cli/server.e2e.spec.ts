@@ -57,7 +57,8 @@ Output: ${output}`)
       const text = await response.text();
       expect(text).toContain('Hello Server');
       // Verify script injection
-      expect(text).toContain('WebSocket');
+      expect(text).toContain('EventSource');
+      expect(text).toContain('/zolt-events');
       expect(text).toContain('Zolt: Rebuild detected');
     } finally {
       proc.kill('SIGINT');

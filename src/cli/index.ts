@@ -1,10 +1,10 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { existsSync, watch as watchFile } from 'node:fs';
 import { copyFile, mkdir, readFile, stat } from 'node:fs/promises';
+import { createServer } from 'node:http';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { serve } from 'bun';
 import pc from 'picocolors';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
@@ -612,102 +612,107 @@ export async function handleServer(
   port: number = 1302
 ) {
   let serverInstance: any = null;
+  const sseClients = new Set<any>();
 
   const startServer = (outputDir: string) => {
     if (serverInstance) {
-      serverInstance.publish('zolt-reload', 'zolt-reload');
+      for (const res of sseClients) {
+        res.write('data: reload\n\n');
+      }
       printServerInfo(files, output, host, port);
 
       return;
     }
 
-    serverInstance = serve({
-      port,
-      hostname: host,
-      fetch(req, server) {
-        if (server.upgrade(req)) {
+    serverInstance = createServer(async (req, res) => {
+      const url = new URL(req.url || '/', `http://${host}:${port}`);
+
+      // SSE Endpoint
+      if (url.pathname === '/zolt-events') {
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        });
+        sseClients.add(res);
+        req.on('close', () => sseClients.delete(res));
+
+        return;
+      }
+
+      let pathname = url.pathname;
+      if (pathname === '/') {
+        pathname = '/index.html';
+      }
+
+      const filePath = join(outputDir, pathname);
+
+      try {
+        const fileStat = await stat(filePath);
+        if (!fileStat.isFile()) {
+          res.writeHead(404);
+          res.end('Not Found');
+
           return;
         }
 
-        const url = new URL(req.url);
-        let pathname = url.pathname;
-        if (pathname === '/') {
-          pathname = '/index.html';
-        }
-
-        const filePath = join(outputDir, pathname);
-        const file = Bun.file(filePath);
+        const content = await readFile(filePath);
 
         if (filePath.endsWith('.html')) {
-          return file
-            .text()
-            .then((text) => {
-              const injected = text.replace(
-                '</body>',
-                `<script>
+          const injected = content.toString().replace(
+            '</body>',
+            `<script>
                 (function() {
-                  const ws = new WebSocket('ws://' + location.host);
-                  ws.onmessage = (event) => {
-                    if (event.data === 'zolt-reload') {
+                  const eventSource = new EventSource('/zolt-events');
+                  eventSource.onmessage = (event) => {
+                    if (event.data === 'reload') {
                       console.log('Zolt: Rebuild detected, reloading...');
                       location.reload();
                     }
                   };
-                  ws.onclose = () => {
+                  eventSource.onerror = () => {
                     console.log('Zolt: Server disconnected. Retrying connection...');
-                    const retry = setInterval(() => {
-                      const nextWs = new WebSocket('ws://' + location.host);
-                      nextWs.onopen = () => {
-                        clearInterval(retry);
-                        location.reload();
-                      };
-                    }, 1000);
+                    setTimeout(() => location.reload(), 1000);
                   };
                 })();
               </script></body>`
-              );
-              console.log(
-                `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
-              );
+          );
 
-              return new Response(injected, {
-                headers: { 'Content-Type': 'text/html' },
-              });
-            })
-            .catch(() => {
-              console.log(
-                `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
-              );
-
-              return new Response('Not Found', { status: 404 });
-            });
-        }
-
-        return file.exists().then((exists) => {
-          if (!exists) {
-            console.log(
-              `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
-            );
-
-            return new Response('Not Found', { status: 404 });
-          }
           console.log(
             `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
           );
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(injected);
+        } else {
+          // Simple mime type detection
+          const ext = pathname.split('.').pop();
+          const mimeTypes: Record<string, string> = {
+            js: 'application/javascript',
+            css: 'text/css',
+            png: 'image/png',
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            svg: 'image/svg+xml',
+            json: 'application/json',
+            pdf: 'application/pdf',
+          };
 
-          return new Response(file);
-        });
-      },
-      websocket: {
-        open(ws) {
-          ws.subscribe('zolt-reload');
-        },
-        message() {
-          // No messages expected
-        },
-      },
+          console.log(
+            `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.green(200)}`
+          );
+          res.writeHead(200, { 'Content-Type': mimeTypes[ext || ''] || 'application/octet-stream' });
+          res.end(content);
+        }
+      } catch {
+        console.log(
+          `${pc.dim(new Date().toISOString())} ${pc.cyan(req.method)} ${pc.white(url.pathname)} - ${pc.red(404)}`
+        );
+        res.writeHead(404);
+        res.end('Not Found');
+      }
     });
 
+    serverInstance.listen(port, host);
     printServerInfo(files, output, host, port);
   };
 
