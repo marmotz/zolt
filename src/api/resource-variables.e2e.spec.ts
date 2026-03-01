@@ -67,8 +67,8 @@ $f = "doc.pdf"
 &&[File]({$f})
     `;
     const html = await buildString(zolt);
-    expect(html).toContain('<video src="video.mp4" class="zolt-video">Video</video>');
-    expect(html).toContain('<audio src="audio.mp3">Audio</audio>');
+    expect(html).toContain('<video src="video.mp4" controls class="zolt-video">Video</video>');
+    expect(html).toContain('<audio src="audio.mp3" controls>Audio</audio>');
     expect(html).toContain('<iframe src="https://youtube.com/123" title="Embed" style="border: 0" class="zolt-embed"');
     expect(html).toContain('<a href="doc.pdf" target="_blank" rel="noopener">File</a>');
   });

@@ -29,12 +29,12 @@ describe('API: Images', () => {
 
   test('should build video', async () => {
     const html = await buildString('!![Video](video.mp4){autoplay controls}');
-    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay controls>Video</video>');
+    expect(html).toContain('<video src="video.mp4" controls class="zolt-video" autoplay>Video</video>');
   });
 
   test('should build video with autoplay, loop and muted', async () => {
     const html = await buildString('!![Video](video.mp4){autoplay loop muted}');
-    expect(html).toContain('<video src="video.mp4" class="zolt-video" autoplay loop muted>Video</video>');
+    expect(html).toContain('<video src="video.mp4" controls class="zolt-video" autoplay loop muted>Video</video>');
   });
 
   test('should automatically embed YouTube videos', async () => {
@@ -61,7 +61,7 @@ describe('API: Images', () => {
 
   test('should build audio with loop and muted', async () => {
     const html = await buildString('??[Audio](audio.mp3){loop muted}');
-    expect(html).toContain('<audio src="audio.mp3" loop muted>Audio</audio>');
+    expect(html).toContain('<audio src="audio.mp3" controls loop muted>Audio</audio>');
   });
 
   test('should build embed', async () => {

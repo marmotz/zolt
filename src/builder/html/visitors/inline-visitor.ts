@@ -255,20 +255,25 @@ export class InlineVisitor {
       return `<iframe src="${embedSrc}" title="${alt}"${renderedAttrs} allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
     }
 
+    // Remove controls from attributes if present to avoid duplicate
+    delete (nodeAttrs as any)['controls'];
     const attrs = this.renderAllAttributes(nodeAttrs);
 
-    return `<video src="${resolvedSrc}"${attrs}>${alt}</video>`;
+    return `<video src="${resolvedSrc}" controls${attrs}>${alt}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
-    const attrs = this.renderAllAttributes(node.attributes);
+    const nodeAttrs = { ...node.attributes };
+    // Remove controls from attributes if present to avoid duplicate
+    delete nodeAttrs['controls'];
+    const attrs = this.renderAllAttributes(nodeAttrs);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
 
     const isRemote = src.startsWith('http://') || src.startsWith('https://');
     const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    return `<audio src="${resolvedSrc}"${attrs}>${alt}</audio>`;
+    return `<audio src="${resolvedSrc}" controls${attrs}>${alt}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {

@@ -116,7 +116,8 @@ you MUST follow when working on this repository.
 
 5. **No Placeholders:** Write complete code. Do not leave `// TODO` or `...` inside code blocks unless specifically
    requested by the user.
-6. **No `any` Bypass:** Do not use `any` to bypass type-checking or linting rules. Use proper types, interfaces, or type
+6. **No any Bypass:** Do not use `any` to bypass type-checking or linting rules. Use proper types, interfaces, or type
    guards.
+7. **No Autonomous Git:** Never perform git actions (add, commit, push, etc.) yourself unless specifically requested by the user.
 
 Adhere to these rules strictly to maintain the high quality and performance of the Zolt project.
