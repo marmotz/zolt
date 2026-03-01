@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, jest, spyOn, test } from 'bun:test';
-import * as fs from 'fs';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { dirname, join, resolve } from 'path';
+import * as fs from 'node:fs';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 import { version } from '../../package.json';
 import * as api from '../api';
 import * as cli from './index';
@@ -26,7 +26,7 @@ describe('CLI Advanced', () => {
 
     try {
       await cli.main();
-    } catch (e) {
+    } catch (_e) {
       // Ignore
     } finally {
       process.argv = originalArgv;
@@ -115,7 +115,7 @@ describe('CLI Advanced', () => {
     });
 
     test('should show version', async () => {
-      expect(await runMain(['version'])).toContain('zolt v' + version);
+      expect(await runMain(['version'])).toContain(`zolt v${version}`);
     });
 
     test('should handle unknown command', async () => {

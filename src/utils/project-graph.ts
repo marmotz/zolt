@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { FileMetadataUtils } from './file-metadata';
 
 export interface ProjectNode {
@@ -28,15 +28,16 @@ export class ProjectGraphBuilder {
     const links: string[] = [];
     const cleanContent = content.replace(/```[\s\S]*?```/g, '');
     const linkRegex = /\[.*?]\(([^)]+\.zlt)\)|:::include\s+(\S+)/g;
-    let match;
-    while ((match = linkRegex.exec(cleanContent)) !== null) {
+    let match = linkRegex.exec(cleanContent);
+    while (match !== null) {
       const link = match[1] || match[2];
-      if (link && link.endsWith('.zlt') && !link.startsWith('http')) {
+      if (link?.endsWith('.zlt') && !link.startsWith('http')) {
         const absPath = path.resolve(dir, link);
         if (fs.existsSync(absPath)) {
           links.push(absPath);
         }
       }
+      match = linkRegex.exec(cleanContent);
     }
 
     return links;

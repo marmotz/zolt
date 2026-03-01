@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from './parser';
-import { FootnoteDefinitionNode, FootnoteNode } from './types';
+import type { FootnoteDefinitionNode, FootnoteNode } from './types';
 
 describe('Footnotes Parsing', () => {
   it('should parse footnote references', () => {

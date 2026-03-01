@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test';
 import { InlineParser } from './inline-parser';
-import { BoldNode, HighlightNode, ItalicNode, LinkNode, StrikethroughNode, TextNode, UnderlineNode } from './types';
+import type {
+  BoldNode,
+  HighlightNode,
+  ItalicNode,
+  LinkNode,
+  StrikethroughNode,
+  TextNode,
+  UnderlineNode,
+} from './types';
 
 describe('InlineParser', () => {
   const parser = new InlineParser();

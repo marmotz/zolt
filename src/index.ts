@@ -1,11 +1,12 @@
+export * from './api/index';
 export { HTMLBuilder } from './builder/html/builder';
 export { Lexer } from './lexer/lexer';
-export { TokenType, type Token } from './lexer/token-types';
+export { type Token, TokenType } from './lexer/token-types';
 export { ParseError } from './parser/errors/parse-error';
 export { Parser } from './parser/parser';
 export type {
-  ASTNode,
   AbbreviationNode,
+  ASTNode,
   Attributes,
   AudioNode,
   BlockquoteNode,
@@ -43,5 +44,3 @@ export type {
   VariableNode,
   VideoNode,
 } from './parser/types';
-
-export * from './api/index';

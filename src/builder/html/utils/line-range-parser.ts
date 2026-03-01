@@ -11,14 +11,14 @@ export function parseLineRanges(rangeStr: string): Set<number> {
   for (const part of parts) {
     if (part.includes('-')) {
       const [start, end] = part.split('-').map((n) => parseInt(n.trim(), 10));
-      if (!isNaN(start) && !isNaN(end)) {
+      if (!Number.isNaN(start) && !Number.isNaN(end)) {
         for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
           lines.add(i);
         }
       }
     } else {
       const line = parseInt(part.trim(), 10);
-      if (!isNaN(line)) {
+      if (!Number.isNaN(line)) {
         lines.add(line);
       }
     }

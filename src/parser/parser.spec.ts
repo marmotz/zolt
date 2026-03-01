@@ -544,6 +544,7 @@ describe('Parser', () => {
       });
 
       test('should parse inline math with attributes', () => {
+        // biome-ignore lint/suspicious/noTemplateCurlyInString: Testing Zolt math attributes that look like JS templates
         const lexer = new Lexer('$E=mc^2${#formula}');
         const tokens = lexer.tokenize();
         const parser = new Parser(tokens);

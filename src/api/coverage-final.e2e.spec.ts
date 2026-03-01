@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import * as path from 'path';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import { buildFile, buildString, extractAllAssets, getLinkedFiles, lint } from './index';
 
 describe('API Coverage Final Boost', () => {
@@ -19,7 +19,7 @@ describe('API Coverage Final Boost', () => {
     const outputFile = path.join(tmpDir, 'output.html');
     await writeFile(inputFile, '# Hello');
     await buildFile(inputFile, outputFile);
-    const { existsSync } = require('fs');
+    const { existsSync } = require('node:fs');
     expect(existsSync(outputFile)).toBe(true);
   });
 

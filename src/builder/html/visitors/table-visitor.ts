@@ -1,4 +1,4 @@
-import { ASTNode, TableCellNode, TableNode, TableRowNode } from '../../../parser/types';
+import type { ASTNode, TableCellNode, TableNode, TableRowNode } from '../../../parser/types';
 
 export class TableVisitor {
   constructor(
@@ -12,14 +12,14 @@ export class TableVisitor {
 
     if (node.header) {
       html += '  <thead>\n';
-      html += '    ' + (await this.visitTableRow(node.header, true)) + '\n';
+      html += `    ${await this.visitTableRow(node.header, true)}\n`;
       html += '  </thead>\n';
     }
 
     if (node.rows.length > 0) {
       html += '  <tbody>\n';
       for (const row of node.rows) {
-        html += '    ' + (await this.visitTableRow(row, false)) + '\n';
+        html += `    ${await this.visitTableRow(row, false)}\n`;
       }
       html += '  </tbody>\n';
     }
@@ -54,7 +54,7 @@ export class TableVisitor {
       attrs.push(`rowspan="${node.rowspan}"`);
     }
 
-    const attrsStr = attrs.length > 0 ? ' ' + attrs.join(' ') : '';
+    const attrsStr = attrs.length > 0 ? ` ${attrs.join(' ')}` : '';
 
     return `<${tag}${attrsStr}>${childrenHtml}</${tag}>`;
   }

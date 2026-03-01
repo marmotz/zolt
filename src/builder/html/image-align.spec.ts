@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { ImageNode, ParagraphNode } from '../../parser/types';
+import type { ImageNode, ParagraphNode } from '../../parser/types';
 import { HTMLBuilder } from './builder';
 
 describe('HTMLBuilder Image Alignment', () => {

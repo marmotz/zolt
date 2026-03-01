@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { InlineParser } from '../inline-parser';
-import { Attributes, TableCellNode, TableNode, TableRowNode } from '../types';
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { InlineParser } from '../inline-parser';
+import type { Attributes, TableCellNode, TableNode, TableRowNode } from '../types';
 
 export class TableParser {
   constructor(private inlineParser: InlineParser) {}
@@ -160,8 +160,8 @@ export class TableParser {
 
       // Match markers: [h], [colspan=N], [rowspan=N]
       const markerRegex = /^\[(h|colspan=(\d+)|rowspan=(\d+))]\s*/g;
-      let match;
-      while ((match = markerRegex.exec(cellContent)) !== null) {
+      let match = markerRegex.exec(cellContent);
+      while (match !== null) {
         if (match[1] === 'h') {
           isHeader = true;
         } else if (match[1].startsWith('colspan=')) {
@@ -173,6 +173,7 @@ export class TableParser {
         cellContent = cellContent.substring(match[0].length);
         // Reset regex because we modified cellContent
         markerRegex.lastIndex = 0;
+        match = markerRegex.exec(cellContent);
       }
 
       return {

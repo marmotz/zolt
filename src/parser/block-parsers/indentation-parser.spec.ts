@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { Lexer } from '../../lexer/lexer';
-import { Token, TokenType } from '../../lexer/token-types';
+import { type Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
 import { CodeBlockParser } from './code-block-parser';
 import { HeadingParser } from './heading-parser';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { buildString } from './index';
 
 describe('Zolt Syntax Highlighting (Shiki)', () => {
@@ -42,7 +42,7 @@ $var = 1
     expect(html).toContain('shiki');
     // On s'attend à beaucoup de tokens colorés pour un bloc complexe
     const styleMatches = html.match(/style="color:/g);
-    expect(styleMatches && styleMatches.length).toBeGreaterThan(15);
+    expect(styleMatches?.length).toBeGreaterThan(15);
   });
 
   it('should highlight zolt blocks in real documentation files', async () => {
@@ -54,7 +54,7 @@ $var = 1
       // index.zlt contient un bloc Zolt
       // Il doit être coloré
       const styleMatches = html.match(/style="color:/g);
-      expect(styleMatches && styleMatches.length).toBeGreaterThan(20);
+      expect(styleMatches?.length).toBeGreaterThan(20);
     }
   });
 

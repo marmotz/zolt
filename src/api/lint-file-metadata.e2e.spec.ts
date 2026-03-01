@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { unlink, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { unlink, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { lint } from './index';
 
 describe('Linter: File metadata Validation', () => {

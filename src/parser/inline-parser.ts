@@ -1,4 +1,4 @@
-import {
+import type {
   AbbreviationNode,
   ASTNode,
   Attributes,
@@ -114,10 +114,10 @@ export class InlineParser {
       if (node.type === 'Text') {
         const text = (node as TextNode).content;
         let lastIndex = 0;
-        let match;
+        let match = regex.exec(text);
         let hasMatches = false;
 
-        while ((match = regex.exec(text)) !== null) {
+        while (match !== null) {
           hasMatches = true;
           if (match.index > lastIndex) {
             result.push(this.createTextNode(text.slice(lastIndex, match.index)));
@@ -128,8 +128,9 @@ export class InlineParser {
             type: 'Abbreviation',
             abbreviation,
             definition,
-          } as AbbreviationNode);
-          lastIndex = regex.lastIndex;
+          });
+          lastIndex = match.index + abbreviation.length;
+          match = regex.exec(text);
         }
 
         if (hasMatches) {
@@ -820,12 +821,12 @@ export class InlineParser {
       if (quotedMatch) {
         const key = quotedMatch[1];
         const value = quotedMatch[2];
-        this.setAttribute(attrs, key, value);
+        InlineParser.setAttribute(attrs, key, value);
         remaining = remaining.slice(quotedMatch[0].length);
       } else if (quotedMatch2) {
         const key = quotedMatch2[1];
         const value = quotedMatch2[2];
-        this.setAttribute(attrs, key, value);
+        InlineParser.setAttribute(attrs, key, value);
         remaining = remaining.slice(quotedMatch2[0].length);
       } else {
         const keyValueMatch = remaining.match(/^([a-zA-Z0-9-]+)=/);
@@ -843,7 +844,7 @@ export class InlineParser {
           }
 
           // Trim and remove trailing comma if present
-          this.setAttribute(attrs, key, value.trim().replace(/,$/, ''));
+          InlineParser.setAttribute(attrs, key, value.trim().replace(/,$/, ''));
           remaining = remaining.slice(keyValueMatch[0].length + value.length);
         } else {
           // Handle shortcuts like .class or #id, or boolean attributes
@@ -853,14 +854,14 @@ export class InlineParser {
             const val = shortcutMatch[1];
             if (val.startsWith('.')) {
               const className = val.slice(1);
-              attrs['class'] = (attrs['class'] ? attrs['class'] + ' ' : '') + className;
+              attrs.class = (attrs.class ? `${attrs.class} ` : '') + className;
             } else {
-              attrs['id'] = val.slice(1);
+              attrs.id = val.slice(1);
             }
             remaining = remaining.slice(val.length);
           } else if (booleanMatch) {
             const key = booleanMatch[1];
-            this.setAttribute(attrs, key, '');
+            InlineParser.setAttribute(attrs, key, '');
             remaining = remaining.slice(key.length);
           } else {
             if (onWarning) {
@@ -883,17 +884,17 @@ export class InlineParser {
     return Object.keys(attrs).length > 0 ? attrs : undefined;
   }
 
+  public parseAttributes(attrStr?: string): Attributes | undefined {
+    return InlineParser.parseAttributes(attrStr, this.onWarning);
+  }
+
   private static setAttribute(attrs: Attributes, key: string, value: string): void {
     if (key === 'visuallyHidden' || key === 'srOnly' || key === 'visuallyHidden' || key === 'srOnly') {
-      attrs['ariaHidden'] = 'true';
-      attrs['class'] = (attrs['class'] ? attrs['class'] + ' ' : '') + (key === 'srOnly' ? 'srOnly' : 'visuallyHidden');
+      attrs.ariaHidden = 'true';
+      attrs.class = (attrs.class ? `${attrs.class} ` : '') + (key === 'srOnly' ? 'srOnly' : 'visuallyHidden');
     } else {
       attrs[key] = value;
     }
-  }
-
-  public parseAttributes(attrStr?: string): Attributes | undefined {
-    return InlineParser.parseAttributes(attrStr, this.onWarning);
   }
 
   private setAttribute(attrs: Attributes, key: string, value: string): void {

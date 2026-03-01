@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { FileMetadataUtils } from '../../utils/file-metadata';
 import { ContentProcessor } from './content-processor';
-import { ExpressionEvaluator, Value } from './expression-evaluator';
+import type { ExpressionEvaluator, Value } from './expression-evaluator';
 
 export class SourceEvaluator {
   private evaluator: ExpressionEvaluator;
@@ -47,7 +47,7 @@ export class SourceEvaluator {
 
     let fileMetadataProcessed = false;
     const metadataLines: string[] = [];
-    let rootLayout: string | undefined = undefined;
+    let rootLayout: string | undefined;
 
     // Initial check for layout from project metadata
     if (this.allowLayout && !this.isLayoutProcessing) {
@@ -160,7 +160,7 @@ export class SourceEvaluator {
     }
 
     if (metadataLines.length > 0) {
-      return metadataLines.join('\n') + '\n' + expandedBody;
+      return `${metadataLines.join('\n')}\n${expandedBody}`;
     }
 
     return expandedBody;
@@ -180,7 +180,7 @@ export class SourceEvaluator {
     const targetPath = this.findLayout(currentDir, layoutPath);
 
     if (!targetPath) {
-      const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+      const metadata = documentMetadataLines.length > 0 ? `${documentMetadataLines.join('\n')}\n` : '';
 
       return `${metadata}:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
     }
@@ -222,7 +222,7 @@ export class SourceEvaluator {
 
       return layoutBody;
     } catch (err: any) {
-      const metadata = documentMetadataLines.length > 0 ? documentMetadataLines.join('\n') + '\n' : '';
+      const metadata = documentMetadataLines.length > 0 ? `${documentMetadataLines.join('\n')}\n` : '';
 
       return `${metadata}:::error Failed to process layout: ${layoutPath} (${err.message}):::\n${contentToInject}`;
     }

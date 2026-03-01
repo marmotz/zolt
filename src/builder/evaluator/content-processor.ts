@@ -1,4 +1,4 @@
-import { ExpressionEvaluator, Value } from './expression-evaluator';
+import type { ExpressionEvaluator, Value } from './expression-evaluator';
 
 export class ContentProcessor {
   private evaluator: ExpressionEvaluator;
@@ -141,11 +141,8 @@ export class ContentProcessor {
     if (/^String\.\w+\(/.test(trimmed)) {
       return true;
     }
-    if (/^Date\.\w+\(/.test(trimmed)) {
-      return true;
-    }
 
-    return false;
+    return /^Date\.\w+\(/.test(trimmed);
   }
 
   private looksLikeObject(str: string): boolean {
@@ -216,7 +213,7 @@ export class ContentProcessor {
         return match;
       }
       try {
-        const value = this.evaluator.evaluate('$' + varPath);
+        const value = this.evaluator.evaluate(`$${varPath}`);
         if (value === null || value === undefined) {
           return match;
         }
@@ -290,7 +287,7 @@ export class ContentProcessor {
 
     expr = expr.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*|\[[^\]]+])*)}/g, (_, varPath) => {
       try {
-        const value = this.evaluator.evaluate('$' + varPath);
+        const value = this.evaluator.evaluate(`$${varPath}`);
 
         return this.formatValue(value);
       } catch {
@@ -320,7 +317,7 @@ export class ContentProcessor {
     }
 
     return {
-      collection: '$' + match[1],
+      collection: `$${match[1]}`,
       iterator: match[2],
     };
   }

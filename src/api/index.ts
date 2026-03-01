@@ -1,14 +1,14 @@
-import * as fs from 'fs';
-import { readFile, stat, writeFile } from 'fs/promises';
-import * as path from 'path';
-import { Builder } from '../builder/builder';
-import { ExpressionEvaluator, Value } from '../builder/evaluator/expression-evaluator';
+import * as fs from 'node:fs';
+import { readFile, stat, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
+import type { Builder } from '../builder/builder';
+import { ExpressionEvaluator, type Value } from '../builder/evaluator/expression-evaluator';
 import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
-import { HTMLBuilder, InitialVariables } from '../builder/html/builder';
+import { HTMLBuilder, type InitialVariables } from '../builder/html/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
 import { createFileDateVariables } from '../utils/file-metadata';
-import { ProjectGraphBuilder, ProjectNode } from '../utils/project-graph';
+import { ProjectGraphBuilder, type ProjectNode } from '../utils/project-graph';
 
 export interface BuildOptions {
   type?: 'html' | 'pdf';
@@ -92,7 +92,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
   const ast = parser.parse();
 
   // Update global abbreviations if provided
-  if (options && options.globalAbbreviations) {
+  if (options?.globalAbbreviations) {
     const currentGlobals = parser.getGlobalAbbreviations();
     if (currentGlobals) {
       for (const [key, value] of currentGlobals.entries()) {

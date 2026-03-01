@@ -1,6 +1,12 @@
-import * as path from 'path';
-import { ASTNode, Attributes, DoubleBracketBlockNode, HeadingNode, TripleColonBlockNode } from '../../../parser/types';
-import { ProjectNode } from '../../../utils/project-graph';
+import * as path from 'node:path';
+import type {
+  ASTNode,
+  Attributes,
+  DoubleBracketBlockNode,
+  HeadingNode,
+  TripleColonBlockNode,
+} from '../../../parser/types';
+import type { ProjectNode } from '../../../utils/project-graph';
 import { escapeHtml, slugify, toAlpha, toRoman } from '../utils/string-utils';
 
 export class SpecialBlockVisitor {
@@ -85,8 +91,8 @@ export class SpecialBlockVisitor {
     }
 
     if (node.blockType === 'columns' && node.attributes?.cols) {
-      const cols = parseInt(node.attributes.cols);
-      if (!isNaN(cols)) {
+      const cols = parseInt(node.attributes.cols, 10);
+      if (!Number.isNaN(cols)) {
         const style = `--zolt-cols: ${cols};`;
         node.attributes.style = node.attributes.style ? `${node.attributes.style} ${style}` : style;
       }
@@ -94,7 +100,7 @@ export class SpecialBlockVisitor {
 
     if (node.blockType === 'column' && node.attributes?.width?.endsWith('%')) {
       const p = parseFloat(node.attributes.width);
-      if (!isNaN(p)) {
+      if (!Number.isNaN(p)) {
         const factor = (1 - p / 100).toFixed(3);
         node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
       }
@@ -191,29 +197,25 @@ export class SpecialBlockVisitor {
       return '<div class="zolt-filetree-error">Project graph not available. Please specify an entry point.</div>';
     }
 
-    const from = parseInt(node.attributes?.from || '0') || 0;
-    const to = parseInt(node.attributes?.to || '99') || 99;
-    const depth = parseInt(node.attributes?.depth || '99') || 99;
+    const from = parseInt(node.attributes?.from || '0', 10) || 0;
+    const to = parseInt(node.attributes?.to || '99', 10) || 99;
+    const depth = parseInt(node.attributes?.depth || '99', 10) || 99;
     const numbered =
       node.attributes?.numbered === 'true' ||
-      (node.attributes &&
-        Object.prototype.hasOwnProperty.call(node.attributes, 'numbered') &&
-        node.attributes.numbered === '') ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
       false;
     const showToc =
       (node.attributes?.toc === 'true' ||
-        (node.attributes &&
-          Object.prototype.hasOwnProperty.call(node.attributes, 'toc') &&
-          node.attributes.toc === '')) ??
+        (node.attributes && Object.hasOwn(node.attributes, 'toc') && node.attributes.toc === '')) ??
       false;
 
     const getIntAttr = (val: any, defaultVal: number) => {
       if (val === undefined || val === '') {
         return defaultVal;
       }
-      const parsed = parseInt(val);
+      const parsed = parseInt(val, 10);
 
-      return isNaN(parsed) ? defaultVal : parsed;
+      return Number.isNaN(parsed) ? defaultVal : parsed;
     };
 
     const tocOptions = {
@@ -222,9 +224,7 @@ export class SpecialBlockVisitor {
       depth: getIntAttr(node.attributes?.tocDepth, 3),
       numbered:
         node.attributes?.tocNumbered === 'true' ||
-        (node.attributes &&
-          Object.prototype.hasOwnProperty.call(node.attributes, 'tocNumbered') &&
-          node.attributes.tocNumbered === '') ||
+        (node.attributes && Object.hasOwn(node.attributes, 'tocNumbered') && node.attributes.tocNumbered === '') ||
         false,
       hasTo: !!node.attributes?.tocTo && node.attributes?.tocTo !== '',
       hasDepth: !!node.attributes?.tocDepth && node.attributes?.tocDepth !== '',
@@ -369,9 +369,9 @@ export class SpecialBlockVisitor {
       if (val === undefined || val === '') {
         return defaultVal;
       }
-      const parsed = parseInt(val);
+      const parsed = parseInt(val, 10);
 
-      return isNaN(parsed) ? defaultVal : parsed;
+      return Number.isNaN(parsed) ? defaultVal : parsed;
     };
 
     const from = getIntAttr(node.attributes?.from, 1);
@@ -379,9 +379,7 @@ export class SpecialBlockVisitor {
     const depth = getIntAttr(node.attributes?.depth, 3);
     const numbered =
       node.attributes?.numbered === 'true' ||
-      (node.attributes &&
-        Object.prototype.hasOwnProperty.call(node.attributes, 'numbered') &&
-        node.attributes.numbered === '') ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
       false;
     const customClass = node.attributes?.class || '';
 
@@ -395,7 +393,7 @@ export class SpecialBlockVisitor {
     }
 
     const tocHtml = await this.buildTocTree(filteredHeadings, from, numbered);
-    const classAttr = ` class="zolt-toc${customClass ? ' ' + customClass : ''}"`;
+    const classAttr = ` class="zolt-toc${customClass ? ` ${customClass}` : ''}"`;
 
     const cleanAttrs: Attributes = { ...node.attributes };
     delete cleanAttrs.from;
@@ -483,9 +481,9 @@ export class SpecialBlockVisitor {
 
     const attrs = this.renderAllAttributes(Object.keys(filteredAttrs).length > 0 ? filteredAttrs : undefined);
     const layoutAttr = node.layout ? ` data-layout="${node.layout}"` : '';
-    const legendAttr = node.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
-    const gridAttr = node.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
-    const stackedAttr = node.attributes?.['stacked'] === 'true' ? ' data-stacked="true"' : '';
+    const legendAttr = node.attributes?.legend === 'true' ? ' data-legend="true"' : '';
+    const gridAttr = node.attributes?.grid === 'true' ? ' data-grid="true"' : '';
+    const stackedAttr = node.attributes?.stacked === 'true' ? ' data-stacked="true"' : '';
 
     const seriesHtml = node.children.map((series: any) => this.visitChartSeries(series)).join('\n');
 
@@ -505,12 +503,12 @@ export class SpecialBlockVisitor {
 
     const seriesTitle = series.title || series.attributes?.title;
     const titleAttr = seriesTitle ? ` data-title="${escapeHtml(String(seriesTitle))}"` : '';
-    const schemeAttr = series.attributes?.['colorScheme']
-      ? ` data-scheme="${escapeHtml(String(series.attributes['colorScheme'] as string))}"`
+    const schemeAttr = series.attributes?.colorScheme
+      ? ` data-scheme="${escapeHtml(String(series.attributes.colorScheme as string))}"`
       : '';
-    const legendAttr = series.attributes?.['legend'] === 'true' ? ' data-legend="true"' : '';
-    const gridAttr = series.attributes?.['grid'] === 'true' ? ' data-grid="true"' : '';
-    const stackedAttr = series.attributes?.['stacked'] === 'true' ? ' data-stacked="true"' : '';
+    const legendAttr = series.attributes?.legend === 'true' ? ' data-legend="true"' : '';
+    const gridAttr = series.attributes?.grid === 'true' ? ' data-grid="true"' : '';
+    const stackedAttr = series.attributes?.stacked === 'true' ? ' data-stacked="true"' : '';
 
     const dataJson = JSON.stringify(series.data);
 

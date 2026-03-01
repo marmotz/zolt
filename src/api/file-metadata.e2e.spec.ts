@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { buildFile, buildFileToString, buildString } from './index';
 
 describe('API: File Metadata Variables', () => {
@@ -45,7 +45,7 @@ describe('API: File Metadata Variables', () => {
     test('should generate HTML with file dates in the body', async () => {
       await buildFile(testFilePath, testOutputPath);
 
-      const { readFile } = await import('fs/promises');
+      const { readFile } = await import('node:fs/promises');
       const html = await readFile(testOutputPath, 'utf-8');
 
       expect(html).not.toContain('{$created}');

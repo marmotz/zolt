@@ -65,7 +65,7 @@ export class ExpressionEvaluator {
     }
 
     const num = Number(trimmed);
-    if (!isNaN(num) && trimmed !== '') {
+    if (!Number.isNaN(num) && trimmed !== '') {
       return num;
     }
 
@@ -375,7 +375,7 @@ export class ExpressionEvaluator {
 
     switch (op) {
       case '==':
-        return left === right || (!isNaN(leftNum) && !isNaN(rightNum) && leftNum === rightNum);
+        return left === right || (!Number.isNaN(leftNum) && !Number.isNaN(rightNum) && leftNum === rightNum);
       case '!=':
         return left !== right;
       case '<':
@@ -514,7 +514,7 @@ export class ExpressionEvaluator {
       case 'abs':
         return Math.abs(numArgs[0]);
       case 'pow':
-        return Math.pow(numArgs[0], numArgs[1]);
+        return numArgs[0] ** numArgs[1];
       case 'sqrt':
         return Math.sqrt(numArgs[0]);
       case 'min':
@@ -544,13 +544,13 @@ export class ExpressionEvaluator {
         return list.reduce((sum: number, item) => {
           const num = typeof item === 'number' ? item : parseFloat(String(item));
 
-          return sum + (isNaN(num) ? 0 : num);
+          return sum + (Number.isNaN(num) ? 0 : num);
         }, 0);
       case 'avg': {
         const sum = list.reduce((s: number, item) => {
           const num = typeof item === 'number' ? item : parseFloat(String(item));
 
-          return s + (isNaN(num) ? 0 : num);
+          return s + (Number.isNaN(num) ? 0 : num);
         }, 0);
 
         return list.length > 0 ? sum / list.length : 0;
@@ -558,14 +558,14 @@ export class ExpressionEvaluator {
       case 'min': {
         const nums = list
           .map((item) => (typeof item === 'number' ? item : parseFloat(String(item))))
-          .filter((n) => !isNaN(n));
+          .filter((n) => !Number.isNaN(n));
 
         return nums.length > 0 ? Math.min(...nums) : null;
       }
       case 'max': {
         const nums = list
           .map((item) => (typeof item === 'number' ? item : parseFloat(String(item))))
-          .filter((n) => !isNaN(n));
+          .filter((n) => !Number.isNaN(n));
 
         return nums.length > 0 ? Math.max(...nums) : null;
       }
@@ -680,7 +680,7 @@ export class ExpressionEvaluator {
     if (!format) {
       const d = new Date(dateStr);
 
-      return isNaN(d.getTime()) ? null : d;
+      return Number.isNaN(d.getTime()) ? null : d;
     }
 
     // Basic format parsing for YYYY, MM, DD, HH, mm, ss
@@ -704,8 +704,8 @@ export class ExpressionEvaluator {
       for (const token of tokens) {
         if (remainingFormat.startsWith(token)) {
           const len = token.length;
-          const val = parseInt(remainingDate.slice(0, len));
-          if (!isNaN(val)) {
+          const val = parseInt(remainingDate.slice(0, len), 10);
+          if (!Number.isNaN(val)) {
             components[token] = val;
           }
           remainingFormat = remainingFormat.slice(len);
@@ -730,14 +730,14 @@ export class ExpressionEvaluator {
       components.ss
     );
 
-    return isNaN(date.getTime()) ? null : date;
+    return Number.isNaN(date.getTime()) ? null : date;
   }
 
   private calculateDate(date: Date, duration: Record<string, Value>): Date {
     const d = new Date(date);
     for (const [unit, val] of Object.entries(duration)) {
       const amount = typeof val === 'number' ? val : parseFloat(String(val ?? '0'));
-      if (isNaN(amount)) {
+      if (Number.isNaN(amount)) {
         continue;
       }
 
@@ -825,7 +825,7 @@ export class ExpressionEvaluator {
       return null;
     }
 
-    return isNaN(date.getTime()) ? null : date;
+    return Number.isNaN(date.getTime()) ? null : date;
   }
 
   private formatDate(date: Date, format: string): string {
@@ -920,7 +920,7 @@ export class ExpressionEvaluator {
       if (op === '^') {
         const l = typeof operand === 'number' ? operand : parseFloat(String(operand));
         const r = typeof result === 'number' ? result : parseFloat(String(result));
-        result = Math.pow(l, r);
+        result = l ** r;
       }
     }
 
@@ -1104,8 +1104,8 @@ export class ExpressionEvaluator {
       } else {
         if (Array.isArray(value)) {
           // Allow numeric strings as indices for arrays
-          const numIndex = parseInt(String(part));
-          value = !isNaN(numIndex) ? (value[numIndex] ?? null) : null;
+          const numIndex = parseInt(String(part), 10);
+          value = !Number.isNaN(numIndex) ? (value[numIndex] ?? null) : null;
         } else if (typeof value === 'object') {
           value = (value as Record<string, Value>)[part] ?? null;
         } else {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { unlinkSync, writeFileSync } from 'fs';
+import { unlinkSync, writeFileSync } from 'node:fs';
 import { buildString } from './index';
 
 describe('Code Blocks E2E', () => {
@@ -62,7 +62,7 @@ describe('Code Blocks E2E', () => {
     } finally {
       try {
         unlinkSync(layoutPath);
-      } catch (e) {}
+      } catch (_e) {}
     }
   });
 
@@ -86,7 +86,7 @@ describe('Code Blocks E2E', () => {
     } finally {
       try {
         unlinkSync(layoutPath);
-      } catch (e) {}
+      } catch (_e) {}
     }
   });
 });

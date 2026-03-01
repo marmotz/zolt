@@ -1,6 +1,13 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { InlineParser } from '../inline-parser';
-import { ASTNode, Attributes, DefinitionDescriptionNode, DefinitionTermNode, ListItemNode, ListNode } from '../types';
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { InlineParser } from '../inline-parser';
+import type {
+  ASTNode,
+  Attributes,
+  DefinitionDescriptionNode,
+  DefinitionTermNode,
+  ListItemNode,
+  ListNode,
+} from '../types';
 
 export class ListParser {
   constructor(private inlineParser: InlineParser) {}

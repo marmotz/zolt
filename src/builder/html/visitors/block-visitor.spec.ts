@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { HeadingNode, ParagraphNode } from '../../../parser/types';
+import type { HeadingNode, ParagraphNode } from '../../../parser/types';
 import { HTMLBuilder } from '../builder';
 
 describe('BlockVisitor', () => {

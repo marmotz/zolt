@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { InlineParser } from '../inline-parser';
-import { Attributes } from '../types';
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { InlineParser } from '../inline-parser';
+import type { Attributes } from '../types';
 
 export class SpecialBlockParser {
   constructor(private inlineParser: InlineParser) {}

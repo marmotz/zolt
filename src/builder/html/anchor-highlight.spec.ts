@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { DocumentNode } from '../../parser/types';
+import type { DocumentNode } from '../../parser/types';
 import { HTMLBuilder } from './builder';
 
 describe('HTMLBuilder Anchor Highlight', () => {

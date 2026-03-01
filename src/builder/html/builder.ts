@@ -1,8 +1,8 @@
 import { createHighlighter, type Highlighter } from 'shiki';
 import { InlineParser } from '../../parser/inline-parser';
-import { ASTNode, Attributes, DocumentNode, HeadingNode } from '../../parser/types';
-import { ProjectNode } from '../../utils/project-graph';
-import { Builder } from '../builder';
+import type { ASTNode, Attributes, DocumentNode, HeadingNode } from '../../parser/types';
+import type { ProjectNode } from '../../utils/project-graph';
+import type { Builder } from '../builder';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
 import { zoltLanguage } from './shiki/zolt';
@@ -349,7 +349,7 @@ export class HTMLBuilder implements Builder {
           line(hNode, line) {
             const actualLineNumber = line + startLine - 1;
             if (highlightedLines.has(actualLineNumber)) {
-              hNode.properties.class = (hNode.properties.class || '') + ' highlight';
+              hNode.properties.class = `${hNode.properties.class || ''} highlight`;
             }
           },
         },
@@ -381,7 +381,7 @@ export class HTMLBuilder implements Builder {
     </div>`;
 
     return `
-    <div class="${containerClasses.join(' ')}"${startStyle}${attrsHtml ? ' ' + attrsHtml : ''}>
+    <div class="${containerClasses.join(' ')}"${startStyle}${attrsHtml ? ` ${attrsHtml}` : ''}>
       ${headerHtml}
       ${html}
     </div>`;

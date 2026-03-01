@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { ASTNode, TripleColonBlockNode } from '../../../parser/types';
+import type { ASTNode, TripleColonBlockNode } from '../../../parser/types';
 import { SpecialBlockVisitor } from './special-block-visitor';
 
 describe('SpecialBlockVisitor', () => {

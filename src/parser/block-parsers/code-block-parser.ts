@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { InlineParser } from '../inline-parser';
-import { Attributes, CodeBlockNode } from '../types';
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { InlineParser } from '../inline-parser';
+import type { Attributes, CodeBlockNode } from '../types';
 
 export class CodeBlockParser {
   constructor(private inlineParser: InlineParser) {}
@@ -26,10 +26,10 @@ export class CodeBlockParser {
     while (!isEof() && !match(TokenType.CODE_BLOCK_END)) {
       const token = advance();
       if (token.type === TokenType.CODE_BLOCK) {
-        content += token.value + '\n';
+        content += `${token.value}\n`;
       } else {
         // Handle unexpected tokens inside code block if any (should normally be only CODE_BLOCK tokens)
-        content += token.value + '\n';
+        content += `${token.value}\n`;
       }
     }
 

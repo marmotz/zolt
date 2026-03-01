@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { version } from '../../package.json';
 import { findProjectFile, loadProjectMetadata, main } from './index';
 
@@ -24,7 +24,7 @@ describe('CLI', () => {
 
     try {
       await main();
-    } catch (e) {
+    } catch (_e) {
       // Ignore
     } finally {
       process.argv = originalArgv;
@@ -36,7 +36,7 @@ describe('CLI', () => {
     logSpy.mockRestore();
     errorSpy.mockRestore();
 
-    return (logs + '\n' + errors).trim();
+    return `${logs}\n${errors}`.trim();
   };
 
   describe('Utility Functions', () => {

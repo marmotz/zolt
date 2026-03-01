@@ -1,4 +1,4 @@
-import { Token, TokenType } from '../lexer/token-types';
+import { type Token, TokenType } from '../lexer/token-types';
 import { BlockquoteParser } from './block-parsers/blockquote-parser';
 import { CodeBlockParser } from './block-parsers/code-block-parser';
 import { FileMetadataParser } from './block-parsers/file-metadata-parser';
@@ -12,7 +12,7 @@ import { TripleColonParser } from './block-parsers/triple-colon-parser';
 import { DefinitionCollector } from './definition-collector';
 import { ParseError } from './errors/parse-error';
 import { InlineParser } from './inline-parser';
-import { ASTNode, DocumentNode, FileMetadataNode, FootnoteDefinitionNode, VariableDefinitionNode } from './types';
+import type { ASTNode, DocumentNode, FileMetadataNode, FootnoteDefinitionNode, VariableDefinitionNode } from './types';
 
 export class Parser {
   private readonly tokens: Token[];
@@ -242,7 +242,7 @@ export class Parser {
         this.advance();
       }
       if (this.match(TokenType.TEXT)) {
-        content += ' ' + this.advance().value.trim();
+        content += ` ${this.advance().value.trim()}`;
       } else {
         break;
       }

@@ -1,4 +1,4 @@
-import { Token, TokenType } from '../lexer/token-types';
+import { type Token, TokenType } from '../lexer/token-types';
 
 export class DefinitionCollector {
   private abbreviationDefinitions: Map<string, string> = new Map();
@@ -76,13 +76,14 @@ export class DefinitionCollector {
         // Inline abbreviations extraction: abbreviation{abbr="definition"}
         const value = token.value;
         const regex = /([A-Za-z0-9μ]+)\{abbr="([^"]+)"[^}]*}/g;
-        let match;
-        while ((match = regex.exec(value)) !== null) {
+        let match = regex.exec(value);
+        while (match !== null) {
           const abbreviation = match[1];
           const definition = match[2];
           if (!this.abbreviationDefinitions.has(abbreviation)) {
             this.abbreviationDefinitions.set(abbreviation, definition);
           }
+          match = regex.exec(value);
         }
       }
     }

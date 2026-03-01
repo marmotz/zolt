@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { DocumentNode } from '../../parser/types';
+import type { DocumentNode } from '../../parser/types';
 import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { DocumentRenderer } from './document-renderer';
 

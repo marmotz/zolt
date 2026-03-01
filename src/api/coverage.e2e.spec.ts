@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import * as path from 'path';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import { buildString, extractAllAssets, lint } from './index';
 
 describe('API Coverage Improvement', () => {

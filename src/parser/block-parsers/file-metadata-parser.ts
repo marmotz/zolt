@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
+import { type Token, TokenType } from '../../lexer/token-types';
 import { FileMetadataUtils, KNOWN_METADATA_KEYS } from '../../utils/file-metadata';
-import { FileMetadataNode } from '../types';
+import type { FileMetadataNode } from '../types';
 
 export class FileMetadataParser {
   public parseFileMetadata(

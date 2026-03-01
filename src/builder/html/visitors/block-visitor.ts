@@ -1,4 +1,4 @@
-import {
+import type {
   ASTNode,
   BlockquoteNode,
   DefinitionDescriptionNode,
@@ -17,11 +17,11 @@ export class BlockVisitor {
   public headingCounters: number[] = new Array(7).fill(0);
 
   constructor(
-    private build: (node: ASTNode) => Promise<string>,
+    _build: (node: ASTNode) => Promise<string>,
     private joinChildren: (nodes: ASTNode[]) => Promise<string>,
     private joinInlineChildren: (nodes: ASTNode[]) => Promise<string>,
     private renderAllAttributes: (attrs?: any) => string,
-    private processInlineContent: (text: string) => Promise<string>,
+    _processInlineContent: (text: string) => Promise<string>,
     private evaluator: any
   ) {}
 
@@ -88,7 +88,7 @@ export class BlockVisitor {
         if (!node.attributes) {
           node.attributes = {};
         }
-        const currentStyle = node.attributes.style ? node.attributes.style + ';' : '';
+        const currentStyle = node.attributes.style ? `${node.attributes.style};` : '';
         node.attributes.style = `${currentStyle}text-align: center`;
         // Remove align from image to avoid invalid attribute
         delete imageNode.attributes.align;
@@ -124,7 +124,7 @@ export class BlockVisitor {
       if (!node.attributes) {
         node.attributes = {};
       }
-      node.attributes.class = (node.attributes.class ? node.attributes.class + ' ' : '') + 'zolt-list-plain';
+      node.attributes.class = `${node.attributes.class ? `${node.attributes.class} ` : ''}zolt-list-plain`;
     }
 
     const childrenHtml = await this.joinChildren(node.children);

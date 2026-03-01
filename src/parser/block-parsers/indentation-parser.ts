@@ -1,7 +1,7 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { ASTNode, IndentationNode, ParagraphNode } from '../types';
-import { ListParser } from './list-parser';
-import { TripleColonParser } from './triple-colon-parser';
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { ASTNode, IndentationNode, ParagraphNode } from '../types';
+import type { ListParser } from './list-parser';
+import type { TripleColonParser } from './triple-colon-parser';
 
 export class IndentationParser {
   constructor(

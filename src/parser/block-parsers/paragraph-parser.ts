@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
+import { type Token, TokenType } from '../../lexer/token-types';
 import { InlineParser } from '../inline-parser';
-import { Attributes, ParagraphNode } from '../types';
+import type { Attributes, ParagraphNode } from '../types';
 
 export class ParagraphParser {
   constructor(private inlineParser: InlineParser) {}

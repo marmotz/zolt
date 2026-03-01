@@ -12,18 +12,12 @@
   },
   "repository": "github:marmotz/zolt",
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.4.4",
     "@types/bun": "latest",
     "@types/katex": "^0.16.8",
-    "eslint": "^10.0.2",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.8.1",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript": "^5.9.3"
   },
   "bin": {
     "zolt": "./dist/cli/zolt"
@@ -56,10 +50,10 @@
     "test:coverage:watch": "bun test:coverage --watch",
     "type-check": "bun x tsc --noEmit",
     "prepublishOnly": "rm -rf dist && bun run build:lib && bun run build:cli",
-    "format:check": "bun x prettier --check src",
-    "format:fix": "bun x prettier --write src",
-    "lint:check": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "format:check": "biome format src",
+    "format:fix": "biome format --write src",
+    "lint:check": "biome lint .",
+    "lint:fix": "biome check --write .",
     "update:minor": "bunx npm-check-updates -i -t minor",
     "update:latest": "bunx npm-check-updates -i -t latest",
     "prepare": "husky",
@@ -67,8 +61,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "prettier --write",
-      "eslint --fix"
+      "biome check --write"
     ]
   },
   "type": "module",

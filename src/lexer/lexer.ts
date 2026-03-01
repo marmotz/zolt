@@ -1,5 +1,5 @@
 import { LexerState } from './state/lexer-state';
-import { Token, TokenType } from './token-types';
+import { type Token, TokenType } from './token-types';
 
 export class Lexer {
   private source: string;

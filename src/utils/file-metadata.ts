@@ -47,8 +47,8 @@ export function createFileDateVariables(metadata: FileMetadata): { created: stri
   };
 }
 
-export class FileMetadataUtils {
-  public static parse(content: string): Record<string, unknown> {
+export const FileMetadataUtils = {
+  parse(content: string): Record<string, unknown> {
     try {
       // Remove leading/trailing delimiters if present
       let cleanContent = content.trim();
@@ -68,19 +68,19 @@ export class FileMetadataUtils {
     } catch {
       return {};
     }
-  }
+  },
 
-  public static parseValue(value: string): unknown {
+  parseValue(value: string): unknown {
     try {
       return parseYaml(value);
     } catch {
       return value;
     }
-  }
+  },
 
-  public static extractRaw(content: string): string | null {
+  extractRaw(content: string): string | null {
     const match = content.match(/^---\n([\s\S]+?)\n---/);
 
     return match ? match[1] : null;
-  }
-}
+  },
+};

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { main } from './index';
 
 describe('CLI: Project Metadata (zolt.project.yaml and .yml)', () => {

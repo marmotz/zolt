@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { extractZltLinks, getLinkedFiles } from './index';
 
 describe('API: Links', () => {

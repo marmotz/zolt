@@ -1,4 +1,4 @@
-import { Attributes } from '../../../parser/types';
+import type { Attributes } from '../../../parser/types';
 import { escapeHtml, formatValue } from './string-utils';
 
 export class AttributeRenderer {
@@ -83,9 +83,9 @@ export class AttributeRenderer {
         cssProps.push(`${cssKey}: ${processedValue}`);
 
         if (cssKey === 'float') {
-          if (processedValue === 'right' && !attrs['marginLeft'] && !attrs['margin-left'] && !attrs['margin']) {
+          if (processedValue === 'right' && !attrs.marginLeft && !attrs['margin-left'] && !attrs.margin) {
             cssProps.push('margin-left: 1rem');
-          } else if (processedValue === 'left' && !attrs['marginRight'] && !attrs['margin-right'] && !attrs['margin']) {
+          } else if (processedValue === 'left' && !attrs.marginRight && !attrs['margin-right'] && !attrs.margin) {
             cssProps.push('margin-right: 1rem');
           }
         }
@@ -203,7 +203,7 @@ export class AttributeRenderer {
       }
     }
 
-    return parts.length > 0 ? ' ' + parts.join(' ') : '';
+    return parts.length > 0 ? ` ${parts.join(' ')}` : '';
   }
 
   private camelToKebab(str: string): string {
@@ -213,7 +213,7 @@ export class AttributeRenderer {
   private evaluateString(text: string): string {
     return text.replace(/\{\$([a-zA-Z_]\w*)}/g, (_, name) => {
       try {
-        const val = this.evaluator.evaluate('$' + name);
+        const val = this.evaluator.evaluate(`$${name}`);
 
         return escapeHtml(formatValue(val));
       } catch {

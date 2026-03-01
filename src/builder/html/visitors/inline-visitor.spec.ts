@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { ASTNode } from '../../../parser/types';
+import type { ASTNode } from '../../../parser/types';
 import { ExpressionEvaluator } from '../../evaluator/expression-evaluator';
 import { InlineVisitor } from './inline-visitor';
 

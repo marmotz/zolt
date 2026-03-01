@@ -1,5 +1,5 @@
-import { ASTNode, DocumentNode, HeadingNode } from '../../parser/types';
-import { ExpressionEvaluator } from '../evaluator/expression-evaluator';
+import type { ASTNode, DocumentNode, HeadingNode } from '../../parser/types';
+import type { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import {
   ANCHOR_SCRIPT,
   CHART_SCRIPT,
@@ -149,7 +149,7 @@ ${CODE_COPY_SCRIPT}
     if (ogImage && typeof ogImage === 'string' && ogUrl && typeof ogUrl === 'string') {
       if (!ogImage.startsWith('http://') && !ogImage.startsWith('https://')) {
         const base = String(ogUrl).endsWith('/') ? String(ogUrl).slice(0, -1) : String(ogUrl);
-        const img = String(ogImage).startsWith('/') ? String(ogImage) : '/' + String(ogImage);
+        const img = String(ogImage).startsWith('/') ? String(ogImage) : `/${String(ogImage)}`;
         ogImage = base + img;
       }
     }

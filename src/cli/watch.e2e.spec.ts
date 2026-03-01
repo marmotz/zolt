@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { spawn } from 'child_process';
-import { mkdir, readFile, rm, stat, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { spawn } from 'node:child_process';
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const CLI_SRC = 'src/cli/index.ts';
 

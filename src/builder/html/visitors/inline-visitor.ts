@@ -1,5 +1,5 @@
 import katex from 'katex';
-import {
+import type {
   AbbreviationNode,
   ASTNode,
   AudioNode,
@@ -27,7 +27,7 @@ export class InlineVisitor {
   constructor(
     private joinChildren: (nodes: ASTNode[]) => Promise<string>,
     private renderAllAttributes: (attrs?: any) => string,
-    private processInline: (text: string) => Promise<string>,
+    _processInline: (text: string) => Promise<string>,
     private evaluator: any,
     private registerFootnoteRef: (id: string) => { index: number; refId: string },
     private assetResolver?: (path: string) => string
@@ -169,7 +169,7 @@ export class InlineVisitor {
       }
 
       return `<span${attrs} class="zolt-math-inline">${html}</span>`;
-    } catch (e) {
+    } catch (_e) {
       return `<span${attrs} class="zolt-math-error">${node.content}</span>`;
     }
   }
@@ -239,7 +239,7 @@ export class InlineVisitor {
 
     if (youtubeMatch) {
       const videoId = youtubeMatch[1];
-      const embedSrc = 'https://www.youtube-nocookie.com/embed/' + videoId;
+      const embedSrc = `https://www.youtube-nocookie.com/embed/${videoId}`;
       const videoAttrs = { ...nodeAttrs, border: '0' };
       const renderedAttrs = this.renderAllAttributes(videoAttrs);
 
@@ -318,7 +318,7 @@ export class InlineVisitor {
 
   visitVariable(node: VariableNode): string {
     try {
-      const value = this.evaluator.evaluate('$' + node.name);
+      const value = this.evaluator.evaluate(`$${node.name}`);
       if (value === null || value === undefined) {
         return `{$${node.name}}`;
       }
@@ -364,13 +364,13 @@ export class InlineVisitor {
       }
     }
 
-    return parts.length > 0 ? ' ' + parts.join(' ') : '';
+    return parts.length > 0 ? ` ${parts.join(' ')}` : '';
   }
 
   private evaluateString(text: string): string {
     return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/g, (_, name) => {
       try {
-        const val = this.evaluator.evaluate('$' + name);
+        const val = this.evaluator.evaluate(`$${name}`);
 
         return escapeHtml(formatValue(val));
       } catch {

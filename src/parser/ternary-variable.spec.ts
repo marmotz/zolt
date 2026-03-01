@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { InlineParser } from './inline-parser';
-import { VariableNode } from './types';
+import type { VariableNode } from './types';
 
 describe('InlineParser with Ternary Variables', () => {
   const parser = new InlineParser();

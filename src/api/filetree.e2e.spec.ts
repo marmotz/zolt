@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { buildString } from './index';
 
 describe('Filetree Markup', () => {
@@ -97,7 +97,7 @@ title: Sub Page
     );
 
     // Update index to link to subpage
-    fs.writeFileSync(indexFile, fs.readFileSync(indexFile, 'utf-8') + `\n[Sub](sub/subpage.zlt)`);
+    fs.writeFileSync(indexFile, `${fs.readFileSync(indexFile, 'utf-8')}\n[Sub](sub/subpage.zlt)`);
 
     const content = fs.readFileSync(subPageFile, 'utf-8');
     const html = await buildString(content, {

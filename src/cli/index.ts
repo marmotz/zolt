@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 
+import { existsSync, watch as watchFile } from 'node:fs';
+import { copyFile, mkdir, readFile, stat } from 'node:fs/promises';
+import { basename, dirname, join, relative, resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 import { serve } from 'bun';
-import { existsSync, watch as watchFile } from 'fs';
-import { copyFile, mkdir, readFile, stat } from 'fs/promises';
-import { basename, dirname, join, relative, resolve } from 'path';
 import pc from 'picocolors';
-import { parseArgs } from 'util';
 import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 import { FileMetadataUtils } from '../utils/file-metadata';
@@ -96,7 +96,7 @@ export async function buildFileWithDeps(
     const absoluteAssetPath = resolve(dirname(absoluteInput), originalAssetPath);
     const assetPathRelativeToBase = relative(baseInputDir, absoluteAssetPath);
 
-    let destAssetAbsolutePath;
+    let destAssetAbsolutePath: string;
     if (assetPathRelativeToBase.startsWith('..')) {
       const oneLevelUp = dirname(baseInputDir);
       const pathFromOneLevelUp = relative(oneLevelUp, absoluteAssetPath);
@@ -121,7 +121,7 @@ export async function buildFileWithDeps(
     const fullAssetPath = resolve(inputDir, asset);
     const assetPathRelativeToBase = relative(baseInputDir, fullAssetPath);
 
-    let destAssetPath;
+    let destAssetPath: string;
     if (assetPathRelativeToBase.startsWith('..')) {
       const oneLevelUp = dirname(baseInputDir);
       const pathFromOneLevelUp = relative(oneLevelUp, fullAssetPath);
@@ -196,7 +196,7 @@ export function printHelp() {
 
   console.log(`
 ${pc.bold(pc.green('Zolt'))} - ${dim('The high-voltage successor to Markdown')}
-${dim('v' + version)}
+${dim(`v${version}`)}
 
 ${pc.bold('Usage:')}
   zolt ${arg('<command>')} ${dim('[options]')}
@@ -462,7 +462,7 @@ export async function performBuild(
           console.log(`${pc.blue('Copied:')} ${relSrc} ${pc.dim('->')} ${relDest}`);
         }
       }
-    } catch (err) {
+    } catch (_err) {
       console.warn(`${pc.yellow('Warning:')} Asset file not found: ${fullAssetPath}`);
     }
   }
@@ -702,7 +702,9 @@ export async function handleServer(
         open(ws) {
           ws.subscribe('zolt-reload');
         },
-        message() {},
+        message() {
+          // No messages expected
+        },
       },
     });
 

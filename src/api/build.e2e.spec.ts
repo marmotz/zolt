@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { buildFile, buildString } from './index';
 
 describe('API: Build', () => {
@@ -210,7 +210,9 @@ $items = ["Apple", "Banana", "Cherry"]
       expect(liCount).toBe(3);
     });
 
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: Testing Zolt variables that look like JS templates
     test('should NOT confuse ${$var} or ${{$var}} with math formulas', async () => {
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: Testing Zolt variables that look like JS templates
       const zolt = '\n$price = 100\n- Price: ${$price}\n- Double: ${{$price * 2}}\n';
       const html = await buildString(zolt);
 
@@ -268,7 +270,7 @@ $items = ["Apple", "Banana", "Cherry"]
     test('should build file to output', async () => {
       await buildFile(testFilePath, testOutputPath);
 
-      const { exists } = await import('fs/promises');
+      const { exists } = await import('node:fs/promises');
       expect(await exists(testOutputPath)).toBe(true);
     });
   });

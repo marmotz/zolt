@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../../lexer/token-types';
-import { InlineParser } from '../inline-parser';
-import {
+import { type Token, TokenType } from '../../lexer/token-types';
+import type { InlineParser } from '../inline-parser';
+import type {
   ASTNode,
   Attributes,
   ChartDataPoint,
@@ -312,7 +312,7 @@ export class TripleColonParser {
     if (numMatch) {
       const cleaned = rawValue.replace(/,/g, '');
       const num = parseFloat(cleaned);
-      if (!isNaN(num)) {
+      if (!Number.isNaN(num)) {
         return num;
       }
     }

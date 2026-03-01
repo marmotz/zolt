@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import {
+import type {
   BlockquoteNode,
   CodeBlockNode,
   DocumentNode,
