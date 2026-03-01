@@ -28,18 +28,15 @@ function hello() {
 :::
 ### Language Support
 
-Specify the language after the opening backticks:
+Zolt uses [Shiki](https://shiki.style) for high-quality syntax highlighting. You can specify the language after the opening backticks.
 
-| Language   | Syntax            |
-|------------|-------------------|
-| TypeScript | `` ```typescript `` |
-| JavaScript | `` ```javascript `` |
-| HTML       | `` ```html ``       |
-| CSS        | `` ```css ``        |
-| JSON       | `` ```json ``       |
-| Python     | `` ```python ``     |
-| Bash       | `` ```bash ``       |
-| SQL        | `` ```sql ``        |
+A full list of the hundreds of supported languages can be found here: [Shiki Supported Languages](https://shiki.style/languages)
+
+Example syntax:
+- `` ```typescript ``
+- `` ```javascript ``
+- `` ```python ``
+- `` ```bash ``
 
 ---
 
@@ -54,6 +51,13 @@ def hello():
 ```
 ````
 
+:::info [Result]
+```python {title="main.py"}
+def hello():
+    print("Hello, World!")
+```
+:::
+
 ### Available Attributes
 
 | Attribute  | Description          | Example             |
@@ -67,10 +71,51 @@ def hello():
 ```javascript {highlight=2-4}
 function processData(data) {
     const result = data.map(item => item.value);  // Highlighted
+                                                  // Highlighted
     return result.filter(x => x > 0);             // Highlighted
 }
 ```
 ````
+
+:::info [Result]
+```javascript {highlight=2-4}
+function processData(data) {
+    const result = data.map(item => item.value);  // Highlighted
+                                                  // Highlighted
+    return result.filter(x => x > 0);             // Highlighted
+}
+```
+:::
+
+### Multiple Line Ranges
+
+You can combine specific lines and ranges using commas:
+
+````zolt
+```typescript {highlight="1,3-5"}
+import { Parser } from './parser';
+
+// The following lines are part of a range
+const parser = new Parser();
+const tokens = parser.tokenize(input);
+const ast = parser.parse(tokens);
+
+return ast;
+```
+````
+
+:::info [Result]
+```typescript {highlight="1,4-6"}
+import { Parser } from './parser';
+
+// The following lines are part of a range
+const parser = new Parser();
+const tokens = parser.tokenize(input);
+const ast = parser.parse(tokens);
+
+return ast;
+```
+:::
 
 ### Example with Line Numbers
 
@@ -82,6 +127,14 @@ def calculate(a, b):
 ```
 ````
 
+:::info [Result]
+```python {start=10}
+def calculate(a, b):
+    # This function adds two numbers
+    return a + b
+```
+:::
+
 ## Inline Code
 
 Use single backticks for inline code:
@@ -92,51 +145,11 @@ Use the `print()` function to output text.
 The `$variable` syntax is used for variables.
 ```
 
-## Code in Lists
+:::info [Result]
+Use the `print()` function to output text.
 
-Combine code blocks with lists:
-
-```zolt
-To install the package:
-
-1. Run the command:
-   ```bash
-   npm install zolt-cli
-   ```
-
-2. Verify installation:
-   ```bash
-   zolt --version
-   ```
-
-3. Create a new project:
-   ```bash
-   zolt init my-project
-   ```
-```
-
-## Technical Indentation
-
-Use `&` for terminal-style content without syntax highlighting:
-
-```zolt
-& $ npm install zolt
-& Added 45 packages in 3s
-& 
-& $ zolt build
-& Building...
-& Done!
-```
-
-### Nested Indentation
-
-```zolt
-& Installation
-&& Step 1: Download
-&& Step 2: Install
-& Configuration
-&& Edit config file
-```
+The `$variable` syntax is used for variables.
+:::
 
 ## Best Practices
 
@@ -144,9 +157,3 @@ Use `&` for terminal-style content without syntax highlighting:
 2. **Use titles** for code block identification
 3. **Highlight key lines** for emphasis
 4. **Use inline code** for short snippets
-
-## Next Steps
-
-- [Mathematical Formulas](math.zlt) — LaTeX math rendering
-- [Advanced Features](advanced.zlt) — Charts and loops
-- [Basic Syntax](basic-syntax.zlt) — More formatting options

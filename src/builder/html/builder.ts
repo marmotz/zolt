@@ -383,7 +383,10 @@ export class HTMLBuilder implements Builder {
 
     const headerHtml = `
     <div class="zolt-code-header">
-      <span class="zolt-code-title">${title || ''}</span>
+      <div class="zolt-code-info">
+        <span class="zolt-code-lang">${lang}</span>
+        ${title ? `<span class="zolt-code-title">${title}</span>` : ''}
+      </div>
       <button class="zolt-copy-button">Copier</button>
     </div>`;
 

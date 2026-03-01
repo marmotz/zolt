@@ -554,9 +554,28 @@ export const BASE_CSS = `
     font-size: 0.85rem;
   }
 
+  .zolt-code-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .zolt-code-lang {
+    color: #1e1e1e;
+    background-color: var(--zlt-color-primary, #3b82f6);
+    border-radius: 5px;
+    padding: 2px 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-family: var(--zlt-font-mono, monospace);
+    letter-spacing: 0.05em;
+  }
+
   .zolt-code-title {
     font-family: var(--zlt-font-mono, monospace);
     font-weight: 500;
+    opacity: 0.8;
   }
 
   .zolt-copy-button {

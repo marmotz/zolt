@@ -282,6 +282,8 @@ describe('HTMLBuilder', () => {
 
     const html = await builder.build(node);
     expect(html).toContain('zolt-code-block');
+    expect(html).toContain('zolt-code-lang');
+    expect(html).toContain('javascript');
     expect(html).toContain('shiki');
     expect(html).toContain('const');
   });
