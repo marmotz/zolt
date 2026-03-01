@@ -180,9 +180,11 @@ Create visual separators between sections.
 ___    (thin)
 ```
 
+:::info [Result]
 ---
 ***
 ___
+:::
 
 ### With Attributes
 
@@ -191,14 +193,16 @@ ___
 
 *** {color=blue}
 
-___ {width=50% align=center}
+___ {color=lightgreen width=50% align=center}
 ```
 
+:::info [Result]
 --- {color=red style=dashed}
 
 *** {color=blue}
 
-___ {width=50% align=center}
+___ {color=lightgreen width=50% align=center}
+:::
 
 ## Headings
 
@@ -235,6 +239,14 @@ Add IDs, classes, and numbering:
 
 ## Appendix{numbered=false}
 ```
+
+:::info [Result]
+## Introduction{#intro}
+
+## Chapter 1{numbered}
+
+## Appendix{numbered=false}
+:::
 
 ### Automatic Numbering
 

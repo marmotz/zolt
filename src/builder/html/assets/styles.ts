@@ -107,6 +107,8 @@ export const BASE_CSS = `
     padding: 1.2rem;
     margin: 1.5rem 0;
     background: var(--zlt-color-block-bg);
+    border-radius: 5px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.15);
   }
   .triple-colon-block.columns, .triple-colon-block.column {
     background: var(--zlt-color-bg);
@@ -512,6 +514,7 @@ export const BASE_CSS = `
     background: #1e1e1e; /* Shiki default bg */
     border: 1px solid var(--zlt-color-border);
     position: relative;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.15);
   }
 
   .zolt-code-header {

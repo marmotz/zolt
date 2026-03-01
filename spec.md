@@ -614,7 +614,6 @@ Contenu du bloc
 | `error`    | Erreurs critiques      |
 | `success`  | Confirmations          |
 | `note`     | Notes et remarques     |
-| `abstract` | Résumés                |
 
 #### Exemples
 

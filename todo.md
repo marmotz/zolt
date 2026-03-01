@@ -160,7 +160,7 @@
 
 ### Triple Colon Blocks `:::`
 
-- [x] Semantic containers: `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`, `:::abstract`
+- [x] Semantic containers: `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`
 - [x] Optional titles `:::type [Title]`
 - [x] Block attributes `{attributes}`
 - [x] Details/accordion `:::details [Title]`

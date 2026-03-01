@@ -35,10 +35,6 @@ This is a success message.
 :::note [Note]
 This is a note.
 :::
-
-:::abstract [Abstract]
-This is an abstract summary.
-:::
 ```
 
 ### With Attributes

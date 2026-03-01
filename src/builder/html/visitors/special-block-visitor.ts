@@ -109,7 +109,7 @@ export class SpecialBlockVisitor {
     const attrs = this.renderAllAttributes(node.attributes);
 
     const extraClass = node.blockType === 'columns' || node.blockType === 'column' ? ` ${node.blockType}` : '';
-    const semanticTypes = ['info', 'warning', 'error', 'success', 'note', 'abstract'];
+    const semanticTypes = ['info', 'warning', 'error', 'success', 'note'];
     const semanticClass = semanticTypes.includes(node.blockType) ? ` ${node.blockType}` : '';
 
     let html = `<div${attrs} class="triple-colon-block${extraClass}${semanticClass}" data-type="${node.blockType}">\n`;
