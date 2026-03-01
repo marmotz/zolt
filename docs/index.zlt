@@ -5,23 +5,9 @@ lang: en
 
 # Zolt Documentation
 
-**Zolt** is a markup language designed to be fully readable as plain text while offering the semantic power of HTML5 and
-the precision of LaTeX.
+**Zolt** is a markup language designed to be fully readable as plain text while offering powerful tools to create
+complete, usable, professional, and elegant documents. \n
 It combines the simplicity of Markdown with advanced features for professional documentation.
-
----
-
-## Quick Start
-
-New to Zolt? Start here:
-
-1. [Installation & Usage](installation.zlt) — How to install Zolt
-1. [CLI Commands Reference](cli-commands.zlt) — How to use the CLI
-1. [Basic Syntax](basic-syntax.zlt) — Learn text formatting, typography, and inline styles
-1. [Lists](lists.zlt) — Bullet, numbered, task, and definition lists
-1. [Links & Media](links-media.zlt) — Hyperlinks, images, videos, and audio
-
----
 
 ## Feature Overview
 
@@ -37,53 +23,49 @@ Zolt comes with powerful features:
 | **Charts** | `:::chart` | Built-in data visualization |
 | **Blocks** | `:::info`, `:::tabs` | Semantic containers |
 
----
-
-## Documentation Sections
-
-### Getting Started
+## Getting Started
 
 - [Installation & Usage](installation.zlt) — Installation and CLI guide
 - [Basic Syntax](basic-syntax.zlt) — Text formatting, inline styles, and typography
 - [Lists](lists.zlt) — All types of lists with nesting and attributes
 - [Links & Media](links-media.zlt) — External links, internal references, images, videos
 
-### Content Structure
+## Content Structure
 
 - [Tables](tables.zlt) — Grid tables with cell merging
 - [Semantic Blocks](blocks.zlt) — Tabs, accordions, columns, and callouts
 - [Citations & Technical Content](citations.zlt) — Blockquotes and technical indentation
 
-### Technical Features
+## Technical Features
 
 - [Code Blocks](code-blocks.zlt) — Syntax highlighting and code display
 - [Mathematical Formulas](math.zlt) — LaTeX equations with KaTeX
 
-### Reference
-
-- [Quick Reference](quick-reference.zlt) — Quick syntax lookup
-
-### Dynamic Content
+## Dynamic Content
 
 - [Variables & Calculations](variables.zlt) — Variables, expressions, and math functions
 - [Advanced Features](advanced.zlt) — Loops, conditionals, charts, and diagrams
 - [Metadata](metadata.zlt) — File metadata, themes, and configuration
 
+## Reference
+
+- [Syntax Reference](syntax-reference.zlt) — Quick syntax lookup
+- [CLI Commands Reference](cli-commands.zlt) — How to use the CLI
+
+## Related Resources
+
+- [Contributing Guide](contributing.zlt) — How to build and contribute to Zolt
+- [Official Website](https://zolt.marmotz.dev)
+- [GitHub Repository](https://github.com/marmotz/zolt)
+
 ---
 
 ## Why Zolt?
 
-### Design Philosophy
-
 - **Zero HTML**: Everything achievable in HTML/CSS has native Zolt syntax
-- **Strict but Flexible**: Syntax errors don't break documents but generate warnings
-- **Extensibility**: Use "Triple Colon" `:::` for advanced features
-
-### Key Benefits
-
-- Create interactive, professional documents as quickly as taking notes
-- Files remain simple `.txt` with superior structural intelligence
-- Easy maintenance through variables and dynamic references
+- Create **interactive, professional** documents as quickly as taking notes
+- Files remain **simple text** files with superior structural intelligence
+- **Easy maintenance** through variables and dynamic references
 
 ---
 
@@ -107,14 +89,6 @@ This document demonstrates **Zolt** features:
 This is an informational block with native syntax.
 :::
 ```
-
----
-
-## Related Resources
-
-- [Contributing Guide](contributing.zlt) — How to build and contribute to Zolt
-- [Official Website](https://zolt.marmotz.dev)
-- [GitHub Repository](https://github.com/marmotz/zolt)
 
 :::columns
 :::column

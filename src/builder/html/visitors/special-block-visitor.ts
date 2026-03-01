@@ -191,9 +191,15 @@ export class SpecialBlockVisitor {
       return '<div class="zolt-filetree-error">Project graph not available. Please specify an entry point.</div>';
     }
 
-    const from = parseInt(node.attributes?.from || '0');
-    const to = parseInt(node.attributes?.to || '99');
-    const depth = parseInt(node.attributes?.depth || '99');
+    const from = parseInt(node.attributes?.from || '0') || 0;
+    const to = parseInt(node.attributes?.to || '99') || 99;
+    const depth = parseInt(node.attributes?.depth || '99') || 99;
+    const numbered =
+      node.attributes?.numbered === 'true' ||
+      (node.attributes &&
+        Object.prototype.hasOwnProperty.call(node.attributes, 'numbered') &&
+        node.attributes.numbered === '') ||
+      false;
     const showToc =
       (node.attributes?.toc === 'true' ||
         (node.attributes &&
@@ -201,9 +207,56 @@ export class SpecialBlockVisitor {
           node.attributes.toc === '')) ??
       false;
 
-    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc);
+    const getIntAttr = (val: any, defaultVal: number) => {
+      if (val === undefined || val === '') return defaultVal;
+      const parsed = parseInt(val);
+
+      return isNaN(parsed) ? defaultVal : parsed;
+    };
+
+    const tocOptions = {
+      from: getIntAttr(node.attributes?.tocFrom, 1),
+      to: getIntAttr(node.attributes?.tocTo, 6),
+      depth: getIntAttr(node.attributes?.tocDepth, 3),
+      numbered:
+        node.attributes?.tocNumbered === 'true' ||
+        (node.attributes &&
+          Object.prototype.hasOwnProperty.call(node.attributes, 'tocNumbered') &&
+          node.attributes.tocNumbered === '') ||
+        false,
+      hasTo: !!node.attributes?.tocTo && node.attributes?.tocTo !== '',
+      hasDepth: !!node.attributes?.tocDepth && node.attributes?.tocDepth !== '',
+    };
+
+    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc, tocOptions, numbered);
 
     return `<nav class="zolt-filetree">\n${html}\n</nav>`;
+  }
+
+  private getFilteredHeadings(
+    headings: HeadingNode[],
+    from: number,
+    to: number,
+    depth: number,
+    hasTo: boolean,
+    hasDepth: boolean
+  ): HeadingNode[] {
+    return headings.filter((h) => {
+      if (h.level < from) return false;
+
+      let maxLevel: number;
+      if (hasTo && hasDepth) {
+        maxLevel = Math.min(to, depth);
+      } else if (hasTo) {
+        maxLevel = to;
+      } else if (hasDepth) {
+        maxLevel = depth;
+      } else {
+        maxLevel = 3; // default depth
+      }
+
+      return h.level <= maxLevel;
+    });
   }
 
   private async renderFileTreeNodes(
@@ -212,18 +265,22 @@ export class SpecialBlockVisitor {
     from: number,
     to: number,
     maxDepth: number,
-    showToc: boolean
+    showToc: boolean,
+    tocOptions: any,
+    numbered: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) return '';
     if (!nodes || nodes.length === 0) return '';
 
     const htmlParts = [];
     for (const n of nodes) {
-      htmlParts.push(await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc));
+      htmlParts.push(await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc, tocOptions, numbered));
     }
     const html = htmlParts.join('');
 
-    return `<ul>\n${html}</ul>`;
+    const tag = numbered ? 'ol' : 'ul';
+
+    return `<${tag}>\n${html}</${tag}>`;
   }
 
   private async renderFileTreeNode(
@@ -232,7 +289,9 @@ export class SpecialBlockVisitor {
     from: number,
     to: number,
     maxDepth: number,
-    showToc: boolean
+    showToc: boolean,
+    tocOptions: any,
+    numbered: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) return '';
 
@@ -240,10 +299,6 @@ export class SpecialBlockVisitor {
     const normCurrent = this.currentFilePath ? path.normalize(this.currentFilePath) : null;
     const normNode = path.normalize(node.absPath);
     const isActive = normCurrent === normNode;
-
-    // if (this.currentFilePath && node.absPath.includes('test-project-filetree-toc')) {
-    //   console.log(`Node: ${normNode} vs Current: ${normCurrent} -> isActive: ${isActive}`);
-    // }
 
     const activeClass = isActive ? ' class="active"' : '';
 
@@ -262,19 +317,33 @@ export class SpecialBlockVisitor {
     }
 
     if (isActive && showToc && this.currentHeadings.length > 0) {
-      const tocHtml = await this.buildTocTree(this.currentHeadings, 1, false);
-      html += `\n<div class="zolt-filetree-toc">${tocHtml}</div>\n`;
+      const filteredHeadings = this.getFilteredHeadings(
+        this.currentHeadings,
+        tocOptions.from,
+        tocOptions.to,
+        tocOptions.depth,
+        tocOptions.hasTo,
+        tocOptions.hasDepth
+      );
+
+      if (filteredHeadings.length > 0) {
+        const tocHtml = await this.buildTocTree(filteredHeadings, tocOptions.from, tocOptions.numbered);
+        html += `\n<div class="zolt-filetree-toc">${tocHtml}</div>\n`;
+      }
     }
 
     if (node.children.length > 0 && currentDepth < to && currentDepth + 1 < maxDepth) {
       const childrenHtmlParts = [];
       for (const child of node.children) {
-        childrenHtmlParts.push(await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc));
+        childrenHtmlParts.push(
+          await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc, tocOptions, numbered)
+        );
       }
       const childrenHtml = childrenHtmlParts.join('');
 
       if (childrenHtml) {
-        html += `\n<ul>\n${childrenHtml}</ul>\n`;
+        const tag = numbered ? 'ol' : 'ul';
+        html += `\n<${tag}>\n${childrenHtml}</${tag}>\n`;
       }
     }
 
@@ -286,35 +355,28 @@ export class SpecialBlockVisitor {
   }
 
   private async visitToc(node: DoubleBracketBlockNode): Promise<string> {
-    const fromAttr = node.attributes?.from;
-    const toAttr = node.attributes?.to;
-    const depthAttr = node.attributes?.depth;
-    const numbered = node.attributes?.numbered === 'true';
+    const getIntAttr = (val: any, defaultVal: number) => {
+      if (val === undefined || val === '') return defaultVal;
+      const parsed = parseInt(val);
+
+      return isNaN(parsed) ? defaultVal : parsed;
+    };
+
+    const from = getIntAttr(node.attributes?.from, 1);
+    const to = getIntAttr(node.attributes?.to, 6);
+    const depth = getIntAttr(node.attributes?.depth, 3);
+    const numbered =
+      node.attributes?.numbered === 'true' ||
+      (node.attributes &&
+        Object.prototype.hasOwnProperty.call(node.attributes, 'numbered') &&
+        node.attributes.numbered === '') ||
+      false;
     const customClass = node.attributes?.class || '';
 
-    const from = parseInt(fromAttr || '1');
-    const to = parseInt(toAttr || '6');
-    const depth = parseInt(depthAttr || '3');
+    const hasTo = !!node.attributes?.to && node.attributes?.to !== '';
+    const hasDepth = !!node.attributes?.depth && node.attributes?.depth !== '';
 
-    const filteredHeadings = this.currentHeadings.filter((h) => {
-      const level = h.level;
-      if (level < from) {
-        return false;
-      }
-
-      let maxLevel: number;
-      if (toAttr && depthAttr) {
-        maxLevel = Math.min(to, depth);
-      } else if (toAttr) {
-        maxLevel = to;
-      } else if (depthAttr) {
-        maxLevel = depth;
-      } else {
-        maxLevel = 3; // default depth
-      }
-
-      return level <= maxLevel;
-    });
+    const filteredHeadings = this.getFilteredHeadings(this.currentHeadings, from, to, depth, hasTo, hasDepth);
 
     if (filteredHeadings.length === 0) {
       return '';

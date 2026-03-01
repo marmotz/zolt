@@ -33,7 +33,7 @@ describe('CLI Server', () => {
       await new Promise<void>((resolve, reject) => {
         proc.stdout.on('data', (data) => {
           output += data.toString();
-          if (output.includes('Zolt Development Server')) {
+          if (output.includes('Zolt Live Preview')) {
             resolve();
           }
         });

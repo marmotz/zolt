@@ -309,6 +309,14 @@ ${CODE_COPY_SCRIPT}
     for (const node of nodes) {
       if (node.type === 'Heading') {
         headings.push(node as HeadingNode);
+      } else if (node.type === 'Table') {
+        const table = node as any;
+        if (table.header) headings.push(...this.findAllHeadings(table.header.cells));
+        if (table.rows) {
+          for (const row of table.rows) {
+            headings.push(...this.findAllHeadings(row.cells));
+          }
+        }
       } else if ('children' in node && Array.isArray(node.children)) {
         headings.push(...this.findAllHeadings(node.children as ASTNode[]));
       }

@@ -218,9 +218,9 @@ ${pc.bold('Build Options:')}
   ${opt('-o')}, ${opt('--output')} ${arg('<path>')}       Output file or directory
   ${opt('-t')}, ${opt('--type')}   ${arg('<html|pdf>')}   Output type ${dim('(default: html)')}
   ${opt('-w')}, ${opt('--watch')}               Watch for file changes and rebuild
-  ${opt('-s')}, ${opt('--server')}              Start a development server
-  ${opt('-h')}, ${opt('--host')}   ${arg('<host>')}       Development server host ${dim('(default: 127.0.0.1)')}
-  ${opt('-p')}, ${opt('--port')}   ${arg('<port>')}       Development server port ${dim('(default: 1302)')}
+  ${opt('-s')}, ${opt('--server')}              Start a live preview server
+  ${opt('-h')}, ${opt('--host')}   ${arg('<host>')}       Live preview host ${dim('(default: 127.0.0.1)')}
+  ${opt('-p')}, ${opt('--port')}   ${arg('<port>')}       Live preview port ${dim('(default: 1302)')}
 
 ${pc.bold('Examples:')}
   ${dim('$')} zolt ${cmd('lint')} document.zlt
@@ -454,6 +454,15 @@ export async function performBuild(
   return { touchedFiles: allTouchedFiles, outputDir };
 }
 
+export function printWatchingMessage(withExtraPadding: boolean = false) {
+  const message = `\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)`;
+  if (withExtraPadding) {
+    console.log(`${message}\n`);
+  } else {
+    console.log(message);
+  }
+}
+
 export async function handleWatch(
   files: string[],
   output: string | undefined,
@@ -487,9 +496,12 @@ export async function handleWatch(
 
     isBuilding = true;
     console.log(`\n${pc.cyan(pc.bold('Change detected, rebuilding...'))}`);
+    const startTime = performance.now();
 
     try {
       const { touchedFiles: newTouchedFiles, outputDir } = await performBuild(files, output, type);
+      const duration = (performance.now() - startTime).toFixed(0);
+      console.log(`${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
       updateWatchers(newTouchedFiles);
       if (onRebuild) onRebuild(outputDir);
     } catch (err) {
@@ -500,7 +512,7 @@ export async function handleWatch(
         buildPending = false;
         rebuild();
       } else {
-        console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)\n`);
+        printWatchingMessage(!!onRebuild);
       }
     }
   };
@@ -537,11 +549,14 @@ export async function handleWatch(
     }
   };
 
+  const startTime = performance.now();
   try {
     const { touchedFiles: initialTouchedFiles, outputDir } = await performBuild(files, output, type);
+    const duration = (performance.now() - startTime).toFixed(0);
+    console.log(`\n${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
     updateWatchers(initialTouchedFiles);
     if (onRebuild) onRebuild(outputDir);
-    console.log(`\n${pc.cyan(pc.bold('Watching for changes...'))} (Press Ctrl+C to stop)\n`);
+    printWatchingMessage(!!onRebuild);
   } catch (err) {
     console.error(`${pc.red('Initial build failed:')}`, err instanceof Error ? err.message : 'Unknown error');
   }
@@ -557,9 +572,9 @@ export function printServerInfo(files: string[], output: string | undefined, hos
   const entryBasename = entryPoint.endsWith('.zlt') ? basename(entryPoint.replace(/\.zlt$/, '.html')) : 'index.html';
   const urlPath = output && (output.endsWith('.html') || output.endsWith('.pdf')) ? basename(output) : entryBasename;
 
-  console.log(`\n${pc.bold(pc.green('Zolt Development Server'))}`);
+  console.log(`\n${pc.bold(pc.green('Zolt Live Preview'))}`);
   console.log(`${pc.cyan('URL:')} http://${host}:${port}/${urlPath}`);
-  console.log(`${pc.yellow('Notice:')} This server is for development only. Do not use in production.`);
+  console.log(`${pc.yellow('Notice:')} This server is for preview only. Do not use in production.`);
 }
 
 export async function handleServer(
@@ -572,7 +587,7 @@ export async function handleServer(
 
   const startServer = (outputDir: string) => {
     if (serverInstance) {
-      serverInstance.publish('reload', 'reload');
+      serverInstance.publish('zolt-reload', 'zolt-reload');
       printServerInfo(files, output, host, port);
 
       return;
@@ -601,7 +616,7 @@ export async function handleServer(
                 (function() {
                   const ws = new WebSocket('ws://' + location.host);
                   ws.onmessage = (event) => {
-                    if (event.data === 'reload') {
+                    if (event.data === 'zolt-reload') {
                       console.log('Zolt: Rebuild detected, reloading...');
                       location.reload();
                     }
@@ -653,7 +668,7 @@ export async function handleServer(
       },
       websocket: {
         open(ws) {
-          ws.subscribe('reload');
+          ws.subscribe('zolt-reload');
         },
         message() {},
       },
@@ -712,9 +727,11 @@ export async function handleBuild(args: string[]) {
     return;
   }
 
+  const startTime = performance.now();
   try {
     await performBuild(files, output, type);
-    console.log(`\n${pc.green(pc.bold('Build successful!'))}`);
+    const duration = (performance.now() - startTime).toFixed(0);
+    console.log(`\n${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
   } catch (error) {
     console.error(`${pc.red('Build error:')}`, error instanceof Error ? error.message : 'Unknown error');
     if (import.meta.main) process.exit(1);

@@ -147,10 +147,20 @@ The file tree automatically detects links between your files to build a visual h
 | `depth` | Maximum depth | 99 |
 | `from` | Starting depth level | 0 |
 | `to` | Ending depth level | 99 |
+| `numbered` | Enable numbering for the file tree | false |
+| `toc` | Show TOC for the active page | false |
+| `tocFrom` | TOC starting heading level | 1 |
+| `tocTo` | TOC ending heading level | 6 |
+| `tocDepth` | TOC maximum depth | 3 |
+| `tocNumbered` | Enable numbering for TOC | false |
 
-**Example with custom depth:**
-```zolt
+
+```zolt {title=Example with custom depth}
 [[filetree {depth=2}]]
+```
+
+```zolt {title=Example with advanced TOC settings}
+[[filetree {toc tocFrom=2 tocNumbered}]]
 ```
 
 ---

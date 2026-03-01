@@ -1,19 +1,19 @@
-title: Zolt documentation
-siteName: Zolt documentation
+title: "Zolt documentation"
+siteName: "Zolt documentation"
 description: "The complete reference guide for Zolt, the high-voltage successor to Markdown"
-author: Marmotz
-version: 0.1.0
-theme: technical
-image: og-image.png
-layout: _layout.zlt
-iconPng: assets/favicons/favicon-96x96.png
-iconSvg: assets/favicons/favicon.svg
-iconIco: favicon.ico
-iconApple: assets/favicons/apple-touch-icon.png
-manifest: assets/favicons/site.webmanifest
-url: https://zolt.marmotz.dev
+author: "Marmotz"
+version: "0.1.0"
+theme: "technical"
+image: "og-image.png"
+layout: "_layout.zlt"
+iconPng: "assets/favicons/favicon-96x96.png"
+iconSvg: "assets/favicons/favicon.svg"
+iconIco: "favicon.ico"
+iconApple: "assets/favicons/apple-touch-icon.png"
+manifest: "assets/favicons/site.webmanifest"
+url: "https://zolt.marmotz.dev"
 ogTitle: "Zolt : The high-voltage successor to Markdown"
-ogImageWidth: 1024
-ogImageHeight: 1024
+ogImageWidth: "1600"
+ogImageHeight: "900"
 twitterSite: "@marmotz"
 twitterCreator: "@marmotz"

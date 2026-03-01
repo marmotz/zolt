@@ -3,7 +3,7 @@ title: "Installation & Usage"
 description: "How to install and use Zolt"
 ---
 
-# Installation & Usage
+# Installation & Usagea
 
 Zolt can be used in two primary ways: as a **Command Line Interface (CLI)** or as a **library** integrated into your TypeScript/JavaScript projects.
 
@@ -41,15 +41,15 @@ yarn dlx @marmotz/zolt build your-file.zlt -o output.html
 :::
 :::
 
-### Development Server
+### Live Preview
 
-Zolt includes a built-in development server with automatic page reloading (LiveReload). This is the recommended way to work on your documents:
+Zolt includes a built-in live preview mode with automatic page reloading (LiveReload). This is the recommended way to work on your documents:
 
 ```bash
 bunx @marmotz/zolt build index.zlt --server
 ```
 
-This will build your project, start a server at `http://127.0.0.1:1302`, and automatically rebuild and refresh your browser whenever you save a file.
+This will build your project, start a live preview server at `http://127.0.0.1:1302`, and automatically rebuild and refresh your browser whenever you save a file.
 
 ### CLI Commands Reference
 

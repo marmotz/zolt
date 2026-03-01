@@ -7,16 +7,25 @@ export class SpecialBlockParser {
 
   public parseDoubleBracketBlock(expect: (type: TokenType) => Token): any {
     const token = expect(TokenType.DOUBLE_BRACKET_START);
-    const value = token.value;
-    const firstSpaceIndex = value.indexOf(' ');
+    const value = token.value.trim();
+
     let blockType = value;
     let attributes: Attributes | undefined;
 
-    if (firstSpaceIndex !== -1) {
-      blockType = value.substring(0, firstSpaceIndex);
-      const attrStr = value.substring(firstSpaceIndex + 1).trim();
-      const attrMatch = attrStr.match(/^\{([^}]+)}$/);
-      if (attrMatch) attributes = this.inlineParser.parseAttributes(attrMatch[1]);
+    const attrMatch = value.match(/^([a-zA-Z0-9/-]+)\s*\{([^}]+)}$/);
+    if (attrMatch) {
+      blockType = attrMatch[1];
+      attributes = this.inlineParser.parseAttributes(attrMatch[2]);
+    } else {
+      const firstSpaceIndex = value.indexOf(' ');
+      if (firstSpaceIndex !== -1) {
+        blockType = value.substring(0, firstSpaceIndex);
+        const attrStr = value.substring(firstSpaceIndex + 1).trim();
+        const innerAttrMatch = attrStr.match(/^\{([^}]+)}$/);
+        if (innerAttrMatch) {
+          attributes = this.inlineParser.parseAttributes(innerAttrMatch[1]);
+        }
+      }
     }
 
     return { type: 'DoubleBracketBlock', blockType, content: '', attributes };

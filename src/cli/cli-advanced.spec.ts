@@ -161,7 +161,7 @@ describe('CLI Advanced', () => {
     test('printServerInfo should log server details', () => {
       const logSpy = spyOn(console, 'log').mockImplementation(() => {});
       cli.printServerInfo(['index.zlt'], undefined, 'localhost', 3000);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Zolt Development Server'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Zolt Live Preview'));
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('http://localhost:3000/index.html'));
       logSpy.mockRestore();
     });
