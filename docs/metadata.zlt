@@ -54,20 +54,20 @@ By {$author}
 
 ## Supported Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string | Document title |
-| `author` | string | Author name |
-| `date` | date | Creation date |
-| `version` | string/number | Document version |
-| `tags` | array | List of tags |
-| `description` | string | Short description |
-| `keywords` | array/string | SEO keywords |
-| `lang` | string | Language code |
-| `theme` | string | Theme name (`default`, `professional`, `technical`, `playful`) |
-| `colorScheme` | string | `auto`, `light`, or `dark` |
-| `layout` | string | Path to a layout file (e.g., `_layout.zlt`) |
-| `toc` | boolean | Auto-generate TOC |
+| Field         | Type         | Description                                                  |
+|---------------|--------------|--------------------------------------------------------------|
+| `title`       | string       | Document title                                               |
+| `author`      | string       | Author name                                                  |
+| `date`        | date         | Creation date                                                |
+| `version`     | string/number| Document version                                             |
+| `tags`        | array        | List of tags                                                 |
+| `description` | string       | Short description                                            |
+| `keywords`    | array/string | SEO keywords                                                 |
+| `lang`        | string       | Language code                                                |
+| `theme`       | string       | Theme name (`default`, `professional`, `technical`, `playful`)|
+| `colorScheme` | string       | `auto`, `light`, or `dark`                                   |
+| `layout`      | string       | Path to a layout file (e.g., `_layout.zlt`)                  |
+| `toc`         | boolean      | Auto-generate TOC                                            |
 
 ---
 
@@ -125,12 +125,12 @@ Generate a TOC for the current page:
 [[toc]]
 ```
 
-| Attribute | Description | Default |
-|-----------|-------------|---------|
-| `depth` | Maximum depth (1-6) | 3 |
-| `from` | Start level | 1 |
-| `to` | End level | 6 |
-| `numbered` | Include numbers | false |
+| Attribute  | Description         | Default |
+|------------|---------------------|---------|
+| `depth`    | Maximum depth (1-6) | 3       |
+| `from`     | Start level         | 1       |
+| `to`       | End level           | 6       |
+| `numbered` | Include numbers     | false   |
 
 ### File Tree
 
@@ -142,17 +142,17 @@ Generate a navigation tree based on your project structure:
 
 The file tree automatically detects links between your files to build a visual hierarchy.
 
-| Attribute | Description | Default |
-|-----------|-------------|---------|
-| `depth` | Maximum depth | 99 |
-| `from` | Starting depth level | 0 |
-| `to` | Ending depth level | 99 |
-| `numbered` | Enable numbering for the file tree | false |
-| `toc` | Show TOC for the active page | false |
-| `tocFrom` | TOC starting heading level | 1 |
-| `tocTo` | TOC ending heading level | 6 |
-| `tocDepth` | TOC maximum depth | 3 |
-| `tocNumbered` | Enable numbering for TOC | false |
+| Attribute      | Description                         | Default |
+|----------------|-------------------------------------|---------|
+| `depth`        | Maximum depth                       | 99      |
+| `from`         | Starting depth level                | 0       |
+| `to`           | Ending depth level                  | 99      |
+| `numbered`     | Enable numbering for the file tree  | false   |
+| `toc`          | Show TOC for the active page        | false   |
+| `tocFrom`      | TOC starting heading level          | 1       |
+| `tocTo`        | TOC ending heading level            | 6       |
+| `tocDepth`     | TOC maximum depth                   | 3       |
+| `tocNumbered`  | Enable numbering for TOC            | false   |
 
 
 ```zolt {title=Example with custom depth}
@@ -173,9 +173,9 @@ Automatically generate "Previous" and "Next" links based on your project structu
 
 The navigation links are determined by the order of files in your `[[filetree]]`. This is perfect for multi-page documentation or tutorials.
 
-| Attribute | Description | Default |
-|-----------|-------------|---------|
-| `lang` | Language for labels (`en`, `fr`) | `en` |
+| Attribute | Description                     | Default |
+|-----------|---------------------------------|---------|
+| `lang`    | Language for labels (`en`, `fr`)| `en`    |
 
 > **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
 
@@ -185,10 +185,10 @@ The navigation links are determined by the order of files in your `[[filetree]]`
 
 Zolt provides automatic variables that you can use anywhere:
 
-| Variable | Description |
-|----------|-------------|
-| `{$created}` | File creation date (ISO 8601) |
-| `{$modified}` | Last modification date (ISO 8601) |
+| Variable      | Description                      |
+|---------------|----------------------------------|
+| `{$created}`  | File creation date (ISO 8601)    |
+| `{$modified}` | Last modification date (ISO 8601)|
 
 ### Formatting Dates
 

@@ -11,15 +11,15 @@ This page provides a quick reference for common Zolt syntax patterns.
 
 ## Text Formatting
 
-| Zolt Syntax | Result |
-|-------------|--------|
-| `**bold**` | **bold** |
-| `//italic//` | *italic* |
-| `__underline__` | <u>underline</u> |
-| `~~strikethrough~~` | ~~strikethrough~~ |
-| `^{superscript}` | <sup>superscript</sup> |
-| `_{subscript}` | <sub>subscript</sub> |
-| `==highlight==` | <mark>highlight</mark> |
+| Zolt Syntax        | Result                 |
+|--------------------|------------------------|
+| `**bold**`         | **bold**               |
+| `//italic//`       | *italic*               |
+| `__underline__`    | <u>underline</u>       |
+| `~~strikethrough~~`| ~~strikethrough~~      |
+| `^{superscript}`   | <sup>superscript</sup> |
+| `_{subscript}`     | <sub>subscript</sub>   |
+| `==highlight==`    | <mark>highlight</mark> |
 
 ---
 
@@ -38,12 +38,12 @@ This page provides a quick reference for common Zolt syntax patterns.
 
 ## Lists
 
-| Type | Syntax |
-|------|--------|
-| Bullet | `- Item` |
-| Numbered | `1. Item` |
-| Task | `- [ ] Task` |
-| Definition | `: Term` |
+| Type       | Syntax      |
+|------------|-------------|
+| Bullet     | `- Item`    |
+| Numbered   | `1. Item`   |
+| Task       | `- [ ] Task`|
+| Definition | `: Term`    |
 
 ---
 
@@ -61,13 +61,13 @@ This page provides a quick reference for common Zolt syntax patterns.
 
 ## Media
 
-| Type | Syntax |
-|------|--------|
-| Image | `![alt](image.jpg)` |
-| Video | `!![alt](video.mp4)` |
-| Audio | `??[alt](audio.mp3)` |
+| Type  | Syntax                 |
+|-------|------------------------|
+| Image | `![alt](image.jpg)`    |
+| Video | `!![alt](video.mp4)`   |
+| Audio | `??[alt](audio.mp3)`   |
 | Embed | `@@[alt](youtube_url)` |
-| File | `&&[alt](file.pdf)` |
+| File  | `&&[alt](file.pdf)`    |
 
 ---
 
@@ -126,8 +126,8 @@ Content
 ```zolt
 [[table]]
 | Header | Header |
-| :--- | :--- |
-| Cell | Cell |
+| :---   | :---   |
+| Cell   | Cell   |
 [[/table]]
 ```
 
@@ -146,13 +146,13 @@ $$
 
 ## Common Attributes
 
-| Attribute | Example |
-|-----------|---------|
-| ID | `{#my-id}` |
-| Class | `{.my-class}` |
-| Color | `{color=red}` |
-| Style | `{background=yellow}` |
-| Width | `{w=200}` |
+| Attribute | Example               |
+|-----------|-----------------------|
+| ID        | `{#my-id}`            |
+| Class     | `{.my-class}`         |
+| Color     | `{color=red}`         |
+| Style     | `{background=yellow}` |
+| Width     | `{w=200}`             |
 
 ---
 
@@ -160,20 +160,20 @@ $$
 
 | Syntax | Result |
 |--------|--------|
-| `\[` | [ |
-| `\{` | { |
-| `\*` | * |
-| `\\` | \ |
+| `\[`   | [      |
+| `\{`   | {      |
+| `\*`   | *      |
+| `\\`   | \      |
 
 ---
 
 ## Navigation & Tools
 
-| Type | Syntax | Description |
-|------|--------|-------------|
-| TOC | `[[toc]]` | Table of contents for current page |
-| File Tree | `[[filetree]]` | Project-wide navigation tree |
-| Nav Links | `[[filetree-nav]]` | Previous/Next links based on tree |
+| Type       | Syntax            | Description                         |
+|------------|-------------------|-------------------------------------|
+| TOC        | `[[toc]]`         | Table of contents for current page  |
+| File Tree  | `[[filetree]]`    | Project-wide navigation tree        |
+| Nav Links  | `[[filetree-nav]]`| Previous/Next links based on tree   |
 
 ---
 

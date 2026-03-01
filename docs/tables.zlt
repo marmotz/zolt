@@ -77,12 +77,12 @@ Mark header cells with `[h]`. Unlike standard Markdown which only supports heade
 
 Control alignment with colon position in the separator row:
 
-| Syntax   | Alignment        |
-| :------- | :--------------- |
-| `---`    | Default (= left) |
-| `:---`   | Left             |
-| `:---:`  | Center           |
-| `---:`   | Right            |
+| Syntax  | Alignment        |
+|:--------|:-----------------|
+| `---`   | Default (= left) |
+| `:---`  | Left             |
+| `:---:` | Center           |
+| `---:`  | Right            |
 
 ### Examples
 
@@ -105,35 +105,35 @@ Control alignment with colon position in the separator row:
 ### Horizontal Merge (colspan)
 
 ```zolt
-| Header     | Header     | Header      |
-| :--------- | :--------- | ----------- |
-| [colspan=2] Merged Cell | Simple cell |
-| Cell 1     | Cell 2     | Cell 3      |
+| Header                  | Header      | Header      |
+| :---------------------- | :---------- | ----------- |
+| [colspan=2] Merged Cell | Simple cell |             |
+| Cell 1                  | Cell 2      | Cell 3      |
 ```
 
 :::info [Result]
-| Header     | Header     | Header      |
-| :--------- | :--------- | ----------- |
-| [colspan=2] Merged Cell | Simple cell |
-| Cell 1     | Cell 2     | Cell 3      |
+| Header                  | Header      | Header      |
+| :---------------------- | :---------- | ----------- |
+| [colspan=2] Merged Cell | Simple cell |             |
+| Cell 1                  | Cell 2      | Cell 3      |
 :::
 
 ### Vertical Merge (rowspan)
 
 ```zolt
-| Header              | Header   |
-| :------------------ | :------- |
-| [rowspan=2] Merged  | Row 1    |
-|                       Row 2    |
-| Normal              | Row 3    |
+| Header              | Header |
+| :------------------ | :----- |
+| [rowspan=2] Merged  | Row 1  |
+|                       Row 2  |
+| Normal              | Row 3  |
 ```
 
 :::info [Result]
-| Header              | Header   |
-| :------------------ | :------- |
-| [rowspan=2] Merged  | Row 1    |
-|                       Row 2    |
-| Normal              | Row 3    |
+| Header              | Header |
+| :------------------ | :----- |
+| [rowspan=2] Merged  | Row 1  |
+|                       Row 2  |
+| Normal              | Row 3  |
 :::
 
 ---

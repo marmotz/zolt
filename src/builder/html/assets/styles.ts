@@ -115,6 +115,7 @@ export const BASE_CSS = `
   }
   .triple-colon-block.columns, .triple-colon-block.column {
     background: var(--zlt-color-bg);
+    box-shadow: none;
   }
   .triple-colon-block.column {
     border-left: 1px solid var(--zlt-color-border);
@@ -638,7 +639,7 @@ export const THEMES_CSS = `
     --zlt-color-border: #e0e0e0;
     --zlt-color-link: #0066cc;
     --zlt-color-quote-bg: #f9f9f9;
-    --zlt-color-quote-border: #dddddd;
+    --zlt-color-quote-border: #4a5568;
     --zlt-color-quote-text: #555555;
     --zlt-color-code-bg: #f3f4f6;
     --zlt-color-code-text: #d91e18;
@@ -667,7 +668,7 @@ export const THEMES_CSS = `
     --zlt-color-border: #334155;
     --zlt-color-link: #60a5fa;
     --zlt-color-quote-bg: #1e293b;
-    --zlt-color-quote-border: #3b82f6;
+    --zlt-color-quote-border: #4a5568;
     --zlt-color-quote-text: #94a3b8;
     --zlt-color-code-bg: #1e293b;
     --zlt-color-code-text: #f472b6;
@@ -694,7 +695,7 @@ export const THEMES_CSS = `
       --zlt-color-border: #334155;
       --zlt-color-link: #60a5fa;
       --zlt-color-quote-bg: #1e293b;
-      --zlt-color-quote-border: #3b82f6;
+      --zlt-color-quote-border: #4a5568;
       --zlt-color-quote-text: #94a3b8;
       --zlt-color-code-bg: #1e293b;
       --zlt-color-code-text: #f472b6;
@@ -724,7 +725,7 @@ export const THEMES_CSS = `
     --zlt-h1-border: none;
     --zlt-h2-border: none;
     --zlt-color-quote-bg: transparent;
-    --zlt-color-quote-border: #1a202c;
+    --zlt-color-quote-border: #4a5568;
     --zlt-quote-font-style: italic;
     --zlt-color-block-bg: #edf2f7;
     --zlt-color-info-bg: #e0f2fe;
@@ -751,7 +752,7 @@ export const THEMES_CSS = `
     --zlt-color-heading: #f1f5f9;
     --zlt-color-border: #475569;
     --zlt-color-link: #94a3b8;
-    --zlt-color-quote-border: #f8fafc;
+    --zlt-color-quote-border: #4a5568;
     --zlt-color-block-bg: #334155;
     --zlt-color-info-bg: #0c4a6e;
     --zlt-color-warning-bg: #713f12;
@@ -777,7 +778,7 @@ export const THEMES_CSS = `
       --zlt-color-heading: #f1f5f9;
       --zlt-color-border: #475569;
       --zlt-color-link: #94a3b8;
-      --zlt-color-quote-border: #f8fafc;
+      --zlt-color-quote-border: #4a5568;
       --zlt-color-block-bg: #334155;
       --zlt-color-info-bg: #0c4a6e;
       --zlt-color-warning-bg: #713f12;
@@ -815,7 +816,7 @@ export const THEMES_CSS = `
     --zlt-color-success-bg: #f0fdf4;
     --zlt-color-text-soft: #4a5568;
     --zlt-color-quote-bg: #edf2f7;
-    --zlt-color-quote-border: #3182ce;
+    --zlt-color-quote-border: #4a5568;
     --zlt-color-quote-text: #2d3748;
     --zlt-color-code-bg: #e2e8f0;
     --zlt-color-code-text: #2c5282;
@@ -897,7 +898,7 @@ export const THEMES_CSS = `
     --zlt-color-success-bg: #f0fdf4;
     --zlt-color-text-soft: #718096;
     --zlt-color-quote-bg: #fff5f7;
-    --zlt-color-quote-border: #ec4899;
+    --zlt-color-quote-border: #4a5568;
     --zlt-color-quote-text: #718096;
     --zlt-color-code-bg: #fff5f7;
     --zlt-color-code-text: #be185d;

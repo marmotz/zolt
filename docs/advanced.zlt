@@ -43,14 +43,14 @@ $products = [
 
 Access loop metadata:
 
-| Variable | Description |
-|----------|-------------|
-| `{$foreach.index}` | Current index (0-based) |
-| `{$foreach.index1}` | Current index (1-based) |
-| `{$foreach.first}` | `true` if first element |
-| `{$foreach.last}` | `true` if last element |
-| `{$foreach.even}` | `true` if index is even |
-| `{$foreach.odd}` | `true` if index is odd |
+| Variable             | Description             |
+|----------------------|-------------------------|
+| `{$foreach.index}`   | Current index (0-based) |
+| `{$foreach.index1}`  | Current index (1-based) |
+| `{$foreach.first}`   | `true` if first element |
+| `{$foreach.last}`    | `true` if last element  |
+| `{$foreach.even}`    | `true` if index is even |
+| `{$foreach.odd}`     | `true` if index is odd  |
 
 ### Examples
 

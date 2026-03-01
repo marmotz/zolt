@@ -68,74 +68,74 @@ $$
 ```
 
 ---
-
 ## Common Mathematical Symbols
 
 ### Operations
 
-| Symbol | LaTeX | Example |
-|--------|-------|---------|
-| Fraction | `\frac{a}{b}` | ½ |
-| Square root | `\sqrt{x}` | √x |
-| nth root | `\sqrt[n]{x}` | ⁿ√x |
-| Power | `a^b` | aᵇ |
-| Subscript | `a_b` | aᵦ |
+| Symbol      | LaTeX          | Example |
+|-------------|----------------|---------|
+| Fraction    | `\frac{a}{b}`  | ½       |
+| Square root | `\sqrt{x}`     | √x      |
+| nth root    | `\sqrt[n]{x}`  | ⁿ√x     |
+| Power       | `a^b`          | aᵇ      |
+| Subscript   | `a_b`          | aᵦ      |
 
 ### Greek Letters
 
-| Lowercase | LaTeX | Uppercase | LaTeX |
-|-----------|-------|-----------|-------|
-| α | `\alpha` | Α | `A` |
-| β | `\beta` | Β | `B` |
-| γ | `\gamma` | Γ | `\Gamma` |
-| δ | `\delta` | Δ | `\Delta` |
-| ε | `\epsilon` | Ε | `E` |
-| θ | `\theta` | Θ | `\Theta` |
-| λ | `\lambda` | Λ | `\Lambda` |
-| μ | `\mu` | Μ | `M` |
-| π | `\pi` | Π | `\Pi` |
-| σ | `\sigma` | Σ | `\Sigma` |
-| φ | `\phi` | Φ | `\Phi` |
-| ω | `\omega` | Ω | `\Omega` |
+| Lowercase | LaTeX      | Uppercase | LaTeX      |
+|-----------|------------|-----------|------------|
+| α         | `\alpha`   | Α         | `A`        |
+| β         | `\beta`    | Β         | `B`        |
+| γ         | `\gamma`   | Γ         | `\Gamma`   |
+| δ         | `\delta`   | Δ         | `\Delta`   |
+| ε         | `\epsilon` | Ε         | `E`        |
+| θ         | `\theta`   | Θ         | `\Theta`   |
+| λ         | `\lambda`  | Λ         | `\Lambda`  |
+| μ         | `\mu`      | Μ         | `M`        |
+| π         | `\pi`      | Π         | `\Pi`      |
+| σ         | `\sigma`   | Σ         | `\Sigma`   |
+| φ         | `\phi`     | Φ         | `\Phi`     |
+| ω         | `\omega`   | Ω         | `\Omega`   |
 
 ### Relations
 
-| Symbol | LaTeX |
-|--------|-------|
-| ≠ | `\neq` |
-| ≤ | `\leq` |
-| ≥ | `\geq` |
-| ≈ | `\approx` |
-| ≡ | `\equiv` |
-| ∈ | `\in` |
-| ∉ | `\notin` |
-| ⊂ | `\subset` |
-| ∪ | `\cup` |
-| ∩ | `\cap` |
+| Symbol | LaTeX      |
+|--------|------------|
+| ≠      | `\neq`     |
+| ≤      | `\leq`     |
+| ≥      | `\geq`     |
+| ≈      | `\approx`  |
+| ≡      | `\equiv`   |
+| ∈      | `\in`      |
+| ∉      | `\notin`   |
+| ⊂      | `\subset`  |
+| ∪      | `\cup`     |
+| ∩      | `\cap`     |
 
 ### Calculus
 
-| Symbol | LaTeX |
-|--------|-------|
-| ∫ | `\int` |
-| ∮ | `\oint` |
-| ∂ | `\partial` |
-| ∇ | `\nabla` |
-| ∞ | `\infty` |
-| lim | `\lim` |
-| sum | `\sum` |
-| prod | `\prod` |
+| Symbol | LaTeX      |
+|--------|------------|
+| ∫      | `\int`     |
+| ∮      | `\oint`    |
+| ∂      | `\partial` |
+| ∇      | `\nabla`   |
+| ∞      | `\infty`   |
+| lim    | `\lim`     |
+| sum    | `\sum`     |
+| prod   | `\prod`    |
 
 ---
 
-## Examples by Field
+...
 
-### Physics
-
-**Einstein's Mass-Energy Equivalence:**
+### Trigonometry
 
 ```zolt
-$$E = mc^2$$
+| Function | Identity                        |
+| :---     | :---                            |
+| Sine     | $\sin^2\theta + \cos^2\theta = 1$ |
+| Tangent  | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ |
 ```
 
 **Newton's Second Law:**

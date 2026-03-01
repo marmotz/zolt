@@ -97,12 +97,12 @@ Visit [our website]({$site_url}).
 
 Zolt uses unique prefixes for each media type:
 
-| Prefix | Type  | HTML Tag   | Usage                              |
-|--------|-------|------------|------------------------------------|
-| `!`    | Image | `<img>`    | Static images (jpg, png, gif, svg) |
-| `!!`   | Video | `<video>`  | Video files (mp4, webm, ogg)       |
-| `??`   | Audio | `<audio>`  | Audio files (mp3, wav, ogg)        |
-| `&&`   | File  | `<a>`      | Downloadable files (pdf, doc, zip) |
+| Prefix | Type  | HTML Tag  | Usage                              |
+|--------|-------|-----------|------------------------------------|
+| `!`    | Image | `<img>`   | Static images (jpg, png, gif, svg) |
+| `!!`   | Video | `<video>` | Video files (mp4, webm, ogg)       |
+| `??`   | Audio | `<audio>` | Audio files (mp3, wav, ogg)        |
+| `&&`   | File  | `<a>`     | Downloadable files (pdf, doc, zip) |
 
 ---
 

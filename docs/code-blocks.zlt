@@ -7,8 +7,6 @@ description: "Display code with syntax highlighting in Zolt"
 
 Zolt supports code blocks with syntax highlighting for technical documentation.
 
----
-
 ## Basic Code Blocks
 
 Create code blocks using triple backticks:
@@ -21,20 +19,27 @@ function hello() {
 ```
 ````
 
+:::info [Result]
+```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+```
+:::
 ### Language Support
 
 Specify the language after the opening backticks:
 
-| Language | Syntax |
-|----------|--------|
+| Language   | Syntax            |
+|------------|-------------------|
 | TypeScript | `` ```typescript `` |
 | JavaScript | `` ```javascript `` |
-| HTML | `` ```html `` |
-| CSS | `` ```css `` |
-| JSON | `` ```json `` |
-| Python | `` ```python `` |
-| Bash | `` ```bash `` |
-| SQL | `` ```sql `` |
+| HTML       | `` ```html ``       |
+| CSS        | `` ```css ``        |
+| JSON       | `` ```json ``       |
+| Python     | `` ```python ``     |
+| Bash       | `` ```bash ``       |
+| SQL        | `` ```sql ``        |
 
 ---
 
@@ -51,12 +56,11 @@ def hello():
 
 ### Available Attributes
 
-| Attribute | Description | Example |
-|-----------|-------------|---------|
-| `title` | Display title | `{title="main.py"}` |
-| `highlight` | Highlight lines | `{highlight=1,3-5}` |
-| `start` | Starting line number | `{start=10}` |
-
+| Attribute  | Description          | Example             |
+|------------|----------------------|---------------------|
+| `title`    | Display title        | `{title="main.py"}` |
+| `highlight`| Highlight lines      | `{highlight=1,3-5}` |
+| `start`    | Starting line number | `{start=10}`        |
 ### Example with Highlighting
 
 ````zolt
@@ -78,8 +82,6 @@ def calculate(a, b):
 ```
 ````
 
----
-
 ## Inline Code
 
 Use single backticks for inline code:
@@ -89,8 +91,6 @@ Use the `print()` function to output text.
 
 The `$variable` syntax is used for variables.
 ```
-
----
 
 ## Code in Lists
 
@@ -115,8 +115,6 @@ To install the package:
    ```
 ```
 
----
-
 ## Technical Indentation
 
 Use `&` for terminal-style content without syntax highlighting:
@@ -140,16 +138,12 @@ Use `&` for terminal-style content without syntax highlighting:
 && Edit config file
 ```
 
----
-
 ## Best Practices
 
 1. **Specify language** for proper syntax highlighting
 2. **Use titles** for code block identification
 3. **Highlight key lines** for emphasis
 4. **Use inline code** for short snippets
-
----
 
 ## Next Steps
 

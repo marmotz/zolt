@@ -224,7 +224,7 @@ $items = [
 ]
 
 | Item | Qty | Price | Total |
-| :--- | ---: | ---: | ---: |
+| :--- |---: |---:  |---:  |
 :::foreach {$items as $item}
 | {$item.name} | {$item.qty} | ${{$item.price}} | ${{$item.qty * $item.price}} |
 :::

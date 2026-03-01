@@ -34,7 +34,7 @@ This is a success message.
 This is a note.
 :::
 ```
-
+:::info [Result]
 :::info [Information]
 This is an informational message.
 :::
@@ -54,6 +54,7 @@ This is a success message.
 :::note [Note]
 This is a note.
 :::
+:::
 
 ### With Attributes
 
@@ -63,8 +64,10 @@ Styled callout with custom attributes.
 :::
 ```
 
+:::info [Result]
 :::info [Custom Title] {color=red}
 Styled callout with custom attributes.
+:::
 :::
 
 ## Accordions (Details)
@@ -79,8 +82,10 @@ Hidden content that appears when clicked.
 :::
 ```
 
+:::info [Result]
 :::details [Click to expand]
 Hidden content that appears when clicked.
+:::
 :::
 
 ### With Attributes
@@ -91,8 +96,10 @@ This content is visible by default.
 :::
 ```
 
+:::info [Result]
 :::details [Open by default] {open=true}
 This content is visible by default.
+:::
 :::
 
 ### Example
@@ -111,6 +118,7 @@ This content is visible by default.
 :::
 ```
 
+:::info [Result]
 :::details [Installation Steps]
 1. Download the installer
 2. Run the executable
@@ -121,6 +129,7 @@ This content is visible by default.
 - Option A
 - Option B
 - Option C
+:::
 :::
 
 ## Tabs
@@ -145,6 +154,7 @@ Content of the third tab.
 :::
 ```
 
+:::info [Result]
 :::tabs
 :::tab [Tab One]
 Content of the first tab.
@@ -156,6 +166,7 @@ Content of the second tab.
 
 :::tab [Tab Three]
 Content of the third tab.
+:::
 :::
 :::
 
@@ -173,6 +184,7 @@ print("Hello")
 :::
 ```
 
+:::info [Result]
 :::tabs {default=Python}
 :::tab [JavaScript]
 ```javascript
@@ -184,6 +196,7 @@ console.log("Hello");
 ```python
 print("Hello")
 ```
+:::
 :::
 :::
 
@@ -201,6 +214,7 @@ Second step content (shown by default).
 :::
 ```
 
+:::info [Result]
 :::tabs
 :::tab [Step 1]
 First step content.
@@ -208,6 +222,7 @@ First step content.
 
 :::tab [Step 2] {active=true}
 Second step content (shown by default).
+:::
 :::
 :::
 
@@ -229,6 +244,7 @@ Second column content.
 :::
 ```
 
+:::info [Result]
 :::columns
 :::column
 First column content.
@@ -236,6 +252,7 @@ First column content.
 
 :::column
 Second column content.
+:::
 :::
 :::
 
@@ -253,6 +270,7 @@ Sidebar content (30% width).
 :::
 ```
 
+:::info [Result]
 :::columns
 :::column {width=70%}
 Main content (70% width).
@@ -260,6 +278,7 @@ Main content (70% width).
 
 :::column {width=30%}
 Sidebar content (30% width).
+:::
 :::
 :::
 
@@ -287,6 +306,7 @@ Content here.
 :::
 ```
 
+:::info [Result]
 :::columns {cols=3}
 :::column
 **Left Column**
@@ -304,6 +324,7 @@ Content here.
 **Right Column**
 
 Content here.
+:::
 :::
 :::
 
@@ -335,6 +356,7 @@ Important sidebar information.
 :::
 ```
 
+:::info [Result]
 :::columns
 :::column {width=60%}
 ### Main Content
@@ -355,6 +377,7 @@ Additional details that can be expanded.
 
 :::info [Note]
 Important sidebar information.
+:::
 :::
 :::
 :::

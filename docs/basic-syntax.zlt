@@ -13,15 +13,15 @@ This guide covers the fundamental text formatting and typography features in Zol
 
 Zolt supports several inline text formatting options:
 
-| Symbol | Rendered | Description |
-|--------|----------|-------------|
-| `**bold**` | **bold** | Bold text |
-| `//text//` | //italic// | Italic text |
-| `underline` | <u>underline</u> | Native underline |
-| `~~strikethrough~~` | ~~strikethrough~~ | Strikethrough text |
-| `^{superscript}` | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}} |
-| `_{subscript}` | this is _{subscript} | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}} |
-| `==highlight==` | ==highlight== | Native highlight |
+| Symbol             | Rendered               | Description                                                     |
+|--------------------|------------------------|-----------------------------------------------------------------|
+| `**bold**`         | **bold**               | Bold text                                                       |
+| `//text//`         | //italic//             | Italic text                                                     |
+| `underline`        | <u>underline</u>       | Native underline                                                |
+| `~~strikethrough~~`| ~~strikethrough~~      | Strikethrough text                                              |
+| `^{superscript}`   | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}}   |
+| `_{subscript}`     | this is _{subscript}   | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}}     |
+| `==highlight==`    | ==highlight==          | Native highlight                                                |
 
 ---
 
@@ -55,15 +55,15 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 
 ### Common Attributes
 
-| Attribute | Description | Example |
-|-----------|-------------|---------|
-| `color` | Text color | `{color=red}` |
-| `background` | Background color | `{background=yellow}` |
-| `fontWeight` | Font weight | `{fontWeight=bold}` |
-| `fontSize` | Font size | `{fontSize=1.5em}` |
-| `fontStyle` | Font style | `{fontStyle=italic}` |
-| `border` | Border | `{border=1px solid black}` |
-| `borderRadius` | Border radius | `{borderRadius=10px}` |
+| Attribute      | Description      | Example                       |
+|----------------|------------------|-------------------------------|
+| `color`        | Text color       | `{color=red}`                 |
+| `background`   | Background color | `{background=yellow}`         |
+| `fontWeight`   | Font weight      | `{fontWeight=bold}`           |
+| `fontSize`     | Font size        | `{fontSize=1.5em}`            |
+| `fontStyle`    | Font style       | `{fontStyle=italic}`          |
+| `border`       | Border           | `{border=1px solid black}`    |
+| `borderRadius` | Border radius    | `{borderRadius=10px}`         |
 
 ### Practical Examples
 
@@ -91,14 +91,14 @@ Display literal special characters using the backslash `\` character.
 
 ### Common Escapes
 
-| Syntax | Result |
-|--------|--------|
-| `\[text]` | [text] |
-| `\{text}` | {text} |
-| `\|\|text\|\|` | \|\|text\|\| |
-| `\-` | - (not a list item) |
-| `\.` | . (not a list) |
-| `\\` | \ (literal backslash) |
+| Syntax         | Result                |
+|----------------|-----------------------|
+| `\[text]`      | [text]                |
+| `\{text}`      | {text}                |
+| `\|\|text\|\|` | \|\|text\|\|          |
+| `\-`           | - (not a list item)   |
+| `\.`           | . (not a list)        |
+| `\\`           | \ (literal backslash) |
 
 ### Examples
 
@@ -340,13 +340,13 @@ Zolt uses a smart numbering system for document titles:
 
 Available styles: `decimal` (default), `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`
 
-| Style | Example Output |
-|-------|----------------|
-| `decimal` | 1, 1.1, 1.2.1 |
+| Style         | Example Output |
+|---------------|----------------|
+| `decimal`     | 1, 1.1, 1.2.1  |
 | `roman-lower` | i, i.i, i.ii.i |
 | `roman-upper` | I, I.I, I.II.I |
-| `alpha-lower` | a, a.a, a.b.a |
-| `alpha-upper` | A, A.A, A.B.A |
+| `alpha-lower` | a, a.a, a.b.a  |
+| `alpha-upper` | A, A.A, A.B.A  |
 
 ---
 

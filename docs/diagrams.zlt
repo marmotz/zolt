@@ -130,10 +130,10 @@ Le bloc `:::chart` peut accepter des attributs pour contrôler la mise en page g
 :::
 ```
 
-| Attribut | Description |
-|-----------|-------------|
-| `width` | Largeur du conteneur |
-| `height` | Hauteur du conteneur |
+| Attribut | Description                             |
+|----------|-----------------------------------------|
+| `width`  | Largeur du conteneur                    |
+| `height` | Hauteur du conteneur                    |
 | `layout` | Disposition: `horizontal` ou `vertical` |
 
 ### Attributs Spécifiques aux Graphiques
@@ -145,12 +145,12 @@ Chaque type de graphique (`chart-line`, `chart-bar`, etc.) accepte ses propres a
 :::
 ```
 
-| Attribut | Description |
-|-----------|-------------|
-| `title` | Titre du graphique |
+| Attribut      | Description                                     |
+|---------------|-------------------------------------------------|
+| `title`       | Titre du graphique                              |
 | `colorScheme` | Palette de couleurs (`cool`, `warm`, `pastel`) |
-| `legend` | Afficher la légende |
-| `grid` | Afficher la grille |
+| `legend`      | Afficher la légende                             |
+| `grid`        | Afficher la grille                              |
 
 ---
 

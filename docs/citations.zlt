@@ -1,227 +1,106 @@
 ---
-title: "Citations & Technical Content"
-description: "Blockquotes for citations and technical indentation for code-like content"
+title: "Citations & Indentation"
+description: "Blockquotes pour les citations et blocs d'indentation pour la structure visuelle"
 ---
 
-# Citations & Technical Content
+# Citations & Indentation
 
-Zolt provides distinct syntax for semantic citations (`>`) and technical indentation (`&`).
+Zolt propose deux syntaxes distinctes pour structurer votre contenu : les citations sémantiques (`>`) et l'indentation de structure (`&`).
 
----
+## Citations (Blockquotes)
 
-## Blockquotes (Citations)
+Utilisez `>` pour le texte cité, les références ou les témoignages. Ce bloc a une valeur sémantique forte.
 
-Use `>` for quoted or referenced text:
-
-### Basic Blockquote
+### Citation Simple
 
 ```zolt
-> This is a simple blockquote.
-> It can span multiple lines.
+> La connaissance est le seul bien qui s'accroît quand on le partage.
+> — Socrate
 ```
 
-### Result
+:::info [Résultat]
+> La connaissance est le seul bien qui s'accroît quand on le partage.
+> — Socrate
+:::
 
-> This is a simple blockquote.
-> It can span multiple lines.
-
----
-
-### Nested Blockquotes
+### Citations Imbriquées
 
 ```zolt
-> Level 1 quote
+> Citation de niveau 1
 >
-> > Level 2 quote
+> > Réponse ou citation de niveau 2
 > >
-> > > Level 3 quote
-> >
-> > Back to level 2
->
-> Back to level 1
+> > > Niveau 3
 ```
 
----
+## Blocs d'Indentation
 
-### Blockquotes with Attributes
+Utilisez `&` pour indenter du contenu et créer une structure visuelle claire, sans la connotation sémantique d'une citation. C'est un outil flexible pour organiser vos idées, vos notes ou tout texte nécessitant un retrait.
+
+### Indentation Simple
 
 ```zolt
-> This quote has an ID{#quote1}
-> This quote is styled{color=red}
+& Ce texte est indenté (niveau 1)
+& Une autre ligne indentée
 ```
 
----
-
-## Blockquote Use Cases
-
-### Testimonials
-
-```zolt
-> "Zolt has completely transformed how I write documentation. It's intuitive, powerful, and a joy to use."
->
-> — **Sarah Johnson**, Technical Writer
-```
-
-### Important Notes
-
-```zolt
-> **Note:** This is an important piece of information that readers should notice.
-> It stands out from regular text.
-```
-
-### Warnings
-
-```zolt
-> **Warning:** This feature is experimental.
-> Use at your own risk in production environments.{color=orange}
-```
-
----
-
-## Technical Indentation
-
-Use `&` for technical content like terminal output, without semantic meaning:
-
-### Basic Indentation
-
-```zolt
-& This text is indented (level 1)
-& Another indented line
-```
-
-### Multiple Levels
-
-```zolt
-& Level 1
-&& Level 2
-&&& Level 3
-&& Back to level 2
-& Back to level 1
-```
-
----
-
-## Comparison: Quotes vs Indentation
-
-| Feature | Symbol | Use Case |
-|---------|--------|----------|
-| Blockquote | `>` | Citations, testimonials, semantic quotes |
-| Indentation | `&` | Terminal output, code-style content |
-
-### Side by Side
-
-```zolt
-> This is a quote (semantic meaning, like a citation)
-
-& This is technical indentation (code output, terminal)
-```
-
----
-
-## Practical Examples
-
-### Terminal Output
-
-```zolt
-& $ python script.py
-& Hello, World!
-& Process completed successfully.
-```
-
-### Log Files
-
-```zolt
-& [INFO] Application started
-& [DEBUG] Loading configuration
-& [WARN] Configuration file not found, using defaults
-& [INFO] Ready to serve requests
-```
-
-### Command Usage
-
-```zolt
-& Usage: zolt [options] [input]
-&
-& Options:
-&   -o, --output    Output file
-&   -f, --format   Output format (html, pdf)
-&   -w, --watch     Watch for changes
-```
-
-### Error Messages
-
-```zolt
-& Error: Connection failed
-& Details: Unable to connect to database server
-& Suggestion: Check your connection settings
-&& Host: localhost
-&& Port: 5432
-```
-
----
-
-## Combining with Other Elements
-
-### Indentation in Lists
-
-```zolt
-- Installation steps:
-  & Step 1: Download
-  & Step 2: Install
-- Configuration:
-  & Edit config file
-  & Save changes
-```
-
-### Blockquotes in Columns
-
-```zolt
-:::columns
-:::column
-### Main Content
-
-Lorem ipsum dolor sit amet.
+:::info [Résultat]
+& Ce texte est indenté (niveau 1)
+& Une autre ligne indentée
 :::
 
-:::column
-> **Tip:** Use blockquotes for important callouts in sidebars.
-:::
-:::
-```
+### Niveaux Multiples
 
----
-
-## Styled Content
-
-### Styled Indentation
+L'indentation peut être cumulée pour créer des hiérarchies complexes :
 
 ```zolt
-& Regular indented text
-& **Bold** indented text
-& This is blue{color=blue}
-& This has a yellow background{background=yellow}
+& Idée principale
+&& Détail de l'idée
+&&& Sous-détail très spécifique
+&& Retour au détail
+& Nouvelle idée
 ```
 
-### Styled Blockquotes
+:::info [Résultat]
+& Idée principale
+&& Détail de l'idée
+&&& Sous-détail très spécifique
+&& Retour au détail
+& Nouvelle idée
+:::
+
+## Comparaison : Citations vs Indentation
+
+| Fonctionnalité | Symbole | Cas d'usage                                                         |
+|----------------|---------|---------------------------------------------------------------------|
+| Citation       | `>`     | Citations, témoignages, références sémantiques                      |
+| Indentation    | `&`     | Notes structurées, poésie, hiérarchie visuelle, sorties de terminaux |
+
+## Combinaison avec d'autres éléments
+
+### Indentation dans les Listes
 
 ```zolt
-> **Important:** This is bold text in a quote.
-> This is regular text in the same quote.
+- Étapes de configuration :
+  & Vérifier le fichier package.json
+  & Lancer l'installation des dépendances
+- Déploiement :
+  & Configurer les variables d'environnement
 ```
 
+:::info [Result]
+- Étapes de configuration :
+  & Vérifier le fichier package.json
+  & Lancer l'installation des dépendances
+- Déploiement :
+  & Configurer les variables d'environnement
+:::
+
 ---
 
-## Best Practices
+## Bonnes Pratiques
 
-1. **Use blockquotes** for semantic quotations and citations
-2. **Use indentation** for terminal output and technical content
-3. **Don't mix** the two - they serve different purposes
-4. **Apply attributes** to highlight important content
-
----
-
-## Next Steps
-
-- [Code Blocks](code-blocks.zlt) — Syntax highlighted code
-- [Mathematical Formulas](math.zlt) — LaTeX equations
-- [Basic Syntax](basic-syntax.zlt) — More formatting options
+1. **Utilisez les citations** (`>`) uniquement lorsque le texte est réellement une citation ou une référence externe.
+2. **Utilisez l'indentation** (`&`) pour toute mise en forme nécessitant un retrait visuel sans valeur de citation.
+3. **Niveaux d'indentation** : N'hésitez pas à multiplier les `&` pour représenter une hiérarchie, mais restez lisible.
+4. **Styles** : Vous pouvez appliquer des attributs (couleurs, bordures) aux deux types de blocs pour les personnaliser.
