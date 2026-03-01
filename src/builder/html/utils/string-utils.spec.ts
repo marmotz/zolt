@@ -87,10 +87,6 @@ describe('string-utils', () => {
   });
 
   describe('transformHref', () => {
-    it('should transform @ to #', () => {
-      expect(transformHref('@target')).toBe('#target');
-    });
-
     it('should transform .zlt to .html', () => {
       expect(transformHref('page.zlt')).toBe('page.html');
       expect(transformHref('sub/page.zlt')).toBe('sub/page.html');

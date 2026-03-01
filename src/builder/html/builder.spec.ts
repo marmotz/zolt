@@ -603,16 +603,6 @@ describe('HTMLBuilder', () => {
       const html = await builder.build(node);
       expect(html).toContain('<table id="table-1">');
     });
-
-    test('should handle internal links with @ prefix', async () => {
-      const node = {
-        type: 'Link',
-        href: '@target',
-        children: [{ type: 'Text', content: 'Link' }],
-      } as any;
-      const html = await builder.build(node);
-      expect(html).toContain('href="#target"');
-    });
   });
 
   test('should build line break (\\n)', async () => {

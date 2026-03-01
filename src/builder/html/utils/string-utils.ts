@@ -72,9 +72,6 @@ export function formatValue(value: any): string {
 }
 
 export function transformHref(href: string): string {
-  if (href.startsWith('@')) {
-    return `#${href.substring(1)}`;
-  }
   if (href.endsWith('.zlt')) {
     return href.replace(/\.zlt$/, '.html');
   }

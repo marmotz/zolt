@@ -60,13 +60,6 @@ describe('API: Attributes and Anchors', () => {
     expect(html).toContain('<code id="code-id">code</code>');
   });
 
-  test('should resolve internal link with @ prefix', async () => {
-    const zolt = `[Lien](@target)\n\nCible {#target}`;
-    const html = await buildString(zolt);
-    expect(html).toContain('<a href="#target">Lien</a>');
-    expect(html).toContain('<p id="target">Cible</p>');
-  });
-
   test('should apply attributes to triple colon blocks on new line', async () => {
     const zolt = `:::info\nContenu\n:::\n{#info-id}`;
     const html = await buildString(zolt);

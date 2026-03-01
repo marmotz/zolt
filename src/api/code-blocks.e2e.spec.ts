@@ -54,7 +54,7 @@ describe('Code Blocks E2E', () => {
     writeFileSync(layoutPath, ':::content:::');
 
     try {
-      const content = `---\nlayout: "./${layoutPath}"\ntitle: "Home"\n---\n\n# Test\n\n\`\`\`zolt\n# {$title}\n\`\`\``;
+      const content = `---\nlayout: "./${layoutPath}"\ntitle: "Home"\n---\n\n# Test\n\n\`\`\`text\n# {$title}\n\`\`\``;
       const html = await buildString(content);
 
       expect(html).toContain('{$title}');

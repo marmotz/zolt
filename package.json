@@ -57,7 +57,8 @@
     "update:minor": "bunx npm-check-updates -i -t minor",
     "update:latest": "bunx npm-check-updates -i -t latest",
     "prepare": "husky",
-    "release": "bun scripts/release.ts"
+    "release": "bun scripts/release.ts",
+    "export:grammar": "bun scripts/export-grammar.ts"
   },
   "lint-staged": {
     "src/**/*.ts": [

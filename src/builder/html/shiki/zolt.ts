@@ -1,4 +1,6 @@
-export const zoltLanguage = {
+import type { LanguageRegistration } from 'shiki';
+
+export const zoltLanguage: LanguageRegistration = {
   name: 'zolt',
   scopeName: 'source.zolt',
   fileTypes: ['zolt'],
@@ -13,6 +15,7 @@ export const zoltLanguage = {
         { include: '#variable_interpolation' },
         { include: '#variable' },
         { include: '#expression' },
+        { include: '#checkbox' },
         { include: '#bold' },
         { include: '#italic' },
         { include: '#underline' },
@@ -26,6 +29,10 @@ export const zoltLanguage = {
         { include: '#media' },
         { include: '#attributes' },
       ],
+    },
+    checkbox: {
+      name: 'keyword.operator.checkbox.zolt',
+      match: '\\[[ xX]\\]',
     },
     comment_inline: {
       name: 'comment.block.zolt',
@@ -149,19 +156,37 @@ export const zoltLanguage = {
   },
   patterns: [
     {
-      begin: '^([-*_]){3,}',
+      name: 'metadata.yaml.zolt',
+      begin: '\\A---$',
+      beginCaptures: {
+        0: { name: 'punctuation.definition.metadata.zolt' },
+      },
+      end: '^---$',
+      endCaptures: {
+        0: { name: 'punctuation.definition.metadata.zolt' },
+      },
+      patterns: [{ include: 'source.yaml' }],
+    },
+    {
+      match: '(?<=^|\\n)[ \t]*([-*+]|\\d+\\.|:)(?=[ \t]+)',
+      captures: {
+        1: { name: 'constant.character.escape.zolt' },
+      },
+    },
+    {
+      match: '(?<=^|\\n| )[ \t]*(\\[[ xX]\\])',
+      captures: {
+        1: { name: 'keyword.operator.checkbox.zolt' },
+      },
+    },
+    {
+      begin: '^([-*_]){3,}(?!\\S)',
       beginCaptures: {
         0: { name: 'comment.line.number-sign.zolt' },
       },
       end: '$',
       name: 'comment.line.number-sign.zolt',
       patterns: [{ include: '#attributes' }],
-    },
-    {
-      name: 'metadata.yaml.zolt',
-      begin: '\\A---',
-      end: '^---',
-      patterns: [{ include: 'source.yaml' }],
     },
     {
       match: '^\\s*\\[([^\\]]+)\\]:\\s*(.*)$',
@@ -175,12 +200,6 @@ export const zoltLanguage = {
       beginCaptures: { 0: { name: 'punctuation.definition.heading.zolt' } },
       end: '$',
       name: 'markup.heading.zolt',
-      patterns: [{ include: '#inline' }],
-    },
-    {
-      begin: '^\\s*([-*+]|\\d+\\.|:)\\s+',
-      beginCaptures: { 0: { name: 'punctuation.definition.list.zolt' } },
-      end: '$',
       patterns: [{ include: '#inline' }],
     },
     {

@@ -5,3 +5,6 @@ bunx lint-staged
 # We use --max-warnings=0 so that it fails if there is any warning remaining
 bun run lint:check
 bun type-check
+
+# 3. Export shiki grammar to VS Code extension
+bun run export:grammar && git add editors/vscode

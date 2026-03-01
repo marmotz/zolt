@@ -77,7 +77,6 @@ export class BlockVisitor {
             return toAlpha(val).toLowerCase();
           case 'alpha-upper':
             return toAlpha(val).toUpperCase();
-          case 'decimal':
           default:
             return val.toString();
         }

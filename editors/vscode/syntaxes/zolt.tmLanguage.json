@@ -1,0 +1,389 @@
+{
+  "name": "zolt",
+  "scopeName": "source.zolt",
+  "fileTypes": [
+    "zlt",
+    "zolt"
+  ],
+  "repository": {
+    "variable": {
+      "name": "variable.parameter.zolt",
+      "match": "\\$[a-zA-Z0-9_.]+"
+    },
+    "inline": {
+      "patterns": [
+        {
+          "include": "#comment_inline"
+        },
+        {
+          "include": "#variable_interpolation"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#expression"
+        },
+        {
+          "include": "#checkbox"
+        },
+        {
+          "include": "#bold"
+        },
+        {
+          "include": "#italic"
+        },
+        {
+          "include": "#underline"
+        },
+        {
+          "include": "#strikethrough"
+        },
+        {
+          "include": "#highlight"
+        },
+        {
+          "include": "#superscript"
+        },
+        {
+          "include": "#subscript"
+        },
+        {
+          "include": "#inline_code"
+        },
+        {
+          "include": "#inline_styled"
+        },
+        {
+          "include": "#link"
+        },
+        {
+          "include": "#media"
+        },
+        {
+          "include": "#attributes"
+        }
+      ]
+    },
+    "checkbox": {
+      "name": "keyword.operator.checkbox.zolt",
+      "match": "\\[[ xX]\\]"
+    },
+    "comment_inline": {
+      "name": "comment.block.zolt",
+      "begin": "%%",
+      "end": "%%"
+    },
+    "bold": {
+      "name": "markup.bold.zolt",
+      "begin": "\\*\\*",
+      "end": "\\*\\*",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "italic": {
+      "name": "markup.italic.zolt",
+      "begin": "(?<!:)//",
+      "end": "//",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "underline": {
+      "name": "markup.underline.zolt",
+      "begin": "(?<!_)__(?!_)",
+      "end": "(?<!_)__(?!_)",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "strikethrough": {
+      "name": "markup.strikethrough.zolt",
+      "begin": "~~",
+      "end": "~~",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "highlight": {
+      "name": "markup.changed.zolt",
+      "begin": "==",
+      "end": "==",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "superscript": {
+      "name": "markup.superscript.zolt",
+      "begin": "\\^{",
+      "end": "}",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "subscript": {
+      "name": "markup.subscript.zolt",
+      "begin": "_{",
+      "end": "}",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    "inline_code": {
+      "name": "markup.inline.code.zolt",
+      "begin": "`",
+      "end": "`"
+    },
+    "inline_styled": {
+      "begin": "\\|\\|",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.zolt"
+        }
+      },
+      "end": "\\|\\|",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.zolt"
+        }
+      },
+      "patterns": [
+        {
+          "name": "string.quoted.double.zolt",
+          "match": "[^|]+"
+        }
+      ]
+    },
+    "variable_interpolation": {
+      "match": "(\\{\\$)([a-zA-Z0-9_.]+)(\\})",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.variable.zolt"
+        },
+        "2": {
+          "name": "variable.parameter.zolt"
+        },
+        "3": {
+          "name": "punctuation.definition.variable.zolt"
+        }
+      }
+    },
+    "expression": {
+      "begin": "\\{\\{",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.expression.zolt"
+        }
+      },
+      "end": "\\}\\}",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.expression.zolt"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#variable"
+        },
+        {
+          "name": "keyword.operator.zolt",
+          "match": "[+\\-*/^%?:=]"
+        },
+        {
+          "name": "constant.numeric.zolt",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        },
+        {
+          "name": "string.quoted.double.zolt",
+          "match": "\"[^\"]*\""
+        }
+      ]
+    },
+    "attributes": {
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.attributes.begin.zolt"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.attributes.end.zolt"
+        }
+      },
+      "patterns": [
+        {
+          "name": "variable.parameter.zolt",
+          "match": "[a-zA-Z0-9_-]+(?==)"
+        },
+        {
+          "name": "string.unquoted.zolt",
+          "match": "(?<==)[^\\s\\}]+"
+        },
+        {
+          "name": "entity.name.tag.zolt",
+          "match": "#[a-zA-Z0-9_-]+"
+        },
+        {
+          "name": "entity.other.attribute-name.class.zolt",
+          "match": "\\.[a-zA-Z0-9_-]+"
+        },
+        {
+          "name": "punctuation.separator.key-value.zolt",
+          "match": "="
+        },
+        {
+          "name": "variable.parameter.zolt",
+          "match": "[a-zA-Z0-9_-]+"
+        }
+      ]
+    }
+  },
+  "patterns": [
+    {
+      "name": "metadata.yaml.zolt",
+      "begin": "\\A---$",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.metadata.zolt"
+        }
+      },
+      "end": "^---$",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.metadata.zolt"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.yaml"
+        }
+      ]
+    },
+    {
+      "match": "(?<=^|\\n)[ \t]*([-*+]|\\d+\\.|:)(?=[ \t]+)",
+      "captures": {
+        "1": {
+          "name": "constant.character.escape.zolt"
+        }
+      }
+    },
+    {
+      "match": "(?<=^|\\n| )[ \t]*(\\[[ xX]\\])",
+      "captures": {
+        "1": {
+          "name": "keyword.operator.checkbox.zolt"
+        }
+      }
+    },
+    {
+      "begin": "^([-*_]){3,}(?!\\S)",
+      "beginCaptures": {
+        "0": {
+          "name": "comment.line.number-sign.zolt"
+        }
+      },
+      "end": "$",
+      "name": "comment.line.number-sign.zolt",
+      "patterns": [
+        {
+          "include": "#attributes"
+        }
+      ]
+    },
+    {
+      "match": "^\\s*\\[([^\\]]+)\\]:\\s*(.*)$",
+      "captures": {
+        "1": {
+          "name": "variable.parameter.zolt"
+        },
+        "2": {
+          "name": "markup.underline.link.zolt"
+        }
+      }
+    },
+    {
+      "begin": "^#{1,6}\\s+",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.heading.zolt"
+        }
+      },
+      "end": "$",
+      "name": "markup.heading.zolt",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    {
+      "begin": "^>\\s*",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.quote.zolt"
+        }
+      },
+      "end": "$",
+      "name": "markup.quote.zolt",
+      "patterns": [
+        {
+          "include": "#inline"
+        }
+      ]
+    },
+    {
+      "name": "comment.block.zolt",
+      "begin": "^:::comment\\b",
+      "end": "^:::\\s*$"
+    },
+    {
+      "name": "keyword.control.block.zolt",
+      "begin": "^:::[a-z0-9_-]+",
+      "end": "$",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.control.zolt"
+        }
+      },
+      "patterns": [
+        {
+          "name": "string.other.title.zolt",
+          "match": "\\[[^\\]]+\\]"
+        },
+        {
+          "include": "#attributes"
+        }
+      ]
+    },
+    {
+      "name": "keyword.control.block.end.zolt",
+      "match": "^:::\\s*$"
+    },
+    {
+      "name": "markup.fenced_code.block.zolt",
+      "begin": "^```",
+      "end": "^```"
+    },
+    {
+      "include": "#inline"
+    }
+  ],
+  "uuid": "a6139f29-f431-4519-aac9-ee466557d7b9"
+}

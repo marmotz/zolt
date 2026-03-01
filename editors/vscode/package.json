@@ -1,0 +1,35 @@
+{
+  "name": "zolt",
+  "displayName": "Zolt Language Support",
+  "description": "Syntax highlighting for Zolt files",
+  "version": "0.1.0",
+  "publisher": "zolt",
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "zolt",
+        "aliases": [
+          "Zolt",
+          "zolt"
+        ],
+        "extensions": [
+          ".zlt"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "zolt",
+        "scopeName": "source.zolt",
+        "path": "./syntaxes/zolt.tmLanguage.json"
+      }
+    ]
+  }
+}

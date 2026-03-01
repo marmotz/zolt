@@ -525,7 +525,6 @@ export class SpecialBlockVisitor {
             return toAlpha(val).toLowerCase();
           case 'alpha-upper':
             return toAlpha(val).toUpperCase();
-          case 'decimal':
           default:
             return val.toString();
         }
@@ -536,8 +535,8 @@ export class SpecialBlockVisitor {
 
       if (numbering) {
         const formattedParts = numberParts.map((p, i) => {
-          const styleIdx = i; // Inside TOC, we already sliced from 'from', so i is relative to start level
-          const style = styles[styleIdx] || styles[styles.length - 1] || 'decimal';
+          // Inside TOC, we already sliced from 'from', so "i" is relative to start level
+          const style = styles[i] || styles[styles.length - 1] || 'decimal';
 
           return formatPart(p, style);
         });

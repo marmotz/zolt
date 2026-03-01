@@ -1,0 +1,153 @@
+{
+  "comments": {
+    "blockComment": [
+      "%%",
+      "%%"
+    ]
+  },
+  "brackets": [
+    [
+      "{",
+      "}"
+    ],
+    [
+      "[",
+      "]"
+    ],
+    [
+      "(",
+      ")"
+    ],
+    [
+      "{{",
+      "}}"
+    ],
+    [
+      "[[",
+      "]]"
+    ],
+    [
+      "||",
+      "||"
+    ]
+  ],
+  "autoClosingPairs": [
+    {
+      "open": "{",
+      "close": "}"
+    },
+    {
+      "open": "[",
+      "close": "]"
+    },
+    {
+      "open": "(",
+      "close": ")"
+    },
+    {
+      "open": "'",
+      "close": "'",
+      "notIn": [
+        "string",
+        "comment"
+      ]
+    },
+    {
+      "open": "\"",
+      "close": "\"",
+      "notIn": [
+        "string"
+      ]
+    },
+    {
+      "open": "`",
+      "close": "`",
+      "notIn": [
+        "string",
+        "comment"
+      ]
+    },
+    {
+      "open": "%%",
+      "close": "%%"
+    },
+    {
+      "open": "**",
+      "close": "**"
+    },
+    {
+      "open": "//",
+      "close": "//"
+    },
+    {
+      "open": "__",
+      "close": "__"
+    },
+    {
+      "open": "~~",
+      "close": "~~"
+    },
+    {
+      "open": "==",
+      "close": "=="
+    },
+    {
+      "open": "||",
+      "close": "||"
+    }
+  ],
+  "surroundingPairs": [
+    {
+      "open": "{",
+      "close": "}"
+    },
+    {
+      "open": "[",
+      "close": "]"
+    },
+    {
+      "open": "(",
+      "close": ")"
+    },
+    {
+      "open": "'",
+      "close": "'"
+    },
+    {
+      "open": "\"",
+      "close": "\""
+    },
+    {
+      "open": "`",
+      "close": "`"
+    },
+    {
+      "open": "%%",
+      "close": "%%"
+    },
+    {
+      "open": "**",
+      "close": "**"
+    },
+    {
+      "open": "//",
+      "close": "//"
+    },
+    {
+      "open": "__",
+      "close": "__"
+    },
+    {
+      "open": "~~",
+      "close": "~~"
+    },
+    {
+      "open": "==",
+      "close": "=="
+    },
+    {
+      "open": "||",
+      "close": "||"
+    }
+  ]
+}

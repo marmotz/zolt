@@ -61,34 +61,20 @@ If you find a bug in [Zolt][zolt], please open an issue on [GitHub][zolt-repo].
 [zolt-repo]: https://github.com/marmotz/zolt
 :::
 
-### Internal Links (Cross-references)
-
-Link to document sections using `@`:
-
-```zolt
-See the [Introduction](@intro) for details.
-Go to [Advanced Features](@advanced).
-[Back to top](@top)
-```
-
-:::info [Result]
-See the [Introduction](@intro) for details.
-Go to [Advanced Features](@advanced).
-[Back to top](@top)
-:::
-
 ### Anchor Links
 
 Link to specific elements with anchors:
 
 ```zolt
 Jump to [Lists section](#lists).
+
 [Return to summary](#summary)
 ```
 
 :::info [Result]
-Jump to [Lists section](#lists).
-[Return to summary](#summary)
+Jump to [Lists section](#links-media).
+
+[Return to Reference Links](#reference-links)
 :::
 
 ### Links with Variables
@@ -330,7 +316,7 @@ The new product features include:
 - Feature two
 - Feature three
 
-Watch the [demo video](@demo) for more details.
+Watch the [demo video](#demo) for more details.
 
 &&[Download Brochure](brochure.pdf)
 ```
@@ -346,7 +332,7 @@ The new product features include:
 - Feature two
 - Feature three
 
-Watch the [demo video](@demo) for more details.
+Watch the [demo video](#demo) for more details.
 
 &&[Download Brochure](brochure.pdf)
 :::
