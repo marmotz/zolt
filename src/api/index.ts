@@ -176,9 +176,13 @@ export function extractAllAssets(
     let currentDir = dir;
     while (true) {
       const fullPath = path.resolve(currentDir, fileName);
-      if (fs.existsSync(fullPath)) return true;
+      if (fs.existsSync(fullPath)) {
+        return true;
+      }
       const parentDir = path.dirname(currentDir);
-      if (parentDir === currentDir) break;
+      if (parentDir === currentDir) {
+        break;
+      }
       currentDir = parentDir;
     }
 
@@ -186,7 +190,9 @@ export function extractAllAssets(
   };
 
   const checkHref = (href: unknown) => {
-    if (!href || typeof href !== 'string') return;
+    if (!href || typeof href !== 'string') {
+      return;
+    }
 
     if (
       href.startsWith('http://') ||
@@ -213,7 +219,9 @@ export function extractAllAssets(
 
   // Check all possible metadata keys for assets
   const checkMetadata = (data: Record<string, unknown> | undefined) => {
-    if (!data) return;
+    if (!data) {
+      return;
+    }
     const keys = [
       'image',
       'icon',
@@ -230,7 +238,9 @@ export function extractAllAssets(
       'sidebar',
     ];
     for (const key of keys) {
-      if (data[key]) checkHref(data[key]);
+      if (data[key]) {
+        checkHref(data[key]);
+      }
     }
   };
 
@@ -240,7 +250,9 @@ export function extractAllAssets(
   }
 
   const visit = (node: unknown) => {
-    if (!node || typeof node !== 'object') return;
+    if (!node || typeof node !== 'object') {
+      return;
+    }
 
     const n = node as Record<string, unknown>;
 

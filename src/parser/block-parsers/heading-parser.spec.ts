@@ -13,7 +13,9 @@ describe('HeadingParser', () => {
 
     return (type: TokenType) => {
       const token = tokens[pos++];
-      if (token.type !== type) throw new Error(`Expected ${type}`);
+      if (token.type !== type) {
+        throw new Error(`Expected ${type}`);
+      }
 
       return token;
     };

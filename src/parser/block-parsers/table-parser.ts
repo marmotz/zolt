@@ -96,14 +96,18 @@ export class TableParser {
     rows: TableRowNode[],
     alignments: ('left' | 'center' | 'right' | undefined)[]
   ): void {
-    if (alignments.length === 0) return;
+    if (alignments.length === 0) {
+      return;
+    }
 
     const allRows = header ? [header, ...rows] : rows;
     const occupied: Set<number>[] = [];
 
     allRows.forEach((row, rowIndex) => {
       let currentCol = 0;
-      if (!occupied[rowIndex]) occupied[rowIndex] = new Set();
+      if (!occupied[rowIndex]) {
+        occupied[rowIndex] = new Set();
+      }
       const rowOccupied = occupied[rowIndex];
 
       row.cells.forEach((cell) => {
@@ -123,7 +127,9 @@ export class TableParser {
         // Mark occupied cells for current and subsequent rows
         for (let r = 0; r < rowspan; r++) {
           const targetRowIndex = rowIndex + r;
-          if (!occupied[targetRowIndex]) occupied[targetRowIndex] = new Set();
+          if (!occupied[targetRowIndex]) {
+            occupied[targetRowIndex] = new Set();
+          }
           for (let c = 0; c < colspan; c++) {
             occupied[targetRowIndex].add(currentCol + c);
           }

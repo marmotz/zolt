@@ -12,7 +12,9 @@ describe('Filetree TOC Option', () => {
   });
 
   afterEach(() => {
-    if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
+    if (fs.existsSync(testDir)) {
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
   });
 
   it('should render TOC in filetree when toc=true', async () => {

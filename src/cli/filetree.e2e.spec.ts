@@ -33,8 +33,11 @@ describe('CLI Filetree', () => {
 
     await new Promise<void>((resolve, reject) => {
       proc.on('exit', (code) => {
-        if (code === 0) resolve();
-        else reject(new Error('CLI failed'));
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error('CLI failed'));
+        }
       });
     });
 

@@ -208,7 +208,9 @@ export class SpecialBlockVisitor {
       false;
 
     const getIntAttr = (val: any, defaultVal: number) => {
-      if (val === undefined || val === '') return defaultVal;
+      if (val === undefined || val === '') {
+        return defaultVal;
+      }
       const parsed = parseInt(val);
 
       return isNaN(parsed) ? defaultVal : parsed;
@@ -242,7 +244,9 @@ export class SpecialBlockVisitor {
     hasDepth: boolean
   ): HeadingNode[] {
     return headings.filter((h) => {
-      if (h.level < from) return false;
+      if (h.level < from) {
+        return false;
+      }
 
       let maxLevel: number;
       if (hasTo && hasDepth) {
@@ -269,8 +273,12 @@ export class SpecialBlockVisitor {
     tocOptions: any,
     numbered: boolean
   ): Promise<string> {
-    if (currentDepth > to || currentDepth > maxDepth) return '';
-    if (!nodes || nodes.length === 0) return '';
+    if (currentDepth > to || currentDepth > maxDepth) {
+      return '';
+    }
+    if (!nodes || nodes.length === 0) {
+      return '';
+    }
 
     const htmlParts = [];
     for (const n of nodes) {
@@ -293,7 +301,9 @@ export class SpecialBlockVisitor {
     tocOptions: any,
     numbered: boolean
   ): Promise<string> {
-    if (currentDepth > to || currentDepth > maxDepth) return '';
+    if (currentDepth > to || currentDepth > maxDepth) {
+      return '';
+    }
 
     const isVisible = currentDepth >= from;
     const normCurrent = this.currentFilePath ? path.normalize(this.currentFilePath) : null;
@@ -356,7 +366,9 @@ export class SpecialBlockVisitor {
 
   private async visitToc(node: DoubleBracketBlockNode): Promise<string> {
     const getIntAttr = (val: any, defaultVal: number) => {
-      if (val === undefined || val === '') return defaultVal;
+      if (val === undefined || val === '') {
+        return defaultVal;
+      }
       const parsed = parseInt(val);
 
       return isNaN(parsed) ? defaultVal : parsed;
@@ -416,7 +428,9 @@ export class SpecialBlockVisitor {
       }
 
       counters[level]++;
-      for (let i = level + 1; i <= 6; i++) counters[i] = 0;
+      for (let i = level + 1; i <= 6; i++) {
+        counters[i] = 0;
+      }
 
       const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
       const numberParts = counters.slice(from, level + 1);

@@ -58,5 +58,11 @@ export default tseslint.config(
     },
   },
 
-  eslintConfigPrettier
+  eslintConfigPrettier,
+
+  {
+    rules: {
+      curly: ['error', 'all'],
+    },
+  }
 );

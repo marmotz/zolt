@@ -38,7 +38,9 @@ export class Lexer {
 
         this.skipWhitespace();
       }
-      if (this.isEof()) break;
+      if (this.isEof()) {
+        break;
+      }
 
       const token = this.nextToken();
       if (token) {
@@ -183,7 +185,9 @@ export class Lexer {
     this.advanceChar(); // {
 
     // Skip "include" and whitespace
-    for (let i = 0; i < 7; i++) this.advanceChar();
+    for (let i = 0; i < 7; i++) {
+      this.advanceChar();
+    }
     this.skipWhitespace();
 
     let path = '';

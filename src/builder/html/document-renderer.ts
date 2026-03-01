@@ -169,34 +169,55 @@ ${CODE_COPY_SCRIPT}
     }
 
     let meta = '';
-    if (description) meta += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
-    if (author) meta += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
-    if (keywords) meta += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
-    if (robots) meta += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
+    if (description) {
+      meta += `  <meta name="description" content="${this.escapeHtml(String(description))}">\n`;
+    }
+    if (author) {
+      meta += `  <meta name="author" content="${this.escapeHtml(String(author))}">\n`;
+    }
+    if (keywords) {
+      meta += `  <meta name="keywords" content="${this.escapeHtml(String(keywords))}">\n`;
+    }
+    if (robots) {
+      meta += `  <meta name="robots" content="${this.escapeHtml(String(robots))}">\n`;
+    }
 
-    if (siteName) meta += `  <meta property="og:site_name" content="${this.escapeHtml(String(siteName))}">\n`;
+    if (siteName) {
+      meta += `  <meta property="og:site_name" content="${this.escapeHtml(String(siteName))}">\n`;
+    }
     meta += `  <meta property="og:type" content="${this.escapeHtml(String(ogType))}">\n`;
     meta += `  <meta property="og:title" content="${this.escapeHtml(String(ogTitle))}">\n`;
-    if (ogDescription)
+    if (ogDescription) {
       meta += `  <meta property="og:description" content="${this.escapeHtml(String(ogDescription))}">\n`;
-    if (ogUrl) meta += `  <meta property="og:url" content="${this.escapeHtml(String(ogUrl))}">\n`;
+    }
+    if (ogUrl) {
+      meta += `  <meta property="og:url" content="${this.escapeHtml(String(ogUrl))}">\n`;
+    }
     if (ogImage) {
       meta += `  <meta property="og:image" content="${this.escapeHtml(String(ogImage))}">\n`;
-      if (ogImageWidth)
+      if (ogImageWidth) {
         meta += `  <meta property="og:image:width" content="${this.escapeHtml(String(ogImageWidth))}">\n`;
-      if (ogImageHeight)
+      }
+      if (ogImageHeight) {
         meta += `  <meta property="og:image:height" content="${this.escapeHtml(String(ogImageHeight))}">\n`;
+      }
     }
 
     const twitterCard = ogImage ? 'summary_large_image' : 'summary';
     meta += `  <meta name="twitter:card" content="${twitterCard}">\n`;
-    if (twitterSite) meta += `  <meta name="twitter:site" content="${this.escapeHtml(String(twitterSite))}">\n`;
-    if (twitterCreator)
+    if (twitterSite) {
+      meta += `  <meta name="twitter:site" content="${this.escapeHtml(String(twitterSite))}">\n`;
+    }
+    if (twitterCreator) {
       meta += `  <meta name="twitter:creator" content="${this.escapeHtml(String(twitterCreator))}">\n`;
+    }
     meta += `  <meta name="twitter:title" content="${this.escapeHtml(String(ogTitle))}">\n`;
-    if (ogDescription)
+    if (ogDescription) {
       meta += `  <meta name="twitter:description" content="${this.escapeHtml(String(ogDescription))}">\n`;
-    if (ogImage) meta += `  <meta name="twitter:image" content="${this.escapeHtml(String(ogImage))}">\n`;
+    }
+    if (ogImage) {
+      meta += `  <meta name="twitter:image" content="${this.escapeHtml(String(ogImage))}">\n`;
+    }
 
     return meta;
   }
@@ -224,13 +245,21 @@ ${CODE_COPY_SCRIPT}
       }
     }
 
-    if (iconPng)
+    if (iconPng) {
       links += `  <link rel="icon" type="image/png" href="${this.escapeHtml(String(iconPng))}" sizes="96x96">\n`;
-    if (iconSvg) links += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
-    if (iconIco) links += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
-    if (iconApple)
+    }
+    if (iconSvg) {
+      links += `  <link rel="icon" type="image/svg+xml" href="${this.escapeHtml(String(iconSvg))}">\n`;
+    }
+    if (iconIco) {
+      links += `  <link rel="shortcut icon" href="${this.escapeHtml(String(iconIco))}">\n`;
+    }
+    if (iconApple) {
       links += `  <link rel="apple-touch-icon" sizes="180x180" href="${this.escapeHtml(String(iconApple))}">\n`;
-    if (manifest) links += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+    }
+    if (manifest) {
+      links += `  <link rel="manifest" href="${this.escapeHtml(String(manifest))}">\n`;
+    }
 
     return links;
   }
@@ -311,7 +340,9 @@ ${CODE_COPY_SCRIPT}
         headings.push(node as HeadingNode);
       } else if (node.type === 'Table') {
         const table = node as any;
-        if (table.header) headings.push(...this.findAllHeadings(table.header.cells));
+        if (table.header) {
+          headings.push(...this.findAllHeadings(table.header.cells));
+        }
         if (table.rows) {
           for (const row of table.rows) {
             headings.push(...this.findAllHeadings(row.cells));

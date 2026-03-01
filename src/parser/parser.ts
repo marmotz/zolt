@@ -213,7 +213,9 @@ export class Parser {
       for (let i = 0; i < val.length; i++) {
         const char = val[i];
         if (inString) {
-          if (char === stringChar && (i === 0 || val[i - 1] !== '\\')) inString = false;
+          if (char === stringChar && (i === 0 || val[i - 1] !== '\\')) {
+            inString = false;
+          }
           continue;
         }
         if (char === '"' || char === "'") {
@@ -221,8 +223,11 @@ export class Parser {
           stringChar = char;
           continue;
         }
-        if (char === '[' || char === '{' || char === '(') depth++;
-        else if (char === ']' || char === '}' || char === ')') depth--;
+        if (char === '[' || char === '{' || char === '(') {
+          depth++;
+        } else if (char === ']' || char === '}' || char === ')') {
+          depth--;
+        }
       }
 
       return depth <= 0;
@@ -230,8 +235,12 @@ export class Parser {
 
     while (!isComplete(content) && !this.isEof()) {
       this.skipNewlines();
-      if (this.isEof()) break;
-      if (this.match(TokenType.INDENTATION)) this.advance();
+      if (this.isEof()) {
+        break;
+      }
+      if (this.match(TokenType.INDENTATION)) {
+        this.advance();
+      }
       if (this.match(TokenType.TEXT)) {
         content += ' ' + this.advance().value.trim();
       } else {
@@ -528,17 +537,23 @@ export class Parser {
           [TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST, TokenType.DEFINITION].includes(next.type)
         ) {
           const block = this.parseBlock();
-          if (block) children.push(block);
+          if (block) {
+            children.push(block);
+          }
         } else {
           this.advance(); // Skip indentation for non-list blocks
           const block = this.parseBlock();
-          if (block) children.push(block);
+          if (block) {
+            children.push(block);
+          }
         }
         this.skipNewlines();
       } else if (children.length === 0 && this.isNewBlockStart()) {
         // If the footnote is still empty and we see a block start, consume it as part of the footnote
         const block = this.parseBlock();
-        if (block) children.push(block);
+        if (block) {
+          children.push(block);
+        }
         // After one non-indented block, we only continue if subsequent lines are indented
         // (to match standard Markdown/Zolt behavior where only the first block can be non-indented if empty)
         this.skipNewlines();
@@ -570,7 +585,9 @@ export class Parser {
       const startPos = this.pos;
       this.skipNewlines();
 
-      if (this.isEof()) break;
+      if (this.isEof()) {
+        break;
+      }
 
       try {
         const block = this.parseBlock();
@@ -613,6 +630,8 @@ export class Parser {
   }
 
   private skipNewlines(): void {
-    while (this.match(TokenType.NEWLINE)) this.advance();
+    while (this.match(TokenType.NEWLINE)) {
+      this.advance();
+    }
   }
 }

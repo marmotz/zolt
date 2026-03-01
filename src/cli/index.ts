@@ -140,9 +140,13 @@ export async function buildFileWithDeps(
     let currentDir = startDir;
     while (true) {
       const fullPath = resolve(currentDir, fileName);
-      if (existsSync(fullPath)) return fullPath;
+      if (existsSync(fullPath)) {
+        return fullPath;
+      }
       const parentDir = dirname(currentDir);
-      if (parentDir === currentDir) break;
+      if (parentDir === currentDir) {
+        break;
+      }
       currentDir = parentDir;
     }
 
@@ -248,7 +252,9 @@ export async function handleLint(args: string[]) {
 
   if (files.length === 0) {
     console.error(`${pc.red('Error:')} No files specified for linting`);
-    if (import.meta.main) process.exit(1);
+    if (import.meta.main) {
+      process.exit(1);
+    }
     throw new Error('No files specified for linting');
   }
 
@@ -315,7 +321,9 @@ export async function handleLint(args: string[]) {
   }
 
   if (hasErrors) {
-    if (import.meta.main) process.exit(1);
+    if (import.meta.main) {
+      process.exit(1);
+    }
     throw new Error('Lint failed');
   }
 }
@@ -363,7 +371,9 @@ export async function performBuild(
           entryPoint,
           assetsToCopy
         );
-        for (const f of touched) allTouchedFiles.add(f);
+        for (const f of touched) {
+          allTouchedFiles.add(f);
+        }
       } else {
         const outputStat = await stat(output).catch(() => null);
         if (outputStat?.isDirectory()) {
@@ -379,7 +389,9 @@ export async function performBuild(
             entryPoint,
             assetsToCopy
           );
-          for (const f of touched) allTouchedFiles.add(f);
+          for (const f of touched) {
+            allTouchedFiles.add(f);
+          }
         } else {
           outputFile = output;
         }
@@ -402,7 +414,9 @@ export async function performBuild(
         entryPoint,
         assetsToCopy
       );
-      for (const f of touched) allTouchedFiles.add(f);
+      for (const f of touched) {
+        allTouchedFiles.add(f);
+      }
     }
   } else {
     if (!output) {
@@ -428,7 +442,9 @@ export async function performBuild(
         entryPoint,
         assetsToCopy
       );
-      for (const f of touched) allTouchedFiles.add(f);
+      for (const f of touched) {
+        allTouchedFiles.add(f);
+      }
     }
   }
 
@@ -503,7 +519,9 @@ export async function handleWatch(
       const duration = (performance.now() - startTime).toFixed(0);
       console.log(`${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
       updateWatchers(newTouchedFiles);
-      if (onRebuild) onRebuild(outputDir);
+      if (onRebuild) {
+        onRebuild(outputDir);
+      }
     } catch (err) {
       console.error(`${pc.red('Rebuild failed:')}`, err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -518,8 +536,12 @@ export async function handleWatch(
   };
 
   const updateWatchers = (touchedFiles: Set<string>) => {
-    if (projectFile) touchedFiles.add(projectFile);
-    if (cwdProjectFile) touchedFiles.add(cwdProjectFile);
+    if (projectFile) {
+      touchedFiles.add(projectFile);
+    }
+    if (cwdProjectFile) {
+      touchedFiles.add(cwdProjectFile);
+    }
 
     for (const [filePath, watcher] of watchers) {
       if (!touchedFiles.has(filePath)) {
@@ -532,7 +554,9 @@ export async function handleWatch(
       if (!watchers.has(filePath)) {
         try {
           const watcher = watchFile(filePath, () => {
-            if (buildTimeout) clearTimeout(buildTimeout);
+            if (buildTimeout) {
+              clearTimeout(buildTimeout);
+            }
             buildTimeout = setTimeout(rebuild, 20);
           });
 
@@ -555,14 +579,18 @@ export async function handleWatch(
     const duration = (performance.now() - startTime).toFixed(0);
     console.log(`\n${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
     updateWatchers(initialTouchedFiles);
-    if (onRebuild) onRebuild(outputDir);
+    if (onRebuild) {
+      onRebuild(outputDir);
+    }
     printWatchingMessage(!!onRebuild);
   } catch (err) {
     console.error(`${pc.red('Initial build failed:')}`, err instanceof Error ? err.message : 'Unknown error');
   }
 
   process.on('SIGINT', () => {
-    for (const watcher of watchers.values()) watcher.close();
+    for (const watcher of watchers.values()) {
+      watcher.close();
+    }
     process.exit(0);
   });
 }
@@ -597,11 +625,15 @@ export async function handleServer(
       port,
       hostname: host,
       fetch(req, server) {
-        if (server.upgrade(req)) return;
+        if (server.upgrade(req)) {
+          return;
+        }
 
         const url = new URL(req.url);
         let pathname = url.pathname;
-        if (pathname === '/') pathname = '/index.html';
+        if (pathname === '/') {
+          pathname = '/index.html';
+        }
 
         const filePath = join(outputDir, pathname);
         const file = Bun.file(filePath);
@@ -706,14 +738,18 @@ export async function handleBuild(args: string[]) {
 
   if (files.length === 0) {
     console.error(`${pc.red('Error:')} No files specified for building`);
-    if (import.meta.main) process.exit(1);
+    if (import.meta.main) {
+      process.exit(1);
+    }
     throw new Error('No files specified for building');
   }
 
   if (server) {
     if (type !== 'html') {
       console.error(`${pc.red('Error:')} Server mode is only available for HTML output`);
-      if (import.meta.main) process.exit(1);
+      if (import.meta.main) {
+        process.exit(1);
+      }
       throw new Error('Server mode only available for HTML');
     }
     await handleServer(files, output, host, port);
@@ -734,7 +770,9 @@ export async function handleBuild(args: string[]) {
     console.log(`\n${pc.green(pc.bold('Build successful!'))} ${pc.dim(`(${duration}ms)`)}`);
   } catch (error) {
     console.error(`${pc.red('Build error:')}`, error instanceof Error ? error.message : 'Unknown error');
-    if (import.meta.main) process.exit(1);
+    if (import.meta.main) {
+      process.exit(1);
+    }
     throw error;
   }
 }
@@ -744,7 +782,9 @@ export async function main() {
 
   if (args.length === 0) {
     printHelp();
-    if (import.meta.main) process.exit(0);
+    if (import.meta.main) {
+      process.exit(0);
+    }
 
     return;
   }
@@ -753,7 +793,9 @@ export async function main() {
 
   if (command === '-v' || command === '--version') {
     console.log(`zolt v${version}`);
-    if (import.meta.main) process.exit(0);
+    if (import.meta.main) {
+      process.exit(0);
+    }
 
     return;
   }
@@ -776,7 +818,9 @@ export async function main() {
     default:
       console.error(`${pc.red('Error:')} Unknown command: ${command}`);
       printHelp();
-      if (import.meta.main) process.exit(1);
+      if (import.meta.main) {
+        process.exit(1);
+      }
       throw new Error(`Unknown command: ${command}`);
   }
 }

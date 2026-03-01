@@ -22,8 +22,12 @@ theme: dark
   });
 
   afterEach(() => {
-    if (fs.existsSync(layoutPath)) fs.unlinkSync(layoutPath);
-    if (fs.existsSync(docPath)) fs.unlinkSync(docPath);
+    if (fs.existsSync(layoutPath)) {
+      fs.unlinkSync(layoutPath);
+    }
+    if (fs.existsSync(docPath)) {
+      fs.unlinkSync(docPath);
+    }
   });
 
   it('should apply layout to a document', async () => {
@@ -56,7 +60,9 @@ layout: test-layout.zlt
       const html = await buildString(content, { filePath: docPath });
       expect(html).toContain('Included Content');
     } finally {
-      if (fs.existsSync(includePath)) fs.unlinkSync(includePath);
+      if (fs.existsSync(includePath)) {
+        fs.unlinkSync(includePath);
+      }
     }
   });
 
@@ -105,8 +111,12 @@ Content here`;
       expect(html).not.toContain('LAYOUT 2');
       expect(html).toContain('Included with layout');
     } finally {
-      if (fs.existsSync(layout2Path)) fs.unlinkSync(layout2Path);
-      if (fs.existsSync(includePath)) fs.unlinkSync(includePath);
+      if (fs.existsSync(layout2Path)) {
+        fs.unlinkSync(layout2Path);
+      }
+      if (fs.existsSync(includePath)) {
+        fs.unlinkSync(includePath);
+      }
     }
   });
 });

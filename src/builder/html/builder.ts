@@ -250,7 +250,9 @@ export class HTMLBuilder implements Builder {
 
     for (const id of sortedIds) {
       const def = this.footnoteDefinitions.get(id);
-      if (!def) continue;
+      if (!def) {
+        continue;
+      }
 
       const relevantRefs = this.footnoteReferences.filter((ref) => ref.id === id);
       const backlinks = relevantRefs
@@ -291,22 +293,32 @@ export class HTMLBuilder implements Builder {
   private hasNodeType(nodes: ASTNode[], type: string, extraCheck?: (node: ASTNode) => boolean): boolean {
     for (const node of nodes) {
       if (node.type === type) {
-        if (!extraCheck || extraCheck(node)) return true;
+        if (!extraCheck || extraCheck(node)) {
+          return true;
+        }
       }
       if ('children' in node && Array.isArray(node.children)) {
-        if (this.hasNodeType(node.children as ASTNode[], type, extraCheck)) return true;
+        if (this.hasNodeType(node.children as ASTNode[], type, extraCheck)) {
+          return true;
+        }
       }
       if (node.type === 'Table') {
         const table = node as any;
-        if (this.hasNodeType(table.rows as ASTNode[], type, extraCheck)) return true;
+        if (this.hasNodeType(table.rows as ASTNode[], type, extraCheck)) {
+          return true;
+        }
       }
       if (node.type === 'TableRow') {
         const row = node as any;
-        if (this.hasNodeType(row.cells as ASTNode[], type, extraCheck)) return true;
+        if (this.hasNodeType(row.cells as ASTNode[], type, extraCheck)) {
+          return true;
+        }
       }
       if (node.type === 'TableCell') {
         const cell = node as any;
-        if (cell.children && this.hasNodeType(cell.children as ASTNode[], type, extraCheck)) return true;
+        if (cell.children && this.hasNodeType(cell.children as ASTNode[], type, extraCheck)) {
+          return true;
+        }
       }
     }
 
@@ -346,7 +358,9 @@ export class HTMLBuilder implements Builder {
 
     const hasLineNumbers = attributes.start !== undefined;
     const containerClasses = ['zolt-code-block'];
-    if (hasLineNumbers) containerClasses.push('with-line-numbers');
+    if (hasLineNumbers) {
+      containerClasses.push('with-line-numbers');
+    }
 
     const startStyle = hasLineNumbers ? ` style="--zlt-code-start: ${startLine - 1}"` : '';
 

@@ -39,8 +39,11 @@ export class SpecialBlockParser {
     const attrsStr = colonIndex !== -1 ? value.substring(colonIndex + 1) : '';
 
     let style: 'solid' | 'thick' | 'thin' = 'solid';
-    if (styleChar.includes('*')) style = 'thick';
-    else if (styleChar.includes('_')) style = 'thin';
+    if (styleChar.includes('*')) {
+      style = 'thick';
+    } else if (styleChar.includes('_')) {
+      style = 'thin';
+    }
 
     let attributes: Attributes | undefined;
     if (attrsStr) {

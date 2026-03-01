@@ -808,7 +808,9 @@ export class InlineParser {
       if (remaining.startsWith(',')) {
         remaining = remaining.slice(1).trimStart();
       }
-      if (remaining.length === 0) break;
+      if (remaining.length === 0) {
+        break;
+      }
 
       const startLen = remaining.length;
 

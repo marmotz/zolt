@@ -46,12 +46,16 @@ export class BlockquoteParser {
       parseParagraph,
       warn
     );
-    if (firstLineContent) children.push(firstLineContent);
+    if (firstLineContent) {
+      children.push(firstLineContent);
+    }
 
     while (!isEof()) {
       if (match(TokenType.BLOCKQUOTE)) {
         const nextLevel = currentToken().level || 1;
-        if (nextLevel < baseLevel) break;
+        if (nextLevel < baseLevel) {
+          break;
+        }
         if (nextLevel > baseLevel) {
           children.push(
             this.parseBlockquote(
@@ -91,12 +95,18 @@ export class BlockquoteParser {
           parseParagraph,
           warn
         );
-        if (lineContent) children.push(lineContent);
+        if (lineContent) {
+          children.push(lineContent);
+        }
         continue;
       }
-      if (!match(TokenType.NEWLINE)) break;
+      if (!match(TokenType.NEWLINE)) {
+        break;
+      }
       advance();
-      if (match(TokenType.NEWLINE)) break;
+      if (match(TokenType.NEWLINE)) {
+        break;
+      }
     }
 
     return { type: 'Blockquote', level: baseLevel, children };
@@ -159,13 +169,19 @@ export class BlockquoteParser {
     parseBlock: () => ASTNode | null
   ): any {
     const kind = this.listParser.getListKind(currentToken().type);
-    if (!kind) return null;
+    if (!kind) {
+      return null;
+    }
 
     const children: any[] = [];
 
     while (!isEof()) {
-      if (!match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) break;
-      if (this.listParser.getListKind(currentToken().type) !== kind) break;
+      if (!match(TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST)) {
+        break;
+      }
+      if (this.listParser.getListKind(currentToken().type) !== kind) {
+        break;
+      }
 
       const item = this.listParser.parseListItem(
         kind,
@@ -187,10 +203,16 @@ export class BlockquoteParser {
       skipNewlines();
 
       if (match(TokenType.BLOCKQUOTE)) {
-        if (currentToken().level !== 1) break;
+        if (currentToken().level !== 1) {
+          break;
+        }
         const peekedNext = tokens[pos.current + 1] || { type: TokenType.EOF };
-        if (![TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST].includes(peekedNext.type)) break;
-        if (this.listParser.getListKind(peekedNext.type) !== kind) break;
+        if (![TokenType.BULLET_LIST, TokenType.ORDERED_LIST, TokenType.TASK_LIST].includes(peekedNext.type)) {
+          break;
+        }
+        if (this.listParser.getListKind(peekedNext.type) !== kind) {
+          break;
+        }
         advance();
       }
     }

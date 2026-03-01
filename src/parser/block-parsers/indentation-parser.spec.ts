@@ -28,13 +28,17 @@ describe('IndentationParser', () => {
       advance: () => tokens[ctx.pos.current++],
       expect: (type: TokenType) => {
         const token = tokens[ctx.pos.current++];
-        if (token.type !== type) throw new Error(`Expected ${type} but got ${token.type}`);
+        if (token.type !== type) {
+          throw new Error(`Expected ${type} but got ${token.type}`);
+        }
 
         return token;
       },
       match: (...types: TokenType[]) => types.includes(tokens[ctx.pos.current]?.type),
       skipNewlines: () => {
-        while (tokens[ctx.pos.current]?.type === TokenType.NEWLINE) ctx.pos.current++;
+        while (tokens[ctx.pos.current]?.type === TokenType.NEWLINE) {
+          ctx.pos.current++;
+        }
       },
       isEof: () => ctx.pos.current >= tokens.length || tokens[ctx.pos.current].type === TokenType.EOF,
       error: (msg: string) => {

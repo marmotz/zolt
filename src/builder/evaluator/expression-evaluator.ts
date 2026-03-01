@@ -184,7 +184,9 @@ export class ExpressionEvaluator {
 
     for (const pair of pairs) {
       const colonIndex = pair.indexOf(':');
-      if (colonIndex === -1) continue;
+      if (colonIndex === -1) {
+        continue;
+      }
 
       let key = pair.slice(0, colonIndex).trim();
       if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
@@ -646,7 +648,9 @@ export class ExpressionEvaluator {
 
         const date1 = this.parseDate(date1Value);
         const date2 = this.parseDate(date2Value);
-        if (!date1 || !date2) return null;
+        if (!date1 || !date2) {
+          return null;
+        }
 
         return this.calculateDiff(date1, date2, unit);
       }
@@ -670,7 +674,9 @@ export class ExpressionEvaluator {
   }
 
   private parseDateWithFormat(dateStr: string, format: string | null): Date | null {
-    if (!dateStr) return null;
+    if (!dateStr) {
+      return null;
+    }
     if (!format) {
       const d = new Date(dateStr);
 
@@ -731,7 +737,9 @@ export class ExpressionEvaluator {
     const d = new Date(date);
     for (const [unit, val] of Object.entries(duration)) {
       const amount = typeof val === 'number' ? val : parseFloat(String(val ?? '0'));
-      if (isNaN(amount)) continue;
+      if (isNaN(amount)) {
+        continue;
+      }
 
       switch (unit.toLowerCase()) {
         case 'years':
@@ -951,7 +959,9 @@ export class ExpressionEvaluator {
         depth--;
         current += char;
       } else if (char === '^' && depth === 0) {
-        if (current.trim()) tokens.push(current.trim());
+        if (current.trim()) {
+          tokens.push(current.trim());
+        }
         tokens.push('^');
         current = '';
       } else {
@@ -959,7 +969,9 @@ export class ExpressionEvaluator {
       }
     }
 
-    if (current.trim()) tokens.push(current.trim());
+    if (current.trim()) {
+      tokens.push(current.trim());
+    }
 
     return tokens.length >= 3 ? tokens : [];
   }
@@ -1034,11 +1046,15 @@ export class ExpressionEvaluator {
       const char = varExpr[i];
 
       if (char === '.') {
-        if (current) parts.push(current);
+        if (current) {
+          parts.push(current);
+        }
         current = '';
         i++;
       } else if (char === '[') {
-        if (current) parts.push(current);
+        if (current) {
+          parts.push(current);
+        }
         current = '';
 
         // Find matching ] while handling nested brackets
@@ -1046,10 +1062,15 @@ export class ExpressionEvaluator {
         let j = i + 1;
         let indexStr = '';
         while (j < varExpr.length && depth > 0) {
-          if (varExpr[j] === '[') depth++;
-          else if (varExpr[j] === ']') depth--;
+          if (varExpr[j] === '[') {
+            depth++;
+          } else if (varExpr[j] === ']') {
+            depth--;
+          }
 
-          if (depth > 0) indexStr += varExpr[j];
+          if (depth > 0) {
+            indexStr += varExpr[j];
+          }
           j++;
         }
 
@@ -1066,7 +1087,9 @@ export class ExpressionEvaluator {
       }
     }
 
-    if (current) parts.push(current);
+    if (current) {
+      parts.push(current);
+    }
 
     if (parts.length === 0) {
       return null;
@@ -1097,8 +1120,9 @@ export class ExpressionEvaluator {
   private findMatchingParen(str: string, start: number): number {
     let depth = 0;
     for (let i = start; i < str.length; i++) {
-      if (str[i] === '(') depth++;
-      else if (str[i] === ')') {
+      if (str[i] === '(') {
+        depth++;
+      } else if (str[i] === ')') {
         depth--;
         if (depth === 0) {
           return i;

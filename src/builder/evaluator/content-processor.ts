@@ -178,8 +178,9 @@ export class ContentProcessor {
         continue;
       }
 
-      if (char === open) depth++;
-      else if (char === close) {
+      if (char === open) {
+        depth++;
+      } else if (char === close) {
         depth--;
         if (depth === 0) {
           return i === str.length - 1;
@@ -261,8 +262,11 @@ export class ContentProcessor {
       let depth = 0;
       let isBalanced = true;
       for (let i = 0; i < expr.length; i++) {
-        if (expr[i] === '{') depth++;
-        else if (expr[i] === '}') depth--;
+        if (expr[i] === '{') {
+          depth++;
+        } else if (expr[i] === '}') {
+          depth--;
+        }
         if (depth === 0 && i < expr.length - 1) {
           isBalanced = false;
           break;

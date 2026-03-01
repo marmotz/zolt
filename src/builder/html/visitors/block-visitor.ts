@@ -49,7 +49,9 @@ export class BlockVisitor {
     let numberStr = '';
     if ((isGlobalNumbering && !isNumberingDisabled) || isLocalNumbering) {
       this.headingCounters[level]++;
-      for (let i = level + 1; i <= 6; i++) this.headingCounters[i] = 0;
+      for (let i = level + 1; i <= 6; i++) {
+        this.headingCounters[i] = 0;
+      }
 
       const numberingStyle = this.evaluator.getVariable('numberingStyle') || 'decimal';
       const parts = this.headingCounters.slice(1, level + 1);
@@ -83,7 +85,9 @@ export class BlockVisitor {
       const imageNode = node.children[0] as ImageNode;
       if (imageNode.attributes && imageNode.attributes.align === 'center') {
         // Add style to paragraph
-        if (!node.attributes) node.attributes = {};
+        if (!node.attributes) {
+          node.attributes = {};
+        }
         const currentStyle = node.attributes.style ? node.attributes.style + ';' : '';
         node.attributes.style = `${currentStyle}text-align: center`;
         // Remove align from image to avoid invalid attribute

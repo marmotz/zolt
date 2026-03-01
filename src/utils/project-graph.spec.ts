@@ -9,13 +9,17 @@ describe('ProjectGraphBuilder', () => {
   const page1File = path.join(testDir, 'page1.zlt');
 
   beforeEach(() => {
-    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir);
+    }
     fs.writeFileSync(indexFile, '# Index\n[Page 1](page1.zlt)');
     fs.writeFileSync(page1File, '# Page 1\n[Index](index.zlt)');
   });
 
   afterEach(() => {
-    if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
+    if (fs.existsSync(testDir)) {
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
   });
 
   test('should build a project graph and handle cycles', () => {

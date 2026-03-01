@@ -3,7 +3,9 @@
  */
 export function parseLineRanges(rangeStr: string): Set<number> {
   const lines = new Set<number>();
-  if (!rangeStr) return lines;
+  if (!rangeStr) {
+    return lines;
+  }
 
   const parts = rangeStr.split(',');
   for (const part of parts) {

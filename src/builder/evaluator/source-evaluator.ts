@@ -249,7 +249,9 @@ export class SourceEvaluator {
   }
 
   private processMetadata(lines: string[]): void {
-    if (lines.length < 2) return;
+    if (lines.length < 2) {
+      return;
+    }
 
     const content = lines.join('\n');
     const data = FileMetadataUtils.parse(content);
@@ -343,7 +345,9 @@ export class SourceEvaluator {
         depth++;
       } else if (trimmed === ':::') {
         depth--;
-        if (depth === 0) break;
+        if (depth === 0) {
+          break;
+        }
       }
       blockLines.push(line);
       i++;

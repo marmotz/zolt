@@ -10,7 +10,9 @@ describe('Filetree Markup', () => {
   const page2File = path.join(testDir, 'page2.zlt');
 
   beforeEach(() => {
-    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir);
+    }
     fs.writeFileSync(
       indexFile,
       `---
@@ -37,7 +39,9 @@ title: First Page
   });
 
   afterEach(() => {
-    if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
+    if (fs.existsSync(testDir)) {
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
   });
 
   it('should render a project file tree', async () => {
@@ -79,7 +83,9 @@ title: First Page
 
   it('should render correct relative links when in a sub-directory', async () => {
     const subDir = path.join(testDir, 'sub');
-    if (!fs.existsSync(subDir)) fs.mkdirSync(subDir);
+    if (!fs.existsSync(subDir)) {
+      fs.mkdirSync(subDir);
+    }
     const subPageFile = path.join(subDir, 'subpage.zlt');
 
     fs.writeFileSync(
