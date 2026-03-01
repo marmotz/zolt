@@ -134,7 +134,7 @@ layout: f-layout.zlt
     it('should handle missing file gracefully in buildString stats', async () => {
       // Provide a non-existent path to trigger the catch block in buildString
       const html = await buildString('# Test', { filePath: '/tmp/non-existent-file-12345.zlt' });
-      expect(html).toMatch(/<h1[^>]*>Test<\/h1>/);
+      expect(html).toMatch(/<h1[^>]*>.*Test<\/h1>/);
     });
 
     it('should use projectTitle from projectMetadata.title', async () => {

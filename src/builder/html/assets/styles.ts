@@ -178,6 +178,28 @@ export const BASE_CSS = `
   .zolt-toc a:hover { color: var(--zlt-color-primary); }
   .zolt-toc-number { margin-right: 0.5rem; }
   .zolt-heading-number { margin-right: 0.5rem; }
+  .zolt-anchor {
+    float: left;
+    margin-left: -1.2em;
+    padding-right: 0.5em;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    color: var(--zlt-color-text-soft, #9ca3af);
+    font-weight: normal;
+    user-select: none;
+  }
+  h1:hover .zolt-anchor,
+  h2:hover .zolt-anchor,
+  h3:hover .zolt-anchor,
+  h4:hover .zolt-anchor,
+  h5:hover .zolt-anchor,
+  h6:hover .zolt-anchor {
+    opacity: 1;
+  }
+  .zolt-anchor:hover {
+    color: var(--zlt-color-primary) !important;
+    text-decoration: none !important;
+  }
 
   /* --- FILETREE --- */
   .zolt-filetree {

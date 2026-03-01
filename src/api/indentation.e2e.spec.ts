@@ -77,7 +77,7 @@ test('should group multiple lines at same indentation level', async () => {
 test('should build indentation with heading', async () => {
   const html = await buildString(`& ## Heading inside indentation\n& Some text`);
   expect(html).toContain('<div class="indented" style="margin-left: 2em">');
-  expect(html).toMatch(/<h2[^>]*>Heading inside indentation<\/h2>/);
+  expect(html).toMatch(/<h2[^>]*>.*Heading inside indentation<\/h2>/);
   expect(html).toContain('<p>Some text</p>');
 });
 

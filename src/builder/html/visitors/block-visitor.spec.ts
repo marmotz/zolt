@@ -13,7 +13,9 @@ describe('BlockVisitor', () => {
     };
 
     const html = await builder.build(node);
-    expect(html).toBe('<h1 id="hello-world">Hello World</h1>');
+    expect(html).toBe(
+      '<h1 id="hello-world"><a href="#hello-world" class="zolt-anchor" aria-hidden="true">#</a>Hello World</h1>'
+    );
   });
 
   test('should build paragraph', async () => {

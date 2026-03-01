@@ -94,7 +94,9 @@ describe('API: TOC', () => {
 # My Awesome Heading!
 `;
     const html = await buildString(zolt);
-    expect(html).toContain('<h1 id="my-awesome-heading">My Awesome Heading!</h1>');
+    expect(html).toContain(
+      '<h1 id="my-awesome-heading"><a href="#my-awesome-heading" class="zolt-anchor" aria-hidden="true">#</a>My Awesome Heading!</h1>'
+    );
     expect(html).toContain('<a href="#my-awesome-heading">My Awesome Heading!</a>');
   });
 

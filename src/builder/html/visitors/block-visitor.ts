@@ -122,7 +122,8 @@ export class BlockVisitor {
     delete cleanAttributes.numbering;
     const attrs = this.renderAllAttributes(cleanAttributes);
 
-    return `<h${level}${attrs}>${numberStr}${renderedContent}</h${level}>`;
+    const anchor = `<a href="#${node.attributes.id}" class="zolt-anchor" aria-hidden="true">#</a>`;
+    return `<h${level}${attrs}>${anchor}${numberStr}${renderedContent}</h${level}>`;
   }
 
   async visitParagraph(node: ParagraphNode): Promise<string> {

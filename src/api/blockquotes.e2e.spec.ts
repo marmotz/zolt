@@ -102,7 +102,7 @@ describe('Blockquotes E2E', () => {
   test('should build blockquote with heading', async () => {
     const html = await buildString('> ## Heading inside quote\n> Some text');
     expect(html).toContain('<blockquote>');
-    expect(html).toMatch(/<h2[^>]*>Heading inside quote<\/h2>/);
+    expect(html).toMatch(/<h2[^>]*>.*Heading inside quote<\/h2>/);
     expect(html).toContain('<p>Some text</p>');
   });
 });

@@ -26,7 +26,9 @@ describe('HTMLBuilder', () => {
     };
 
     const html = await builder.build(node);
-    expect(html).toContain('<h1 id="hello-world">Hello World</h1>');
+    expect(html).toContain(
+      '<h1 id="hello-world"><a href="#hello-world" class="zolt-anchor" aria-hidden="true">#</a>Hello World</h1>'
+    );
   });
 
   test('should build heading with level 6', async () => {
@@ -37,7 +39,9 @@ describe('HTMLBuilder', () => {
     };
 
     const html = await builder.build(node);
-    expect(html).toContain('<h6 id="smallest-heading">Smallest Heading</h6>');
+    expect(html).toContain(
+      '<h6 id="smallest-heading"><a href="#smallest-heading" class="zolt-anchor" aria-hidden="true">#</a>Smallest Heading</h6>'
+    );
   });
 
   test('should build paragraph', async () => {
@@ -306,7 +310,7 @@ describe('HTMLBuilder', () => {
 
     const html = await builder.buildDocument(node);
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('<h1 id="title">Title</h1>');
+    expect(html).toContain('<h1 id="title"><a href="#title" class="zolt-anchor" aria-hidden="true">#</a>Title</h1>');
     expect(html).toContain('<p>Content</p>');
   });
 
@@ -330,7 +334,9 @@ describe('HTMLBuilder', () => {
     };
 
     const html = await builder.build(node);
-    expect(html).toContain('<h2 id="heading-2">Heading 2</h2>');
+    expect(html).toContain(
+      '<h2 id="heading-2"><a href="#heading-2" class="zolt-anchor" aria-hidden="true">#</a>Heading 2</h2>'
+    );
   });
 
   test('should build list item with content', async () => {
@@ -814,12 +820,20 @@ describe('HTMLBuilder', () => {
       } as DocumentNode;
 
       const html1 = await builder.buildDocument(doc);
-      expect(html1).toContain('<h1 id="chapter-1"><span class="zolt-heading-number">1 </span>Chapter 1</h1>');
-      expect(html1).toContain('<h1 id="chapter-2"><span class="zolt-heading-number">2 </span>Chapter 2</h1>');
+      expect(html1).toContain(
+        '<h1 id="chapter-1"><a href="#chapter-1" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">1 </span>Chapter 1</h1>'
+      );
+      expect(html1).toContain(
+        '<h1 id="chapter-2"><a href="#chapter-2" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">2 </span>Chapter 2</h1>'
+      );
 
       const html2 = await builder.buildDocument(doc);
-      expect(html2).toContain('<h1 id="chapter-1"><span class="zolt-heading-number">1 </span>Chapter 1</h1>');
-      expect(html2).toContain('<h1 id="chapter-2"><span class="zolt-heading-number">2 </span>Chapter 2</h1>');
+      expect(html2).toContain(
+        '<h1 id="chapter-1"><a href="#chapter-1" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">1 </span>Chapter 1</h1>'
+      );
+      expect(html2).toContain(
+        '<h1 id="chapter-2"><a href="#chapter-2" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">2 </span>Chapter 2</h1>'
+      );
     });
 
     test('should NOT number single H1 and start numbering from H2', async () => {

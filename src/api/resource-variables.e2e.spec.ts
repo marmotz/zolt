@@ -86,7 +86,7 @@ $categories = [
 :::
     `;
     const html = await buildString(zolt);
-    expect(html).toMatch(/<h1[^>]*>Tech<\/h1>/);
+    expect(html).toMatch(/<h1[^>]*>.*Tech<\/h1>/);
     expect(html).toContain('<li>Laptop</li>');
   });
 });

@@ -66,9 +66,9 @@ If you find a bug in [Zolt][zolt], please open an issue on [GitHub][zolt-repo].
 Link to specific elements with anchors:
 
 ```zolt
-Jump to [Lists section](#lists).
+Jump to [Lists section](#links-media).
 
-[Return to summary](#summary)
+[Return to Reference Links](#reference-links)
 ```
 
 :::info [Result]
@@ -80,13 +80,13 @@ Jump to [Lists section](#links-media).
 ### Links with Variables
 
 ```zolt
-$site_url = "https://example.com"
+$site_url = "https://zolt.marmotz.dev"
 
 Visit [our website]({$site_url}).
 ```
 
 :::info [Result]
-$site_url = "https://example.com"
+$site_url = "https://zolt.marmotz.dev"
 
 Visit [our website]({$site_url}).
 :::
@@ -97,13 +97,13 @@ Visit [our website]({$site_url}).
 
 Zolt uses unique prefixes for each media type:
 
-| Prefix | Type | HTML Tag | Usage |
-|--------|------|----------|-------|
-| `!` | Image | `<img>` | Static images (jpg, png, gif, svg) |
-| `!!` | Video | `<video>` | Video files (mp4, webm, ogg) |
-| `??` | Audio | `<audio>` | Audio files (mp3, wav, ogg) |
-| `@@` | Embed | `<iframe>` | External embeds (YouTube, Vimeo) |
-| `&&` | File | `<a>` | Downloadable files (pdf, doc, zip) |
+| Prefix | Type  | HTML Tag   | Usage                              |
+|--------|-------|------------|------------------------------------|
+| `!`    | Image | `<img>`    | Static images (jpg, png, gif, svg) |
+| `!!`   | Video | `<video>`  | Video files (mp4, webm, ogg)       |
+| `??`   | Audio | `<audio>`  | Audio files (mp3, wav, ogg)        |
+| `@@`   | Embed | `<iframe>` | External embeds (YouTube, Vimeo)   |
+| `&&`   | File  | `<a>`      | Downloadable files (pdf, doc, zip) |
 
 ---
 

@@ -24,7 +24,7 @@ describe('API: Build', () => {
       const html = await buildString('# Hello World');
 
       expect(html).toContain('<!DOCTYPE html>');
-      expect(html).toMatch(/<h1[^>]*>Hello World<\/h1>/);
+      expect(html).toMatch(/<h1[^>]*>.*Hello World<\/h1>/);
     });
 
     test('should build document with paragraph', async () => {
@@ -59,9 +59,9 @@ describe('API: Build', () => {
     test('should build heading with different levels', async () => {
       const html = await buildString('# H1\n## H2\n### H3');
 
-      expect(html).toMatch(/<h1[^>]*>H1<\/h1>/);
-      expect(html).toMatch(/<h2[^>]*>H2<\/h2>/);
-      expect(html).toMatch(/<h3[^>]*>H3<\/h3>/);
+      expect(html).toMatch(/<h1[^>]*>.*H1<\/h1>/);
+      expect(html).toMatch(/<h2[^>]*>.*H2<\/h2>/);
+      expect(html).toMatch(/<h3[^>]*>.*H3<\/h3>/);
     });
 
     test('should build link in paragraph', async () => {
@@ -90,8 +90,8 @@ Paragraph with [link](url).
 1. First
 2. Second`);
 
-      expect(html).toMatch(/<h1[^>]*>Title<\/h1>/);
-      expect(html).toMatch(/<h2[^>]*>Section<\/h2>/);
+      expect(html).toMatch(/<h1[^>]*>.*Title<\/h1>/);
+      expect(html).toMatch(/<h2[^>]*>.*Section<\/h2>/);
       expect(html).toContain('<a href="url">link</a>');
       expect(html).toContain('<a href="item1.html">item 1</a>');
       expect(html).toContain('<ol>');

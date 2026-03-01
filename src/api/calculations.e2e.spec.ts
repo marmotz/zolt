@@ -422,9 +422,9 @@ $category_products = {
 :::
 `;
     const html = await buildString(input);
-    expect(html).toMatch(/<h2[^>]*>Technology<\/h2>/);
+    expect(html).toMatch(/<h2[^>]*>.*Technology<\/h2>/);
     expect(html).toContain('<li>Laptop</li>');
-    expect(html).toMatch(/<h2[^>]*>Home<\/h2>/);
+    expect(html).toMatch(/<h2[^>]*>.*Home<\/h2>/);
     expect(html).toContain('<li>Lamp</li>');
   });
 

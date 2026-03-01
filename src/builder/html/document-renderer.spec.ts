@@ -109,7 +109,8 @@ describe('DocumentRenderer', () => {
       children: [],
       sourceFile: 'test.zlt',
     };
-    const contentHtml = '<aside class="zolt-sidebar zolt-sidebar-left">Sidebar</aside><h1>Main Content</h1>';
+    const contentHtml =
+      '<aside class="zolt-sidebar zolt-sidebar-left">Sidebar</aside><h1 id="main-content"><a href="#main-content" class="zolt-anchor" aria-hidden="true">#</a>Main Content</h1>';
 
     const html = renderer.renderDocumentWithContent(
       node,
@@ -128,6 +129,8 @@ describe('DocumentRenderer', () => {
     expect(html).toContain('class="theme-default color-scheme-auto has-sidebar sidebar-left"');
     expect(html).toContain('<main class="zolt-main-content">');
     expect(html).toContain('<div class="zolt-content-container">');
-    expect(html).toContain('<h1>Main Content</h1>');
+    expect(html).toContain(
+      '<h1 id="main-content"><a href="#main-content" class="zolt-anchor" aria-hidden="true">#</a>Main Content</h1>'
+    );
   });
 });
