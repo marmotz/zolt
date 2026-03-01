@@ -96,8 +96,6 @@ L'indentation peut être cumulée pour créer des hiérarchies complexes :
   & Configurer les variables d'environnement
 :::
 
----
-
 ## Bonnes Pratiques
 
 1. **Utilisez les citations** (`>`) uniquement lorsque le texte est réellement une citation ou une référence externe.

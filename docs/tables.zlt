@@ -51,8 +51,6 @@ Wrapping your table in `[[table]]` and `[[/table]]` is useful when you need to a
 [[/table]]
 :::
 
----
-
 ## Header Cells
 
 Mark header cells with `[h]`. Unlike standard Markdown which only supports headers in the first row, Zolt allows headers anywhere.
@@ -70,8 +68,6 @@ Mark header cells with `[h]`. Unlike standard Markdown which only supports heade
 | [h] Alice | 30      | New York |
 | [h] Bob   | 25      | London   |
 :::
-
----
 
 ## Cell Alignment
 
@@ -97,8 +93,6 @@ Control alignment with colon position in the separator row:
 | :------- | :------: | -------: |
 | Data     | Data     | Data     |
 :::
-
----
 
 ## Cell Merging
 
@@ -136,8 +130,6 @@ Control alignment with colon position in the separator row:
 | Normal              | Row 3  |
 :::
 
----
-
 ## Complex Example
 
 ```zolt
@@ -161,8 +153,6 @@ Control alignment with colon position in the separator row:
 | [h] Total               | $80K   | $95K   | $110K  | $125K  |
 [[/table]]
 :::
-
----
 
 ## Best Practices
 

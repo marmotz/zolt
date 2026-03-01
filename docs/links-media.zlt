@@ -91,8 +91,6 @@ $site_url = "https://zolt.marmotz.dev"
 Visit [our website]({$site_url}).
 :::
 
----
-
 ## Media Prefixes
 
 Zolt uses unique prefixes for each media type:
@@ -103,8 +101,6 @@ Zolt uses unique prefixes for each media type:
 | `!!`   | Video | `<video>` | Video files (mp4, webm, ogg)       |
 | `??`   | Audio | `<audio>` | Audio files (mp3, wav, ogg)        |
 | `&&`   | File  | `<a>`     | Downloadable files (pdf, doc, zip) |
-
----
 
 ## Images
 
@@ -234,8 +230,6 @@ Caption for photo 2.
 :::
 :::
 
----
-
 ## Complete Examples
 
 ### Article with Media
@@ -305,8 +299,6 @@ Watch the [demo video](#video-attributes) for more details.
 :::
 :::
 :::
-
----
 
 ## Best Practices
 

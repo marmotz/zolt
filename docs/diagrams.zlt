@@ -7,8 +7,6 @@ description: "Visualisation de données avec Mermaid et les graphiques natifs de
 
 Zolt propose des outils puissants pour la visualisation de données, incluant le support natif de Mermaid pour les diagrammes et un système de graphiques intégré pour les données numériques.
 
----
-
 ## Diagrammes Mermaid
 
 Créez des diagrammes complexes en utilisant la syntaxe Mermaid directement dans vos documents :
@@ -59,8 +57,6 @@ classDiagram
     Animal <|-- Dog
 :::
 ```
-
----
 
 ## Graphiques Natifs
 
@@ -117,8 +113,6 @@ Nuit: 50
 :::
 ```
 
----
-
 ## Attributs des Graphiques
 
 ### Attributs du Conteneur
@@ -152,8 +146,6 @@ Chaque type de graphique (`chart-line`, `chart-bar`, etc.) accepte ses propres a
 | `legend`      | Afficher la légende                             |
 | `grid`        | Afficher la grille                              |
 
----
-
 ## Graphiques Multiples
 
 Vous pouvez combiner plusieurs graphiques dans un seul conteneur :
@@ -174,16 +166,12 @@ Vous pouvez combiner plusieurs graphiques dans un seul conteneur :
 :::
 ```
 
----
-
 ## Bonnes Pratiques
 
 1. **Simplicité** : Ne surchargez pas vos graphiques avec trop de points de données.
 2. **Titres clairs** : Utilisez l'attribut `title` pour donner du contexte à vos visualisations.
 3. **Couleurs cohérentes** : Utilisez `colorScheme` pour maintenir une harmonie visuelle.
 4. **Légendes** : Activez les légendes lorsque vous comparez plusieurs séries de données.
-
----
 
 ## Étapes Suivantes
 

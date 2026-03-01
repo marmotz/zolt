@@ -38,8 +38,6 @@ Example syntax:
 - `` ```python ``
 - `` ```bash ``
 
----
-
 ## Code Block Attributes
 
 Apply attributes to code blocks:

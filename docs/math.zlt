@@ -5,9 +5,9 @@ description: "Write mathematical equations using LaTeX syntax in Zolt"
 
 # Mathematical Formulas
 
-Zolt integrates **KaTeX** for high-performance mathematical rendering. You can use LaTeX syntax for both inline and block formulas.
+Zolt integrates **KaTeX** for high-performance mathematical rendering.
 
----
+You can use LaTeX syntax for both inline and block formulas. For a full list of supported LaTeX functions, you can refer to the official [KaTeX documentation](https://katex.org/docs).
 
 ## Inline Math
 
@@ -21,13 +21,13 @@ The Pythagorean theorem: $a^2 + b^2 = c^2$.
 Greek letters: $\alpha, \beta, \gamma, \Delta, \Omega$.
 ```
 
-### Result
+:::info [Result]
+The mass-energy equivalence is defined by $E = mc^2$.
 
-- The mass-energy equivalence is defined by E = mc².
-- The Pythagorean theorem: a² + b² = c².
-- Greek letters: α, β, γ, Δ, Ω.
+The Pythagorean theorem: $a^2 + b^2 = c^2$.
 
----
+Greek letters: $\alpha, \beta, \gamma, \Delta, \Omega$.
+:::
 
 ## Block Math
 
@@ -39,11 +39,11 @@ $$
 $$
 ```
 
-### Result
-
-∫(-∞ to ∞) e^(-x²) dx = √π
-
----
+:::info [Result]
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+:::
 
 ## Advanced Equations
 
@@ -59,6 +59,16 @@ $$
 $$
 ```
 
+:::info [Result]
+$$
+\begin{aligned}
+(a+b)^2 &= (a+b)(a+b) \\
+        &= a^2 + ab + ba + b^2 \\
+        &= a^2 + 2ab + b^2
+\end{aligned}
+$$
+:::
+
 ### Quadratic Formula
 
 ```zolt
@@ -67,55 +77,61 @@ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
 $$
 ```
 
+:::info [Result]
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+:::
+
 ---
 ## Common Mathematical Symbols
 
 ### Operations
 
-| Symbol      | LaTeX          | Example |
-|-------------|----------------|---------|
-| Fraction    | `\frac{a}{b}`  | ½       |
-| Square root | `\sqrt{x}`     | √x      |
-| nth root    | `\sqrt[n]{x}`  | ⁿ√x     |
-| Power       | `a^b`          | aᵇ      |
-| Subscript   | `a_b`          | aᵦ      |
+| Symbol      | LaTeX         | Example       |
+| ----------- | ------------- | ------------- |
+| Fraction    | `\frac{a}{b}` | $\frac{a}{b}$ |
+| Square root | `\sqrt{x}`    | $\sqrt{x}$    |
+| nth root    | `\sqrt[n]{x}` | $\sqrt[n]{x}$ |
+| Power       | `a^b`         | $a^b$         |
+| Subscript   | `a_b`         | $a_b$         |
 
 ### Greek Letters
 
-| Lowercase | LaTeX      | Uppercase | LaTeX      |
-|-----------|------------|-----------|------------|
-| α         | `\alpha`   | Α         | `A`        |
-| β         | `\beta`    | Β         | `B`        |
-| γ         | `\gamma`   | Γ         | `\Gamma`   |
-| δ         | `\delta`   | Δ         | `\Delta`   |
-| ε         | `\epsilon` | Ε         | `E`        |
-| θ         | `\theta`   | Θ         | `\Theta`   |
-| λ         | `\lambda`  | Λ         | `\Lambda`  |
-| μ         | `\mu`      | Μ         | `M`        |
-| π         | `\pi`      | Π         | `\Pi`      |
-| σ         | `\sigma`   | Σ         | `\Sigma`   |
-| φ         | `\phi`     | Φ         | `\Phi`     |
-| ω         | `\omega`   | Ω         | `\Omega`   |
+| Lowercase  | LaTeX      | Uppercase  | LaTeX      |
+| ---------- | ---------- | ---------- | ---------- |
+| $\alpha$   | `\alpha`   | $\Alpha$   | `\Alpha`   |
+| $\beta$    | `\beta`    | $\Beta$    | `\Beta`    |
+| $\gamma$   | `\gamma`   | $\Gamma$   | `\Gamma`   |
+| $\delta$   | `\delta`   | $\Delta$   | `\Delta`   |
+| $\epsilon$ | `\epsilon` | $\Epsilon$ | `\Epsilon` |
+| $\theta$   | `\theta`   | $\Theta$   | `\Theta`   |
+| $\lambda$  | `\lambda`  | $\Lambda$  | `\Lambda`  |
+| $\mu$      | `\mu`      | $\Mu$      | `\Mu`      |
+| $\pi$      | `\pi`      | $\Pi$      | `\Pi`      |
+| $\sigma$   | `\sigma`   | $\Sigma$   | `\Sigma`   |
+| $\phi$     | `\phi`     | $\Phi$     | `\Phi`     |
+| $\omega$   | `\omega`   | $\Omega$   | `\Omega`   |
 
 ### Relations
 
-| Symbol | LaTeX      |
-|--------|------------|
-| ≠      | `\neq`     |
-| ≤      | `\leq`     |
-| ≥      | `\geq`     |
-| ≈      | `\approx`  |
-| ≡      | `\equiv`   |
-| ∈      | `\in`      |
-| ∉      | `\notin`   |
-| ⊂      | `\subset`  |
-| ∪      | `\cup`     |
-| ∩      | `\cap`     |
+| Symbol | LaTeX     |
+| ------ | --------- |
+| ≠      | `\neq`    |
+| ≤      | `\leq`    |
+| ≥      | `\geq`    |
+| ≈      | `\approx` |
+| ≡      | `\equiv`  |
+| ∈      | `\in`     |
+| ∉      | `\notin`  |
+| ⊂      | `\subset` |
+| ∪      | `\cup`    |
+| ∩      | `\cap`    |
 
 ### Calculus
 
 | Symbol | LaTeX      |
-|--------|------------|
+| ------ | ---------- |
 | ∫      | `\int`     |
 | ∮      | `\oint`    |
 | ∂      | `\partial` |
@@ -125,88 +141,23 @@ $$
 | sum    | `\sum`     |
 | prod   | `\prod`    |
 
----
-
-...
-
 ### Trigonometry
 
-```zolt
-| Function | Identity                        |
-| :---     | :---                            |
-| Sine     | $\sin^2\theta + \cos^2\theta = 1$ |
-| Tangent  | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ |
-```
-
-**Newton's Second Law:**
-
-```zolt
-$$F = ma$$
-```
-
-**Maxwell's Equations:**
-
-```zolt
-$$
-\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}
-$$
-```
-
-### Statistics
-
-**Normal Distribution:**
-
-```zolt
-$$
-f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
-$$
-```
-
-### Trigonometry
-
-```zolt
-| Function | Identity |
-| :--- | :--- |
-| Sine | $\sin^2\theta + \cos^2\theta = 1$ |
-| Tangent | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ |
-```
-
-### Linear Algebra
-
-**Matrix:**
-
-```zolt
-$$
-\begin{pmatrix}
-a & b \\
-c & d
-\end{pmatrix}
-$$
-```
-
-**Determinant:**
-
-```zolt
-$$
-\det(A) = ad - bc
-$$
-```
-
----
+| Function | Identity                                     | LaTeX                                        |
+| :------- | :------------------------------------------- | :------------------------------------------- |
+| Sine     | $\sin^2\theta + \cos^2\theta = 1$            | `\sin^2\theta + \cos^2\theta = 1`            |
+| Tangent  | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ | `\tan\theta = \frac{\sin\theta}{\cos\theta}` |
 
 ## Formulas with Attributes
 
 Apply Zolt attributes to formulas:
 
 ```zolt
-Important formula: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ {#quadratic}
-```
-
-```zolt
 $$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$ {color=red}
 ```
-
----
+:::info [Result]
+$$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$ {color=red}
+:::
 
 ## Best Practices
 
@@ -214,11 +165,3 @@ $$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $$ {color=red}
 2. **Use block math** for complex equations
 3. **Escape dollar signs** with `\$` if needed literally
 4. **Test rendering** especially for complex LaTeX
-
----
-
-## Next Steps
-
-- [Code Blocks](code-blocks.zlt) — Syntax highlighting
-- [Advanced Features](advanced.zlt) — Charts and data
-- [Variables](variables.zlt) — Calculations in Zolt

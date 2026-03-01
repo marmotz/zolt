@@ -7,8 +7,6 @@ description: "Learn text formatting, inline styles, and typography in Zolt"
 
 This guide covers the fundamental text formatting and typography features in Zolt.
 
----
-
 ## Text Formatting
 
 Zolt supports several inline text formatting options:
@@ -22,8 +20,6 @@ Zolt supports several inline text formatting options:
 | `^{superscript}`   | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}}   |
 | `_{subscript}`     | this is _{subscript}   | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}}     |
 | `==highlight==`    | ==highlight==          | Native highlight                                                |
-
----
 
 ## Inline Styles
 
@@ -83,8 +79,6 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 ||$variable||{fontFamily=monospace background=#F3F4F6}
 :::
 
----
-
 ## Character Escaping
 
 Display literal special characters using the backslash `\` character.
@@ -126,8 +120,6 @@ Literal pipe: \|
 Literal backslash: \\
 :::
 
----
-
 ## Comments
 
 Add notes that won't appear in the rendered output.
@@ -165,8 +157,6 @@ in the output.
 :::
 After
 :::
-
----
 
 ## Horizontal Rules
 
@@ -347,8 +337,6 @@ Available styles: `decimal` (default), `roman-lower`, `roman-upper`, `alpha-lowe
 | `roman-upper` | I, I.I, I.II.I |
 | `alpha-lower` | a, a.a, a.b.a  |
 | `alpha-upper` | A, A.A, A.B.A  |
-
----
 
 ## Processing Order
 

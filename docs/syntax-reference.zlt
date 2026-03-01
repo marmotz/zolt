@@ -7,8 +7,6 @@ description: "Quick reference guide for Zolt syntax"
 
 This page provides a quick reference for common Zolt syntax patterns.
 
----
-
 ## Text Formatting
 
 | Zolt Syntax        | Result                 |
@@ -21,8 +19,6 @@ This page provides a quick reference for common Zolt syntax patterns.
 | `_{subscript}`     | <sub>subscript</sub>   |
 | `==highlight==`    | <mark>highlight</mark> |
 
----
-
 ## Headings
 
 ```zolt
@@ -34,8 +30,6 @@ This page provides a quick reference for common Zolt syntax patterns.
 ###### Heading 6
 ```
 
----
-
 ## Lists
 
 | Type       | Syntax      |
@@ -44,8 +38,6 @@ This page provides a quick reference for common Zolt syntax patterns.
 | Numbered   | `1. Item`   |
 | Task       | `- [ ] Task`|
 | Definition | `: Term`    |
-
----
 
 ## Links
 
@@ -57,8 +49,6 @@ This page provides a quick reference for common Zolt syntax patterns.
 [ref]: url
 ```
 
----
-
 ## Media
 
 | Type  | Syntax                 |
@@ -68,8 +58,6 @@ This page provides a quick reference for common Zolt syntax patterns.
 | Audio | `??[alt](audio.mp3)`   |
 | Embed | `@@[alt](youtube_url)` |
 | File  | `&&[alt](file.pdf)`    |
-
----
 
 ## Code
 
@@ -81,8 +69,6 @@ code block
 ```
 ```
 
----
-
 ## Attributes
 
 Apply to any element:
@@ -93,8 +79,6 @@ Text{color=red}
 ## Heading{#id}
 ```
 
----
-
 ## Variables
 
 ```zolt
@@ -102,8 +86,6 @@ $name = "value"
 {$name}
 {{ 10 + 5 }}
 ```
-
----
 
 ## Blocks
 
@@ -119,8 +101,6 @@ Content
 :::
 ```
 
----
-
 ## Tables
 
 ```zolt
@@ -131,8 +111,6 @@ Content
 [[/table]]
 ```
 
----
-
 ## Math
 
 ```zolt
@@ -141,8 +119,6 @@ $$
 block
 $$
 ```
-
----
 
 ## Common Attributes
 
@@ -154,8 +130,6 @@ $$
 | Style     | `{background=yellow}` |
 | Width     | `{w=200}`             |
 
----
-
 ## Escape Characters
 
 | Syntax | Result |
@@ -165,8 +139,6 @@ $$
 | `\*`   | *      |
 | `\\`   | \      |
 
----
-
 ## Navigation & Tools
 
 | Type       | Syntax            | Description                         |
@@ -174,8 +146,6 @@ $$
 | TOC        | `[[toc]]`         | Table of contents for current page  |
 | File Tree  | `[[filetree]]`    | Project-wide navigation tree        |
 | Nav Links  | `[[filetree-nav]]`| Previous/Next links based on tree   |
-
----
 
 ## Footnotes
 
@@ -185,8 +155,6 @@ Text[^1]
 [^1]: Definition
 ```
 
----
-
 ## Abbreviations
 
 ```zolt
@@ -194,8 +162,6 @@ HTML{abbr="HyperText Markup Language"}
 
 *[HTML]: HyperText Markup Language
 ```
-
----
 
 ## Next Steps
 

@@ -7,8 +7,6 @@ description: "Use variables, expressions, and built-in functions in Zolt"
 
 Zolt provides powerful variable and calculation features for dynamic content.
 
----
-
 ## Variables
 
 ### Local Variables
@@ -40,8 +38,6 @@ Use `$$` prefix for project-wide variables:
 $$siteName = "My Website"
 $$company = "Acme Corp"
 ```
-
----
 
 ## Arrays and Objects
 
@@ -75,8 +71,6 @@ $products = [
 $products[0].name   # Laptop
 ```
 
----
-
 ## Calculations
 
 ### Basic Math
@@ -97,8 +91,6 @@ $products[0].name   # Laptop
 {{ (3 + 2) * 5 }}    # 25 (parentheses override)
 {{ 2 ^ 3 ^ 2 }}      # 512 (right associative)
 ```
-
----
 
 ## Namespace Functions
 
@@ -138,8 +130,6 @@ $numbers = [10, 20, 30, 40, 50]
 {{ String.replace("hello", "l", "r") }}  # herro
 ```
 
----
-
 ## Practical Examples
 
 ### Shopping Cart
@@ -174,8 +164,6 @@ Fahrenheit: {{ $celsius * 9/5 + 32 }}°F
 Kelvin: {{ $celsius + 273.15 }}K
 ```
 
----
-
 ## Ternary Operator
 
 Conditional values inline:
@@ -184,8 +172,6 @@ Conditional values inline:
 Status: {$enabled ? "Active" : "Inactive"}
 Level: {{ $count > 10 ? "High" : "Low" }}
 ```
-
----
 
 ## Date Functions
 
@@ -210,8 +196,6 @@ Modified: {$modified}
 {{ Date.timestamp($created) }}
 {{ Date.msTimestamp($created) }}
 ```
-
----
 
 ## Combining Features
 
@@ -240,16 +224,12 @@ Welcome to the premium section!
 :::
 ```
 
----
-
 ## Best Practices
 
 1. **Define variables** at the top of documents
 2. **Use descriptive names** (`$product_price` not `$p`)
 3. **Test calculations** especially complex expressions
 4. **Use functions** for formatting (Date, String)
-
----
 
 ## Next Steps
 

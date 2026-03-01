@@ -45,8 +45,6 @@ Indent with 2 spaces or 1 tab:
     - Sub-item 2.1.1
 :::
 
----
-
 ## Numbered Lists
 
 Create ordered lists with numbers:
@@ -76,8 +74,6 @@ The parser handles numbering automatically:
 1. Step two
 1. Step three
 :::
-
----
 
 ## Task Lists (Checkboxes)
 
@@ -113,8 +109,6 @@ Without prefix:
   [ ] Publish
 :::
 
----
-
 ## Definition Lists
 
 Define terms using `:` prefix:
@@ -139,8 +133,6 @@ Define terms using `:` prefix:
 :   for describing the presentation of a document.
 :::
 
----
-
 ## Plain Lists
 
 Display items without bullets or numbers using `+`:
@@ -159,8 +151,6 @@ Display items without bullets or numbers using `+`:
 
 Useful for inline lists without visual markers.
 
----
-
 ## List Attributes
 
 Apply attributes to list items:
@@ -178,8 +168,6 @@ Apply attributes to list items:
 - Highlighted item{background=yellow}
 - Custom styled item{.my-class}
 :::
-
----
 
 ## Complex Examples
 
@@ -210,8 +198,6 @@ Apply attributes to list items:
   - [x] Carrots
   - [ ] Tomatoes
 :::
-
----
 
 ## Best Practices
 

@@ -7,8 +7,6 @@ description: "Full reference for Zolt CLI commands and options"
 
 The Zolt CLI provides several commands to manage, lint, and build your documents.
 
----
-
 ## `build`
 
 Converts `.zlt` files into HTML or PDF.
@@ -39,8 +37,6 @@ Zolt doesn't just build the file you point to. It intelligently analyzes your do
 
 This makes it easy to build an entire multi-page documentation site by just pointing to your `index.zlt`.
 
----
-
 ## `lint`
 
 Analyzes your Zolt files for syntax errors or warnings.
@@ -64,8 +60,6 @@ zolt lint document.zlt
 ```bash
 zolt lint document.zlt -f json
 ```
-
----
 
 ## Global Options
 

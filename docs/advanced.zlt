@@ -7,8 +7,6 @@ description: "Loops, conditionals, charts, and data visualization in Zolt"
 
 Zolt provides powerful advanced features including loops, conditionals, and built-in charts.
 
----
-
 ## Loops (foreach)
 
 Iterate over arrays to generate dynamic content.
@@ -37,8 +35,6 @@ $products = [
 :::
 ```
 
----
-
 ## Loop Variables
 
 Access loop metadata:
@@ -64,8 +60,6 @@ Access loop metadata:
 :::
 :::
 ```
-
----
 
 ## Conditionals (if)
 
@@ -104,15 +98,11 @@ No items.
 :::
 ```
 
----
-
 ## Diagrammes et Graphiques
 
 Zolt propose des outils puissants pour la visualisation de données, incluant le support de Mermaid et des graphiques intégrés.
 
 - [Diagrammes et Graphiques](diagrams.zlt) — Support complet de Mermaid et des graphiques de données
-
----
 
 ## Practical Examples
 
@@ -153,16 +143,12 @@ $products = [
 :::
 ```
 
----
-
 ## Best Practices
 
 1. **Check data** before using in loops
 2. **Use descriptive** variable names
 3. **Limit complexity** in visualizations
 4. **Test conditions** thoroughly
-
----
 
 ## Next Steps
 

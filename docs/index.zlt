@@ -60,16 +60,12 @@ Zolt comes with powerful features:
 - [Official Website](https://zolt.marmotz.dev)
 - [GitHub Repository](https://github.com/marmotz/zolt)
 
----
-
 ## Why Zolt?
 
 - **Zero HTML**: Everything achievable in HTML/CSS has native Zolt syntax
 - Create **interactive, professional** documents as quickly as taking notes
 - Files remain **simple text** files with superior structural intelligence
 - **Easy maintenance** through variables and dynamic references
-
----
 
 ## Code Example
 

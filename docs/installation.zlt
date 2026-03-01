@@ -55,8 +55,6 @@ This will build your project, start a live preview server at `http://127.0.0.1:1
 
 For a complete list of commands and options, see the [CLI Commands Reference](cli-commands.zlt).
 
----
-
 ## Programmatic Usage (API)
 
 You can integrate Zolt directly into your Node.js applications by using it as a library.
@@ -115,8 +113,6 @@ const htmlFromFile = await buildFileToString('input.zlt', {
   variables: { author: 'Zolt User' }
 });
 ```
-
----
 
 ## Creating Your First Document
 
