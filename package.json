@@ -10,7 +10,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "github:marmotz/zolt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marmotz/zolt.git"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
     "@types/bun": "latest",
@@ -20,7 +23,7 @@
     "typescript": "^5.9.3"
   },
   "bin": {
-    "zolt": "./dist/cli/zolt"
+    "zolt": "dist/cli/zolt"
   },
   "description": "Zolt - The high-voltage successor to Markdown",
   "keywords": [
