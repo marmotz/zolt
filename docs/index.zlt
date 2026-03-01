@@ -22,6 +22,7 @@ Zolt comes with powerful features:
 | **Tables** | `[[table]]...[[/table]]` | Advanced grid tables |
 | **Charts** | `:::chart` | Built-in data visualization |
 | **Blocks** | `:::info`, `:::tabs` | Semantic containers |
+| **Navigation** | `[[filetree-nav]]` | Automatic Prev/Next links |
 
 ## Getting Started
 
@@ -89,12 +90,3 @@ This document demonstrates **Zolt** features:
 This is an informational block with native syntax.
 :::
 ```
-
-:::columns
-:::column
-:::
-
-:::column {align=right}
-[Installation & Usage →](installation.zlt)
-:::
-:::

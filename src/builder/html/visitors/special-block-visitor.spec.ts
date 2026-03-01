@@ -92,6 +92,91 @@ describe('SpecialBlockVisitor', () => {
     expect(html).toContain('Page 1');
   });
 
+  test('should render filetree-nav with previous/next links', async () => {
+    const graph = [
+      { path: 'index.zlt', absPath: '/root/index.zlt', title: 'Home', children: [] },
+      { path: 'page1.zlt', absPath: '/root/page1.zlt', title: 'Page 1', children: [] },
+      { path: 'page2.zlt', absPath: '/root/page2.zlt', title: 'Page 2', children: [] },
+    ];
+
+    const visitorWithGraph = new SpecialBlockVisitor(
+      async () => '',
+      async () => '',
+      () => '',
+      { getVariable: (name: string) => (name === 'lang' ? 'en' : null) },
+      async (text: string) => text,
+      [],
+      graph as any,
+      '/root/page1.zlt'
+    );
+
+    const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree-nav', attributes: {} };
+    const html = await visitorWithGraph.visitDoubleBracketBlock(node);
+
+    expect(html).toContain('filetree-nav');
+    expect(html).toContain('zolt-nav-link prev');
+    expect(html).toContain('zolt-nav-link next');
+    expect(html).toContain('href="index.html"');
+    expect(html).toContain('href="page2.html"');
+    expect(html).toContain('Home');
+    expect(html).toContain('Page 2');
+    expect(html).toContain('Previous');
+    expect(html).toContain('Next');
+  });
+
+  test('should respect lang variable for filetree-nav', async () => {
+    const graph = [
+      { path: 'index.zlt', absPath: '/root/index.zlt', title: 'Home', children: [] },
+      { path: 'page1.zlt', absPath: '/root/page1.zlt', title: 'Page 1', children: [] },
+    ];
+
+    const visitorFr = new SpecialBlockVisitor(
+      async () => '',
+      async () => '',
+      () => '',
+      { getVariable: (name: string) => (name === 'lang' ? 'fr' : null) },
+      async (text: string) => text,
+      [],
+      graph as any,
+      '/root/page1.zlt'
+    );
+
+    const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree-nav', attributes: {} };
+    const html = await visitorFr.visitDoubleBracketBlock(node);
+
+    expect(html).toContain('Précédent');
+    expect(html).not.toContain('Previous');
+  });
+
+  test('should handle nested nodes in filetree-nav', async () => {
+    const graph = [
+      {
+        path: 'index.zlt',
+        absPath: '/root/index.zlt',
+        title: 'Home',
+        children: [{ path: 'sub/page1.zlt', absPath: '/root/sub/page1.zlt', title: 'Sub 1', children: [] }],
+      },
+    ];
+
+    const visitorWithGraph = new SpecialBlockVisitor(
+      async () => '',
+      async () => '',
+      () => '',
+      { getVariable: () => null },
+      async (text: string) => text,
+      [],
+      graph as any,
+      '/root/sub/page1.zlt'
+    );
+
+    const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree-nav', attributes: {} };
+    const html = await visitorWithGraph.visitDoubleBracketBlock(node);
+
+    expect(html).toContain('zolt-nav-link prev');
+    expect(html).toContain('href="../index.html"');
+    expect(html).toContain('Home');
+  });
+
   test('should reset state correctly', () => {
     visitor.hasSidebar = true;
     visitor.sidebarSide = 'right';

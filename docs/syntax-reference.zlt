@@ -167,6 +167,16 @@ $$
 
 ---
 
+## Navigation & Tools
+
+| Type | Syntax | Description |
+|------|--------|-------------|
+| TOC | `[[toc]]` | Table of contents for current page |
+| File Tree | `[[filetree]]` | Project-wide navigation tree |
+| Nav Links | `[[filetree-nav]]` | Previous/Next links based on tree |
+
+---
+
 ## Footnotes
 
 ```zolt

@@ -256,6 +256,47 @@ export const BASE_CSS = `
     border-radius: 4px;
   }
 
+  /* --- NAV LINKS --- */
+  .filetree-nav {
+    margin-top: 4rem !important;
+    border-top: 1px solid var(--zlt-color-border);
+    padding-top: 2rem !important;
+    background: transparent !important;
+  }
+  .filetree-nav .column {
+    border-left: none !important;
+  }
+  .zolt-nav-link {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border: 1px solid var(--zlt-color-border);
+    border-radius: 8px;
+    transition: all 0.2s;
+    background: var(--zlt-color-block-bg);
+  }
+  .zolt-nav-link:hover {
+    border-color: var(--zlt-color-primary);
+    background: var(--zlt-color-primary-soft);
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  .zolt-nav-link .nav-label {
+    font-size: 0.8rem;
+    color: var(--zlt-color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+  }
+  .zolt-nav-link .nav-title {
+    font-weight: bold;
+    color: var(--zlt-color-primary);
+    font-size: 1.1rem;
+  }
+  .zolt-nav-link.next {
+    align-items: flex-end;
+  }
+
   .zolt-chart {
     margin: 2.5rem 0;
     background: var(--zlt-color-bg);

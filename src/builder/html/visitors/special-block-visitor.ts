@@ -187,9 +187,88 @@ export class SpecialBlockVisitor {
     if (node.blockType === 'filetree') {
       return await this.visitFileTree(node);
     }
+    if (node.blockType === 'filetree-nav') {
+      return await this.visitFileTreeNav(node);
+    }
     const attrs = this.renderAllAttributes(node.attributes);
 
     return `<div${attrs} class="double-bracket-block" data-type="${node.blockType}">${escapeHtml(node.content)}</div>`;
+  }
+
+  private flattenProjectGraph(nodes: ProjectNode[]): ProjectNode[] {
+    const flattened: ProjectNode[] = [];
+    for (const node of nodes) {
+      flattened.push(node);
+      if (node.children.length > 0) {
+        flattened.push(...this.flattenProjectGraph(node.children));
+      }
+    }
+
+    return flattened;
+  }
+
+  private async visitFileTreeNav(node: DoubleBracketBlockNode): Promise<string> {
+    if (!this.projectGraph || !this.currentFilePath) {
+      return '';
+    }
+
+    const flattened = this.flattenProjectGraph(this.projectGraph);
+    const normCurrent = path.normalize(this.currentFilePath);
+    const currentIndex = flattened.findIndex((n) => path.normalize(n.absPath) === normCurrent);
+
+    if (currentIndex === -1) {
+      return '';
+    }
+
+    const prev = currentIndex > 0 ? flattened[currentIndex - 1] : null;
+    const next = currentIndex < flattened.length - 1 ? flattened[currentIndex + 1] : null;
+
+    if (!prev && !next) {
+      return '';
+    }
+
+    const currentDir = path.dirname(this.currentFilePath);
+    const lang = this.evaluator.getVariable('lang') || 'en';
+    const labels = {
+      en: { prev: '← Previous', next: 'Next →' },
+      fr: { prev: '← Précédent', next: 'Suivant →' },
+    }[lang as 'en' | 'fr'] || { prev: '← Previous', next: 'Next →' };
+
+    let prevHtml = '';
+    if (prev) {
+      const relPath = path
+        .relative(currentDir, prev.absPath)
+        .replace(/\.zlt$/, '.html')
+        .replace(/\\/g, '/');
+      prevHtml = `<a href="${relPath}" class="zolt-nav-link prev">
+        <span class="nav-label">${labels.prev}</span>
+        <span class="nav-title">${escapeHtml(prev.title)}</span>
+      </a>`;
+    }
+
+    let nextHtml = '';
+    if (next) {
+      const relPath = path
+        .relative(currentDir, next.absPath)
+        .replace(/\.zlt$/, '.html')
+        .replace(/\\/g, '/');
+      nextHtml = `<a href="${relPath}" class="zolt-nav-link next">
+        <span class="nav-label">${labels.next}</span>
+        <span class="nav-title">${escapeHtml(next.title)}</span>
+      </a>`;
+    }
+
+    const attrs = this.renderAllAttributes(node.attributes);
+
+    return `
+<div${attrs} class="triple-colon-block columns filetree-nav" data-type="columns">
+  <div class="triple-colon-block column" data-type="column">
+    ${prevHtml}
+  </div>
+  <div class="triple-colon-block column" data-type="column" style="text-align: right;">
+    ${nextHtml}
+  </div>
+</div>`.trim();
   }
 
   private async visitFileTree(node: DoubleBracketBlockNode): Promise<string> {
