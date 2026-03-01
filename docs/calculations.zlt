@@ -1,0 +1,231 @@
+---
+title: "Calculations & Functions"
+description: "Perform mathematical operations and use built-in functions in Zolt"
+---
+
+# Calculations & Functions
+
+Zolt features a robust expression engine for performing calculations and manipulating data.
+
+## Calculations
+
+### Basic Math
+
+```zolt
++ $10 + 5 = {{ 10 + 5 }}$
++ $20 - 8 = {{ 20 - 8 }}$
++ $3 * 4 = {{ 3 * 4 }}$
++ $15 / 3 = {{ 15 / 3 }}$
++ $10 \% 3 = {{ 10 % 3 }}$
++ $2 ^ 8 = {{ 2 ^ 8 }}$
+```
+
+:::info [Result]
++ $10 + 5 = {{ 10 + 5 }}$
++ $20 - 8 = {{ 20 - 8 }}$
++ $3 * 4 = {{ 3 * 4 }}$
++ $15 / 3 = {{ 15 / 3 }}$
++ $10 \% 3 = {{ 10 % 3 }}$
++ $2 ^ 8 = {{ 2 ^ 8 }}$
+:::
+
+### Operator Precedence
+
+```zolt
++ $3 + 2 * 5 = {{ 3 + 2 * 5 }}$
++ $(3 + 2) * 5 = {{ (3 + 2) * 5 }}$
++ $2 ^ {3 ^ 2} = {{ 2 ^ 3 ^ 2 }}$
+```
+
+:::info [Result]
++ $3 + 2 * 5 = {{ 3 + 2 * 5 }}$
++ $(3 + 2) * 5 = {{ (3 + 2) * 5 }}$
++ $2 ^ {3 ^ 2} = {{ 2 ^ 3 ^ 2 }}$
+:::
+
+## Namespace Functions
+
+### Math Namespace
+
+The `Math` namespace provides common mathematical constants and functions.
+
+| Function         | Arguments              | Return   | Description                                               |
+| :--------------- | :--------------------- | :------- | :-------------------------------------------------------- |
+| `Math.floor(n)`  | `n: number`            | `number` | Returns the largest integer less than or equal to `n`.    |
+| `Math.ceil(n)`   | `n: number`            | `number` | Returns the smallest integer greater than or equal to `n`. |
+| `Math.round(n)`  | `n: number`            | `number` | Returns the value of `n` rounded to the nearest integer.  |
+| `Math.abs(n)`    | `n: number`            | `number` | Returns the absolute value of `n`.                        |
+| `Math.pow(b, e)` | `b: number, e: number` | `number` | Returns the base `b` to the exponent `e` power.           |
+| `Math.sqrt(n)`   | `n: number`            | `number` | Returns the square root of `n`.                           |
+| `Math.min(...n)` | `...n: number`         | `number` | Returns the smallest of zero or more numbers.             |
+| `Math.max(...n)` | `...n: number`         | `number` | Returns the largest of zero or more numbers.              |
+
+#### Examples
+
+```zolt
++ Math.floor(3.7) = {{ Math.floor(3.7) }}
++ Math.ceil(3.2) = {{ Math.ceil(3.2) }}
++ Math.round(3.5) = {{ Math.round(3.5) }}
++ Math.abs(-5) = {{ Math.abs(-5) }}
++ Math.min(10, 5) = {{ Math.min(10, 5) }}
++ Math.max(10, 5) = {{ Math.max(10, 5) }}
++ Math.pow(2, 8) = {{ Math.pow(2, 8) }}
++ Math.sqrt(16) = {{ Math.sqrt(16) }}
+```
+
+:::info [Result]
++ Math.floor(3.7) = {{ Math.floor(3.7) }}
++ Math.ceil(3.2) = {{ Math.ceil(3.2) }}
++ Math.round(3.5) = {{ Math.round(3.5) }}
++ Math.abs(-5) = {{ Math.abs(-5) }}
++ Math.min(10, 5) = {{ Math.min(10, 5) }}
++ Math.max(10, 5) = {{ Math.max(10, 5) }}
++ Math.pow(2, 8) = {{ Math.pow(2, 8) }}
++ Math.sqrt(16) = {{ Math.sqrt(16) }}
+:::
+
+### List Namespace
+
+The `List` namespace provides functions for manipulating arrays.
+
+| Function         | Arguments  | Return   | Description                                                        |
+| :--------------- | :--------- | :------- | :----------------------------------------------------------------- |
+| `List.length(l)` | `l: array` | `number` | Returns the number of elements in the list.                        |
+| `List.count(l)`  | `l: array` | `number` | Alias of `List.length`.                                            |
+| `List.first(l)`  | `l: array` | `any`    | Returns the first element of the list.                             |
+| `List.last(l)`   | `l: array` | `any`    | Returns the last element of the list.                              |
+| `List.sum(l)`    | `l: array` | `number` | Returns the sum of all numeric elements in the list.               |
+| `List.avg(l)`    | `l: array` | `number` | Returns the average value of numeric elements in the list.         |
+| `List.min(l)`    | `l: array` | `number` | Returns the smallest numeric value in the list.                    |
+| `List.max(l)`    | `l: array` | `number` | Returns the largest numeric value in the list.                     |
+
+#### Examples
+
+```zolt
+$numbers = [10, 20, 30, 40, 50]
+
++ Length: {{ List.length($numbers) }}
++ First: {{ List.first($numbers) }}
++ Last: {{ List.last($numbers) }}
++ Sum: {{ List.sum($numbers) }}
++ Average: {{ List.avg($numbers) }}
+```
+
+$numbers = [10, 20, 30, 40, 50]
+
+:::info [Result]
++ Length: {{ List.length($numbers) }}
++ First: {{ List.first($numbers) }}
++ Last: {{ List.last($numbers) }}
++ Sum: {{ List.sum($numbers) }}
++ Average: {{ List.avg($numbers) }}
+:::
+
+### String Namespace
+
+The `String` namespace provides functions for string manipulation.
+
+| Function                  | Arguments                         | Return   | Description                                                       |
+| :------------------------ | :-------------------------------- | :------- | :---------------------------------------------------------------- |
+| `String.upper(s)`         | `s: string`                       | `string` | Returns the string converted to uppercase.                         |
+| `String.lower(s)`         | `s: string`                       | `string` | Returns the string converted to lowercase.                         |
+| `String.length(s)`        | `s: string`                       | `number` | Returns the number of characters in the string.                    |
+| `String.trim(s)`          | `s: string`                       | `string` | Returns the string with whitespace removed from both ends.         |
+| `String.replace(s, f, r)` | `s: string, f: string, r: string` | `string` | Replaces all occurrences of `f` with `r` in `s`.                   |
+| `String.split(s, sep)`    | `s: string, sep: string`          | `array`  | Splits the string into an array of strings by separator.           |
+| `String.join(l, sep)`     | `l: array, sep: string`           | `string` | Joins all elements of an array into a string using the separator.  |
+
+#### Examples
+
+```zolt
+{{ String.upper("hello") }}
+{{ String.lower("HELLO") }}
+{{ String.length("text") }}
+{{ String.trim("  text  ") }}
+{{ String.replace("hello", "l", "r") }}
+```
+
+:::info [Result]
++ String.upper("hello") = {{ String.upper("hello") }}
++ String.lower("HELLO") = {{ String.lower("HELLO") }}
++ String.length("text") = {{ String.length("text") }}
++ String.trim("  text  ") = {{ String.trim("  text  ") }}
++ String.replace("hello", "l", "r") = {{ String.replace("hello", "l", "r") }}
+:::
+
+### Date Namespace
+
+The `Date` namespace provides functions for date and time operations.
+
+| Function                | Arguments                        | Return   | Description                                                               |
+| :---------------------- | :------------------------------- | :------- | :------------------------------------------------------------------------ |
+| `Date.now()`            | None                             | `number` | Returns the current timestamp in milliseconds.                            |
+| `Date.format(d, f)`     | `d: date/str, f: string`         | `string` | Formats a date according to the provided format string.                   |
+| `Date.parse(s, f?)`     | `s: string, f: string?`          | `date`   | Parses a string into a Date object (optionally using a format).           |
+| `Date.calc(d, dur)`     | `d: date, dur: object`           | `date`   | Adds/subtracts time from a date (e.g., `{days: 1}`).                      |
+| `Date.diff(d1, d2, u?)` | `d1: date, d2: date, u: string?` | `number` | Returns the difference between two dates in the specified unit.           |
+| `Date.timestamp(d?)`    | `d: date?`                       | `number` | Returns the Unix timestamp (seconds) for a date or now.                   |
+| `Date.msTimestamp(d?)`  | `d: date?`                       | `number` | Returns the timestamp (milliseconds) for a date or now.                   |
+
+#### Format Tokens
+
+Available format tokens:
+
+| Token  | Description                 | Example                               |
+| :----- | :-------------------------- | :------------------------------------ |
+| `D`    | Day (1-2 digits)            | {{ Date.format(Date.now(), 'D') }}    |
+| `DD`   | Day (2 digits)              | {{ Date.format(Date.now(), 'DD') }}   |
+| `ddd`  | Day name (short)            | {{ Date.format(Date.now(), 'ddd') }}  |
+| `Ddd`  | Day name (short, Capital)   | {{ Date.format(Date.now(), 'Ddd') }}  |
+| `DDD`  | Day name (short, Uppercase) | {{ Date.format(Date.now(), 'DDD') }}  |
+| `dddd` | Day name (full)             | {{ Date.format(Date.now(), 'dddd') }} |
+| `Dddd` | Day name (full, Capital)    | {{ Date.format(Date.now(), 'Dddd') }} |
+| `DDDD` | Day name (full, Uppercase)  | {{ Date.format(Date.now(), 'DDDD') }} |
+| `M`    | Month (1-2 digits)          | {{ Date.format(Date.now(), 'M') }}    |
+| `MM`   | Month (2 digits)            | {{ Date.format(Date.now(), 'MM') }}   |
+| `mmm`  | Month name (short)          | {{ Date.format(Date.now(), 'mmm') }}  |
+| `Mmm`  | Month name (short, Capital) | {{ Date.format(Date.now(), 'Mmm') }}  |
+| `MMM`  | Month name (short, Upper)   | {{ Date.format(Date.now(), 'MMM') }}  |
+| `mmmm` | Month name (full)           | {{ Date.format(Date.now(), 'mmmm') }} |
+| `Mmmm` | Month name (full, Capital)  | {{ Date.format(Date.now(), 'Mmmm') }} |
+| `MMMM` | Month name (full, Upper)    | {{ Date.format(Date.now(), 'MMMM') }} |
+| `YY`   | Year (2 digits)             | {{ Date.format(Date.now(), 'YY') }}   |
+| `YYYY` | Year (4 digits)             | {{ Date.format(Date.now(), 'YYYY') }} |
+| `h`    | Hour (12h, 1-12)            | {{ Date.format(Date.now(), 'h') }}    |
+| `H`    | Hour (24h, 0-23)            | {{ Date.format(Date.now(), 'H') }}    |
+| `hh`   | Hour (12h, 01-12)           | {{ Date.format(Date.now(), 'hh') }}   |
+| `HH`   | Hour (24h, 00-23)           | {{ Date.format(Date.now(), 'HH') }}   |
+| `a`    | am/pm (lowercase)           | {{ Date.format(Date.now(), 'a') }}    |
+| `A`    | AM/PM (uppercase)           | {{ Date.format(Date.now(), 'A') }}    |
+| `m`    | Minutes (0-59)              | {{ Date.format(Date.now(), 'm') }}    |
+| `mm`   | Minutes (00-59)             | {{ Date.format(Date.now(), 'mm') }}   |
+| `s`    | Seconds (0-59)              | {{ Date.format(Date.now(), 's') }}    |
+| `ss`   | Seconds (00-59)             | {{ Date.format(Date.now(), 'ss') }}   |
+| `sss`  | Milliseconds (000-999)      | {{ Date.format(Date.now(), 'sss') }}  |
+
+#### Examples
+
+```zolt
+$created = "2024-01-01"
+
++ Date.now() = {{ Date.now() }}
++ Date.format($created, "DD/MM/YYYY") = {{ Date.format($created, "DD/MM/YYYY") }}
++ Date.timestamp($created) = {{ Date.timestamp($created) }}
++ Date.msTimestamp($created) = {{ Date.msTimestamp($created) }}
+```
+
+:::info [Result]
+$created = "2024-01-01"
+
++ Date.now() = {{ Date.now() }}
++ Date.format($created, "DD/MM/YYYY") = {{ Date.format($created, "DD/MM/YYYY") }}
++ Date.timestamp($created) = {{ Date.timestamp($created) }}
++ Date.msTimestamp($created) = {{ Date.msTimestamp($created) }}
+:::
+
+## Best Practices
+
+1. **Test complex calculations** separately to ensure accuracy
+2. **Use parentheses** to make operator precedence explicit and readable
+3. **Handle null/undefined** variables before performing math
+4. **Use namespace functions** for formatting and common transformations

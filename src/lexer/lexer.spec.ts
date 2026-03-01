@@ -275,4 +275,19 @@ describe('Lexer', () => {
     expect(tokens[0].type).toBe(TokenType.MATH_BLOCK);
     expect(tokens[0].value).toBe('\n\\int x dx\n');
   });
+
+  test('should distinguish between global variable definition and math block', () => {
+    const input = '$$siteName = "My Website"';
+    const lexer = new Lexer(input);
+    const tokens = lexer.tokenize();
+
+    // It should NOT be a MATH_BLOCK
+    const mathBlock = tokens.find((t) => t.type === TokenType.MATH_BLOCK);
+    expect(mathBlock).toBeUndefined();
+
+    // It SHOULD be a GLOBAL_VARIABLE_DEFINITION
+    const varDef = tokens.find((t) => t.type === TokenType.GLOBAL_VARIABLE_DEFINITION);
+    expect(varDef).toBeDefined();
+    expect(varDef?.value).toBe('siteName:"My Website"');
+  });
 });

@@ -697,9 +697,10 @@ export class ExpressionEvaluator {
       HH: 0,
       mm: 0,
       ss: 0,
+      sss: 0,
     };
 
-    const tokens = ['YYYY', 'MM', 'DD', 'HH', 'mm', 'ss'];
+    const tokens = ['YYYY', 'MM', 'DD', 'HH', 'mm', 'ss', 'sss'].sort((a, b) => b.length - a.length);
     let remainingFormat = format;
     let remainingDate = dateStr;
 
@@ -733,7 +734,8 @@ export class ExpressionEvaluator {
       components.DD,
       components.HH,
       components.mm,
-      components.ss
+      components.ss,
+      components.sss
     );
 
     return Number.isNaN(date.getTime()) ? null : date;
@@ -875,6 +877,7 @@ export class ExpressionEvaluator {
       m: () => date.getMinutes().toString(),
       ss: () => date.getSeconds().toString().padStart(2, '0'),
       s: () => date.getSeconds().toString(),
+      sss: () => date.getMilliseconds().toString().padStart(3, '0'),
       a: () => (date.getHours() < 12 ? 'am' : 'pm'),
       A: () => (date.getHours() < 12 ? 'AM' : 'PM'),
     };

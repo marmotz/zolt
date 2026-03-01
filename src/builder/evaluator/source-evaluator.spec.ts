@@ -297,4 +297,15 @@ Content`;
     const result = sourceEvaluator.evaluate('{{include included.zlt}}');
     expect(result).toContain('Included content');
   });
+
+  test('should preserve double dollar signs when injecting content into layout', () => {
+    const evaluator = new ExpressionEvaluator();
+    // We simulate a layout injection
+    const sourceEvaluator = new SourceEvaluator(evaluator, 'unknown', [], 'Use `$$` prefix');
+
+    const layout = ':::content:::';
+    const result = sourceEvaluator.evaluate(layout);
+
+    expect(result).toBe('Use `$$` prefix');
+  });
 });

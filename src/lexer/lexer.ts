@@ -402,7 +402,20 @@ export class Lexer {
   }
 
   private matchMathBlock(): boolean {
-    return this.source.slice(this.pos).startsWith('$$');
+    if (!this.source.slice(this.pos).startsWith('$$')) {
+      return false;
+    }
+
+    // Check if it's a global variable definition ($$var =)
+    // Variable definitions must start at column 1
+    if (this.column === 1) {
+      const remainingLine = this.source.slice(this.pos).split('\n')[0];
+      if (/^\$\$[a-zA-Z_][a-zA-Z0-9_]*\s*=/.test(remainingLine)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private readMathBlock(): Token {

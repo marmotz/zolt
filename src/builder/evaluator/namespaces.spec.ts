@@ -114,9 +114,10 @@ describe('ExpressionEvaluator - Namespaces', () => {
     });
 
     test('Date.format', () => {
-      const date = new Date(2026, 1, 26); // Feb 26, 2026
+      const date = new Date(2026, 1, 26, 14, 30, 45, 123); // Feb 26, 2026, 14:30:45.123
       evaluator.setVariable('myDate', date);
       expect(evaluator.evaluate('Date.format($myDate, "YYYY-MM-DD")')).toBe('2026-02-26');
+      expect(evaluator.evaluate('Date.format($myDate, "HH:mm:ss.sss")')).toBe('14:30:45.123');
     });
 
     test('Date.parse', () => {
@@ -124,6 +125,9 @@ describe('ExpressionEvaluator - Namespaces', () => {
       expect(result.getFullYear()).toBe(2026);
       expect(result.getMonth()).toBe(1); // February is 1
       expect(result.getDate()).toBe(26);
+
+      const resultMs = evaluator.evaluate('Date.parse("2026-02-26 14:30:45.123", "YYYY-MM-DD HH:mm:ss.sss")') as Date;
+      expect(resultMs.getMilliseconds()).toBe(123);
     });
 
     test('Date.calc', () => {

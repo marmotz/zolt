@@ -8,7 +8,7 @@
   "repository": {
     "variable": {
       "name": "variable.parameter.zolt",
-      "match": "\\$[a-zA-Z0-9_.]+"
+      "match": "[$]{1,2}[a-zA-Z0-9_.]+"
     },
     "inline": {
       "patterns": [
@@ -170,7 +170,7 @@
       ]
     },
     "variable_interpolation": {
-      "match": "(\\{\\$)([a-zA-Z0-9_.]+)(\\})",
+      "match": "(\\{[$]{1,2})([a-zA-Z0-9_.]+)(\\})",
       "captures": {
         "1": {
           "name": "punctuation.definition.variable.zolt"
@@ -385,5 +385,5 @@
       "include": "#inline"
     }
   ],
-  "uuid": "9c2ca804-9d36-4f3e-8913-e33d65e01087"
+  "uuid": "cfeedc04-35f3-4d46-89c4-4a9da6db5ec1"
 }

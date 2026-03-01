@@ -7,7 +7,7 @@ export const zoltLanguage: LanguageRegistration = {
   repository: {
     variable: {
       name: 'variable.parameter.zolt',
-      match: '\\$[a-zA-Z0-9_.]+',
+      match: '[$]{1,2}[a-zA-Z0-9_.]+',
     },
     inline: {
       patterns: [
@@ -98,7 +98,7 @@ export const zoltLanguage: LanguageRegistration = {
       patterns: [{ name: 'string.quoted.double.zolt', match: '[^|]+' }],
     },
     variable_interpolation: {
-      match: '(\\{\\$)([a-zA-Z0-9_.]+)(\\})',
+      match: '(\\{[$]{1,2})([a-zA-Z0-9_.]+)(\\})',
       captures: {
         1: { name: 'punctuation.definition.variable.zolt' },
         2: { name: 'variable.parameter.zolt' },
