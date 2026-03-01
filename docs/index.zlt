@@ -82,7 +82,7 @@ author: "Jane Doe"
 
 This document demonstrates **Zolt** features:
 
-- Variables: Welcome to {$author}'s guide
+- Variables: Welcome to {{ $author }}'s guide
 - Calculations: Total: {{ $price * $quantity }}
 - Formatting: ||Important text||{color=red}
 

@@ -7,34 +7,59 @@ description: "Add hyperlinks, images, videos, audio, and embedded content"
 
 Zolt uses distinct prefixes to identify different media types, allowing the parser to generate correct HTML automatically.
 
----
-
 ## Links
 
 ### Basic Links
 
 ```zolt
 [Zolt Documentation](https://zolt.marmotz.dev)
+
 [GitHub](https://github.com/marmotz/zolt)
 ```
+
+:::info [Result]
+[Zolt Documentation](https://zolt.marmotz.dev)
+
+[GitHub](https://github.com/marmotz/zolt)
+:::
 
 ### Links with Attributes
 
 ```zolt
 [External Link](https://example.com){target=_blank rel=noopener}
+
 [Styled Link](page.html){color=blue fontWeight=bold}
 ```
 
+:::info [Result]
+[External Link](https://example.com){target=_blank rel=noopener}
+
+[Styled Link](page.html){color=blue fontWeight=bold}
+:::
+
 ### Reference Links
 
-Avoid repeating URLs by defining references:
+Avoid repeating long URLs by defining references once and using them multiple times:
 
 ```zolt
-Check out [Zolt][zolt] and [GitHub][github].
+[Zolt][zolt] is the successor to Markdown.
+You can find the [Zolt source code][zolt-repo] on GitHub,
+and read the [Zolt documentation][zolt] to get started.
+If you find a bug in [Zolt][zolt], please open an issue on [GitHub][zolt-repo].
 
 [zolt]: https://zolt.marmotz.dev
-[github]: https://github.com/marmotz/zolt
+[zolt-repo]: https://github.com/marmotz/zolt
 ```
+
+:::info [Result]
+[Zolt][zolt] is the successor to Markdown.
+You can find the [Zolt source code][zolt-repo] on GitHub,
+and read the [Zolt documentation][zolt] to get started.
+If you find a bug in [Zolt][zolt], please open an issue on [GitHub][zolt-repo].
+
+[zolt]: https://zolt.marmotz.dev
+[zolt-repo]: https://github.com/marmotz/zolt
+:::
 
 ### Internal Links (Cross-references)
 
@@ -42,9 +67,15 @@ Link to document sections using `@`:
 
 ```zolt
 See the [Introduction](@intro) for details.
-Go to [Advanced Features[Back to top](@advanced).
-](@top)
+Go to [Advanced Features](@advanced).
+[Back to top](@top)
 ```
+
+:::info [Result]
+See the [Introduction](@intro) for details.
+Go to [Advanced Features](@advanced).
+[Back to top](@top)
+:::
 
 ### Anchor Links
 
@@ -55,6 +86,11 @@ Jump to [Lists section](#lists).
 [Return to summary](#summary)
 ```
 
+:::info [Result]
+Jump to [Lists section](#lists).
+[Return to summary](#summary)
+:::
+
 ### Links with Variables
 
 ```zolt
@@ -62,6 +98,12 @@ $site_url = "https://example.com"
 
 Visit [our website]({$site_url}).
 ```
+
+:::info [Result]
+$site_url = "https://example.com"
+
+Visit [our website]({$site_url}).
+:::
 
 ---
 
@@ -87,12 +129,21 @@ Zolt uses unique prefixes for each media type:
 ![Alt text](image.jpg)
 ```
 
+:::info [Result]
+![Alt text](image.jpg)
+:::
+
 ### Image with Attributes
 
 ```zolt
 ![Logo](logo.png){width=200px align=center}
 ![Photo](photo.jpg){w=300 h=200 shadow=true}
 ```
+
+:::info [Result]
+![Logo](logo.png){width=200px align=center}
+![Photo](photo.jpg){w=300 h=200 shadow=true}
+:::
 
 ### Image Attributes
 
@@ -110,6 +161,10 @@ Zolt uses unique prefixes for each media type:
 ![Screenshot](screenshot.png){width=600px align=center}
 ```
 
+:::info [Result]
+![Screenshot](screenshot.png){width=600px align=center}
+:::
+
 ---
 
 ## Videos
@@ -120,17 +175,29 @@ Zolt uses unique prefixes for each media type:
 !![Demo Video](video.mp4)
 ```
 
+:::info [Result]
+!![Demo Video](video.mp4)
+:::
+
 ### YouTube/Vimeo
 
 ```zolt
 !![Tutorial](https://www.youtube.com/embed/dQw4w9WgXcQ)
 ```
 
+:::info [Result]
+!![Tutorial](https://www.youtube.com/embed/dQw4w9WgXcQ)
+:::
+
 ### Video Attributes
 
 ```zolt
 !![Loop Video](video.mp4){autoplay loop muted}
 ```
+
+:::info [Result]
+!![Loop Video](video.mp4){autoplay loop muted}
+:::
 
 | Attribute | Description |
 |-----------|-------------|
@@ -146,11 +213,19 @@ Zolt uses unique prefixes for each media type:
 ??[Podcast Episode](episode.mp3)
 ```
 
+:::info [Result]
+??[Podcast Episode](episode.mp3)
+:::
+
 ### With Controls
 
 ```zolt
 ??[Music Track](music.mp3){controls}
 ```
+
+:::info [Result]
+??[Music Track](music.mp3){controls}
+:::
 
 ---
 
@@ -163,11 +238,20 @@ Embed external content like YouTube, Vimeo, or maps:
 @@[Vimeo Video](https://vimeo.com/xxx)
 ```
 
+:::info [Result]
+@@[YouTube Video](https://www.youtube.com/embed/xxx)
+@@[Vimeo Video](https://vimeo.com/xxx)
+:::
+
 ### Responsive Embeds
 
 ```zolt
 @@[Presentation](https://slides.example.com/embed/xxx){width=100%}
 ```
+
+:::info [Result]
+@@[Presentation](https://slides.example.com/embed/xxx){width=100%}
+:::
 
 ---
 
@@ -180,11 +264,20 @@ Create download links with `&&`:
 &&[Get the Guide](guide.pdf){download=true}
 ```
 
+:::info [Result]
+&&[Download PDF](manual.pdf)
+&&[Get the Guide](guide.pdf){download=true}
+:::
+
 ### With Icon
 
 ```zolt
 &&[User Manual](manual.pdf)
 ```
+
+:::info [Result]
+&&[User Manual](manual.pdf)
+:::
 
 ---
 
@@ -205,6 +298,20 @@ Caption for photo 2.
 :::
 :::
 ```
+
+:::info [Result]
+:::columns
+:::column
+![Photo 1](photo1.jpg){width=100%}
+Caption for photo 1.
+:::
+
+:::column
+![Photo 2](photo2.jpg){width=100%}
+Caption for photo 2.
+:::
+:::
+:::
 
 ---
 
@@ -228,6 +335,22 @@ Watch the [demo video](@demo) for more details.
 &&[Download Brochure](brochure.pdf)
 ```
 
+:::info [Result]
+# Product Launch
+
+![Product Image](product.jpg){w=400 float=right}
+
+The new product features include:
+
+- Feature one
+- Feature two
+- Feature three
+
+Watch the [demo video](@demo) for more details.
+
+&&[Download Brochure](brochure.pdf)
+:::
+
 ### Gallery
 
 ```zolt
@@ -245,6 +368,22 @@ Watch the [demo video](@demo) for more details.
 :::
 :::
 ```
+
+:::info [Result]
+:::columns
+:::column
+![Image 1](gallery1.jpg){width=100%}
+:::
+
+:::column
+![Image 2](gallery2.jpg){width=100%}
+:::
+
+:::column
+![Image 3](gallery3.jpg){width=100%}
+:::
+:::
+:::
 
 ---
 

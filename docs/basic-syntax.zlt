@@ -31,7 +31,7 @@ Apply CSS-like attributes to text spans using the `||text||{attr}` syntax.
 
 ### Syntax
 
-```
+```zolt
 ||text to style||{attribute=value}
 ```
 
@@ -105,7 +105,7 @@ Display literal special characters using the backslash `\` character.
 ```zolt
 This is not a \[link]
 
-This is not bold \**text\**
+This is not bold \*\*text\*\*
 
 Use the function \`print()\`
 
@@ -174,10 +174,14 @@ Create visual separators between sections.
 
 ### Syntax
 
+| Standard | `---` |
+| Thick    | `***` |
+| Thin     | `___` |
+
 ```zolt
----    (standard)
-***    (thick)
-___    (thin)
+---
+***
+___
 ```
 
 :::info [Result]

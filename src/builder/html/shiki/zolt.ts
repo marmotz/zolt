@@ -3,10 +3,15 @@ export const zoltLanguage = {
   scopeName: 'source.zolt',
   fileTypes: ['zolt'],
   repository: {
+    variable: {
+      name: 'variable.parameter.zolt',
+      match: '\\$[a-zA-Z0-9_.]+',
+    },
     inline: {
       patterns: [
         { include: '#comment_inline' },
         { include: '#variable_interpolation' },
+        { include: '#variable' },
         { include: '#expression' },
         { include: '#bold' },
         { include: '#italic' },
@@ -22,6 +27,11 @@ export const zoltLanguage = {
         { include: '#attributes' },
       ],
     },
+    comment_inline: {
+      name: 'comment.block.zolt',
+      begin: '%%',
+      end: '%%',
+    },
     bold: {
       name: 'markup.bold.zolt',
       begin: '\\*\\*',
@@ -30,7 +40,7 @@ export const zoltLanguage = {
     },
     italic: {
       name: 'markup.italic.zolt',
-      begin: '//',
+      begin: '(?<!:)//',
       end: '//',
       patterns: [{ include: '#inline' }],
     },
@@ -70,47 +80,45 @@ export const zoltLanguage = {
       end: '`',
     },
     inline_styled: {
-      name: 'markup.inline.styled.zolt',
       begin: '\\|\\|',
+      beginCaptures: {
+        0: { name: 'punctuation.definition.string.begin.zolt' },
+      },
       end: '\\|\\|',
-      patterns: [{ include: '#inline' }],
-    },
-    comment_inline: {
-      name: 'comment.block.zolt',
-      begin: '%%',
-      end: '%%',
+      endCaptures: {
+        0: { name: 'punctuation.definition.string.end.zolt' },
+      },
+      patterns: [{ name: 'string.quoted.double.zolt', match: '[^|]+' }],
     },
     variable_interpolation: {
-      name: 'variable.other.interpolation.zolt',
-      match: '\\{\\$[a-zA-Z0-9_.]+\\}',
+      match: '(\\{\\$)([a-zA-Z0-9_.]+)(\\})',
+      captures: {
+        1: { name: 'punctuation.definition.variable.zolt' },
+        2: { name: 'variable.parameter.zolt' },
+        3: { name: 'punctuation.definition.variable.zolt' },
+      },
     },
     expression: {
-      name: 'variable.other.expression.zolt',
       begin: '\\{\\{',
+      beginCaptures: { 0: { name: 'punctuation.definition.expression.zolt' } },
       end: '\\}\\}',
+      endCaptures: { 0: { name: 'punctuation.definition.expression.zolt' } },
       patterns: [
-        {
-          name: 'variable.other.zolt',
-          match: '\\$[a-zA-Z0-9_.]+',
-        },
-        {
-          name: 'keyword.operator.zolt',
-          match: '\\+|\\-|\\*|\\/|\\^|%|\\?|:',
-        },
-        {
-          name: 'constant.numeric.zolt',
-          match: '\\b\\d+(\\.\\d+)?\\b',
-        },
-        {
-          name: 'string.quoted.double.zolt',
-          match: '"[^"]*"',
-        },
+        { include: '#variable' },
+        { name: 'keyword.operator.zolt', match: '[+\\-*/^%?:=]' },
+        { name: 'constant.numeric.zolt', match: '\\b\\d+(\\.\\d+)?\\b' },
+        { name: 'string.quoted.double.zolt', match: '"[^"]*"' },
       ],
     },
     attributes: {
-      name: 'entity.other.attribute-name.zolt',
-      begin: '(?<=\\S)\\{',
+      begin: '\\{',
       end: '\\}',
+      beginCaptures: {
+        0: { name: 'punctuation.definition.attributes.begin.zolt' },
+      },
+      endCaptures: {
+        0: { name: 'punctuation.definition.attributes.end.zolt' },
+      },
       patterns: [
         {
           name: 'variable.parameter.zolt',
@@ -128,58 +136,72 @@ export const zoltLanguage = {
           name: 'entity.other.attribute-name.class.zolt',
           match: '\\.[a-zA-Z0-9_-]+',
         },
-      ],
-    },
-    link: {
-      name: 'markup.underline.link.zolt',
-      match: '\\[([^\\]]+)\\]\\(([^)]+)\\)',
-    },
-    media: {
-      patterns: [
         {
-          name: 'markup.underline.link.image.zolt',
-          match: '!\\[([^\\]]*)\\]\\(([^)]+)\\)',
+          name: 'punctuation.separator.key-value.zolt',
+          match: '=',
         },
         {
-          name: 'markup.underline.link.video.zolt',
-          match: '!!\\[([^\\]]*)\\]\\(([^)]+)\\)',
-        },
-        {
-          name: 'markup.underline.link.audio.zolt',
-          match: '\\?\\?\\[([^\\]]*)\\]\\(([^)]+)\\)',
-        },
-        {
-          name: 'markup.underline.link.embed.zolt',
-          match: '@@\\[([^\\]]*)\\]\\(([^)]+)\\)',
-        },
-        {
-          name: 'markup.underline.link.file.zolt',
-          match: '&&\\[([^\\]]*)\\]\\(([^)]+)\\)',
+          name: 'variable.parameter.zolt',
+          match: '[a-zA-Z0-9_-]+',
         },
       ],
     },
   },
   patterns: [
     {
-      name: 'markup.heading.zolt',
-      match: '^#{1,6}\\s+.*$',
+      begin: '^([-*_]){3,}',
+      beginCaptures: {
+        0: { name: 'comment.line.number-sign.zolt' },
+      },
+      end: '$',
+      name: 'comment.line.number-sign.zolt',
+      patterns: [{ include: '#attributes' }],
     },
     {
       name: 'metadata.yaml.zolt',
-      begin: '^---\\s*$',
-      end: '^---\\s*$',
+      begin: '\\A---',
+      end: '^---',
       patterns: [{ include: 'source.yaml' }],
     },
     {
-      name: 'heading.zolt',
+      match: '^\\s*\\[([^\\]]+)\\]:\\s*(.*)$',
+      captures: {
+        1: { name: 'variable.parameter.zolt' },
+        2: { name: 'markup.underline.link.zolt' },
+      },
+    },
+    {
       begin: '^#{1,6}\\s+',
+      beginCaptures: { 0: { name: 'punctuation.definition.heading.zolt' } },
+      end: '$',
+      name: 'markup.heading.zolt',
+      patterns: [{ include: '#inline' }],
+    },
+    {
+      begin: '^\\s*([-*+]|\\d+\\.|:)\\s+',
+      beginCaptures: { 0: { name: 'punctuation.definition.list.zolt' } },
       end: '$',
       patterns: [{ include: '#inline' }],
+    },
+    {
+      begin: '^>\\s*',
+      beginCaptures: { 0: { name: 'punctuation.definition.quote.zolt' } },
+      end: '$',
+      name: 'markup.quote.zolt',
+      patterns: [{ include: '#inline' }],
+    },
+    {
+      name: 'comment.block.zolt',
+      begin: '^:::comment\\b',
+      end: '^:::\\s*$',
     },
     {
       name: 'keyword.control.block.zolt',
       begin: '^:::[a-z0-9_-]+',
       end: '$',
+      beginCaptures: {
+        0: { name: 'keyword.control.zolt' },
+      },
       patterns: [
         {
           name: 'string.other.title.zolt',
@@ -193,48 +215,9 @@ export const zoltLanguage = {
       match: '^:::\\s*$',
     },
     {
-      name: 'variable.other.assignment.zolt',
-      match: '^\\s*\\$\\$?[a-zA-Z0-9_]+\\s*=.*$',
-    },
-    {
-      name: 'blockquote.zolt',
-      begin: '^>\\s*',
-      end: '$',
-      patterns: [{ include: '#inline' }],
-    },
-    {
-      name: 'markup.indentation.zolt',
-      match: '^&+\\s+',
-    },
-    {
-      name: 'list.markup.zolt',
-      match: '^\\s*([-*+]|\\d+\\.|:)\\s+',
-    },
-    {
-      name: 'hr.zolt',
-      match: '^([-*_]){3,}(\\s|:|$).*$',
-    },
-    {
-      name: 'keyword.control.table.zolt',
-      match: '^\\[\\[/?table.*?\\]\\]',
-    },
-    {
-      name: 'keyword.other.toc.zolt',
-      match: '^\\[\\[toc.*?\\]\\]',
-    },
-    {
-      name: 'keyword.other.include.zolt',
-      match: '\\{\\{include\\s+.*?\\}\\}',
-    },
-    {
       name: 'markup.fenced_code.block.zolt',
       begin: '^```',
       end: '^```',
-    },
-    {
-      name: 'table.row.zolt',
-      match: '^\\|.*\\|',
-      patterns: [{ include: '#inline' }],
     },
     { include: '#inline' },
   ],
