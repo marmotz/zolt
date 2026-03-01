@@ -272,6 +272,16 @@ numbering: "roman-upper"
 ---
 ```
 
+Or even a **mixed style** for each level using a comma-separated list:
+
+```zolt
+---
+numbering: "decimal, alpha-lower, roman-upper"
+---
+```
+
+In this case, the first level headings will be `1`, the second level `1.a`, the third level `1.a.I`, etc. If there are more levels than styles, the last style in the list is used for all remaining levels.
+
 #### Selective Numbering
 
 You can toggle numbering mid-document by changing the `$numbering` variable:
@@ -302,6 +312,14 @@ $numbering = true
 $numbering = "alpha-lower"
 
 ## Subsection with different style
+
+$numbering = "decimal, alpha-lower, roman-upper"
+
+## Subsections with different style for each (decimal.alpha-lower)
+
+### Sub-Subsections with decimal.alpha.ROMAN
+
+#### Sub-Sub-Subsections with decimal.alpha.ROMAN.ROMAN
 
 $numbering = false
 

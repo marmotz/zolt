@@ -512,27 +512,35 @@ export class SpecialBlockVisitor {
       }
 
       const numberingVar = this.evaluator.getVariable('numbering');
-      let numberingStyle = 'decimal';
-      if (typeof numberingVar === 'string' && numberingVar !== 'true' && numberingVar !== 'false') {
-        numberingStyle = numberingVar;
-      }
+      const globalValue = typeof numberingVar === 'string' ? numberingVar : 'decimal';
+      const styles = globalValue.split(',').map((s) => s.trim());
+
+      const formatPart = (val: number, style: string) => {
+        switch (style) {
+          case 'roman-lower':
+            return toRoman(val).toLowerCase();
+          case 'roman-upper':
+            return toRoman(val).toUpperCase();
+          case 'alpha-lower':
+            return toAlpha(val).toLowerCase();
+          case 'alpha-upper':
+            return toAlpha(val).toUpperCase();
+          case 'decimal':
+          default:
+            return val.toString();
+        }
+      };
 
       const numberParts = counters.slice(from, level + 1);
       let numberStr = '';
 
       if (numbering) {
-        let formattedParts: string[] = [];
-        if (numberingStyle === 'decimal') {
-          formattedParts = numberParts.map((p) => p.toString());
-        } else if (numberingStyle === 'roman-lower') {
-          formattedParts = numberParts.map((p) => toRoman(p).toLowerCase());
-        } else if (numberingStyle === 'roman-upper') {
-          formattedParts = numberParts.map((p) => toRoman(p).toUpperCase());
-        } else if (numberingStyle === 'alpha-lower') {
-          formattedParts = numberParts.map((p) => toAlpha(p).toLowerCase());
-        } else if (numberingStyle === 'alpha-upper') {
-          formattedParts = numberParts.map((p) => toAlpha(p).toUpperCase());
-        }
+        const formattedParts = numberParts.map((p, i) => {
+          const styleIdx = i; // Inside TOC, we already sliced from 'from', so i is relative to start level
+          const style = styles[styleIdx] || styles[styles.length - 1] || 'decimal';
+
+          return formatPart(p, style);
+        });
         numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
       }
 

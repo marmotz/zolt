@@ -286,6 +286,22 @@ $numbering = true
         expect(html).toContain('zolt-heading-number">2.1 </span>Section 1');
       });
 
+      test('should support mixed numbering styles via comma-separated list', async () => {
+        const zolt = `---
+numbering: "decimal, alpha-lower, roman-upper"
+---
+# Part
+## Chapter
+### Section
+`;
+        const html = await buildString(zolt);
+        // Note: Part is H1 unique, so it's not numbered.
+        // Chapter is H2 -> level 1 of numbering -> uses 'decimal'
+        // Section is H3 -> level 2 of numbering -> uses 'alpha-lower'
+        expect(html).toContain('zolt-heading-number">1 </span>Chapter');
+        expect(html).toContain('zolt-heading-number">1.a </span>Section');
+      });
+
       test('should allow toggling numbering mid-document', async () => {
         const zolt = `
 # Title 1

@@ -113,12 +113,18 @@ Le Zolt permet de numéroter automatiquement les titres de manière hiérarchiqu
 
 #### Activation Globale
 
-Les variables globales (généralement dans le frontmatter) permettent d'activer la numérotation pour tout le document :
+La variable globale `numbering` (généralement dans le frontmatter) permet d'activer la numérotation pour tout le document. Elle accepte :
+- Un booléen : `true` (décimal par défaut) ou `false`.
+- Le nom d'un style unique : `"roman-upper"`.
+- Une liste de styles séparés par des virgules pour un mélange par niveau : `"decimal, alpha-lower, roman-upper"`.
 
 ```yaml
 ---
-numbering: true           # Active la numérotation globale
-numberingStyle: "decimal" # Style : 1, 1.1, 1.1.1 (défaut)
+numbering: true           # Active la numérotation décimale (par défaut)
+# OU
+numbering: "roman-upper"  # Active la numérotation en chiffres romains majuscules
+# OU
+numbering: "decimal, alpha-lower" # Niveau 1: 1, 2; Niveau 2: 1.a, 1.b
 ---
 ```
 

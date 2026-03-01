@@ -59,18 +59,29 @@ export class BlockVisitor {
 
     let numberStr = '';
     if ((isGlobalNumbering && !isNumberingDisabled) || isLocalNumbering) {
-      // Determine style: local attribute takes priority, then global variable
-      let numberingStyle = 'decimal';
-      const localStyle = node.attributes.numbering;
-      const globalStyle = typeof numberingVar === 'string' ? numberingVar : 'decimal';
+      const numberingVar = this.evaluator.getVariable('numbering');
+      const localValue = node.attributes.numbering;
+      const globalValue = typeof numberingVar === 'string' ? numberingVar : 'decimal';
 
-      const validStyles = ['decimal', 'roman-lower', 'roman-upper', 'alpha-lower', 'alpha-upper'];
+      // Determine the list of styles to use
+      const styleSource = (localValue && localValue !== 'true' ? localValue : globalValue) || 'decimal';
+      const styles = styleSource.split(',').map((s) => s.trim());
 
-      if (localStyle && validStyles.includes(localStyle)) {
-        numberingStyle = localStyle;
-      } else if (globalStyle && validStyles.includes(globalStyle)) {
-        numberingStyle = globalStyle;
-      }
+      const formatPart = (val: number, style: string) => {
+        switch (style) {
+          case 'roman-lower':
+            return toRoman(val).toLowerCase();
+          case 'roman-upper':
+            return toRoman(val).toUpperCase();
+          case 'alpha-lower':
+            return toAlpha(val).toLowerCase();
+          case 'alpha-upper':
+            return toAlpha(val).toUpperCase();
+          case 'decimal':
+          default:
+            return val.toString();
+        }
+      };
 
       // Rule: If there is only one H1 in the document, we don't number it
       // and we start numbering from H2 as the first level.
@@ -81,25 +92,24 @@ export class BlockVisitor {
 
         // If selective numbering is used (not global), skip leading zeros
         let effectiveParts = parts;
+        let styleOffset = 0;
         if (!isGlobalNumbering) {
           const firstNonZero = parts.findIndex((p) => p > 0);
           if (firstNonZero !== -1) {
             effectiveParts = parts.slice(firstNonZero);
+            styleOffset = firstNonZero;
           }
         }
 
         if (effectiveParts.length > 0) {
-          if (numberingStyle === 'decimal') {
-            numberStr = `<span class="zolt-heading-number">${effectiveParts.join('.')} </span>`;
-          } else if (numberingStyle === 'roman-lower') {
-            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toRoman(p).toLowerCase()).join('.')} </span>`;
-          } else if (numberingStyle === 'roman-upper') {
-            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toRoman(p).toUpperCase()).join('.')} </span>`;
-          } else if (numberingStyle === 'alpha-lower') {
-            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toAlpha(p).toLowerCase()).join('.')} </span>`;
-          } else if (numberingStyle === 'alpha-upper') {
-            numberStr = `<span class="zolt-heading-number">${effectiveParts.map((p) => toAlpha(p).toUpperCase()).join('.')} </span>`;
-          }
+          const formattedParts = effectiveParts.map((p, i) => {
+            const styleIdx = styleOffset + i;
+            const style = styles[styleIdx] || styles[styles.length - 1] || 'decimal';
+
+            return formatPart(p, style);
+          });
+
+          numberStr = `<span class="zolt-heading-number">${formattedParts.join('.')} </span>`;
         }
       }
     }

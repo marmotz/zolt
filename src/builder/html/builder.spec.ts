@@ -691,6 +691,37 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('<span class="zolt-heading-number">I </span>One');
     });
 
+    test('should support mixed numbering styles via comma-separated list', async () => {
+      (builder as any).evaluator.setVariable('numbering', 'decimal, alpha-lower, roman-upper');
+
+      const h1: HeadingNode = {
+        type: 'Heading',
+        level: 1,
+        children: [{ type: 'Text', content: 'Part' }],
+        attributes: {},
+      };
+      const h2: HeadingNode = {
+        type: 'Heading',
+        level: 2,
+        children: [{ type: 'Text', content: 'Chapter' }],
+        attributes: {},
+      };
+      const h3: HeadingNode = {
+        type: 'Heading',
+        level: 3,
+        children: [{ type: 'Text', content: 'Section' }],
+        attributes: {},
+      };
+
+      const html1 = await builder.build(h1);
+      const html2 = await builder.build(h2);
+      const html3 = await builder.build(h3);
+
+      expect(html1).toContain('<span class="zolt-heading-number">1 </span>Part');
+      expect(html2).toContain('<span class="zolt-heading-number">1.a </span>Chapter');
+      expect(html3).toContain('<span class="zolt-heading-number">1.a.I </span>Section');
+    });
+
     test('should skip numbering for headings with {numbering=false} even if global numbering is on', async () => {
       (builder as any).evaluator.setVariable('numbering', true);
 
