@@ -30,6 +30,9 @@ export const BASE_CSS = `
   h4 { font-size: 1.15rem; }
   ul, ol, dl { padding-left: 2rem; margin: 1em 0; }
   ul.zolt-list-plain { list-style: none; padding-left: 0; margin-left: 0; margin-right: 0; }
+  ul.zolt-list-task { list-style: none; padding-left: 0; }
+  li ul.zolt-list-task, li ol.zolt-list-task { padding-left: 1.5rem; margin-top: 0.2rem; }
+  ul.zolt-list-task input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; cursor: default; }
   li, dt, dd { margin: 0.4em 0; }
   dt { font-weight: bold; margin-top: 1em; }
   dd { margin-left: 1.5rem; }

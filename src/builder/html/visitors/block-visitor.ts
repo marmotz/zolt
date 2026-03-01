@@ -174,6 +174,13 @@ export class BlockVisitor {
       node.attributes.class = `${node.attributes.class ? `${node.attributes.class} ` : ''}zolt-list-plain`;
     }
 
+    if (node.kind === 'task') {
+      if (!node.attributes) {
+        node.attributes = {};
+      }
+      node.attributes.class = `${node.attributes.class ? `${node.attributes.class} ` : ''}zolt-list-task`;
+    }
+
     const childrenHtml = await this.joinChildren(node.children);
     const attrs = this.renderAllAttributes(node.attributes);
 

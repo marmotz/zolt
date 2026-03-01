@@ -93,9 +93,37 @@ describe('HTMLBuilder', () => {
     };
 
     const html = await builder.build(node);
+    expect(html).toContain('class="zolt-list-task"');
     expect(html).toContain('<input type="checkbox" checked');
     expect(html).toContain('Done');
     expect(html).toContain('Not done');
+  });
+
+  test('should build nested task lists', async () => {
+    const node: ListNode = {
+      type: 'List',
+      kind: 'task',
+      children: [
+        {
+          type: 'ListItem',
+          checked: false,
+          children: [
+            { type: 'Text', content: 'Parent task' },
+            {
+              type: 'List',
+              kind: 'task',
+              children: [{ type: 'ListItem', checked: true, children: [{ type: 'Text', content: 'Subtask' }] }],
+            },
+          ],
+        },
+      ] as any[],
+    };
+
+    const html = await builder.build(node);
+    const taskLists = html.match(/class="zolt-list-task"/g);
+    expect(taskLists).toHaveLength(2);
+    expect(html).toContain('Parent task');
+    expect(html).toContain('Subtask');
   });
 
   test('should build blockquote', async () => {
@@ -777,7 +805,7 @@ describe('HTMLBuilder', () => {
     });
 
     test('should reset counters between buildDocument calls', async () => {
-      const doc: DocumentNode = {
+      const doc = {
         type: 'Document',
         children: [
           {
@@ -793,7 +821,7 @@ describe('HTMLBuilder', () => {
             attributes: { numbering: '' },
           } as any,
         ],
-      };
+      } as DocumentNode;
 
       const html1 = await builder.buildDocument(doc);
       expect(html1).toContain('<h1 id="chapter-1"><span class="zolt-heading-number">1 </span>Chapter 1</h1>');
@@ -805,7 +833,7 @@ describe('HTMLBuilder', () => {
     });
 
     test('should NOT number single H1 and start numbering from H2', async () => {
-      const doc: DocumentNode = {
+      const doc = {
         type: 'Document',
         children: [
           { type: 'Heading', level: 1, children: [{ type: 'Text', content: 'Title' }], attributes: {} } as any,
@@ -822,7 +850,7 @@ describe('HTMLBuilder', () => {
             attributes: { numbering: '' },
           } as any,
         ],
-      };
+      } as DocumentNode;
 
       const html = await builder.buildDocument(doc);
       expect(html).not.toContain('zolt-heading-number">1 </span>Title');
@@ -831,7 +859,7 @@ describe('HTMLBuilder', () => {
     });
 
     test('should number H1 if there are multiple H1s', async () => {
-      const doc: DocumentNode = {
+      const doc = {
         type: 'Document',
         children: [
           {
@@ -847,7 +875,7 @@ describe('HTMLBuilder', () => {
             attributes: { numbering: '' },
           } as any,
         ],
-      };
+      } as DocumentNode;
 
       const html = await builder.buildDocument(doc);
       expect(html).toContain('<span class="zolt-heading-number">1 </span>Part 1');
