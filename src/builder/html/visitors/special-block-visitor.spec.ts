@@ -184,4 +184,54 @@ describe('SpecialBlockVisitor', () => {
     expect(visitor.hasSidebar).toBe(false);
     expect(visitor.sidebarSide as any).toBe('left');
   });
+
+  test('should render column with width and flex: none', async () => {
+    const { AttributeRenderer } = await import('../utils/attribute-renderer');
+    const { ExpressionEvaluator } = await import('../../evaluator/expression-evaluator');
+    const renderer = new AttributeRenderer(new ExpressionEvaluator());
+
+    const visitorWithRenderer = new SpecialBlockVisitor(
+      async () => '',
+      async () => '',
+      (attrs) => renderer.renderAllAttributes(attrs),
+      { getVariable: () => null },
+      async (text: string) => text,
+      []
+    );
+
+    const node: TripleColonBlockNode = {
+      type: 'TripleColonBlock',
+      blockType: 'column',
+      children: [],
+      attributes: { width: '70%' },
+    };
+
+    const html = await visitorWithRenderer.visitTripleColonBlock(node);
+    expect(html).toContain('style="flex: none; width: calc(70% - (var(--zolt-column-gap, 1.5rem) * 0.300))"');
+  });
+
+  test('should render columns with cols attribute as style variable', async () => {
+    const { AttributeRenderer } = await import('../utils/attribute-renderer');
+    const { ExpressionEvaluator } = await import('../../evaluator/expression-evaluator');
+    const renderer = new AttributeRenderer(new ExpressionEvaluator());
+
+    const visitorWithRenderer = new SpecialBlockVisitor(
+      async () => '',
+      async () => '',
+      (attrs) => renderer.renderAllAttributes(attrs),
+      { getVariable: () => null },
+      async (text: string) => text,
+      []
+    );
+
+    const node: TripleColonBlockNode = {
+      type: 'TripleColonBlock',
+      blockType: 'columns',
+      children: [],
+      attributes: { cols: '3' },
+    };
+
+    const html = await visitorWithRenderer.visitTripleColonBlock(node);
+    expect(html).toContain('style="--zolt-cols: 3"');
+  });
 });

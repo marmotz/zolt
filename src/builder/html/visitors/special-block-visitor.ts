@@ -103,6 +103,9 @@ export class SpecialBlockVisitor {
       if (!Number.isNaN(p)) {
         const factor = (1 - p / 100).toFixed(3);
         node.attributes.width = `calc(${p}% - (var(--zolt-column-gap, 1.5rem) * ${factor}))`;
+        // Ensure flex-grow/shrink don't override the width
+        const flexStyle = 'flex: none;';
+        node.attributes.style = node.attributes.style ? `${node.attributes.style} ${flexStyle}` : flexStyle;
       }
     }
 

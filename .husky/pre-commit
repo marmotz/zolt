@@ -3,8 +3,9 @@ bunx lint-staged
 
 # 2. Checks that the ENTIRE project is clean (Global Lint without fix + Types)
 # We use --max-warnings=0 so that it fails if there is any warning remaining
+bun run format:check
 bun run lint:check
-bun type-check
+bun type:check
 
 # 3. Export shiki grammar to VS Code extension
 bun run export:grammar && git add editors/vscode

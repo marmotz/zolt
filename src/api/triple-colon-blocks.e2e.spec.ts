@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildString } from '../index';
+import { buildString } from './index';
 
 describe('Triple Colon Blocks E2E', () => {
   test('should handle details block with title', async () => {
@@ -68,7 +68,7 @@ Right content
 :::
 :::`;
     const html = await buildString(input);
-    expect(html).toContain('style="--zolt-cols: 3;"');
+    expect(html).toContain('style="--zolt-cols: 3"');
     expect(html).toContain('class="triple-colon-block columns"');
   });
 });

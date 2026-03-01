@@ -31,9 +31,9 @@ Sidebar
 :::`;
     const html = await buildString(input);
     // Factor for 70% is (1 - 0.7) = 0.3
-    expect(html).toContain('style="width: calc(70% - (var(--zolt-column-gap, 1.5rem) * 0.300))"');
+    expect(html).toContain('style="flex: none; width: calc(70% - (var(--zolt-column-gap, 1.5rem) * 0.300))"');
     // Factor for 30% is (1 - 0.3) = 0.7
-    expect(html).toContain('style="width: calc(30% - (var(--zolt-column-gap, 1.5rem) * 0.700))"');
+    expect(html).toContain('style="flex: none; width: calc(30% - (var(--zolt-column-gap, 1.5rem) * 0.700))"');
   });
 
   test('should handle cols attribute', async () => {

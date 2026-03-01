@@ -1,0 +1,192 @@
+---
+title: "Diagrammes et Graphiques"
+description: "Visualisation de données avec Mermaid et les graphiques natifs de Zolt"
+---
+
+# Diagrammes et Graphiques
+
+Zolt propose des outils puissants pour la visualisation de données, incluant le support natif de Mermaid pour les diagrammes et un système de graphiques intégré pour les données numériques.
+
+---
+
+## Diagrammes Mermaid
+
+Créez des diagrammes complexes en utilisant la syntaxe Mermaid directement dans vos documents :
+
+```zolt
+:::mermaid
+graph TD
+    A[Début] --> B{Décision}
+    B -->|Oui| C[Résultat 1]
+    B -->|No| D[Résultat 2]
+:::
+```
+
+### Organigramme (Flowchart)
+
+```zolt
+:::mermaid
+flowchart LR
+    A[Entrée] --> B[Processus]
+    B --> C[Sortie]
+:::
+```
+
+### Diagramme de Séquence
+
+```zolt
+:::mermaid
+sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    A->>B: Salut Bob !
+    B-->>A: Salut Alice !
+:::
+```
+
+### Diagramme de Classe
+
+```zolt
+:::mermaid
+classDiagram
+    class Animal {
+        +String name
+        +makeSound()
+    }
+    class Dog {
+        +bark()
+    }
+    Animal <|-- Dog
+:::
+```
+
+---
+
+## Graphiques Natifs
+
+Zolt permet de créer des visualisations de données avec un support natif pour plusieurs types de graphiques.
+
+### Graphique Linéaire (Line Chart)
+
+```zolt
+:::chart
+:::chart-line {title="Ventes Mensuelles"}
+Janvier: 100
+Février: 150
+Mars: 200
+Avril: 250
+:::
+:::
+```
+
+### Graphique en Barres (Bar Chart)
+
+```zolt
+:::chart
+:::chart-bar {title="Ventes par Produit"}
+Produit A: 150
+Produit B: 200
+Produit C: 175
+:::
+:::
+```
+
+### Graphique Circulaire (Pie Chart)
+
+```zolt
+:::chart
+:::chart-pie {title="Parts de Marché"}
+Entreprise A: 35
+Entreprise B: 25
+Entreprise C: 20
+Autres: 20
+:::
+:::
+```
+
+### Graphique en Aires (Area Chart)
+
+```zolt
+:::chart
+:::chart-area {title="Trafic"}
+Matin: 120
+Après-midi: 200
+Soir: 180
+Nuit: 50
+:::
+:::
+```
+
+---
+
+## Attributs des Graphiques
+
+### Attributs du Conteneur
+
+Le bloc `:::chart` peut accepter des attributs pour contrôler la mise en page globale.
+
+```zolt
+:::chart {width=100% height=400px}
+:::
+```
+
+| Attribut | Description |
+|-----------|-------------|
+| `width` | Largeur du conteneur |
+| `height` | Hauteur du conteneur |
+| `layout` | Disposition: `horizontal` ou `vertical` |
+
+### Attributs Spécifiques aux Graphiques
+
+Chaque type de graphique (`chart-line`, `chart-bar`, etc.) accepte ses propres attributs.
+
+```zolt
+:::chart-line {title="Titre" colorScheme=cool legend=true grid=true}
+:::
+```
+
+| Attribut | Description |
+|-----------|-------------|
+| `title` | Titre du graphique |
+| `colorScheme` | Palette de couleurs (`cool`, `warm`, `pastel`) |
+| `legend` | Afficher la légende |
+| `grid` | Afficher la grille |
+
+---
+
+## Graphiques Multiples
+
+Vous pouvez combiner plusieurs graphiques dans un seul conteneur :
+
+```zolt
+:::chart {layout=horizontal}
+:::chart-line {title="Revenus"}
+2020: 50000
+2021: 75000
+2022: 100000
+:::
+
+:::chart-bar {title="Dépenses"}
+2020: 30000
+2021: 35000
+2022: 40000
+:::
+:::
+```
+
+---
+
+## Bonnes Pratiques
+
+1. **Simplicité** : Ne surchargez pas vos graphiques avec trop de points de données.
+2. **Titres clairs** : Utilisez l'attribut `title` pour donner du contexte à vos visualisations.
+3. **Couleurs cohérentes** : Utilisez `colorScheme` pour maintenir une harmonie visuelle.
+4. **Légendes** : Activez les légendes lorsque vous comparez plusieurs séries de données.
+
+---
+
+## Étapes Suivantes
+
+- [Syntaxe de Base](basic-syntax.zlt) — Formatage du texte et styles
+- [Fonctionnalités Avancées](advanced.zlt) — Boucles et conditions
+- [Variables](variables.zlt) — Utiliser des variables dans les graphiques

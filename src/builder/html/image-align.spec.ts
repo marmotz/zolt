@@ -60,6 +60,6 @@ describe('HTMLBuilder Image Alignment', () => {
     };
 
     const html = await builder.build(paragraphNode);
-    expect(html).toContain('style="color: red;text-align: center"');
+    expect(html).toContain('style="color: red; text-align: center"');
   });
 });

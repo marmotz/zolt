@@ -110,7 +110,8 @@ you MUST follow when working on this repository.
   or warnings:
     - `bun run format:fix` (Format the code)
     - `bun run lint:fix` (Clean up the code)
-    - `bun run type-check` (Must pass with 0 errors)
+    - `bun run type:check` (Must pass with 0 errors)
+    - `bun run format:check` (Must pass with 0 errors and 0 warnings)
     - `bun run lint:check` (Must pass with 0 errors and 0 warnings)
     - `bun test --coverage` (100% pass and coverage requirement met)
 
@@ -118,6 +119,7 @@ you MUST follow when working on this repository.
    requested by the user.
 6. **No any Bypass:** Do not use `any` to bypass type-checking or linting rules. Use proper types, interfaces, or type
    guards.
-7. **No Autonomous Git:** Never perform git actions (add, commit, push, etc.) yourself unless specifically requested by the user.
+7. **No Autonomous Git:** Never perform git actions (add, commit, push, etc.) yourself unless specifically requested by
+   the user.
 
 Adhere to these rules strictly to maintain the high quality and performance of the Zolt project.

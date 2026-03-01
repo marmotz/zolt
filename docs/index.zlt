@@ -41,11 +41,12 @@ Zolt comes with powerful features:
 
 - [Code Blocks](code-blocks.zlt) — Syntax highlighting and code display
 - [Mathematical Formulas](math.zlt) — LaTeX equations with KaTeX
+- [Diagrams & Charts](diagrams.zlt) — Mermaid diagrams and built-in charts
 
 ## Dynamic Content
 
 - [Variables & Calculations](variables.zlt) — Variables, expressions, and math functions
-- [Advanced Features](advanced.zlt) — Loops, conditionals, charts, and diagrams
+- [Advanced Features](advanced.zlt) — Loops, conditionals, and logical expressions
 - [Metadata](metadata.zlt) — File metadata, themes, and configuration
 
 ## Reference

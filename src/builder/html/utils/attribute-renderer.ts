@@ -9,18 +9,16 @@ export class AttributeRenderer {
       return '';
     }
 
+    const cssProps = this.getStyleProperties(attrs);
+    const styleStr = cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
+
     const htmlAttrs = this.filterCssProperties(attrs);
-    const styleStr = this.buildStyleAttribute(attrs);
     const otherAttrs = this.buildAttributes(htmlAttrs);
 
     return `${styleStr}${otherAttrs}`;
   }
 
-  public buildStyleAttribute(attrs?: Attributes): string {
-    if (!attrs) {
-      return '';
-    }
-
+  private getStyleProperties(attrs: Attributes): string[] {
     const cssProps: string[] = [];
     const cssPropertyMap: Record<string, string> = {
       fontWeight: 'font-weight',
@@ -66,7 +64,21 @@ export class AttributeRenderer {
       zIndex: 'z-index',
     };
 
+    // First, add the explicit 'style' attribute if it exists
+    if (attrs.style) {
+      const explicitStyle = this.evaluateString(String(attrs.style));
+      const parts = explicitStyle
+        .split(';')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      cssProps.push(...parts);
+    }
+
     for (const [key, value] of Object.entries(attrs)) {
+      if (key === 'style') {
+        continue;
+      }
+
       if (value !== undefined && (cssPropertyMap[key] || cssPropertyMap[this.camelToKebab(key)])) {
         const cssKey = cssPropertyMap[key] || cssPropertyMap[this.camelToKebab(key)];
         let processedValue = this.evaluateString(String(value));
@@ -92,11 +104,21 @@ export class AttributeRenderer {
       }
     }
 
+    return cssProps;
+  }
+
+  public buildStyleAttribute(attrs?: Attributes): string {
+    if (!attrs) {
+      return '';
+    }
+
+    const cssProps = this.getStyleProperties(attrs);
     return cssProps.length > 0 ? ` style="${cssProps.join('; ')}"` : '';
   }
 
   private filterCssProperties(attrs: Attributes): Attributes {
     const cssProps = new Set([
+      'style',
       'fontWeight',
       'fontSize',
       'fontStyle',

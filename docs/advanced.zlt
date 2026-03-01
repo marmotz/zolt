@@ -106,111 +106,11 @@ No items.
 
 ---
 
-## Charts
+## Diagrammes et Graphiques
 
-Create data visualizations with native chart support.
+Zolt propose des outils puissants pour la visualisation de données, incluant le support de Mermaid et des graphiques intégrés.
 
-### Line Chart
-
-```zolt
-:::chart
-:::chart-line {title="Monthly Sales"}
-January: 100
-February: 150
-March: 200
-April: 250
-:::
-:::
-```
-
-### Bar Chart
-
-```zolt
-:::chart
-:::chart-bar {title="Product Sales"}
-Product A: 150
-Product B: 200
-Product C: 175
-:::
-:::
-```
-
-### Pie Chart
-
-```zolt
-:::chart
-:::chart-pie {title="Market Share"}
-Company A: 35
-Company B: 25
-Company C: 20
-Others: 20
-:::
-:::
-```
-
-### Area Chart
-
-```zolt
-:::chart
-:::chart-area {title="Traffic"}
-Morning: 120
-Afternoon: 200
-Evening: 180
-Night: 50
-:::
-:::
-```
-
----
-
-## Chart Attributes
-
-### Container Attributes
-
-```zolt
-:::chart {width=100% height=400px}
-:::
-```
-
-| Attribute | Description |
-|-----------|-------------|
-| `width` | Container width |
-| `height` | Container height |
-| `layout` | `horizontal` or `vertical` |
-
-### Chart Attributes
-
-```zolt
-:::chart-line {title="Title" colorScheme=cool legend=true grid=true}
-:::
-```
-
-| Attribute | Description |
-|-----------|-------------|
-| `title` | Chart title |
-| `colorScheme` | Color palette (cool, warm, pastel) |
-| `legend` | Show legend |
-| `grid` | Show grid |
-
----
-
-## Multiple Charts
-
-```zolt
-:::chart {layout=horizontal}
-:::chart-line {title="Revenue"}
-2020: 50000
-2021: 75000 100000
-
-2022::::
-
-:::chart-bar {title="Expenses"}
-2020: 30000
-2021: 35000
-2022: 40000
-:::
-:::
-```
+- [Diagrammes et Graphiques](diagrams.zlt) — Support complet de Mermaid et des graphiques de données
 
 ---
 
@@ -235,26 +135,6 @@ $products = [
 :::
 ```
 
-### Sales Report
-
-```zolt
-:::chart
-:::chart-line {title="Revenue Trend" legend=true grid=true}
-January: 45000
-February: 52000
-March: 61000
-April: 58000
-May: 72000
-:::
-
-:::chart-bar {title="By Category"}
-Electronics: 120000
-Clothing: 80000
-Home: 65000
-:::
-:::
-```
-
 ### Conditional Styling
 
 ```zolt
@@ -275,33 +155,11 @@ $products = [
 
 ---
 
-## Complete Example
-
-```zolt
-$months = ["Jan", "Feb", "Mar", "Apr"]
-$sales = [100, 150, 200, 180]
-
-## Sales Report
-
-Total: {{ List.sum($sales) }}
-Average: {{ Math.round(List.avg($sales)) }}
-
-:::chart
-:::chart-line {title="Monthly Sales" colorScheme=blue grid=true}
-:::foreach {$months as $month}
-{$month}: {$sales[$foreach.index]}
-:::
-:::
-:::
-```
-
----
-
 ## Best Practices
 
 1. **Check data** before using in loops
 2. **Use descriptive** variable names
-3. **Limit complexity** in charts
+3. **Limit complexity** in visualizations
 4. **Test conditions** thoroughly
 
 ---

@@ -256,7 +256,7 @@ export class InlineVisitor {
     }
 
     // Remove controls from attributes if present to avoid duplicate
-    delete (nodeAttrs as any)['controls'];
+    delete (nodeAttrs as any).controls;
     const attrs = this.renderAllAttributes(nodeAttrs);
 
     return `<video src="${resolvedSrc}" controls${attrs}>${alt}</video>`;
@@ -265,7 +265,7 @@ export class InlineVisitor {
   visitAudio(node: AudioNode): string {
     const nodeAttrs = { ...node.attributes };
     // Remove controls from attributes if present to avoid duplicate
-    delete nodeAttrs['controls'];
+    delete nodeAttrs.controls;
     const attrs = this.renderAllAttributes(nodeAttrs);
     const src = this.evaluateString(node.src);
     const alt = this.evaluateString(node.alt ?? '');
