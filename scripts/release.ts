@@ -58,14 +58,14 @@ if (confirmVersion?.toLowerCase() !== 'y') {
 pkg.version = newVersion;
 writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 
-// 2. Update docs/zolt.project.yaml
-const yamlPath = path.join(process.cwd(), 'docs/zolt.project.yaml');
+// 2. Update docs/zolt.yaml
+const yamlPath = path.join(process.cwd(), 'docs/zolt.yaml');
 try {
   let yaml = readFileSync(yamlPath, 'utf-8');
-  yaml = yaml.replace(/version: .*/, `version: ${newVersion}`);
+  yaml = yaml.replace(/version: .*/, `version: "${newVersion}"`);
   writeFileSync(yamlPath, yaml);
 } catch (_e) {
-  console.warn('Could not update docs/zolt.project.yaml');
+  console.warn('Could not update docs/zolt.yaml');
 }
 
 // 3. Update README.md
@@ -84,7 +84,7 @@ console.log('✅ Files updated.');
 // 4. Commit
 const confirmCommit = prompt(`Commit changes with message "chore: release v${newVersion}"? (y/N)`, 'n');
 if (confirmCommit?.toLowerCase() === 'y') {
-  execSync('git add package.json docs/zolt.project.yaml README.md');
+  execSync('git add package.json docs/zolt.yaml README.md');
   execSync(`git commit -m "chore: release v${newVersion}"`);
   console.log('✅ Committed.');
 } else {

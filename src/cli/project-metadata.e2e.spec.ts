@@ -3,7 +3,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { main } from './index';
 
-describe('CLI: Project Metadata (zolt.project.yaml and .yml)', () => {
+describe('CLI: Project Metadata (zolt.yaml and .yml)', () => {
   const testDir = join(process.cwd(), 'temp_project_test_metadata');
   const testDirYml = join(process.cwd(), 'temp_project_test_yml_metadata');
 
@@ -22,7 +22,7 @@ image: "resources/logo.png"
 {$description}
 `.trim();
 
-    await writeFile(join(testDir, 'zolt.project.yaml'), projectYaml);
+    await writeFile(join(testDir, 'zolt.yaml'), projectYaml);
     await writeFile(join(testDir, 'index.zlt'), zltContent);
     await writeFile(join(testDir, 'resources/logo.png'), 'fake-image-content');
 
@@ -62,7 +62,7 @@ description: "Test description from yml"
 {$description}
 `.trim();
 
-    await writeFile(join(testDirYml, 'zolt.project.yml'), projectYml);
+    await writeFile(join(testDirYml, 'zolt.yml'), projectYml);
     await writeFile(join(testDirYml, 'index.zlt'), zltContent);
 
     // Mock process.argv

@@ -1223,20 +1223,20 @@ date: 2026-02-18
 
 Les métadonnées de fichier sont accessibles comme des variables : `{$title}`, `{$author}`, etc.
 
-### 5.7 Métadonnées de Projet (zolt.project.yaml)
+### 5.7 Métadonnées de Projet (zolt.yaml)
 
-Le Zolt supporte une configuration globale via un fichier `zolt.project.yaml` placé à la racine du projet. Ces
+Le Zolt supporte une configuration globale via un fichier `zolt.yaml` placé à la racine du projet. Ces
 métadonnées sont injectées comme variables globales dans tous les fichiers lors de la génération.
 
 #### Hiérarchie de Surcharge
 
 Les valeurs sont résolues dans cet ordre (la dernière écrase les précédentes) :
 
-1. **Métadonnées de Projet** (`zolt.project.yaml`)
+1. **Métadonnées de Projet** (`zolt.yaml`)
 2. **Métadonnées de Fichier** (Bloc YAML en haut de fichier)
 3. **Variables Locales** (Définies via `$var = value`)
 
-#### Exemple de `zolt.project.yaml`
+#### Exemple de `zolt.yaml`
 
 ```yaml
 siteName: "Documentation Zolt"

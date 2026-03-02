@@ -10,7 +10,7 @@ import { version } from '../../package.json';
 import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
 import { FileMetadataUtils } from '../utils/file-metadata';
 
-const PROJECT_FILENAMES = ['zolt.project.yaml', 'zolt.project.yml'];
+const PROJECT_FILENAMES = ['zolt.yaml', 'zolt.yml'];
 
 export async function findProjectFile(baseDir: string): Promise<string | null> {
   for (const filename of PROJECT_FILENAMES) {

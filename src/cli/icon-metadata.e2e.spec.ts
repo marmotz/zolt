@@ -43,7 +43,7 @@ iconApple: assets/favicons/apple-touch-icon.png
 manifest: assets/favicons/site.webmanifest
 `.trim();
 
-    await writeFile(join(testDir, 'zolt.project.yaml'), projectYaml);
+    await writeFile(join(testDir, 'zolt.yaml'), projectYaml);
     await writeFile(join(testDir, 'index.zlt'), '# Home');
     await writeFile(join(testDir, 'other.zlt'), '# Other page sharing assets');
   });

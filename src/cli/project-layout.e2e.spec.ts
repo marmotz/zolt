@@ -14,7 +14,7 @@ describe('CLI: Project Metadata Layout Regression', () => {
     await rm(testDir, { recursive: true, force: true });
   });
 
-  it('should apply layout defined in zolt.project.yaml', async () => {
+  it('should apply layout defined in zolt.yaml', async () => {
     const projectYaml = `
 layout: _project_layout.zlt
 custom_var: "SUCCESS"
@@ -31,7 +31,7 @@ custom_var: "SUCCESS"
 # Page Content
 `.trim();
 
-    await writeFile(path.join(testDir, 'zolt.project.yaml'), projectYaml);
+    await writeFile(path.join(testDir, 'zolt.yaml'), projectYaml);
     await writeFile(path.join(testDir, '_project_layout.zlt'), layoutContent);
     await writeFile(path.join(testDir, 'index.zlt'), docContent);
 

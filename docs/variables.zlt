@@ -49,7 +49,7 @@ Items: {$count}
 
 ## Global Variables
 
-Use the `$$` prefix for project-wide variables defined in `zolt.project.yaml` or global scope:
+Use the `$$` prefix for project-wide variables defined in `zolt.yaml` or global scope:
 
 ```zolt
 $$siteName = "My Website"

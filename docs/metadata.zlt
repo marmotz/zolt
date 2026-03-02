@@ -11,16 +11,16 @@ Zolt uses YAML metadata to configure both individual documents and entire projec
 
 Metadata allows you to define properties like titles, authors, or themes. In Zolt, metadata can be defined at two levels:
 
-1.  **Project Metadata**: Defined in `zolt.project.yaml` at the root of your project. These settings apply to every file.
+1.  **Project Metadata**: Defined in `zolt.yaml` at the root of your project. These settings apply to every file.
 2.  **File Metadata**: Defined at the very top of a `.zlt` file between `---` markers. These settings apply only to that specific file.
 
 ### Overriding Hierarchy
 
-File metadata always takes precedence. If a property (like `theme`) is defined in both `zolt.project.yaml` and a file's header, the file-specific value will be used for that document.
+File metadata always takes precedence. If a property (like `theme`) is defined in both `zolt.yaml` and a file's header, the file-specific value will be used for that document.
 
 ## Metadata Syntax
 
-### Global: `zolt.project.yaml`
+### Global: `zolt.yaml`
 
 Create this file in your project root for project-wide settings.
 

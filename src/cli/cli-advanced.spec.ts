@@ -48,7 +48,7 @@ describe('CLI Advanced', () => {
     });
 
     test('loadProjectMetadata should handle read errors', async () => {
-      const projectFile = join(testDir, 'zolt.project.yaml');
+      const projectFile = join(testDir, 'zolt.yaml');
       await writeFile(projectFile, 'invalid: yaml: :');
       const metadata = await cli.loadProjectMetadata(testDir);
       expect(metadata).toEqual({});

@@ -40,20 +40,20 @@ describe('CLI', () => {
   };
 
   describe('Utility Functions', () => {
-    test('findProjectFile should find zolt.project.yaml', async () => {
-      await writeFile(join(testDir, 'zolt.project.yaml'), 'title: Test');
+    test('findProjectFile should find zolt.yaml', async () => {
+      await writeFile(join(testDir, 'zolt.yaml'), 'title: Test');
       const found = await findProjectFile(testDir);
-      expect(found).toContain('zolt.project.yaml');
+      expect(found).toContain('zolt.yaml');
     });
 
-    test('findProjectFile should find zolt.project.yml', async () => {
-      await writeFile(join(testDir, 'zolt.project.yml'), 'title: Test');
+    test('findProjectFile should find zolt.yml', async () => {
+      await writeFile(join(testDir, 'zolt.yml'), 'title: Test');
       const found = await findProjectFile(testDir);
-      expect(found).toContain('zolt.project.yml');
+      expect(found).toContain('zolt.yml');
     });
 
     test('loadProjectMetadata should load all metadata without filtering', async () => {
-      await writeFile(join(testDir, 'zolt.project.yaml'), 'title: Test Site\nunknown_key: value');
+      await writeFile(join(testDir, 'zolt.yaml'), 'title: Test Site\nunknown_key: value');
       const meta = await loadProjectMetadata(testDir);
       expect(meta.title).toBe('Test Site');
       expect(meta.unknown_key).toBe('value');
