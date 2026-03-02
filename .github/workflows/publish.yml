@@ -27,6 +27,9 @@ jobs:
       - name: Build library
         run: bun run build:lib
 
+      - name: Build cli
+        run: bun run build:cli
+
       - name: Setup Node.js for publishing
         uses: actions/setup-node@v4
         with:
