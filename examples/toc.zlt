@@ -39,8 +39,8 @@ Combine multiple attributes:
 
 ```yaml
 ---
-numbering: true
-numberingStyle: decimal
+numbered: true
+numbered: decimal
 ---
 ```
 

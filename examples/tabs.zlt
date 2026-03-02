@@ -186,7 +186,7 @@ editor:
 export:
   format: [html, pdf]
   toc: true
-  numbering: true
+  numbered: true
 ```
 :::
 

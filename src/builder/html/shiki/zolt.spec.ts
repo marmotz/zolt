@@ -34,7 +34,7 @@ describe('Zolt Shiki Grammar', () => {
       expect(html).toContain('style="color:#9ECBFF">red</span>');
     });
 
-    it('should highlight file metadata (YAML frontmatter)', () => {
+    it('should highlight file metadata (YAML)', () => {
       const html = highlight('---\ntitle: Hello\n---');
       expect(html).toContain('---');
       expect(html).toContain('style="color:#85E89D">title</span>');
@@ -43,10 +43,10 @@ describe('Zolt Shiki Grammar', () => {
   });
 
   describe('Headings & Attributes', () => {
-    it('should highlight numbering flag in headings', () => {
-      const html = highlight('## Chapter 1{numbering}');
+    it('should highlight numbered flag in headings', () => {
+      const html = highlight('## Chapter 1{numbered}');
       expect(html).toContain('style="color:#79B8FF;font-weight:bold">## Chapter 1{</span>');
-      expect(html).toContain('style="color:#FFAB70;font-weight:bold">numbering</span>');
+      expect(html).toContain('style="color:#FFAB70;font-weight:bold">numbered</span>');
     });
   });
 

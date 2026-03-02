@@ -51,8 +51,8 @@
 
 - [x] `{#id}` - Heading ID for cross-references
 - [x] `{.class}` - CSS classes
-- [x] `{numbered}` - Enable numbering
-- [x] `{numbered=false}` - Disable numbering
+- [x] `{numbered}` - Enable numbered
+- [x] `{numbered=false}` - Disable numbered
 
 ### Attributes on Images
 
@@ -339,8 +339,8 @@
 
 ### Global Numbering
 
-- [x] `$numbering = true` - Enable global numbering
-- [x] `$numberingStyle = "style"` - Set numbering style
+- [x] `$numbered = true` - Enable global numbered
+- [x] `$numbered = "style"` - Set numbered style
 
 ### Local Numbering
 

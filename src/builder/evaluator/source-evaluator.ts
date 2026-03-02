@@ -61,7 +61,7 @@ export class SourceEvaluator {
       const line = lines[i];
       const trimmed = line.trim();
 
-      // Handle file metadata (frontmatter) at the very beginning
+      // Handle file metadata at the very beginning
       if (!fileMetadataProcessed && i === firstNonEmptyLineIndex && trimmed === '---') {
         metadataLines.push(line);
         i++;

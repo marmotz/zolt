@@ -44,24 +44,26 @@ export class BlockVisitor {
       node.attributes = {};
     }
 
-    const numberingVar = this.evaluator.getVariable('numbering');
-    const isGlobalNumbering = numberingVar === true || (typeof numberingVar === 'string' && numberingVar !== 'false');
-    const isLocalNumbering =
-      node.attributes.numbering === 'true' ||
-      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering !== 'false');
-    const isNumberingDisabled = node.attributes.numbering === 'false';
+    const numberedVar = this.evaluator.getVariable('numbered');
+    const isGlobalNumbered = numberedVar === true || (typeof numberedVar === 'string' && numberedVar !== 'false');
+    const isLocalNumbered =
+      node.attributes.numbered === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered !== 'false');
+    const isNumberingDisabled = node.attributes.numbered === 'false' || Object.hasOwn(node.attributes, 'noCount');
 
-    // Always increment the counter for every heading to track structure
-    this.headingCounters[level]++;
-    for (let i = level + 1; i <= 6; i++) {
-      this.headingCounters[i] = 0;
+    // Always increment the counter for every heading to track structure,
+    // unless explicitely disabled via noCount attribute or excluded from TOC.
+    if (!Object.hasOwn(node.attributes, 'noCount') && !Object.hasOwn(node.attributes, 'noToc')) {
+      this.headingCounters[level]++;
+      for (let i = level + 1; i <= 6; i++) {
+        this.headingCounters[i] = 0;
+      }
     }
 
     let numberStr = '';
-    if ((isGlobalNumbering && !isNumberingDisabled) || isLocalNumbering) {
-      const numberingVar = this.evaluator.getVariable('numbering');
-      const localValue = node.attributes.numbering;
-      const globalValue = typeof numberingVar === 'string' ? numberingVar : 'decimal';
+    if (((isGlobalNumbered && !isNumberingDisabled) || isLocalNumbered) && !isNumberingDisabled) {
+      const localValue = node.attributes.numbered;
+      const globalValue = typeof numberedVar === 'string' ? numberedVar : 'decimal';
 
       // Determine the list of styles to use
       const styleSource = (localValue && localValue !== 'true' ? localValue : globalValue) || 'decimal';
@@ -92,7 +94,7 @@ export class BlockVisitor {
         // If selective numbering is used (not global), skip leading zeros
         let effectiveParts = parts;
         let styleOffset = 0;
-        if (!isGlobalNumbering) {
+        if (!isGlobalNumbered) {
           const firstNonZero = parts.findIndex((p) => p > 0);
           if (firstNonZero !== -1) {
             effectiveParts = parts.slice(firstNonZero);
@@ -119,7 +121,9 @@ export class BlockVisitor {
     }
 
     const cleanAttributes = { ...node.attributes };
-    delete cleanAttributes.numbering;
+    delete cleanAttributes.numbered;
+    delete cleanAttributes.noCount;
+    delete cleanAttributes.noToc;
     const attrs = this.renderAllAttributes(cleanAttributes);
 
     const anchor = `<a href="#${node.attributes.id}" class="zolt-anchor" aria-hidden="true">#</a>`;

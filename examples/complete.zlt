@@ -4,7 +4,7 @@ author: "Jane Doe"
 date: {$created}
 version: 1.0
 tags: [documentation, tutorial, zolt, complete]
-numbering: true
+numbered: true
 theme: professional
 ---
 

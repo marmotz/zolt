@@ -191,12 +191,12 @@ Hello {$name}`;
     expect(result).toContain('Hello World');
   });
 
-  test('should process frontmatter and extract variables', () => {
+  test('should process metadata and extract variables', () => {
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator);
 
     const input = `---
-title: Frontmatter Title
+title: Title
 author: "Zolt Expert"
 count: 42
 ---
@@ -205,8 +205,8 @@ By {$author} ({$count})`;
 
     const result = sourceEvaluator.evaluate(input);
     expect(result).toContain('---');
-    expect(result).toContain('title: Frontmatter Title');
-    expect(result).toContain('# Frontmatter Title');
+    expect(result).toContain('title: Title');
+    expect(result).toContain('# Title');
     expect(result).toContain('By Zolt Expert (42)');
   });
 

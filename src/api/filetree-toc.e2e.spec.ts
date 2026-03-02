@@ -101,14 +101,14 @@ title: TOC From Page
     expect(html).not.toContain('H1 (Excluded)</a>');
   });
 
-  it('should support tocNumbering in filetree', async () => {
-    const indexFile = path.join(testDir, 'toc-numbering.zlt');
+  it('should support tocNumbered in filetree', async () => {
+    const indexFile = path.join(testDir, 'toc-numbered.zlt');
     const content = `---
 title: TOC Numbering Page
 ---
 # Heading 1
 # Heading 2
-[[filetree {toc tocNumbering}]]`;
+[[filetree {toc tocNumbered}]]`;
 
     fs.writeFileSync(indexFile, content);
 
@@ -123,12 +123,12 @@ title: TOC Numbering Page
     expect(html).toContain('2</span>');
   });
 
-  it('should support numbering attribute in filetree', async () => {
-    const indexFile = path.join(testDir, 'numbering-filetree.zlt');
+  it('should support numbered attribute in filetree', async () => {
+    const indexFile = path.join(testDir, 'numbered-filetree.zlt');
     const content = `---
 title: Numbering Filetree
 ---
-[[filetree {numbering}]]
+[[filetree {numbered}]]
 [Page 1](page1.zlt)`;
 
     fs.writeFileSync(indexFile, content);

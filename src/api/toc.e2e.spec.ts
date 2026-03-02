@@ -65,16 +65,18 @@ describe('API: TOC', () => {
     expect(navHtml).not.toContain('H5');
   });
 
-  test('should support numbering attribute', async () => {
+  test('should support numbered attribute', async () => {
     const zolt = `
-[[toc {numbering=true}]]
+[[toc {numbered=true}]]
 
 # Heading 1
-## Heading 2
+# Heading 2
+## Heading 2.1
 `;
     const html = await buildString(zolt);
     expect(html).toContain('<span class="zolt-toc-number">1</span>');
-    expect(html).toContain('<span class="zolt-toc-number">1.1</span>');
+    expect(html).toContain('<span class="zolt-toc-number">2</span>');
+    expect(html).toContain('<span class="zolt-toc-number">2.1</span>');
   });
 
   test('should support custom class', async () => {
@@ -132,7 +134,7 @@ describe('API: TOC', () => {
 
   test('should not render internal attributes in HTML', async () => {
     const zolt = `
-[[toc {from=2 to=4 depth=3 numbering=true}]]
+[[toc {from=2 to=4 depth=3 numbered=true}]]
 
 # H1
 ## H2
@@ -142,6 +144,42 @@ describe('API: TOC', () => {
     expect(html).not.toContain('from="2"');
     expect(html).not.toContain('to="4"');
     expect(html).not.toContain('depth="3"');
-    expect(html).not.toContain('numbering="true"');
+    expect(html).not.toContain('numbered="true"');
+  });
+
+  test('should handle noToc and noCount heading attributes', async () => {
+    const zolt = `
+$numbered = true
+[[toc {numbered}]]
+
+# Title {noToc}
+## Introduction {noCount}
+## Section 1
+## Section 2 {noToc}
+### Subsection 2.1
+`;
+    const html = await buildString(zolt, { numbered: true });
+
+    // Title should not be in TOC
+    expect(html).not.toContain('Title</a>');
+
+    // Introduction should be in TOC but NOT numbered
+    expect(html).toContain('Introduction</a>');
+    expect(html).not.toContain('zolt-toc-number">1</span><a href="#introduction">Introduction</a>');
+
+    // Section 1 should be numbered "1" because Title was single H1 (not numbered) and Introduction was noCount
+    expect(html).toContain('zolt-toc-number">1</span><a href="#section-1">Section 1</a>');
+
+    // Section 2 should not be in TOC
+    expect(html).not.toContain('Section 2</a>');
+
+    // Subsection 2.1 should be numbered "1.1" relative to Section 1
+    expect(html).toContain('zolt-toc-number">1.1</span><a href="#subsection-21">Subsection 2.1</a>');
+
+    // In document body:
+    expect(html).not.toContain('zolt-heading-number">1 </span>Introduction');
+    expect(html).toContain('zolt-heading-number">1 </span>Section 1');
+    expect(html).not.toContain('Section 2 <'); // Section 2 has no number
+    expect(html).toContain('zolt-heading-number">1.1 </span>Subsection 2.1');
   });
 });

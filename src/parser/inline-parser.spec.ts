@@ -461,4 +461,30 @@ describe('InlineParser', () => {
       expect((nodes[0] as any).content).toBe('`code`');
     });
   });
+
+  describe('Attribute Parsing Rules', () => {
+    test('should terminate unquoted values at the first space', () => {
+      const attrs = InlineParser.parseAttributes('color=red noToc');
+      expect(attrs?.color).toBe('red');
+      expect(Object.hasOwn(attrs!, 'noToc')).toBe(true);
+    });
+
+    test('should allow spaces in values if quoted', () => {
+      const attrs = InlineParser.parseAttributes('border="1px solid black" noToc');
+      expect(attrs?.border).toBe('1px solid black');
+      expect(Object.hasOwn(attrs!, 'noToc')).toBe(true);
+    });
+
+    test('should support single quotes for values with spaces', () => {
+      const attrs = InlineParser.parseAttributes("style='color: blue; font-weight: bold' noCount");
+      expect(attrs?.style).toBe('color: blue; font-weight: bold');
+      expect(Object.hasOwn(attrs!, 'noCount')).toBe(true);
+    });
+
+    test('should handle empty unquoted value as empty string', () => {
+      const attrs = InlineParser.parseAttributes('attr= noToc');
+      expect(attrs?.attr).toBe('');
+      expect(Object.hasOwn(attrs!, 'noToc')).toBe(true);
+    });
+  });
 });

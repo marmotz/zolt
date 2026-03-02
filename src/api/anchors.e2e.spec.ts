@@ -10,33 +10,33 @@ describe('API: Heading Anchors', () => {
     expect(html).toContain('<a href="#my-heading" class="zolt-anchor" aria-hidden="true">#</a>');
   });
 
-  test('should include anchor link with numbering', async () => {
+  test('should include anchor link with numbered', async () => {
     const zolt = `
-$numbering = true
+$numbered = true
 # First
 ## Second
 `;
     const html = await buildString(zolt);
 
-    // H1 should have anchor but NO numbering (since it's the only H1)
+    // H1 should have anchor but NO numbered (since it's the only H1)
     expect(html).toContain('<h1 id="first"><a href="#first" class="zolt-anchor" aria-hidden="true">#</a>First</h1>');
 
-    // H2 should have anchor AND numbering "1"
+    // H2 should have anchor AND numbered "1"
     expect(html).toContain(
       '<h2 id="second"><a href="#second" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">1 </span>Second</h2>'
     );
   });
 
-  test('should correctly place anchor before numbering', async () => {
+  test('should correctly place anchor before numbered', async () => {
     const zolt = `
-$numbering = true
+$numbered = true
 # H1
 # H2
 `;
     const html = await buildString(zolt);
 
     // Multiple H1s: they are numbered.
-    // The anchor should be BEFORE the numbering span.
+    // The anchor should be BEFORE the numbered span.
     expect(html).toContain(
       '<h1 id="h1"><a href="#h1" class="zolt-anchor" aria-hidden="true">#</a><span class="zolt-heading-number">1 </span>H1</h1>'
     );

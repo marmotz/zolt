@@ -117,13 +117,13 @@ Paragraph with [link](url).
     });
 
     test('should build inline style with padding', async () => {
-      const html = await buildString('||Button||{background=blue color=white padding=4px 8px}');
+      const html = await buildString('||Button||{background=blue color=white padding="4px 8px"}');
 
       expect(html).toContain('<span style="background: blue; color: white; padding: 4px 8px">Button</span>');
     });
 
     test('should build inline style with border', async () => {
-      const html = await buildString('||Bordered||{border=1px solid black}');
+      const html = await buildString('||Bordered||{border="1px solid black"}');
 
       expect(html).toContain('<span style="border: 1px solid black">Bordered</span>');
     });
@@ -147,7 +147,7 @@ Paragraph with [link](url).
     });
 
     test('should build inline style with border-radius', async () => {
-      const html = await buildString('||Rounded||{border=1px solid red borderRadius=4px}');
+      const html = await buildString('||Rounded||{border="1px solid red" borderRadius=4px}');
 
       expect(html).toContain('<span style="border: 1px solid red; border-radius: 4px">Rounded</span>');
     });
@@ -222,11 +222,11 @@ $items = ["Apple", "Banana", "Cherry"]
     });
 
     describe('Heading Numbering', () => {
-      test('should NOT number single H1 and start numbering from H2', async () => {
+      test('should NOT number single H1 and start numbered from H2', async () => {
         const zolt = `
 # Main Title
-## Section 1{numbering}
-## Section 2{numbering}
+## Section 1{numbered}
+## Section 2{numbered}
 `;
         const html = await buildString(zolt);
         expect(html).not.toContain('zolt-heading-number">1 </span>Main Title');
@@ -236,17 +236,17 @@ $items = ["Apple", "Banana", "Cherry"]
 
       test('should number H1 if there are multiple H1s', async () => {
         const zolt = `
-# Part 1{numbering}
-# Part 2{numbering}
+# Part 1{numbered}
+# Part 2{numbered}
 `;
         const html = await buildString(zolt);
         expect(html).toContain('zolt-heading-number">1 </span>Part 1');
         expect(html).toContain('zolt-heading-number">2 </span>Part 2');
       });
 
-      test('should support global numbering with $numbering', async () => {
+      test('should support global numbered with $numbered', async () => {
         const zolt = `---
-numbering: true
+numbered: true
 ---
 # Title 1
 # Title 2
@@ -259,9 +259,9 @@ numbering: true
         expect(html).toContain('zolt-heading-number">2.1 </span>Section 1');
       });
 
-      test('should respect $numbering style globally', async () => {
+      test('should respect $numbered style globally', async () => {
         const zolt = `---
-numbering: "roman-upper"
+numbered: "roman-upper"
 ---
 # Title 1
 # Title 2
@@ -273,9 +273,9 @@ numbering: "roman-upper"
         expect(html).toContain('zolt-heading-number">II.I </span>Section');
       });
 
-      test('should support numbering variable in document body', async () => {
+      test('should support numbered variable in document body', async () => {
         const zolt = `
-$numbering = true
+$numbered = true
 # Title 1
 # Title 2
 ## Section 1
@@ -286,9 +286,9 @@ $numbering = true
         expect(html).toContain('zolt-heading-number">2.1 </span>Section 1');
       });
 
-      test('should support mixed numbering styles via comma-separated list', async () => {
+      test('should support mixed numbered styles via comma-separated list', async () => {
         const zolt = `---
-numbering: "decimal, alpha-lower, roman-upper"
+numbered: "decimal, alpha-lower, roman-upper"
 ---
 # Part
 ## Chapter
@@ -296,18 +296,18 @@ numbering: "decimal, alpha-lower, roman-upper"
 `;
         const html = await buildString(zolt);
         // Note: Part is H1 unique, so it's not numbered.
-        // Chapter is H2 -> level 1 of numbering -> uses 'decimal'
-        // Section is H3 -> level 2 of numbering -> uses 'alpha-lower'
+        // Chapter is H2 -> level 1 of numbered -> uses 'decimal'
+        // Section is H3 -> level 2 of numbered -> uses 'alpha-lower'
         expect(html).toContain('zolt-heading-number">1 </span>Chapter');
         expect(html).toContain('zolt-heading-number">1.a </span>Section');
       });
 
-      test('should allow toggling numbering mid-document', async () => {
+      test('should allow toggling numbered mid-document', async () => {
         const zolt = `
 # Title 1
-$numbering = true
+$numbered = true
 # Title 2
-$numbering = false
+$numbered = false
 # Title 3
 `;
         const html = await buildString(zolt);

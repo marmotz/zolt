@@ -172,7 +172,7 @@ export class HTMLBuilder implements Builder {
       case 'VariableDefinition': {
         const def = node as any;
         this.evaluator.setVariable(def.name, this.evaluator.parseValue(def.value));
-        // If we are changing numbering settings mid-document, we might want to reset counters?
+        // If we are changing numbered settings mid-document, we might want to reset counters?
         // Actually, let's just let it continue with current counters unless it's a global toggle.
         return '';
       }

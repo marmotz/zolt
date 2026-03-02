@@ -278,9 +278,9 @@ export class SpecialBlockVisitor {
     const from = parseInt(node.attributes?.from || '0', 10) || 0;
     const to = parseInt(node.attributes?.to || '99', 10) || 99;
     const depth = parseInt(node.attributes?.depth || '99', 10) || 99;
-    const numbering =
-      node.attributes?.numbering === 'true' ||
-      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering === '') ||
+    const numbered =
+      node.attributes?.numbered === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
       false;
     const showToc =
       (node.attributes?.toc === 'true' ||
@@ -296,19 +296,27 @@ export class SpecialBlockVisitor {
       return Number.isNaN(parsed) ? defaultVal : parsed;
     };
 
+    const tocNumbered =
+      node.attributes?.tocNumbered === 'true' ||
+      node.attributes?.['toc-numbered'] === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'tocNumbered') && node.attributes.tocNumbered === '') ||
+      (node.attributes && Object.hasOwn(node.attributes, 'toc-numbered') && node.attributes['toc-numbered'] === '') ||
+      false;
+
     const tocOptions = {
-      from: getIntAttr(node.attributes?.tocFrom, 1),
-      to: getIntAttr(node.attributes?.tocTo, 6),
-      depth: getIntAttr(node.attributes?.tocDepth, 3),
-      numbering:
-        node.attributes?.tocNumbering === 'true' ||
-        (node.attributes && Object.hasOwn(node.attributes, 'tocNumbering') && node.attributes.tocNumbering === '') ||
-        false,
-      hasTo: !!node.attributes?.tocTo && node.attributes?.tocTo !== '',
-      hasDepth: !!node.attributes?.tocDepth && node.attributes?.tocDepth !== '',
+      from: getIntAttr(node.attributes?.tocFrom || node.attributes?.['toc-from'], 1),
+      to: getIntAttr(node.attributes?.tocTo || node.attributes?.['toc-to'], 6),
+      depth: getIntAttr(node.attributes?.tocDepth || node.attributes?.['toc-depth'], 3),
+      numbered: tocNumbered,
+      hasTo:
+        (!!node.attributes?.tocTo && node.attributes?.tocTo !== '') ||
+        (!!node.attributes?.['toc-to'] && node.attributes?.['toc-to'] !== ''),
+      hasDepth:
+        (!!node.attributes?.tocDepth && node.attributes?.tocDepth !== '') ||
+        (!!node.attributes?.['toc-depth'] && node.attributes?.['toc-depth'] !== ''),
     };
 
-    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc, tocOptions, numbering);
+    const html = await this.renderFileTreeNodes(this.projectGraph, 0, from, to, depth, showToc, tocOptions, numbered);
 
     return `<nav class="zolt-filetree">\n${html}\n</nav>`;
   }
@@ -322,6 +330,9 @@ export class SpecialBlockVisitor {
     hasDepth: boolean
   ): HeadingNode[] {
     return headings.filter((h) => {
+      if (h.attributes && Object.hasOwn(h.attributes, 'noToc')) {
+        return false;
+      }
       if (h.level < from) {
         return false;
       }
@@ -349,7 +360,7 @@ export class SpecialBlockVisitor {
     maxDepth: number,
     showToc: boolean,
     tocOptions: any,
-    numbering: boolean
+    numbered: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) {
       return '';
@@ -360,13 +371,11 @@ export class SpecialBlockVisitor {
 
     const htmlParts = [];
     for (const n of nodes) {
-      htmlParts.push(
-        await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc, tocOptions, numbering)
-      );
+      htmlParts.push(await this.renderFileTreeNode(n, currentDepth, from, to, maxDepth, showToc, tocOptions, numbered));
     }
     const html = htmlParts.join('');
 
-    const tag = numbering ? 'ol' : 'ul';
+    const tag = numbered ? 'ol' : 'ul';
 
     return `<${tag}>\n${html}</${tag}>`;
   }
@@ -379,7 +388,7 @@ export class SpecialBlockVisitor {
     maxDepth: number,
     showToc: boolean,
     tocOptions: any,
-    numbering: boolean
+    numbered: boolean
   ): Promise<string> {
     if (currentDepth > to || currentDepth > maxDepth) {
       return '';
@@ -417,7 +426,7 @@ export class SpecialBlockVisitor {
       );
 
       if (filteredHeadings.length > 0) {
-        const tocHtml = await this.buildTocTree(filteredHeadings, tocOptions.from, tocOptions.numbering);
+        const tocHtml = await this.buildTocTree(filteredHeadings, tocOptions.from, tocOptions.numbered);
         html += `\n<div class="zolt-filetree-toc">${tocHtml}</div>\n`;
       }
     }
@@ -426,13 +435,13 @@ export class SpecialBlockVisitor {
       const childrenHtmlParts = [];
       for (const child of node.children) {
         childrenHtmlParts.push(
-          await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc, tocOptions, numbering)
+          await this.renderFileTreeNode(child, currentDepth + 1, from, to, maxDepth, showToc, tocOptions, numbered)
         );
       }
       const childrenHtml = childrenHtmlParts.join('');
 
       if (childrenHtml) {
-        const tag = numbering ? 'ol' : 'ul';
+        const tag = numbered ? 'ol' : 'ul';
         html += `\n<${tag}>\n${childrenHtml}</${tag}>\n`;
       }
     }
@@ -457,9 +466,9 @@ export class SpecialBlockVisitor {
     const from = getIntAttr(node.attributes?.from, 1);
     const to = getIntAttr(node.attributes?.to, 6);
     const depth = getIntAttr(node.attributes?.depth, 3);
-    const numbering =
-      node.attributes?.numbering === 'true' ||
-      (node.attributes && Object.hasOwn(node.attributes, 'numbering') && node.attributes.numbering === '') ||
+    const numbered =
+      node.attributes?.numbered === 'true' ||
+      (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
       false;
     const customClass = node.attributes?.class || '';
 
@@ -472,14 +481,14 @@ export class SpecialBlockVisitor {
       return '';
     }
 
-    const tocHtml = await this.buildTocTree(filteredHeadings, from, numbering);
+    const tocHtml = await this.buildTocTree(filteredHeadings, from, numbered);
     const classAttr = ` class="zolt-toc${customClass ? ` ${customClass}` : ''}"`;
 
     const cleanAttrs: Attributes = { ...node.attributes };
     delete cleanAttrs.from;
     delete cleanAttrs.to;
     delete cleanAttrs.depth;
-    delete cleanAttrs.numbering;
+    delete cleanAttrs.numbered;
     delete cleanAttrs.class;
 
     const attrs = this.renderAllAttributes(cleanAttrs);
@@ -487,7 +496,7 @@ export class SpecialBlockVisitor {
     return `<nav${attrs}${classAttr}>\n${tocHtml}\n</nav>`;
   }
 
-  private async buildTocTree(headings: HeadingNode[], from: number, numbering: boolean): Promise<string> {
+  private async buildTocTree(headings: HeadingNode[], from: number, numbered: boolean): Promise<string> {
     let html = '<ul>\n';
     const counters: number[] = new Array(7).fill(0);
     let currentDepth = 0;
@@ -505,13 +514,17 @@ export class SpecialBlockVisitor {
         currentDepth--;
       }
 
-      counters[level]++;
-      for (let i = level + 1; i <= 6; i++) {
-        counters[i] = 0;
+      const isNumberingDisabled = h.attributes?.numbered === 'false' || Object.hasOwn(h.attributes || {}, 'noCount');
+
+      if (!isNumberingDisabled) {
+        counters[level]++;
+        for (let i = level + 1; i <= 6; i++) {
+          counters[i] = 0;
+        }
       }
 
-      const numberingVar = this.evaluator.getVariable('numbering');
-      const globalValue = typeof numberingVar === 'string' ? numberingVar : 'decimal';
+      const numberedVar = this.evaluator.getVariable('numbered');
+      const globalValue = typeof numberedVar === 'string' ? numberedVar : 'decimal';
       const styles = globalValue.split(',').map((s) => s.trim());
 
       const formatPart = (val: number, style: string) => {
@@ -529,17 +542,24 @@ export class SpecialBlockVisitor {
         }
       };
 
-      const numberParts = counters.slice(from, level + 1);
       let numberStr = '';
 
-      if (numbering) {
-        const formattedParts = numberParts.map((p, i) => {
-          // Inside TOC, we already sliced from 'from', so "i" is relative to start level
-          const style = styles[i] || styles[styles.length - 1] || 'decimal';
+      if (numbered && !isNumberingDisabled) {
+        const h1Count = this.currentHeadings.filter((h) => h.level === 1).length;
+        const startLevel = h1Count === 1 ? 2 : 1;
+        const effectiveFrom = Math.max(from, startLevel);
 
-          return formatPart(p, style);
-        });
-        numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
+        const effectiveParts = counters.slice(effectiveFrom, level + 1);
+
+        if (level >= effectiveFrom && effectiveParts.length > 0) {
+          const formattedParts = effectiveParts.map((p, i) => {
+            const styleIdx = effectiveFrom - startLevel + i;
+            const style = styles[styleIdx] || styles[styles.length - 1] || 'decimal';
+
+            return formatPart(p, style);
+          });
+          numberStr = `<span class="zolt-toc-number">${formattedParts.join('.')}</span>`;
+        }
       }
 
       const renderedContent = (await this.joinInlineChildren(h.children)).trim();

@@ -61,7 +61,7 @@ Create ordered lists with numbers:
 3. Third step
 :::
 
-The parser handles numbering automatically:
+The parser handles numbered automatically:
 
 ```zolt
 1. Step one

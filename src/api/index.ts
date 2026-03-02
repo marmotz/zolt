@@ -117,7 +117,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     ...extraVariables,
   };
 
-  // Merge variables from frontmatter (after expansion, so it includes layout metadata)
+  // Merge variables from metadata (after expansion, so it includes layout metadata)
   if (ast.fileMetadata) {
     Object.assign(mergedVariables, ast.fileMetadata.data);
   }

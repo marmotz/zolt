@@ -629,7 +629,7 @@ export const BASE_CSS = `
     display: inline-block;
   }
 
-  /* Line numbering */
+  /* Line numbered */
   .zolt-code-block.with-line-numbers .line::before {
     content: counter(line);
     counter-increment: line;

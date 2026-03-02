@@ -58,7 +58,7 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 | `fontWeight`   | Font weight      | `{fontWeight=bold}`           |
 | `fontSize`     | Font size        | `{fontSize=1.5em}`            |
 | `fontStyle`    | Font style       | `{fontStyle=italic}`          |
-| `border`       | Border           | `{border=1px solid black}`    |
+| `border`       | Border           | `{border="1px solid black"}`  |
 | `borderRadius` | Border radius    | `{borderRadius=10px}`         |
 
 ### Practical Examples
@@ -66,7 +66,7 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 ```zolt
 ||Warning:||{color=red fontWeight=bold} This action cannot be undone.
 
-||NEW||{background=blue color=white padding=2px 8px borderRadius=12px}
+||NEW||{background=blue color=white padding="2px 8px" borderRadius=12px}
 
 ||$variable||{fontFamily=monospace background=#F3F4F6}
 ```
@@ -74,7 +74,7 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 :::info [Result]
 ||Warning:||{color=red fontWeight=bold} This action cannot be undone.
 
-||NEW||{background=blue color=white padding=2px 8px borderRadius=12px}
+||NEW||{background=blue color=white padding="2px 8px" borderRadius=12px}
 
 ||$variable||{fontFamily=monospace background=#F3F4F6}
 :::
@@ -214,47 +214,62 @@ Create document structure with headings.
 ```
 
 :::info [Result]
-# Heading 1
-## Heading 2
-### Heading 3
-#### Heading 4
-##### Heading 5
-###### Heading 6
+# Heading 1 {noToc}
+## Heading 2 {noToc}
+### Heading 3 {noToc}
+#### Heading 4 {noToc}
+##### Heading 5 {noToc}
+###### Heading 6 {noToc}
 :::
 
 ### Heading Attributes
 
-Add IDs, classes, and numbering:
+Add IDs, classes, and control numbered or TOC visibility:
 
 ```zolt
 ## Introduction{#intro}
 
-## Chapter 1{numbering}
+## Chapter 1{numbered}
 
-## Appendix{numbering=false}
+## Appendix{numbered=false}
 
-## Chapter 2{numbering=roman-upper}
+## Hidden Section{noToc}
+
+## Unnumbered Section{noCount}
 ```
 
-$numbering = true
+
+$numbered = true
 
 :::info [Result]
-## Introduction{#intro}
+## Introduction{#intro noToc}
 
-## Chapter 1{numbering=roman-upper}
+## Chapter 1{numbered=roman-upper noToc}
 
-## Appendix{numbering=false}
+## Appendix{numbered=false noToc}
+
+## Hidden Section{noToc}
+
+## Unnumbered Section{noCount noToc}
 :::
 
-$numbering = false
+$numbered = false
+
+| Attribute     | Description                                                                 |
+|---------------|-----------------------------------------------------------------------------|
+| `id`          | Set a custom HTML ID for the heading (e.g. `{#my-id}`)                      |
+| `class`       | Add a CSS class (e.g. `{.my-class}`)                                        |
+| `numbered`    | Enable numbered for this specific heading, or set a style (`roman-upper`)  |
+| `noCount`     | Exclude this heading from automatic numbered. It won't increment counters. |
+| `noToc`       | Hide this heading from the Table of Contents (`[[toc]]`).                   |
 
 ### Automatic Numbering
 
-Enable global numbering in your file metadata (frontmatter):
+Enable global numbered in your file metadata:
 
 ```zolt
 ---
-numbering: true
+numbered: true
 ---
 ```
 
@@ -262,7 +277,7 @@ You can also specify a style directly:
 
 ```zolt
 ---
-numbering: "roman-upper"
+numbered: "roman-upper"
 ---
 ```
 
@@ -270,7 +285,7 @@ Or even a **mixed style** for each level using a comma-separated list:
 
 ```zolt
 ---
-numbering: "decimal, alpha-lower, roman-upper"
+numbered: "decimal, alpha-lower, roman-upper"
 ---
 ```
 
@@ -278,36 +293,20 @@ In this case, the first level headings will be `1`, the second level `1.a`, the 
 
 #### Selective Numbering
 
-You can toggle numbering mid-document by changing the `$numbering` variable:
+You can toggle numbered mid-document by changing the `$numbered` variable:
 
 ```zolt
 # Unnumbered Section
 
-$numbering = true
+$numbered = true
 
 ## Numbered Subsection
 
-$numbering = "alpha-lower"
+$numbered = "alpha-lower"
 
 ## Subsection with different style
 
-$numbering = false
-
-## Another Unnumbered Section
-```
-
-:::info [Result]
-# Unnumbered Section
-
-$numbering = true
-
-## Numbered Subsection
-
-$numbering = "alpha-lower"
-
-## Subsection with different style
-
-$numbering = "decimal, alpha-lower, roman-upper"
+$numbered = "decimal, alpha-lower, roman-upper"
 
 ## Subsections with different style for each (decimal.alpha-lower)
 
@@ -315,18 +314,42 @@ $numbering = "decimal, alpha-lower, roman-upper"
 
 #### Sub-Sub-Subsections with decimal.alpha.ROMAN.ROMAN
 
-$numbering = false
+$numbered = false
 
 ## Another Unnumbered Section
+```
+
+:::info [Result]
+# Unnumbered Section {noToc}
+
+$numbered = true
+
+## Numbered Subsection {noToc}
+
+$numbered = "alpha-lower"
+
+## Subsection with different style {noToc}
+
+$numbered = "decimal, alpha-lower, roman-upper"
+
+## Subsections with different style for each (decimal.alpha-lower) {noToc}
+
+### Sub-Subsections with decimal.alpha.ROMAN {noToc}
+
+#### Sub-Sub-Subsections with decimal.alpha.ROMAN.ROMAN {noToc}
+
+$numbered = false
+
+## Another Unnumbered Section {noToc}
 :::
 
 #### Numbering Rules
 
-Zolt uses a smart numbering system for document titles:
+Zolt uses a smart numbered system for document titles:
 
 1.  **Single H1 Rule**: If your document has only one `# Heading 1`, it is treated as the document title and **will not be numbered**. Numbering will automatically start at `## Heading 2` (e.g., the first H2 will be "1", its first H3 will be "1.1").
 2.  **Multiple H1 Rule**: If your document has more than one `# Heading 1`, all H1s are numbered (e.g., "1", "2"), and sub-headings follow (e.g., "1.1", "1.2").
-3.  **Structural Integrity**: Even if some headings are not numbered (no `{numbering}` attribute or `numbering=false`), they are still counted in the document structure to ensure consistent numbering for subsequent elements.
+3.  **Structural Integrity**: Even if some headings are not numbered (no `{numbered}` attribute or `numbered=false`), they are still counted in the document structure to ensure consistent numbered for subsequent elements.
 
 Available styles: `decimal` (default), `roman-lower`, `roman-upper`, `alpha-lower`, `alpha-upper`
 
@@ -346,3 +369,13 @@ The parser processes elements in this order:
 2. Blocks `[[...]]` and `:::`
 3. Inline formatting (bold, italic, etc.)
 4. Attributes `{}` applied to the element on the left
+
+### Attribute Syntax Rules
+
+When providing attributes in curly braces `{}`:
+
+- **Key-Value**: `key=value`
+- **Boolean**: `noToc` (equivalent to `noToc=true`)
+- **Quoting**: If a value contains spaces or special characters, it **must** be enclosed in quotes (single or double).
+  - Correct: `{border="1px solid black"}`
+  - Incorrect: `{border=1px solid black}` (this would be parsed as `border=1px`, `solid` and `black` as separate attributes).

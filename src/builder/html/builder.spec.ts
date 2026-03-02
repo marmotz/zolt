@@ -620,57 +620,57 @@ describe('HTMLBuilder', () => {
   });
 
   describe('Heading Numbering', () => {
-    test('should number heading with {numbering} attribute (empty string)', async () => {
+    test('should number heading with {numbered} attribute (empty string)', async () => {
       const node: HeadingNode = {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'Chapter 1' }],
-        attributes: { numbering: '' },
+        attributes: { numbered: '' },
       };
 
       const html = await builder.build(node);
       expect(html).toContain('<span class="zolt-heading-number">1 </span>Chapter 1');
-      expect(html).not.toContain('numbering=""');
+      expect(html).not.toContain('numbered=""');
     });
 
-    test('should number heading with {numbering="true"} attribute', async () => {
+    test('should number heading with {numbered="true"} attribute', async () => {
       const node: HeadingNode = {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'Chapter 1' }],
-        attributes: { numbering: 'true' },
+        attributes: { numbered: 'true' },
       };
 
       const html = await builder.build(node);
       expect(html).toContain('<span class="zolt-heading-number">1 </span>Chapter 1');
-      expect(html).not.toContain('numbering="true"');
+      expect(html).not.toContain('numbered="true"');
     });
 
-    test('should not number heading with {numbering="false"} attribute', async () => {
+    test('should not number heading with {numbered="false"} attribute', async () => {
       const node: HeadingNode = {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'Chapter 1' }],
-        attributes: { numbering: 'false' },
+        attributes: { numbered: 'false' },
       };
 
       const html = await builder.build(node);
       expect(html).not.toContain('zolt-heading-number');
-      expect(html).not.toContain('numbering="false"');
+      expect(html).not.toContain('numbered="false"');
     });
 
-    test('should number nested headings with {numbering}', async () => {
+    test('should number nested headings with {numbered}', async () => {
       const h1: HeadingNode = {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'One' }],
-        attributes: { numbering: '' },
+        attributes: { numbered: '' },
       };
       const h2: HeadingNode = {
         type: 'Heading',
         level: 2,
         children: [{ type: 'Text', content: 'Two' }],
-        attributes: { numbering: '' },
+        attributes: { numbered: '' },
       };
 
       const html1 = await builder.build(h1);
@@ -680,8 +680,8 @@ describe('HTMLBuilder', () => {
       expect(html2).toContain('<span class="zolt-heading-number">1.1 </span>Two');
     });
 
-    test('should number headings globally when $numbering is true', async () => {
-      (builder as any).evaluator.setVariable('numbering', true);
+    test('should number headings globally when $numbered is true', async () => {
+      (builder as any).evaluator.setVariable('numbered', true);
 
       const h1: HeadingNode = {
         type: 'Heading',
@@ -703,8 +703,8 @@ describe('HTMLBuilder', () => {
       expect(html2).toContain('<span class="zolt-heading-number">1.1 </span>Two');
     });
 
-    test('should respect style when $numbering is a style string', async () => {
-      (builder as any).evaluator.setVariable('numbering', 'roman-upper');
+    test('should respect style when $numbered is a style string', async () => {
+      (builder as any).evaluator.setVariable('numbered', 'roman-upper');
 
       const h1: HeadingNode = {
         type: 'Heading',
@@ -717,8 +717,8 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('<span class="zolt-heading-number">I </span>One');
     });
 
-    test('should support mixed numbering styles via comma-separated list', async () => {
-      (builder as any).evaluator.setVariable('numbering', 'decimal, alpha-lower, roman-upper');
+    test('should support mixed numbered styles via comma-separated list', async () => {
+      (builder as any).evaluator.setVariable('numbered', 'decimal, alpha-lower, roman-upper');
 
       const h1: HeadingNode = {
         type: 'Heading',
@@ -748,8 +748,8 @@ describe('HTMLBuilder', () => {
       expect(html3).toContain('<span class="zolt-heading-number">1.a.I </span>Section');
     });
 
-    test('should skip numbering for headings with {numbering=false} even if global numbering is on', async () => {
-      (builder as any).evaluator.setVariable('numbering', true);
+    test('should skip numbered for headings with {numbered=false} even if global numbered is on', async () => {
+      (builder as any).evaluator.setVariable('numbered', true);
 
       const h1: HeadingNode = {
         type: 'Heading',
@@ -761,7 +761,7 @@ describe('HTMLBuilder', () => {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'Two' }],
-        attributes: { numbering: 'false' },
+        attributes: { numbered: 'false' },
       };
       const h3: HeadingNode = {
         type: 'Heading',
@@ -795,7 +795,7 @@ describe('HTMLBuilder', () => {
         type: 'Heading',
         level: 1,
         children: [{ type: 'Text', content: 'The Eighth' }],
-        attributes: { numbering: '' },
+        attributes: { numbered: '' },
       };
 
       const html = await builder.build(h8);
@@ -810,13 +810,13 @@ describe('HTMLBuilder', () => {
             type: 'Heading',
             level: 1,
             children: [{ type: 'Text', content: 'Chapter 1' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
           {
             type: 'Heading',
             level: 1,
             children: [{ type: 'Text', content: 'Chapter 2' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
         ],
       } as DocumentNode;
@@ -838,7 +838,7 @@ describe('HTMLBuilder', () => {
       );
     });
 
-    test('should NOT number single H1 and start numbering from H2', async () => {
+    test('should NOT number single H1 and start numbered from H2', async () => {
       const doc = {
         type: 'Document',
         children: [
@@ -847,13 +847,13 @@ describe('HTMLBuilder', () => {
             type: 'Heading',
             level: 2,
             children: [{ type: 'Text', content: 'Section 1' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
           {
             type: 'Heading',
             level: 2,
             children: [{ type: 'Text', content: 'Section 2' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
         ],
       } as DocumentNode;
@@ -872,13 +872,13 @@ describe('HTMLBuilder', () => {
             type: 'Heading',
             level: 1,
             children: [{ type: 'Text', content: 'Part 1' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
           {
             type: 'Heading',
             level: 1,
             children: [{ type: 'Text', content: 'Part 2' }],
-            attributes: { numbering: '' },
+            attributes: { numbered: '' },
           } as any,
         ],
       } as DocumentNode;
@@ -886,6 +886,69 @@ describe('HTMLBuilder', () => {
       const html = await builder.buildDocument(doc);
       expect(html).toContain('<span class="zolt-heading-number">1 </span>Part 1');
       expect(html).toContain('<span class="zolt-heading-number">2 </span>Part 2');
+    });
+
+    test('should not number heading with noCount attribute', async () => {
+      const doc = {
+        type: 'Document',
+        children: [
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Title' }],
+            attributes: { noCount: '' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 2,
+            children: [{ type: 'Text', content: 'Section 1' }],
+            attributes: { numbered: '' },
+          } as any,
+        ],
+      } as DocumentNode;
+
+      const html = await builder.buildDocument(doc);
+      expect(html).not.toContain('zolt-heading-number">1 </span>Title');
+      expect(html).toContain('<span class="zolt-heading-number">1 </span>Section 1');
+    });
+
+    test('should not show heading in TOC with noToc attribute', async () => {
+      const doc = {
+        type: 'Document',
+        children: [
+          {
+            type: 'DoubleBracketBlock',
+            blockType: 'toc',
+            content: '',
+            attributes: { numbered: 'true' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 1,
+            children: [{ type: 'Text', content: 'Hidden Title' }],
+            attributes: { noToc: '' },
+          } as any,
+          {
+            type: 'Heading',
+            level: 2,
+            children: [{ type: 'Text', content: 'Visible Section' }],
+            attributes: {},
+          } as any,
+          {
+            type: 'Heading',
+            level: 2,
+            children: [{ type: 'Text', content: 'Another Hidden' }],
+            attributes: { numbered: 'roman-upper', noToc: '' },
+          } as any,
+        ],
+      } as DocumentNode;
+
+      const html = await builder.buildDocument(doc);
+      expect(html).not.toContain('Hidden Title</a>');
+      expect(html).toContain('Visible Section</a>');
+      expect(html).not.toContain('Another Hidden</a>');
+      // Consistency: since there is only one H1 (even if noToc), H2 should be numbered "1" in TOC
+      expect(html).toContain('zolt-toc-number">1</span><a href="#visible-section">Visible Section</a>');
     });
   });
 });

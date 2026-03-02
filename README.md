@@ -40,7 +40,7 @@ documentation features. Write in plain text, publish anywhere.
 
 - **Inline styling** - `||text||{attr}` for styled spans
 - **Indentation** - `&` for non sementical text vs `>` for quotes
-- **Numbered headings** - Automatic section numbering with multiple styles
+- **Numbered headings** - Automatic section numbered with multiple styles
 - **Abbreviations** - Tooltip abbreviations
 - **Comments** - Both block `:::comment` and inline `%% %%`
 

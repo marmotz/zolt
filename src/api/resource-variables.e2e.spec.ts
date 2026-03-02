@@ -16,7 +16,7 @@ $alt = "Description"
     const zolt = `
 $url = "https://zolt.marmotz.dev"
 $title = "Go to Example"
-[Link]({$url}){title={$title}}
+[Link]({$url}){title="{$title}"}
     `;
     const html = await buildString(zolt);
     expect(html).toContain('<a href="https://zolt.marmotz.dev" title="Go to Example">Link</a>');

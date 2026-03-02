@@ -9,7 +9,7 @@ lang: en
 toc: true
 theme: professional
 ---
-$numbering = true
+$numbered = true
 
 # Complete File Metadata Example
 
@@ -31,7 +31,7 @@ All commonly used metadata fields.
 
 **Table of Contents:** {{ $toc }}
 
-**Numbering:** {{ $numbering }}
+**Numbering:** {{ $numbered }}
 
 **Theme:** {{ $theme }}
 

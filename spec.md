@@ -58,7 +58,7 @@ Tout élément (titre, image, lien, paragraphe, liste, bloc, texte) peut accepte
 | `{#mon-ancre}`           | Identifiant unique | `Texte avec ancre{#mon-ancre}`      |
 | `{.ma-classe-css}`       | Classes CSS        | `Texte stylé{.ma-classe-css}`       |
 | `{background=soft-blue}` | Couleur de fond    | `Texte surligné{background=yellow}` |
-| `{fontWeight=bold}`     | Poids de police    | `Important{fontWeight=bold}`       |
+| `{fontWeight=bold}`      | Poids de police    | `Important{fontWeight=bold}`        |
 
 Tout élément inline supporte les attributs :
 
@@ -113,49 +113,62 @@ Le Zolt permet de numéroter automatiquement les titres de manière hiérarchiqu
 
 #### Activation Globale
 
-La variable globale `numbering` (généralement dans le frontmatter) permet d'activer la numérotation pour tout le document. Elle accepte :
+La variable globale `numbered` (généralement dans les metadata) permet d'activer la numérotation pour tout le document.
+Elle accepte :
+
 - Un booléen : `true` (décimal par défaut) ou `false`.
 - Le nom d'un style unique : `"roman-upper"`.
 - Une liste de styles séparés par des virgules pour un mélange par niveau : `"decimal, alpha-lower, roman-upper"`.
 
 ```yaml
 ---
-numbering: true           # Active la numérotation décimale (par défaut)
+numbered: true           # Active la numérotation décimale (par défaut)
 # OU
-numbering: "roman-upper"  # Active la numérotation en chiffres romains majuscules
+numbered: "roman-upper"  # Active la numérotation en chiffres romains majuscules
 # OU
-numbering: "decimal, alpha-lower" # Niveau 1: 1, 2; Niveau 2: 1.a, 1.b
+numbered: "decimal, alpha-lower" # Niveau 1: 1, 2; Niveau 2: 1.a, 1.b
 ---
 ```
 
 #### Règle Intelligente du Titre Principal (H1)
 
-Pour éviter que le titre de la page ne vienne polluer la numérotation structurelle, Zolt applique une règle automatique :
+Pour éviter que le titre de la page ne vienne polluer la numérotation structurelle, Zolt applique une règle
+automatique :
 
-1. **H1 unique :** Si le document ne contient qu'**un seul titre `#`**, celui-ci est considéré comme le titre du document et n'est **pas numéroté**. La numérotation commence alors aux titres de niveau 2 (`##`), qui seront numérotés "1", "2", etc.
-2. **H1 multiples :** Si le document contient **plusieurs titres `#`**, ils sont tous numérotés. Le premier `#` devient "1", et ses sous-titres `##` deviennent "1.1", "1.2", etc.
+1. **H1 unique :** Si le document ne contient qu'**un seul titre `#`**, celui-ci est considéré comme le titre du
+   document et n'est **pas numéroté**. La numérotation commence alors aux titres de niveau 2 (`##`), qui seront
+   numérotés "1", "2", etc.
+2. **H1 multiples :** Si le document contient **plusieurs titres `#`**, ils sont tous numérotés. Le premier `#`
+   devient "1", et ses sous-titres `##` deviennent "1.1", "1.2", etc.
 
 #### Activation Locale
 
-L'attribut `{numbering}` sur un titre active la numérotation pour ce titre et sa hiérarchie :
+L'attribut `{numbered}` sur un titre active la numérotation pour ce titre et sa hiérarchie :
 
 ```zolt
 # Mon Document (H1 unique, non numéroté)
-## Introduction {numbering}  # Devient "1. Introduction"
+## Introduction {numbered}  # Devient "1. Introduction"
 ## Concepts                 # Devient "2. Concepts"
 ### Détails                 # Devient "2.1 Détails"
 ```
 
 #### Intégrité Structurelle
 
-Même si un titre n'affiche pas de numéro (parce qu'il n'a pas l'attribut `{numbering}` ou que `numbering=false`), il est **toujours comptabilisé** dans la structure. Cela garantit que les titres numérotés qui suivent conservent une numérotation cohérente avec leur position réelle dans le document.
+Même si un titre n'affiche pas de numéro (parce qu'il n'a pas l'attribut `{numbered}` ou que `numbered=false`), il est *
+*toujours comptabilisé** dans la structure. Cela garantit que les titres numérotés qui suivent conservent une
+numérotation cohérente avec leur position réelle dans le document.
+
+#### Exclusion de la Séquence
+
+L'attribut `{noCount}` permet d'exclure totalement un titre de la numérotation. Il ne sera ni numéroté, ni comptabilisé
+dans la séquence des titres suivants.
 
 #### Désactivation Locale
 
-Pour désactiver la numérotation sur une section spécifique tout en la gardant active globalement :
+Pour désactiver l'affichage du numéro sur une section spécifique tout en la gardant active globalement :
 
 ```zolt
-# Annexe {numbering=false}
+# Annexe {numbered=false}
 ## Code source            # Non numéroté
 ## Ressources             # Non numéroté
 ```
@@ -589,13 +602,13 @@ Contenu du bloc
 
 #### Types Natifs
 
-| Type       | Usage                  |
-|------------|------------------------|
-| `info`     | Informations générales |
-| `warning`  | Avertissements         |
-| `error`    | Erreurs critiques      |
-| `success`  | Confirmations          |
-| `note`     | Notes et remarques     |
+| Type      | Usage                  |
+|-----------|------------------------|
+| `info`    | Informations générales |
+| `warning` | Avertissements         |
+| `error`   | Erreurs critiques      |
+| `success` | Confirmations          |
+| `note`    | Notes et remarques     |
 
 #### Exemples
 
@@ -778,7 +791,7 @@ const html = zolt.parse('# Hello Zolt');
 
 {
 "theme": "dark",
-"numbering": true
+"numbered": true
 }
 
 \```
@@ -938,8 +951,8 @@ Les variables se définissent généralement en haut de fichier.
 $version = "2.4.1"
 $client_name = "Acme Corp"
 $statut = "En cours"
-$numbering = true
-$numberingStyle = "decimal"
+$numbered = true
+$numbered = "decimal"
 
 ```
 
@@ -1249,35 +1262,35 @@ theme: "professional"
 
 Le tableau ci-dessous répertorie les métadonnées reconnues par le moteur Zolt. Les métadonnées inconnues sont ignorées.
 
-| Champ          | Type          | Description                         |
-|----------------|---------------|-------------------------------------|
-| `title`        | string        | Titre du document                   |
-| `author`       | string        | Auteur                              |
-| `date`         | date          | Date de création                    |
-| `version`      | string/number | Version du document                 |
-| `tags`         | array         | Liste de tags                       |
-| `description`  | string        | Description courte                  |
-| `keywords`     | array/string  | Mots-clés pour le SEO               |
-| `robots`       | string        | Instructions robots (ex: "noindex") |
-| `image`        | string        | Image de partage (Open Graph)       |
-| `lang`         | string        | Code langue (fr, en, etc.)          |
-| `toc`          | boolean       | Afficher la TOC automatiquement     |
-| `theme`        | string        | Thème de rendu                      |
-| `colorScheme` | string        | `auto`, `light`, `dark`             |
-| `layout`       | string        | Fichier de mise en page             |
-| `ogTitle`     | string        | Titre Open Graph spécifique         |
-| `ogDescription`| string       | Description Open Graph spécifique   |
-| `ogType`      | string        | Type Open Graph (website, article)  |
-| `ogImageWidth`| number       | Largeur de l'image OG               |
-| `ogImageHeight`| number      | Hauteur de l'image OG               |
-| `twitterSite` | string        | Compte Twitter du site              |
-| `twitterCreator`| string      | Compte Twitter du créateur          |
-| `siteName`    | string        | Nom du site (og:site_name)          |
-| `iconPng`     | string        | Icône PNG (32x32, 96x96, etc.)      |
-| `iconSvg`     | string        | Icône SVG                           |
-| `iconIco`     | string        | Icône ICO                           |
-| `iconApple`   | string        | Apple Touch Icon                    |
-| `manifest`     | string        | Web App Manifest                    |
+| Champ            | Type          | Description                         |
+|------------------|---------------|-------------------------------------|
+| `title`          | string        | Titre du document                   |
+| `author`         | string        | Auteur                              |
+| `date`           | date          | Date de création                    |
+| `version`        | string/number | Version du document                 |
+| `tags`           | array         | Liste de tags                       |
+| `description`    | string        | Description courte                  |
+| `keywords`       | array/string  | Mots-clés pour le SEO               |
+| `robots`         | string        | Instructions robots (ex: "noindex") |
+| `image`          | string        | Image de partage (Open Graph)       |
+| `lang`           | string        | Code langue (fr, en, etc.)          |
+| `toc`            | boolean       | Afficher la TOC automatiquement     |
+| `theme`          | string        | Thème de rendu                      |
+| `colorScheme`    | string        | `auto`, `light`, `dark`             |
+| `layout`         | string        | Fichier de mise en page             |
+| `ogTitle`        | string        | Titre Open Graph spécifique         |
+| `ogDescription`  | string        | Description Open Graph spécifique   |
+| `ogType`         | string        | Type Open Graph (website, article)  |
+| `ogImageWidth`   | number        | Largeur de l'image OG               |
+| `ogImageHeight`  | number        | Hauteur de l'image OG               |
+| `twitterSite`    | string        | Compte Twitter du site              |
+| `twitterCreator` | string        | Compte Twitter du créateur          |
+| `siteName`       | string        | Nom du site (og:site_name)          |
+| `iconPng`        | string        | Icône PNG (32x32, 96x96, etc.)      |
+| `iconSvg`        | string        | Icône SVG                           |
+| `iconIco`        | string        | Icône ICO                           |
+| `iconApple`      | string        | Apple Touch Icon                    |
+| `manifest`       | string        | Web App Manifest                    |
 
 #### Thèmes Disponibles
 
@@ -1875,12 +1888,12 @@ Feb: 120
 :::chart-line {colorScheme=cool title="Évolution" legend=true}
 ```
 
-| Attribut       | Description         |
-|----------------|---------------------|
-| `title`        | Titre du graphique  |
+| Attribut      | Description         |
+|---------------|---------------------|
+| `title`       | Titre du graphique  |
 | `colorScheme` | Palette de couleurs |
-| `legend`       | Afficher la légende |
-| `grid`         | Afficher la grille  |
+| `legend`      | Afficher la légende |
+| `grid`        | Afficher la grille  |
 
 #### Multi-Graphiques
 
@@ -2056,7 +2069,7 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 | **Mathématiques**        | Extension requise    | `$...$` (natif)                        |
 | **Diagrammes**           | Extension requise    | `:::mermaid` (natif)                   |
 | **Graphiques**           | Non supporté         | `:::chart` (natif)                     |
-| **Numérotation titres**  | Non supporté         | `$numbering=true` + `{numbered}`       |
+| **Numérotation titres**  | Non supporté         | `$numbered=true` + `{numbered}`        |
 | **Commentaires**         | `<!-- -->`           | `:::comment` et `%% %%` (natif)        |
 | **Listes de définition** | Non supporté         | `: terme` / `: définition`             |
 | **Liens avancés**        | Basique              | `[text](url){target=_blank}`           |
@@ -2129,7 +2142,7 @@ Cette compatibilité garantit que les fichiers `.md` existants fonctionnent corr
 
 ### 10.3 Numérotation des Titres
 
-- Activer la numérotation globalement avec `$numbering = true` pour les documents structurés
+- Activer la numérotation globalement avec `$numbered = true` pour les documents structurés
 - Utiliser des styles cohérents : `decimal` pour les rapports techniques, `roman-upper` pour les préfaces
 - Désactiver la numérotation pour les annexes et bibliographies avec `{numbered=false}`
 - Éviter de mélanger les styles de numérotation dans un même document
@@ -2287,7 +2300,7 @@ date: { $created }
 version: 2.0
 tags: [ documentation, tutorial, zolt ]
 toc: true
-numbering: true
+numbered: true
 ---
 
 # {$title}
