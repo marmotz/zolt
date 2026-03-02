@@ -231,11 +231,7 @@ export class SpecialBlockVisitor {
     }
 
     const currentDir = path.dirname(this.currentFilePath);
-    const lang = this.evaluator.getVariable('lang') || 'en';
-    const labels = {
-      en: { prev: '← Previous', next: 'Next →' },
-      fr: { prev: '← Précédent', next: 'Suivant →' },
-    }[lang as 'en' | 'fr'] || { prev: '← Previous', next: 'Next →' };
+    const labels = { prev: '← Previous', next: 'Next →' };
 
     let prevHtml = '';
     if (prev) {

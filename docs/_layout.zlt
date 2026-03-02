@@ -16,3 +16,9 @@
 :::content:::
 
 [[filetree-nav]]
+
+:::if {Date.format(Date.now(), "YYYY") > 2026}
+© 2026 - {{ Date.format(Date.now(), 'YYYY') }} {$author}
+:::else
+© 2026 {$author}
+:::

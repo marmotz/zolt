@@ -103,7 +103,7 @@ describe('SpecialBlockVisitor', () => {
       async () => '',
       async () => '',
       () => '',
-      { getVariable: (name: string) => (name === 'lang' ? 'en' : null) },
+      { getVariable: () => null },
       async (text: string) => text,
       [],
       graph as any,
@@ -122,30 +122,6 @@ describe('SpecialBlockVisitor', () => {
     expect(html).toContain('Page 2');
     expect(html).toContain('Previous');
     expect(html).toContain('Next');
-  });
-
-  test('should respect lang variable for filetree-nav', async () => {
-    const graph = [
-      { path: 'index.zlt', absPath: '/root/index.zlt', title: 'Home', children: [] },
-      { path: 'page1.zlt', absPath: '/root/page1.zlt', title: 'Page 1', children: [] },
-    ];
-
-    const visitorFr = new SpecialBlockVisitor(
-      async () => '',
-      async () => '',
-      () => '',
-      { getVariable: (name: string) => (name === 'lang' ? 'fr' : null) },
-      async (text: string) => text,
-      [],
-      graph as any,
-      '/root/page1.zlt'
-    );
-
-    const node: any = { type: 'DoubleBracketBlock', blockType: 'filetree-nav', attributes: {} };
-    const html = await visitorFr.visitDoubleBracketBlock(node);
-
-    expect(html).toContain('Précédent');
-    expect(html).not.toContain('Previous');
   });
 
   test('should handle nested nodes in filetree-nav', async () => {

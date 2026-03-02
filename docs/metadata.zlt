@@ -165,10 +165,6 @@ Automatically generate "Previous" and "Next" links based on your project structu
 
 The navigation links are determined by the order of files in your `[[filetree]]`. This is perfect for multi-page documentation or tutorials.
 
-| Attribute | Description                     | Default |
-|-----------|---------------------------------|---------|
-| `lang`    | Language for labels (`en`, `fr`)| `en`    |
-
 > **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
 
 ## Automatic Variables
