@@ -54,6 +54,7 @@ Zolt comes with powerful features:
 
 - [Syntax Reference](syntax-reference.zlt) — Quick syntax lookup
 - [CLI Commands Reference](cli-commands.zlt) — How to use the CLI
+- [Changelog](changelog.zlt) — Project history and updates
 
 ## Related Resources
 
@@ -89,3 +90,10 @@ This document demonstrates **Zolt** features:
 This is an informational block with native syntax.
 :::
 ```
+
+## Acknowledgments
+
+- Inspired by Markdown and modern documentation tools
+- Powered by [Shiki](https://shiki.style/), [YAML](https://github.com/eemeli/yaml), [KaTeX](https://katex.org/), [Mermaid.js](https://mermaid.js.org/), and [Chart.js](https://www.chartjs.org/)
+- Built for writers, developers, and content creators
+- Designed with ❤️ for the community

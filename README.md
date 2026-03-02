@@ -102,6 +102,12 @@ Contributions are welcome! Please:
 
 ---
 
+## 📜 Changelog
+
+See the [CHANGELOG.md](CHANGELOG.md) file for a detailed list of changes for each version.
+
+---
+
 ## 📄 License
 
 MIT License - see LICENSE file for details
@@ -111,7 +117,7 @@ MIT License - see LICENSE file for details
 ## 🙏 Acknowledgments
 
 - Inspired by Markdown and modern documentation tools
-- Powered by [Shiki](https://shiki.style/), [YAML](https://github.com/eemeli/yaml), and [KaTeX](https://katex.org/)
+- Powered by [Shiki](https://shiki.style/), [YAML](https://github.com/eemeli/yaml), [KaTeX](https://katex.org/), [Mermaid.js](https://mermaid.js.org/), and [Chart.js](https://www.chartjs.org/)
 - Built for writers, developers, and content creators
 - Designed with ❤️ for the community
 
