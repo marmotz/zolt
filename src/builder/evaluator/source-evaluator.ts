@@ -31,7 +31,7 @@ export class SourceEvaluator {
     this.allowLayout = allowLayout;
   }
 
-  evaluate(source: string): string {
+  evaluate(source: string, allowRootLayout = this.allowLayout): string {
     const lines = source.split('\n');
     const result: string[] = [];
     let i = 0;
@@ -50,7 +50,7 @@ export class SourceEvaluator {
     let rootLayout: string | undefined;
 
     // Initial check for layout from project metadata
-    if (this.allowLayout && !this.isLayoutProcessing) {
+    if (allowRootLayout && !this.isLayoutProcessing) {
       const layoutVar = this.evaluator.getVariable('layout');
       if (typeof layoutVar === 'string') {
         rootLayout = layoutVar;
@@ -78,7 +78,7 @@ export class SourceEvaluator {
         this.processMetadata(metadataLines);
 
         // Update root layout if defined in file metadata
-        if (this.allowLayout && !this.isLayoutProcessing) {
+        if (allowRootLayout && !this.isLayoutProcessing) {
           const layoutVar = this.evaluator.getVariable('layout');
           if (typeof layoutVar === 'string') {
             rootLayout = layoutVar;
@@ -117,17 +117,18 @@ export class SourceEvaluator {
       const trimmedProcessed = processedLine.trim();
 
       if (trimmedProcessed.startsWith(':::foreach')) {
-        const { blockLines, nextIndex } = this.collectBlock(lines, i);
-        const blockType = trimmedProcessed.substring(3).trim();
-        const expanded = this.evaluateForeach(blockType, blockLines.join('\n'));
+        const { branches, nextIndex } = this.collectMultipartBlock(lines, i, ['else']);
+        const expanded = this.evaluateForeachMultipart(branches);
         result.push(expanded);
         i = nextIndex;
       } else if (trimmedProcessed.startsWith(':::if')) {
-        const { blockLines, nextIndex } = this.collectBlock(lines, i);
-        const condition = trimmedProcessed.substring(5).trim();
-        if (this.contentProcessor.evaluateCondition(condition)) {
-          result.push(this.evaluate(blockLines.join('\n')));
-        }
+        const { branches, nextIndex } = this.collectMultipartBlock(lines, i, ['elseif', 'else']);
+        const expanded = this.evaluateIfMultipart(branches);
+        result.push(expanded);
+        i = nextIndex;
+      } else if (trimmedProcessed.startsWith(':::elseif') || trimmedProcessed.startsWith(':::else')) {
+        // Discard standalone branching block
+        const { nextIndex } = this.collectMultipartBlock(lines, i, ['elseif', 'else']);
         i = nextIndex;
       } else if (trimmedProcessed.startsWith(':::include')) {
         const rawPath = trimmedProcessed.substring(10).trim();
@@ -142,7 +143,7 @@ export class SourceEvaluator {
         result.push(expanded);
         i++;
       } else if (trimmedProcessed.startsWith(':::comment')) {
-        const { nextIndex } = this.collectBlock(lines, i);
+        const { nextIndex } = this.collectMultipartBlock(lines, i, []);
         i = nextIndex;
       } else {
         // Variable definitions or normal content
@@ -330,8 +331,17 @@ export class SourceEvaluator {
     return null;
   }
 
-  private collectBlock(lines: string[], startIndex: number): { blockLines: string[]; nextIndex: number } {
-    const blockLines: string[] = [];
+  private collectMultipartBlock(
+    lines: string[],
+    startIndex: number,
+    branchKeywords: string[]
+  ): { branches: { keyword: string; content: string[] }[]; nextIndex: number } {
+    const branches: { keyword: string; content: string[] }[] = [];
+
+    const firstLine = lines[startIndex];
+    let currentKeyword = firstLine.trim().substring(3).trim();
+    let currentContent: string[] = [];
+
     let i = startIndex + 1;
     let depth = 1;
 
@@ -339,57 +349,110 @@ export class SourceEvaluator {
       const line = lines[i];
       const trimmed = line.trim();
 
-      if (trimmed.startsWith(':::') && trimmed.length > 3 && !trimmed.startsWith('::::')) {
-        // Only increment depth for blocks that require a matching :::
-        // (if, foreach, details, tabs, etc.)
-        depth++;
-      } else if (trimmed === ':::') {
+      if (trimmed === ':::') {
         depth--;
         if (depth === 0) {
-          break;
+          branches.push({ keyword: currentKeyword, content: currentContent });
+          return { branches, nextIndex: i + 1 };
         }
+        currentContent.push(line);
+      } else if (trimmed.startsWith(':::') && trimmed.length > 3 && !trimmed.startsWith('::::')) {
+        const keywordPart = trimmed.substring(3).trim();
+        const keyword = keywordPart.split(/\s|{/)[0];
+
+        if (depth === 1 && branchKeywords.includes(keyword)) {
+          // New branch at same level
+          branches.push({ keyword: currentKeyword, content: currentContent });
+          currentKeyword = keywordPart;
+          currentContent = [];
+        } else {
+          // If it's a branching keyword but depth > 1, it's nested, treat as normal block starter
+          // If it's a known branching keyword, it doesn't increment depth
+          if (keyword !== 'else' && keyword !== 'elseif') {
+            depth++;
+          }
+          currentContent.push(line);
+        }
+      } else {
+        currentContent.push(line);
       }
-      blockLines.push(line);
       i++;
     }
 
-    return {
-      blockLines,
-      nextIndex: i + 1,
-    };
+    // Unclosed block
+    branches.push({ keyword: currentKeyword, content: currentContent });
+
+    return { branches, nextIndex: i };
   }
 
-  private evaluateForeach(blockType: string, blockContent: string): string {
-    const foreachInfo = this.contentProcessor.parseForeach(blockType);
+  private evaluateIfMultipart(branches: { keyword: string; content: string[] }[]): string {
+    for (let i = 0; i < branches.length; i++) {
+      const branch = branches[i];
+      const kw = branch.keyword.trim();
+
+      if (kw.startsWith('if')) {
+        const condition = kw.substring(2).trim();
+        if (this.contentProcessor.evaluateCondition(condition)) {
+          return this.evaluate(branch.content.join('\n'), false);
+        }
+      } else if (kw.startsWith('elseif')) {
+        const condition = kw.substring(6).trim();
+        if (this.contentProcessor.evaluateCondition(condition)) {
+          return this.evaluate(branch.content.join('\n'), false);
+        }
+      } else if (kw === 'else') {
+        return this.evaluate(branch.content.join('\n'), false);
+      }
+    }
+
+    return '';
+  }
+
+  private evaluateForeachMultipart(branches: { keyword: string; content: string[] }[]): string {
+    const mainBranch = branches[0];
+    const foreachInfo = this.contentProcessor.parseForeach(mainBranch.keyword);
     if (!foreachInfo) {
       return '';
     }
 
     const collection = this.contentProcessor.getCollection(foreachInfo.collection);
-    if (!collection || collection.length === 0) {
-      return '';
+    if (collection && collection.length > 0) {
+      const results: string[] = [];
+
+      for (let i = 0; i < collection.length; i++) {
+        const item = collection[i];
+
+        const childScope = this.evaluator.createChildScope();
+        childScope.setVariable(foreachInfo.iterator, item);
+        childScope.setVariable('foreach', {
+          index: i,
+          index1: i + 1,
+          first: i === 0,
+          last: i === collection.length - 1,
+          even: i % 2 === 0,
+          odd: i % 2 === 1,
+        });
+
+        const childEvaluator = new SourceEvaluator(
+          childScope,
+          this.filePath,
+          this.includeStack,
+          undefined,
+          false,
+          false
+        );
+        results.push(childEvaluator.evaluate(mainBranch.content.join('\n'), false));
+      }
+
+      return results.join('\n');
     }
 
-    const results: string[] = [];
-
-    for (let i = 0; i < collection.length; i++) {
-      const item = collection[i];
-
-      const childScope = this.evaluator.createChildScope();
-      childScope.setVariable(foreachInfo.iterator, item);
-      childScope.setVariable('foreach', {
-        index: i,
-        index1: i + 1,
-        first: i === 0,
-        last: i === collection.length - 1,
-        even: i % 2 === 0,
-        odd: i % 2 === 1,
-      });
-
-      const childEvaluator = new SourceEvaluator(childScope, this.filePath, this.includeStack);
-      results.push(childEvaluator.evaluate(blockContent));
+    // Look for else branch if collection is empty
+    const elseBranch = branches.find((b) => b.keyword.trim() === 'else');
+    if (elseBranch) {
+      return this.evaluate(elseBranch.content.join('\n'), false);
     }
 
-    return results.join('\n');
+    return '';
   }
 }

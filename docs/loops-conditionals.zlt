@@ -1,0 +1,291 @@
+---
+title: "Loops & Conditionals"
+description: "Loops, conditionals, and logical operators in Zolt"
+---
+
+# Loops & Conditionals
+
+Zolt provides powerful advanced features including loops, conditionals, and built-in charts.
+
+## Loops (foreach)
+
+Iterate over arrays to generate dynamic content.
+
+### Basic Loop
+
+```zolt
+$items = ["Apple", "Banana", "Cherry"]
+
+:::foreach {$items as $item}
+- {$item}
+:::
+```
+
+:::info [Result]
+$items = ["Apple", "Banana", "Cherry"]
+
+:::foreach {$items as $item}
+- {$item}
+:::
+:::
+
+### Loop with Else
+
+The `:::else` block is rendered if the collection is empty or doesn't exist.
+
+```zolt
+$items = []
+
+:::foreach {$items as $item}
+- {$item}
+:::else
+No items found.
+:::
+```
+
+:::info [Result]
+$items = []
+
+:::foreach {$items as $item}
+- {$item}
+:::else
+No items found.
+:::
+:::
+
+### Loop with Index
+
+```zolt
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+:::foreach {$products as $product}
+{$foreach.index1}. {$product.name}: ${{$product.price}}
+:::
+```
+
+:::info [Result]
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+:::foreach {$products as $product}
+{$foreach.index1}. {$product.name}: ${{$product.price}}
+:::
+:::
+
+## Loop Variables
+
+Access loop metadata:
+
+| Variable             | Description             |
+|----------------------|-------------------------|
+| `{$foreach.index}`   | Current index (0-based) |
+| `{$foreach.index1}`  | Current index (1-based) |
+| `{$foreach.first}`   | `true` if first element |
+| `{$foreach.last}`    | `true` if last element  |
+| `{$foreach.even}`    | `true` if index is even |
+| `{$foreach.odd}`     | `true` if index is odd  |
+
+### Examples
+
+```zolt
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+:::foreach {$products as $product}
+:::if {$foreach.first}
+- Featured: {$product.name}
+:::elseif {$foreach.last}
+- Last Item: {$product.name}
+:::else
+- {$product.name}
+:::
+:::
+```
+
+:::info [Result]
+$products = [
+  {name: "Laptop", price: 999},
+  {name: "Mouse", price: 29},
+  {name: "Keyboard", price: 79}
+]
+
+:::foreach {$products as $product}
+:::if {$foreach.first}
+- Featured: {$product.name}
+:::elseif {$foreach.last}
+- Last Item: {$product.name}
+:::else
+- {$product.name}
+:::
+:::
+:::
+
+## Conditionals (if)
+
+Display content based on conditions.
+
+### Basic Condition
+
+```zolt
+$enabled = true
+
+:::if {$enabled}
+This shows when enabled is true.
+:::
+```
+
+:::info [Result]
+$enabled = true
+
+:::if {$enabled}
+This shows when enabled is true.
+:::
+:::
+
+### With Else
+
+```zolt
+:::if {$enabled}
+Content A
+:::else
+Content B
+:::
+```
+
+:::info [Result]
+$enabled = false
+
+:::if {$enabled}
+Content A
+:::else
+Content B
+:::
+:::
+
+### With ElseIf
+
+You can chain multiple conditions using `:::elseif`.
+
+```zolt
+$status = "warning"
+
+:::if {$status == "success"}
+Operation successful!
+:::elseif {$status == "warning"}
+Proceed with caution.
+:::else
+An error occurred.
+:::
+```
+
+:::info [Result]
+$status = "warning"
+
+:::if {$status == "success"}
+Operation successful!
+:::elseif {$status == "warning"}
+Proceed with caution.
+:::else
+An error occurred.
+:::
+:::
+
+### Complex Conditions
+
+```zolt
+:::if {$count > 10}
+Many items!
+:::elseif {$count > 0 && $count <= 10}
+Few items.
+:::else
+No items.
+:::
+```
+
+:::info [Result]
+$count = 5
+
+:::if {$count > 10}
+Many items!
+:::elseif {$count > 0 && $count <= 10}
+Few items.
+:::else
+No items.
+:::
+:::
+
+## Logical & Comparison Operators
+
+Zolt supports standard operators for complex conditions and expressions.
+
+### Comparison Operators
+
+| Operator | Description              | Example              |
+|----------|--------------------------|----------------------|
+| `==`     | Equal to                 | `{$count == 10}`     |
+| `!=`     | Not equal to             | `{$role != "admin"}` |
+| `<`      | Less than                | `{$price < 50}`      |
+| `<=`     | Less than or equal to    | `{$age <= 18}`       |
+| `>`      | Greater than             | `{$count > 0}`       |
+| `>=`     | Greater than or equal to | `{$score >= 100}`    |
+
+### Logical Operators
+
+| Operator | Alias | Description | Example                          |
+|----------|-------|-------------|----------------------------------|
+| `!`      | -     | NOT         | `{!$enabled}`                    |
+| `&&`     | `and` | AND         | `{$count > 0 && $count < 10}`    |
+| `||`     | `or`  | OR          | `{$isAdmin || $isEditor}`        |
+
+#### Examples
+
+```zolt
+$count = 5
+$enabled = false
+
+:::if {!$enabled && $count > 0}
+The system is ready but disabled.
+:::
+```
+
+:::info [Result]
+$count = 5
+$enabled = false
+
+:::if {!$enabled && $count > 0}
+The system is ready but disabled.
+:::
+:::
+
+### Ternary Operator
+
+You can use the ternary operator for quick inline choices: `condition ? trueValue : falseValue`.
+
+```zolt
+$isLogged = true
+
+Status: {{ $isLogged ? "Online" : "Offline" }}
+```
+
+:::info [Result]
+$isLogged = true
+
+Status: {{ $isLogged ? "Online" : "Offline" }}
+:::
+
+## Best Practices
+
+1. **Check data** before using in loops
+2. **Use descriptive** variable names
+3. **Limit complexity** in visualizations
+4. **Test conditions** thoroughly

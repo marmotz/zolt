@@ -67,6 +67,75 @@ Visible`;
     expect(result).not.toContain('Hidden content');
   });
 
+  test('should handle elseif and else branches in if blocks', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator);
+
+    const inputA = `
+$val = "A"
+:::if {$val == "A"}
+A
+:::elseif {$val == "B"}
+B
+:::else
+C
+:::`;
+    expect(sourceEvaluator.evaluate(inputA)).toContain('A');
+    expect(sourceEvaluator.evaluate(inputA)).not.toContain('B');
+    expect(sourceEvaluator.evaluate(inputA)).not.toContain('C');
+
+    const inputB = `
+$val = "B"
+:::if {$val == "A"}
+A
+:::elseif {$val == "B"}
+B
+:::else
+C
+:::`;
+    expect(sourceEvaluator.evaluate(inputB)).not.toContain('A');
+    expect(sourceEvaluator.evaluate(inputB)).toContain('B');
+    expect(sourceEvaluator.evaluate(inputB)).not.toContain('C');
+
+    const inputC = `
+$val = "C"
+:::if {$val == "A"}
+A
+:::elseif {$val == "B"}
+B
+:::else
+C
+:::`;
+    expect(sourceEvaluator.evaluate(inputC)).not.toContain('A');
+    expect(sourceEvaluator.evaluate(inputC)).not.toContain('B');
+    expect(sourceEvaluator.evaluate(inputC)).toContain('C');
+  });
+
+  test('should handle else branch in foreach blocks', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator);
+
+    const inputFull = `
+$items = ["apple"]
+:::foreach {$items as $item}
+- {$item}
+:::else
+EMPTY
+:::`;
+    expect(sourceEvaluator.evaluate(inputFull)).toContain('- apple');
+    expect(sourceEvaluator.evaluate(inputFull)).not.toContain('EMPTY');
+
+    const inputEmpty = `
+$items = []
+:::foreach {$items as $item}
+- {$item}
+:::else
+EMPTY
+:::`;
+    expect(sourceEvaluator.evaluate(inputEmpty)).not.toContain('- apple');
+    expect(sourceEvaluator.evaluate(inputEmpty)).toContain('EMPTY');
+  });
+
   test('should evaluate foreach block', () => {
     const evaluator = new ExpressionEvaluator();
     evaluator.setVariable('items', ['apple', 'banana', 'cherry']);

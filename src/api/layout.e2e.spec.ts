@@ -119,4 +119,35 @@ Content here`;
       }
     }
   });
+
+  it('should not apply layout multiple times for conditional blocks', async () => {
+    fs.writeFileSync(layoutPath, '<div class="layout-wrapper">:::content:::</div>');
+
+    const content = `---
+layout: test-layout.zlt
+---
+:::if {true}
+Inside IF
+:::`;
+
+    const html = await buildString(content, { filePath: docPath });
+    const occurrences = (html.match(/layout-wrapper/g) || []).length;
+    expect(occurrences).toBe(1);
+  });
+
+  it('should not apply layout multiple times for foreach blocks', async () => {
+    fs.writeFileSync(layoutPath, '<div class="layout-wrapper">:::content:::</div>');
+
+    const content = `---
+layout: test-layout.zlt
+---
+$items = [1, 2]
+:::foreach {$items as $item}
+Item {$item}
+:::`;
+
+    const html = await buildString(content, { filePath: docPath });
+    const occurrences = (html.match(/layout-wrapper/g) || []).length;
+    expect(occurrences).toBe(1);
+  });
 });

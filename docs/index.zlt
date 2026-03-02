@@ -47,7 +47,7 @@ Zolt comes with powerful features:
 
 - [Variables](variables.zlt) — Reusable content values and data types
 - [Calculations & Functions](calculations.zlt) — Expressions, math, and string functions
-- [Advanced Features](advanced.zlt) — Loops, conditionals, and logical expressions
+- [Loops & Conditionals](loops-conditionals.zlt) — Loops, conditionals, and logical expressions
 - [Metadata](metadata.zlt) — File metadata, themes, and configuration
 
 ## Reference
