@@ -166,39 +166,3 @@ Automatically generate "Previous" and "Next" links based on your project structu
 The navigation links are determined by the order of files in your `[[filetree]]`. This is perfect for multi-page documentation or tutorials.
 
 > **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
-
-## Abbreviations
-
-Define abbreviations for technical terms.
-
-### Inline & Local
-
-```zolt
-HTML{abbr="HyperText Markup Language"}
-
-*[CSS]: Cascading Style Sheets
-```
-
-### Global Definitions
-
-Use double asterisks for project-wide abbreviations:
-
-```zolt
-**[API]: Application Programming Interface
-```
-
-## Footnotes
-
-Add references with footnotes.
-
-```zolt
-This has a footnote[^1].
-
-[^1]: This is the footnote content.
-```
-
-## Next Steps
-
-- [Basic Syntax](basic-syntax.zlt) — Formatting reference
-- [Tables](tables.zlt) — Advanced table features
-- [Index](index.zlt) — Back to documentation index

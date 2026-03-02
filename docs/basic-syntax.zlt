@@ -224,7 +224,7 @@ Create document structure with headings.
 
 ### Heading Attributes
 
-Add IDs, classes, and control numbered or TOC visibility:
+Add IDs, and control numbered or TOC visibility:
 
 ```zolt
 ## Introduction{#intro}
@@ -258,7 +258,6 @@ $numbered = false
 | Attribute     | Description                                                                 |
 |---------------|-----------------------------------------------------------------------------|
 | `id`          | Set a custom HTML ID for the heading (e.g. `{#my-id}`)                      |
-| `class`       | Add a CSS class (e.g. `{.my-class}`)                                        |
 | `numbered`    | Enable numbered for this specific heading, or set a style (`roman-upper`)  |
 | `noCount`     | Exclude this heading from automatic numbered. It won't increment counters. |
 | `noToc`       | Hide this heading from the Table of Contents (`[[toc]]`).                   |
@@ -360,6 +359,52 @@ Available styles: `decimal` (default), `roman-lower`, `roman-upper`, `alpha-lowe
 | `roman-upper` | I, I.I, I.II.I |
 | `alpha-lower` | a, a.a, a.b.a  |
 | `alpha-upper` | A, A.A, A.B.A  |
+
+## Abbreviations
+
+Define abbreviations for technical terms.
+
+### Inline & Local
+
+```zolt
+HTML{abbr="HyperText Markup Language"} & CSS
+
+CSS is stylesheet language
+
+*[CSS]: Cascading Style Sheets
+```
+
+:::info [Result]
+HTML{abbr="HyperText Markup Language"} & CSS
+
+CSS is stylesheet language
+
+*[CSS]: Cascading Style Sheets
+:::
+
+### Global Definitions
+
+Use double asterisks for project-wide abbreviations:
+
+```zolt
+**[API]: Application Programming Interface
+```
+
+## Footnotes
+
+Add references with footnotes.
+
+```zolt
+This has a footnote[^1].
+
+[^1]: This is the footnote content.
+```
+
+:::info [Result]
+This has a footnote[^1].
+
+[^1]: This is the footnote content.
+:::
 
 ## Processing Order
 

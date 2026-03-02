@@ -159,14 +159,14 @@ Apply attributes to list items:
 - Normal item
 - Important item{color=red fontWeight=bold}
 - Highlighted item{background=yellow}
-- Custom styled item{.my-class}
+- Custom styled item
 ```
 
 :::info [Result]
 - Normal item
 - Important item{color=red fontWeight=bold}
 - Highlighted item{background=yellow}
-- Custom styled item{.my-class}
+- Custom styled item
 :::
 
 ## Complex Examples

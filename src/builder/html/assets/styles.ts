@@ -57,6 +57,7 @@ export const BASE_CSS = `
     color: var(--zlt-color-code-text);
     padding: 0.2em 0.4em;
     border-radius: 4px;
+    white-space: pre-wrap;
   }
   pre {
     background: var(--zlt-color-pre-bg);

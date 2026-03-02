@@ -5,165 +5,196 @@ description: "Quick reference guide for Zolt syntax"
 
 # Syntax Reference
 
-This page provides a quick reference for common Zolt syntax patterns.
+This page provides a quick reference for all Zolt syntax patterns.
 
-## Text Formatting
+## Text Formatting & Layout
 
-| Zolt Syntax        | Result                 |
-|--------------------|------------------------|
-| `**bold**`         | **bold**               |
-| `//italic//`       | *italic*               |
-| `__underline__`    | <u>underline</u>       |
-| `~~strikethrough~~`| ~~strikethrough~~      |
-| `^{superscript}`   | <sup>superscript</sup> |
-| `_{subscript}`     | <sub>subscript</sub>   |
-| `==highlight==`    | <mark>highlight</mark> |
+| Zolt Syntax          | Result                 |
+|----------------------|------------------------|
+| `**bold**`           | **bold**               |
+| `//italic//`         | *italic*               |
+| `__underline__`      | <u>underline</u>       |
+| `~~strikethrough~~`  | ~~strikethrough~~      |
+| `^{superscript}`     | <sup>superscript</sup> |
+| `_{subscript}`       | <sub>subscript</sub>   |
+| `==highlight==`      | <mark>highlight</mark> |
+| `%% comment %%`      | (Hidden comment)       |
+| `---`, `***`, `___`  | Horizontal Rule        |
 
-## Headings
+## Headings & Structure
 
 ```zolt
 # Heading 1
-## Heading 2
-### Heading 3
-#### Heading 4
-##### Heading 5
-###### Heading 6
+## Heading 2 {#custom-id}
+### Heading 3 {color=red}
+#### Heading 4 {numbered}
+##### Heading 5 {noToc}
+###### Heading 6 {noCount}
 ```
 
 ## Lists
 
-| Type       | Syntax      |
-|------------|-------------|
-| Bullet     | `- Item`    |
-| Numbered   | `1. Item`   |
-| Task       | `- [ ] Task`|
-| Definition | `: Term`    |
+| Type       | Syntax          | Description            |
+|------------|-----------------|------------------------|
+| Bullet     | `- Item`        | Standard bullet        |
+| Numbered   | `1. Item`       | Auto-incrementing      |
+| Task       | `[ ] Task`      | `[x]` for completed    |
+| Definition | `: Term`        | followed by definition |
+| Plain      | `+ Item`        | No visual marker       |
+| Nested     | `  - Sub-item`  | 2 spaces or 1 tab      |
 
-## Links
+## Links & Media
 
-```zolt
-[Link](url)
-[Link](url){target=_blank}
-[Reference][ref]
+### Links
+- **Inline**: `[Link](url)`
+- **Attributes**: `[Link](url){target=_blank}`
+- **Reference**: `[Link][ref]` (defined via `[ref]: url`)
+- **Anchor**: `[Jump](#heading-id)`
 
-[ref]: url
-```
-
-## Media
-
-| Type  | Syntax                 |
-|-------|------------------------|
-| Image | `![alt](image.jpg)`    |
-| Video | `!![alt](video.mp4)`   |
-| Audio | `??[alt](audio.mp3)`   |
-| Embed | `@@[alt](youtube_url)` |
-| File  | `&&[alt](file.pdf)`    |
+### Media Prefixes
+| Prefix | Type  | Syntax                 |
+|--------|-------|------------------------|
+| `!`    | Image | `![alt](image.jpg)`    |
+| `!!`   | Video | `!![alt](video.mp4)`   |
+| `??`   | Audio | `??[alt](audio.mp3)`   |
+| `&&`   | File  | `&&[alt](file.pdf)`    |
 
 ## Code
 
-```zolt
-`inline code`
+### Inline
+`` `inline code` ``
 
-```language
+### Blocks
+````zolt
+```language {title="file.ext" highlight="1,3-5" start=10}
 code block
 ```
-```
-
-## Attributes
-
-Apply to any element:
-
-```zolt
-Text{color=red}
-![img](img.jpg){w=200}
-## Heading{#id}
-```
-
-## Variables
-
-```zolt
-$name = "value"
-{$name}
-{{ 10 + 5 }}
-```
-
-## Blocks
-
-```zolt
-:::info [Title]
-Content
-:::
-
-:::tabs
-:::tab [Tab]
-Content
-:::
-:::
-```
+````
 
 ## Tables
 
 ```zolt
-[[table]]
-| Header | Header |
-| :---   | :---   |
-| Cell   | Cell   |
+[[table id=my-table]]
+| Header 1 | Header 2 | Header 3 |
+| :---     | :---:    | ---:     |
+| [h] RowH | Cell     | Cell     |
+| [colspan=2] Merged  | Cell     |
+| [rowspan=2] Vertical| Row 1    |
+|                      Row 2    |
 [[/table]]
 ```
 
-## Math
+## Semantic Blocks (:::)
 
+| Type           | Syntax / Example                                              |
+|----------------|---------------------------------------------------------------|
+| **Callouts**   | `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`  |
+| **Accordions** | `:::details [Title]`                                          |
+| **Tabs**       | `:::tabs` containing `:::tab [Title]`                         |
+| **Columns**    | `:::columns` containing `:::column`                           |
+| **Comment**    | `:::comment`                                                  |
+
+## Citations & Indentation
+
+| Type        | Syntax | Description            |
+|-------------|--------|------------------------|
+| Citation    | `> text`| Semantic blockquote    |
+| Indentation | `& text`| Visual nesting (`&&`, `&&&`) |
+
+## Math & Diagrams
+
+### Math (LaTeX)
+- **Inline**: `$ E = mc^2 $`
+- **Block**: `$$ \int x dx $$`
+
+### Diagrams (Mermaid)
 ```zolt
-$inline$
-$$
-block
-$$
+:::mermaid
+graph TD; A-->B;
+:::
 ```
 
-## Common Attributes
+### Native Charts
+```zolt
+:::chart
+:::chart-line {title="Data"}
+Key: Value
+:::
+:::
+```
+(Types: `chart-line`, `chart-bar`, `chart-pie`, `chart-area`)
 
-| Attribute | Example               |
-|-----------|-----------------------|
-| ID        | `{#my-id}`            |
-| Class     | `{.my-class}`         |
-| Color     | `{color=red}`         |
-| Style     | `{background=yellow}` |
-| Width     | `{w=200}`             |
+## Variables & Data
 
-## Escape Characters
+| Type       | Syntax                                |
+|------------|---------------------------------------|
+| **Define** | `$var = "value"`                      |
+| **Global** | `$$globalVar = "value"`               |
+| **Usage**  | `{$var}`                              |
+| **Array**  | `$arr = [1, 2]` -> `{$arr[0]}`         |
+| **Object** | `$obj = {p: "v"}` -> `{$obj.p}`       |
 
-| Syntax | Result |
-|--------|--------|
-| `\[`   | [      |
-| `\{`   | {      |
-| `\*`   | *      |
-| `\\`   | \      |
+## Expressions & Logic
+
+### Calculations
+`{{ 10 + 5 * 2 }}`
+
+### Control Flow
+```zolt
+:::if {$cond}
+...
+:::elseif {$cond}
+...
+:::else
+...
+:::
+
+:::foreach {$items as $item}
+...
+:::
+```
+
+### Logic
+- **Comparison**: `==`, `!=`, `<`, `>`, `<=`, `>=`
+- **Logical**: `&&` (and), `||` (or), `!` (not)
+- **Ternary**: `{{ cond ? true : false }}`
+
+### Namespaces
+Available built-in functions:
+
+| Namespace | Functions |
+|-----------|-----------|
+| **Math**  | `floor(n)`, `ceil(n)`, `round(n)`, `abs(n)`, `pow(b,e)`, `sqrt(n)`, `min(...n)`, `max(...n)` |
+| **String**| `upper(s)`, `lower(s)`, `length(s)`, `trim(s)`, `replace(s,f,r)`, `split(s,sep)`, `join(l,sep)` |
+| **List**  | `length(l)`, `count(l)`, `first(l)`, `last(l)`, `sum(l)`, `avg(l)`, `min(l)`, `max(l)` |
+| **Date**  | `buildTime()`, `format(d,f)`, `parse(s,f?)`, `calc(d,dur)`, `diff(d1,d2,u?)`, `timestamp(d?)` |
+
+Example: `{{ Math.round($n) }}`, `{{ String.upper($name) }}`
+
+## Metadata & Layouts
+
+- **File Header**: YAML between `---` at top of file.
+- **Project**: `zolt.yaml` in root.
+- **Layout**: `layout: "_layout.zlt"` in metadata.
+- **Injection**: `:::content:::` in layout file.
 
 ## Navigation & Tools
 
-| Type       | Syntax            | Description                         |
-|------------|-------------------|-------------------------------------|
-| TOC        | `[[toc]]`         | Table of contents for current page  |
-| File Tree  | `[[filetree]]`    | Project-wide navigation tree        |
-| Nav Links  | `[[filetree-nav]]`| Previous/Next links based on tree   |
+| Component        | Syntax             | Description                |
+|------------------|--------------------|----------------------------|
+| Table of Contents| `[[toc]]`          | Page-level TOC             |
+| File Tree        | `[[filetree]]`     | Project-wide navigation    |
+| Nav Links        | `[[filetree-nav]]` | Prev/Next page links       |
 
-## Footnotes
+## Footnotes & Abbreviations
 
-```zolt
-Text[^1]
+- **Footnote**: `Text[^1]` and `[^1]: Definition`
+- **Abbreviation**: `HTML{abbr="Text"}` or `*[HTML]: Description`
 
-[^1]: Definition
-```
+## Escape Characters
 
-## Abbreviations
-
-```zolt
-HTML{abbr="HyperText Markup Language"}
-
-*[HTML]: HyperText Markup Language
-```
-
-## Next Steps
-
-- [Index](index.zlt) — Back to documentation
-- [Basic Syntax](basic-syntax.zlt) — Full syntax guide
+| Syntax | Result | Syntax | Result |
+|--------|--------|--------|--------|
+| `\[`   | [      | `\*`   | *      |
+| `\{`   | {      | `\\`   | \      |
+| `\|`   | \|     | `\$`   | $      |
