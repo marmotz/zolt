@@ -1,0 +1,56 @@
+---
+title: "Roadmap"
+lang: en
+---
+
+# Zolt Roadmap
+
+This page outlines the planned features and future directions for the **Zolt** project. 
+As Zolt aims to be the high-voltage successor to Markdown, we are focused on expanding its capabilities while maintaining its core principles of readability and power.
+
+## Upcoming Features
+
+### 🎨 Custom Styles & Themes
+We are working on a more robust way to define custom styles and themes. This will allow users to:
+- Define global CSS-like styles within Zolt files.
+- Create and share reusable theme packages.
+- More granular control over element-specific attributes.
+
+### 🧩 Custom Blocks
+Expand the current block system (`:::info`, `:::tabs`, etc.) to allow users to define their own custom blocks.
+- Define custom rendering logic for specific block types.
+- Support for third-party block plugins.
+
+### 📄 PDF & Docx Builds
+Provide native support for exporting Zolt documents directly to professional formats:
+- High-quality PDF generation with customizable layouts.
+- Microsoft Word (.docx) export for collaborative editing in traditional environments.
+
+### 📥 Markdown Import
+A painless migration path for existing Markdown users:
+- Automated conversion from standard Markdown (CommonMark/GitHub Flavored Markdown) to Zolt syntax.
+- Support for bulk conversion of entire documentation repositories.
+
+### 🌐 Language Switch
+Built-in support for multi-language documentation:
+- Easy switching between different language versions of the same document.
+- Localized system strings and metadata.
+
+### 🔍 Search Engine
+A powerful, client-side or server-side search engine specifically optimized for Zolt's structural intelligence:
+- Fast full-text search across entire documentation sets.
+- Respect for Zolt's semantic blocks and metadata.
+
+### 🌓 Theme Switch
+Native support for light and dark mode switching:
+- Automatic detection of system preferences.
+- A toggle UI element for manual overrides.
+- Theme-aware styles for all built-in Zolt components.
+
+---
+
+## Get Involved
+
+Zolt is an open-source project, and we welcome contributions! If you're interested in helping us build any of these features, please check out our [Contributing Guide](contributing.zlt).
+
+You can also follow our progress on [GitHub](https://github.com/marmotz/zolt).
