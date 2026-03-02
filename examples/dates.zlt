@@ -6,16 +6,16 @@ title: "Automatic Dates"
 ## Basic Date Variables
 
 Using automatic date variables:
-- This document was created on: {$created}
-- Last modified: {$modified}
+- This document was created on: {{ Date.buildTime() }}
+- Last modified: {{ Date.buildTime() }}
 
 ## Date Formatting with Date.format()
 
 Use the `Date.format()` function to format dates:
-- **Date only:** {{ Date.format($created, "DD/MM/YYYY") }}
-- **Date and time:** {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
-- **12-hour format:** {{ Date.format($modified, "DD/MM/YYYY hh:mm a") }}
-- **ISO format:** {{ Date.format($created, "YYYY-MM-DD") }}
+- **Date only:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}
+- **Date and time:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY HH:mm") }}
+- **12-hour format:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY hh:mm a") }}
+- **ISO format:** {{ Date.format(Date.buildTime(), "YYYY-MM-DD") }}
 
 ## Format Tokens
 
@@ -61,15 +61,15 @@ If no language is specified, the system's default locale is used.
 
 ### ISO Format
 
-Created: {{ Date.format($created, "YYYY-MM-DD") }}
+Created: {{ Date.format(Date.buildTime(), "YYYY-MM-DD") }}
 
 ### European Format
 
-Created: {{ Date.format($created, "DD/MM/YYYY") }}
+Created: {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}
 
 ### US Format
 
-Created: {{ Date.format($created, "MM/DD/YYYY") }}
+Created: {{ Date.format(Date.buildTime(), "MM/DD/YYYY") }}
 
 ## Practical Examples
 
@@ -77,9 +77,9 @@ Created: {{ Date.format($created, "MM/DD/YYYY") }}
 
 # My Document
 
-**Created:** {{ Date.format($created, "DD/MM/YYYY") }}
+**Created:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}
 
-**Last Updated:** {{ Date.format($modified, "DD/MM/YYYY à HH:mm") }}
+**Last Updated:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY à HH:mm") }}
 
 ### Version History
 
@@ -87,95 +87,95 @@ Created: {{ Date.format($created, "MM/DD/YYYY") }}
 
 | Version | Date                                       | Changes                    |
 |---------|--------------------------------------------|----------------------------|
-| 1.0.0   | {{ Date.format($created, "YYYY-MM-DD") }}  | Initial release            |
-| 1.1.0   | {{ Date.format($modified, "YYYY-MM-DD") }} | Bug fixes and improvements |
+| 1.0.0   | {{ Date.format(Date.buildTime(), "YYYY-MM-DD") }}  | Initial release            |
+| 1.1.0   | {{ Date.format(Date.buildTime(), "YYYY-MM-DD") }} | Bug fixes and improvements |
 
 ### Blog Post
 
 # Post Title
 
-**Published:** {{ Date.format($created, "MMMM DD, YYYY") }}
+**Published:** {{ Date.format(Date.buildTime(), "MMMM DD, YYYY") }}
 
 ### Technical Report
 
-**Report Generated:** {{ Date.format($created, "DD/MM/YYYY HH:mm") }}
+**Report Generated:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY HH:mm") }}
 
 ## Multiple Date Formats in Same Document
 
-- **Short format:** {{ Date.format($created, "DD/MM/YYYY") }}
-- **Full datetime:** {{ Date.format($created, "YYYY-MM-DD HH:mm:ss") }}
-- **Compact:** {{ Date.format($created, "YYYYMMDD") }}
+- **Short format:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}
+- **Full datetime:** {{ Date.format(Date.buildTime(), "YYYY-MM-DD HH:mm:ss") }}
+- **Compact:** {{ Date.format(Date.buildTime(), "YYYYMMDD") }}
 
 ## Combining with Other Functions
 
 ### With String Functions
 
-Compact date: {{ String.replace(Date.format($created, "YYYY-MM-DD"), "-", "") }}
+Compact date: {{ String.replace(Date.format(Date.buildTime(), "YYYY-MM-DD"), "-", "") }}
 
 ### With Math Functions
 
-- Timestamp in milliseconds: {{ Date.msTimestamp($created) }}
-- Timestamp in seconds: {{ Date.timestamp($created) }}
-- Timestamp in minutes: {{ Math.round(Date.timestamp($created) / 60) }}
+- Timestamp in milliseconds: {{ Date.msTimestamp(Date.buildTime()) }}
+- Timestamp in seconds: {{ Date.timestamp(Date.buildTime()) }}
+- Timestamp in minutes: {{ Math.round(Date.timestamp(Date.buildTime()) / 60) }}
 
 ### In Conditional Blocks
 
-:::if {{ Date.timestamp($modified) > Date.timestamp($created) }}
+:::if {{ Date.timestamp(Date.buildTime()) > Date.timestamp(Date.buildTime()) }}
 **This document has been updated since creation.**
 
-Last update: {{ Date.format($modified, "DD/MM/YYYY HH:mm") }}
+Last update: {{ Date.format(Date.buildTime(), "DD/MM/YYYY HH:mm") }}
 :::
 
 ## Use Cases
 
 ### Document Templates
 
-# Meeting Minutes - {{ Date.format($created, "DD Mmmm YYYY") }}
+# Meeting Minutes - {{ Date.format(Date.buildTime(), "DD Mmmm YYYY") }}
 
-**Date:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Date:** {{ Date.format(Date.buildTime(), "DD MMMM YYYY") }}
 
-**Time:** {{ Date.format($created, "HH:mm") }}
+**Time:** {{ Date.format(Date.buildTime(), "HH:mm") }}
 
 ### Changelog
 
 ## Changelog
 
-### Version 1.0.0 ({{ Date.format($created, "YYYY-MM-DD") }})
+### Version 1.0.0 ({{ Date.format(Date.buildTime(), "YYYY-MM-DD") }})
 - Initial release
 - Core features implemented
 
-### Version 1.1.0 ({{ Date.format($modified, "YYYY-MM-DD") }})
+### Version 1.1.0 ({{ Date.format(Date.buildTime(), "YYYY-MM-DD") }})
 - Bug fixes
 - Performance improvements
 
 ### Legal Documents
 
-**Effective Date:** {{ Date.format($created, "Mmmm DD, YYYY") }}
+**Effective Date:** {{ Date.format(Date.buildTime(), "Mmmm DD, YYYY") }}
 
-**Last Updated:** {{ Date.format($modified, "Mmmm DD, YYYY") }}
+**Last Updated:** {{ Date.format(Date.buildTime(), "Mmmm DD, YYYY") }}
 
 ## Date Localization
 
 ### French Format
 $backLang = $lang
 $lang = 'en'
-{{ Date.format(Date.now(), "DD Mmmm YYYY") }}
+{{ Date.format(Date.buildTime(), "DD Mmmm YYYY") }}
 
 ### French Format
 
 $lang = 'fr'
-{{ Date.format(Date.now(), "DD Mmmm YYYY") }}
+{{ Date.format(Date.buildTime(), "DD Mmmm YYYY") }}
 
 ### German Format
 
 $lang = 'de'
-{{ Date.format(Date.now(), "DD Mmmm YYYY") }}
+{{ Date.format(Date.buildTime(), "DD Mmmm YYYY") }}
 
-## Date.now() Function
+## Date.buildTime() Function
 $lang = $backLang
 Get the current date and time:
-- **Current date:** {{ Date.format(Date.now(), "DD/MM/YYYY") }}
-- **Current datetime:** {{ Date.format(Date.now(), "YYYY-MM-DD HH:mm:ss") }}
+- **Current date:** {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}
+- **Current datetime:** {{ Date.format(Date.buildTime(), "YYYY-MM-DD HH:mm:ss") }}
 
 ## Complex Examples
 
@@ -183,21 +183,21 @@ Get the current date and time:
 
 # Release Notes v2.0
 
-**Release Date:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Release Date:** {{ Date.format(Date.buildTime(), "DD MMMM YYYY") }}
 
-This version was released on {{ Date.format($created, "DD/MM/YYYY") }}.
+This version was released on {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}.
 
 ### Event Planning
 
 # Conference Schedule
 
-**Event Date:** {{ Date.format($created, "dddd, MMMM DD, YYYY") }}
+**Event Date:** {{ Date.format(Date.buildTime(), "dddd, MMMM DD, YYYY") }}
 
 ### Academic Paper
 
 # Research Paper
 
-**Submitted:** {{ Date.format($created, "YYYY-MM-DD") }}
+**Submitted:** {{ Date.format(Date.buildTime(), "YYYY-MM-DD") }}
 
 ## Best Practices
 
@@ -207,14 +207,14 @@ Define a variable for repeated formats:
 
 $fmt = "DD/MM/YYYY"
 
-Created: {{ Date.format($created, $fmt) }}
+Created: {{ Date.format(Date.buildTime(), $fmt) }}
 
-Modified: {{ Date.format($modified, $fmt) }}
+Modified: {{ Date.format(Date.buildTime(), $fmt) }}
 
 ### Always Show Both Dates
 
-**Created:** {{ Date.format($created, "DD MMMM YYYY") }}
+**Created:** {{ Date.format(Date.buildTime(), "DD MMMM YYYY") }}
 
-**Last modified:** {{ Date.format($modified, "DD MMMM YYYY 'at' HH:mm") }}
+**Last modified:** {{ Date.format(Date.buildTime(), "DD MMMM YYYY 'at' HH:mm") }}
 
 [← Back to Examples Index](index.zlt)

@@ -61,17 +61,17 @@ describe('InlineParser', () => {
     });
 
     test('should parse italic with expression immediately after opening delimiter', () => {
-      const nodes = parser.parse('//{{ Date.format($modified, "DD/MM/YYYY") }}//');
+      const nodes = parser.parse('//{{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}//');
       expect(nodes).toHaveLength(1);
       expect(nodes[0].type).toBe('Italic');
-      expect(getFlatContent(nodes[0])).toContain('Date.format($modified, "DD/MM/YYYY")');
+      expect(getFlatContent(nodes[0])).toContain('Date.format(Date.buildTime(), "DD/MM/YYYY")');
     });
 
     test('should parse italic with expression followed immediately by closing delimiter', () => {
-      const nodes = parser.parse('//Last updated: {{ Date.format($modified, "DD/MM/YYYY") }}//');
+      const nodes = parser.parse('//Last updated: {{ Date.format(Date.buildTime(), "DD/MM/YYYY") }}//');
       expect(nodes).toHaveLength(1);
       expect(nodes[0].type).toBe('Italic');
-      expect(getFlatContent(nodes[0])).toContain('Date.format($modified, "DD/MM/YYYY")');
+      expect(getFlatContent(nodes[0])).toContain('Date.format(Date.buildTime(), "DD/MM/YYYY")');
     });
 
     test('should parse italic with URL-like content', () => {

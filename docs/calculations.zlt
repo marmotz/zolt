@@ -157,58 +157,58 @@ The `String` namespace provides functions for string manipulation.
 
 The `Date` namespace provides functions for date and time operations.
 
-| Function                | Arguments                        | Return   | Description                                                               |
-| :---------------------- | :------------------------------- | :------- | :------------------------------------------------------------------------ |
-| `Date.now()`            | None                             | `number` | Returns the current timestamp in milliseconds.                            |
-| `Date.format(d, f)`     | `d: date/str, f: string`         | `string` | Formats a date according to the provided format string.                   |
-| `Date.parse(s, f?)`     | `s: string, f: string?`          | `date`   | Parses a string into a Date object (optionally using a format).           |
-| `Date.calc(d, dur)`     | `d: date, dur: object`           | `date`   | Adds/subtracts time from a date (e.g., `{days: 1}`).                      |
-| `Date.diff(d1, d2, u?)` | `d1: date, d2: date, u: string?` | `number` | Returns the difference between two dates in the specified unit.           |
-| `Date.timestamp(d?)`    | `d: date?`                       | `number` | Returns the Unix timestamp (seconds) for a date or now.                   |
-| `Date.msTimestamp(d?)`  | `d: date?`                       | `number` | Returns the timestamp (milliseconds) for a date or now.                   |
+| Function                | Arguments                          | Return   | Description                                                     |
+| :---------------------- | :--------------------------------- | :------- | :---------------------------------------------------------------|
+| `Date.buildTime()`      | None                               | `number` | Returns the generation timestamp in milliseconds.               |
+| `Date.format(d, f)`     | `d: timestamp/date/str, f: string` | `string` | Formats a date according to the provided format string.         |
+| `Date.parse(s, f?)`     | `s: string, f: string?`            | `date`   | Parses a string into a Date object (optionally using a format). |
+| `Date.calc(d, dur)`     | `d: date, dur: object`             | `date`   | Adds/subtracts time from a date (e.g., `{days: 1}`).            |
+| `Date.diff(d1, d2, u?)` | `d1: date, d2: date, u: string?`   | `number` | Returns the difference between two dates in the specified unit. |
+| `Date.timestamp(d?)`    | `d: date?`                         | `number` | Returns the Unix timestamp (seconds) for a date or now.         |
+| `Date.msTimestamp(d?)`  | `d: date?`                         | `number` | Returns the timestamp (milliseconds) for a date or now.         |
 
 #### Format Tokens
 
 Available format tokens:
 
-| Token  | Description                 | Example                               |
-| :----- | :-------------------------- | :------------------------------------ |
-| `D`    | Day (1-2 digits)            | {{ Date.format(Date.now(), 'D') }}    |
-| `DD`   | Day (2 digits)              | {{ Date.format(Date.now(), 'DD') }}   |
-| `ddd`  | Day name (short)            | {{ Date.format(Date.now(), 'ddd') }}  |
-| `Ddd`  | Day name (short, Capital)   | {{ Date.format(Date.now(), 'Ddd') }}  |
-| `DDD`  | Day name (short, Uppercase) | {{ Date.format(Date.now(), 'DDD') }}  |
-| `dddd` | Day name (full)             | {{ Date.format(Date.now(), 'dddd') }} |
-| `Dddd` | Day name (full, Capital)    | {{ Date.format(Date.now(), 'Dddd') }} |
-| `DDDD` | Day name (full, Uppercase)  | {{ Date.format(Date.now(), 'DDDD') }} |
-| `M`    | Month (1-2 digits)          | {{ Date.format(Date.now(), 'M') }}    |
-| `MM`   | Month (2 digits)            | {{ Date.format(Date.now(), 'MM') }}   |
-| `mmm`  | Month name (short)          | {{ Date.format(Date.now(), 'mmm') }}  |
-| `Mmm`  | Month name (short, Capital) | {{ Date.format(Date.now(), 'Mmm') }}  |
-| `MMM`  | Month name (short, Upper)   | {{ Date.format(Date.now(), 'MMM') }}  |
-| `mmmm` | Month name (full)           | {{ Date.format(Date.now(), 'mmmm') }} |
-| `Mmmm` | Month name (full, Capital)  | {{ Date.format(Date.now(), 'Mmmm') }} |
-| `MMMM` | Month name (full, Upper)    | {{ Date.format(Date.now(), 'MMMM') }} |
-| `YY`   | Year (2 digits)             | {{ Date.format(Date.now(), 'YY') }}   |
-| `YYYY` | Year (4 digits)             | {{ Date.format(Date.now(), 'YYYY') }} |
-| `h`    | Hour (12h, 1-12)            | {{ Date.format(Date.now(), 'h') }}    |
-| `H`    | Hour (24h, 0-23)            | {{ Date.format(Date.now(), 'H') }}    |
-| `hh`   | Hour (12h, 01-12)           | {{ Date.format(Date.now(), 'hh') }}   |
-| `HH`   | Hour (24h, 00-23)           | {{ Date.format(Date.now(), 'HH') }}   |
-| `a`    | am/pm (lowercase)           | {{ Date.format(Date.now(), 'a') }}    |
-| `A`    | AM/PM (uppercase)           | {{ Date.format(Date.now(), 'A') }}    |
-| `m`    | Minutes (0-59)              | {{ Date.format(Date.now(), 'm') }}    |
-| `mm`   | Minutes (00-59)             | {{ Date.format(Date.now(), 'mm') }}   |
-| `s`    | Seconds (0-59)              | {{ Date.format(Date.now(), 's') }}    |
-| `ss`   | Seconds (00-59)             | {{ Date.format(Date.now(), 'ss') }}   |
-| `sss`  | Milliseconds (000-999)      | {{ Date.format(Date.now(), 'sss') }}  |
+| Token  | Description                 | Example                                     |
+| :----- | :-------------------------- | :------------------------------------------ |
+| `D`    | Day (1-2 digits)            | {{ Date.format(Date.buildTime(), 'D') }}    |
+| `DD`   | Day (2 digits)              | {{ Date.format(Date.buildTime(), 'DD') }}   |
+| `ddd`  | Day name (short)            | {{ Date.format(Date.buildTime(), 'ddd') }}  |
+| `Ddd`  | Day name (short, Capital)   | {{ Date.format(Date.buildTime(), 'Ddd') }}  |
+| `DDD`  | Day name (short, Uppercase) | {{ Date.format(Date.buildTime(), 'DDD') }}  |
+| `dddd` | Day name (full)             | {{ Date.format(Date.buildTime(), 'dddd') }} |
+| `Dddd` | Day name (full, Capital)    | {{ Date.format(Date.buildTime(), 'Dddd') }} |
+| `DDDD` | Day name (full, Uppercase)  | {{ Date.format(Date.buildTime(), 'DDDD') }} |
+| `M`    | Month (1-2 digits)          | {{ Date.format(Date.buildTime(), 'M') }}    |
+| `MM`   | Month (2 digits)            | {{ Date.format(Date.buildTime(), 'MM') }}   |
+| `mmm`  | Month name (short)          | {{ Date.format(Date.buildTime(), 'mmm') }}  |
+| `Mmm`  | Month name (short, Capital) | {{ Date.format(Date.buildTime(), 'Mmm') }}  |
+| `MMM`  | Month name (short, Upper)   | {{ Date.format(Date.buildTime(), 'MMM') }}  |
+| `mmmm` | Month name (full)           | {{ Date.format(Date.buildTime(), 'mmmm') }} |
+| `Mmmm` | Month name (full, Capital)  | {{ Date.format(Date.buildTime(), 'Mmmm') }} |
+| `MMMM` | Month name (full, Upper)    | {{ Date.format(Date.buildTime(), 'MMMM') }} |
+| `YY`   | Year (2 digits)             | {{ Date.format(Date.buildTime(), 'YY') }}   |
+| `YYYY` | Year (4 digits)             | {{ Date.format(Date.buildTime(), 'YYYY') }} |
+| `h`    | Hour (12h, 1-12)            | {{ Date.format(Date.buildTime(), 'h') }}    |
+| `H`    | Hour (24h, 0-23)            | {{ Date.format(Date.buildTime(), 'H') }}    |
+| `hh`   | Hour (12h, 01-12)           | {{ Date.format(Date.buildTime(), 'hh') }}   |
+| `HH`   | Hour (24h, 00-23)           | {{ Date.format(Date.buildTime(), 'HH') }}   |
+| `a`    | am/pm (lowercase)           | {{ Date.format(Date.buildTime(), 'a') }}    |
+| `A`    | AM/PM (uppercase)           | {{ Date.format(Date.buildTime(), 'A') }}    |
+| `m`    | Minutes (0-59)              | {{ Date.format(Date.buildTime(), 'm') }}    |
+| `mm`   | Minutes (00-59)             | {{ Date.format(Date.buildTime(), 'mm') }}   |
+| `s`    | Seconds (0-59)              | {{ Date.format(Date.buildTime(), 's') }}    |
+| `ss`   | Seconds (00-59)             | {{ Date.format(Date.buildTime(), 'ss') }}   |
+| `sss`  | Milliseconds (000-999)      | {{ Date.format(Date.buildTime(), 'sss') }}  |
 
 #### Examples
 
 ```zolt
 $created = "2024-01-01"
 
-+ Date.now() = {{ Date.now() }}
++ Date.buildTime() = {{ Date.buildTime() }}
 + Date.format($created, "DD/MM/YYYY") = {{ Date.format($created, "DD/MM/YYYY") }}
 + Date.timestamp($created) = {{ Date.timestamp($created) }}
 + Date.msTimestamp($created) = {{ Date.msTimestamp($created) }}
@@ -217,7 +217,7 @@ $created = "2024-01-01"
 :::info [Result]
 $created = "2024-01-01"
 
-+ Date.now() = {{ Date.now() }}
++ Date.buildTime() = {{ Date.buildTime() }}
 + Date.format($created, "DD/MM/YYYY") = {{ Date.format($created, "DD/MM/YYYY") }}
 + Date.timestamp($created) = {{ Date.timestamp($created) }}
 + Date.msTimestamp($created) = {{ Date.msTimestamp($created) }}

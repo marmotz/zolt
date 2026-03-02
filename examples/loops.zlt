@@ -166,7 +166,7 @@ $users = [
 **Email:** {$user.email}
 
 :::if {$foreach.last}
-//Last updated: {{ Date.format($modified, "DD/MM/YYYY HH:mm:ss") }}//
+//Last updated: {{ Date.format(Date.buildTime(), "DD/MM/YYYY HH:mm:ss") }}//
 :::
 :::
 

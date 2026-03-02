@@ -9,7 +9,7 @@
 
 :::sidebar-footer
 + Zolt v{$version}
-+ Last update : {{ Date.format(Date.now(), "DD/MM/YYYY HH:mm:ss") }}
++ Last update : {{ Date.format(Date.buildTime(), "DD/MM/YYYY HH:mm:ss") }}
 :::
 :::
 
@@ -17,8 +17,8 @@
 
 [[filetree-nav]]
 
-:::if {Date.format(Date.now(), "YYYY") > 2026}
-© 2026 - {{ Date.format(Date.now(), 'YYYY') }} {$author}
+:::if {Date.format(Date.buildTime(), "YYYY") > 2026}
+© 2026 - {{ Date.format(Date.buildTime(), 'YYYY') }} {$author}
 :::else
 © 2026 {$author}
 :::

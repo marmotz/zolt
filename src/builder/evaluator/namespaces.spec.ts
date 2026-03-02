@@ -109,8 +109,8 @@ describe('ExpressionEvaluator - Namespaces', () => {
   });
 
   describe('Date Namespace', () => {
-    test('Date.now', () => {
-      expect(typeof evaluator.evaluate('Date.now()')).toBe('number');
+    test('Date.buildTime', () => {
+      expect(typeof evaluator.evaluate('Date.buildTime()')).toBe('number');
     });
 
     test('Date.format', () => {

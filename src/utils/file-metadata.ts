@@ -1,10 +1,5 @@
 import { parse as parseYaml } from 'yaml';
 
-export interface FileMetadata {
-  created: Date;
-  modified: Date;
-}
-
 export const KNOWN_METADATA_KEYS = new Set([
   'title',
   'author',
@@ -39,13 +34,6 @@ export const KNOWN_METADATA_KEYS = new Set([
   'twitterSite',
   'twitterCreator',
 ]);
-
-export function createFileDateVariables(metadata: FileMetadata): { created: string; modified: string } {
-  return {
-    created: metadata.created.toISOString(),
-    modified: metadata.modified.toISOString(),
-  };
-}
 
 export const FileMetadataUtils = {
   parse(content: string): Record<string, unknown> {

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { unlink, writeFile } from 'node:fs/promises';
-import { buildFileToString, buildString } from './index';
+import { buildString } from './index';
 
 describe('API: Date Namespace', () => {
   const testFilePath = '/tmp/test-dates.zlt';
@@ -75,8 +75,8 @@ describe('API: Date Namespace', () => {
   });
 
   describe('Timestamps', () => {
-    test('Date.now() should return current timestamp', async () => {
-      const html = await buildString('Now: {{ Date.now() }}');
+    test('Date.buildTime() should return current timestamp', async () => {
+      const html = await buildString('Now: {{ Date.buildTime() }}');
       expect(html).toMatch(/Now: \d+/);
     });
 
@@ -88,25 +88,6 @@ describe('API: Date Namespace', () => {
     test('Date.msTimestamp() should return milliseconds', async () => {
       const html = await buildString('MS: {{ Date.msTimestamp("2026-02-25T14:30:00Z") }}');
       expect(html).toMatch(/MS: \d{13}/);
-    });
-  });
-
-  describe('Integration with File Metadata', () => {
-    test('should format $created and $modified variables', async () => {
-      await writeFile(
-        testFilePath,
-        'Created: {{ Date.format($created, "YYYY-MM-DD") }}\nModified: {{ Date.format($modified, "HH:mm") }}'
-      );
-      const html = await buildFileToString(testFilePath);
-
-      expect(html).toMatch(/Created: \d{4}-\d{2}-\d{2}/);
-      expect(html).toMatch(/Modified: \d{2}:\d{2}/);
-    });
-
-    test('Date.timestamp($created) should work', async () => {
-      await writeFile(testFilePath, 'TS: {{ Date.timestamp($created) }}');
-      const html = await buildFileToString(testFilePath);
-      expect(html).toMatch(/TS: \d{10}/);
     });
   });
 

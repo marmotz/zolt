@@ -660,7 +660,7 @@ export class ExpressionEvaluator {
 
         return this.calculateDiff(date1, date2, unit);
       }
-      case 'now':
+      case 'buildTime':
         return Date.now();
       case 'timestamp': {
         const dateValue = args[0];

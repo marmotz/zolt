@@ -554,8 +554,8 @@ describe('HTMLBuilder', () => {
 
   test('should process italic with date format containing slashes', async () => {
     const localBuilder = new HTMLBuilder();
-    (localBuilder as any).evaluator.setVariable('modified', '2023-05-20');
-    const html = await localBuilder.processInline('//Date: {{ Date.format($modified, "DD/MM/YYYY") }}//');
+    (localBuilder as any).evaluator.setVariable('myDate', '2023-05-20');
+    const html = await localBuilder.processInline('//Date: {{ Date.format($myDate, "DD/MM/YYYY") }}//');
     expect(html).toContain('<em>Date: 20/05/2023</em>');
   });
 

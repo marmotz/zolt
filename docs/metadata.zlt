@@ -167,23 +167,6 @@ The navigation links are determined by the order of files in your `[[filetree]]`
 
 > **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
 
-## Automatic Variables
-
-Zolt provides automatic variables that you can use anywhere:
-
-| Variable      | Description                      |
-|---------------|----------------------------------|
-| `{$created}`  | File creation date (ISO 8601)    |
-| `{$modified}` | Last modification date (ISO 8601)|
-
-### Formatting Dates
-
-```zolt
-Created: {{ Date.format($created, "DD/MM/YYYY") }}
-```
-
-See [Variables & Calculations](variables.zlt) for a full list of available date functions.
-
 ## Abbreviations
 
 Define abbreviations for technical terms.

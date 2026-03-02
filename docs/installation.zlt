@@ -132,7 +132,7 @@ This is a **bold** statement and this is //italic//.
 Zolt is awesome!
 :::
 
-Current date: {$created}
+Current date: {{ Date.buildTime() }}
 ```
 
 Then build it:
