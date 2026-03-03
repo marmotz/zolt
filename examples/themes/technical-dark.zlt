@@ -1,6 +1,0 @@
----
-title: "Zolt Theme: Technical (Dark)"
-theme: "technical"
-colorScheme: "dark"
----
-{{include _template.zlt}}

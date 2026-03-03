@@ -1,6 +1,0 @@
----
-title: "Zolt Theme: Playful (Auto)"
-theme: "playful"
-colorScheme: "auto"
----
-{{include _template.zlt}}
