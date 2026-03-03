@@ -48,7 +48,7 @@ if (!newVersion) {
   process.exit(1);
 }
 
-const confirmVersion = prompt(`Update all files to version ${newVersion}? (y/N)`, 'n');
+const confirmVersion = prompt(`\nUpdate all files to version ${newVersion}? (y/N)`, 'n');
 if (confirmVersion?.toLowerCase() !== 'y') {
   console.log('Aborted.');
   process.exit(1);
@@ -82,9 +82,9 @@ try {
 console.log('✅ Files updated.');
 
 // 4. Commit
-const confirmCommit = prompt(`Commit changes with message "chore: release v${newVersion}"? (y/N)`, 'n');
+const confirmCommit = prompt(`\nCommit changes with message "chore: release v${newVersion}"? (y/N)`, 'n');
 if (confirmCommit?.toLowerCase() === 'y') {
-  execSync('git add package.json docs/zolt.yaml README.md');
+  execSync('git add package.json docs/zolt.yaml README.md CHANGELOG.md');
   execSync(`git commit -m "chore: release v${newVersion}"`);
   console.log('✅ Committed.');
 } else {
@@ -93,7 +93,7 @@ if (confirmCommit?.toLowerCase() === 'y') {
 }
 
 // 5. Push Commit
-const confirmPush = prompt('Push commit to remote? (y/N)', 'n');
+const confirmPush = prompt('\nPush commit to remote? (y/N)', 'n');
 if (confirmPush?.toLowerCase() === 'y') {
   try {
     execSync('git push');
@@ -106,7 +106,7 @@ if (confirmPush?.toLowerCase() === 'y') {
 }
 
 // 6. Tag
-const confirmTag = prompt(`Create git tag v${newVersion}? (y/N)`, 'n');
+const confirmTag = prompt(`\nCreate git tag v${newVersion}? (y/N)`, 'n');
 if (confirmTag?.toLowerCase() === 'y') {
   execSync(`git tag v${newVersion}`);
   console.log('✅ Tag created.');
@@ -116,7 +116,7 @@ if (confirmTag?.toLowerCase() === 'y') {
 }
 
 // 7. Push Tag
-const confirmPushTag = prompt(`Push tag v${newVersion} to remote? (y/N)`, 'n');
+const confirmPushTag = prompt(`\nPush tag v${newVersion} to remote? (y/N)`, 'n');
 if (confirmPushTag?.toLowerCase() === 'y') {
   try {
     execSync('git push --tags');
