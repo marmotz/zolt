@@ -1,0 +1,6 @@
+---
+title: "Zolt Theme: Playful (Light)"
+theme: "playful"
+colorScheme: "light"
+---
+{{include _template.zlt}}

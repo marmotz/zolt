@@ -50,20 +50,20 @@ By {$author}
 
 ## Supported Fields
 
-| Field         | Type         | Description                                                  |
-|---------------|--------------|--------------------------------------------------------------|
-| `title`       | string       | Document title                                               |
-| `author`      | string       | Author name                                                  |
-| `date`        | date         | Creation date                                                |
-| `version`     | string/number| Document version                                             |
-| `tags`        | array        | List of tags                                                 |
-| `description` | string       | Short description                                            |
-| `keywords`    | array/string | SEO keywords                                                 |
-| `lang`        | string       | Language code                                                |
-| `theme`       | string       | Theme name (`default`, `professional`, `technical`, `playful`)|
-| `colorScheme` | string       | `auto`, `light`, or `dark`                                   |
-| `layout`      | string       | Path to a layout file (e.g., `_layout.zlt`)                  |
-| `toc`         | boolean      | Auto-generate TOC                                            |
+| Field         | Type         | Description                                                    |
+|---------------|--------------|----------------------------------------------------------------|
+| `title`       | string       | Document title                                                 |
+| `author`      | string       | Author name                                                    |
+| `date`        | date         | Creation date                                                  |
+| `version`     | string/number| Document version                                               |
+| `tags`        | array        | List of tags                                                   |
+| `description` | string       | Short description                                              |
+| `keywords`    | array/string | SEO keywords                                                   |
+| `lang`        | string       | Language code                                                  |
+| `theme`       | string       | Theme name (`default`, `professional`, `technical`, `playful`) |
+| `colorScheme` | string       | `auto`, `light`, or `dark`                                     |
+| `layout`      | string       | Path to a layout file (e.g., `_layout.zlt`)                    |
+| `toc`         | boolean      | Auto-generate TOC                                              |
 
 ## Layouts & Templates
 
@@ -166,3 +166,14 @@ Automatically generate "Previous" and "Next" links based on your project structu
 The navigation links are determined by the order of files in your `[[filetree]]`. This is perfect for multi-page documentation or tutorials.
 
 > **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
+
+## Built-in Themes
+
+Zolt includes several built-in themes that automatically adapt to your color preferences. You can also force a specific mode via file metadata.
+
+| 🎨 **Default**      | [Auto](themes/default-auto.zlt)      | [Light](themes/default-light.zlt)      | [Dark](themes/default-dark.zlt)      |
+| 👔 **Professional** | [Auto](themes/professional-auto.zlt) | [Light](themes/professional-light.zlt) | [Dark](themes/professional-dark.zlt) |
+| 💻 **Technical**    | [Auto](themes/technical-auto.zlt)    | [Light](themes/technical-light.zlt)    | [Dark](themes/technical-dark.zlt)   |
+| 🚀 **Playful**      | [Auto](themes/playful-auto.zlt)      | [Light](themes/playful-light.zlt)      | [Dark](themes/playful-dark.zlt)      |
+
+
