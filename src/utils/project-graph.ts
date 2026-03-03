@@ -65,15 +65,14 @@ export class ProjectGraphBuilder {
     const processedPaths = new Set<string>();
     processedPaths.add(this.entryPoint);
 
-    const nodes = this.scanNodes(this.entryPoint, processedPaths);
-    nodes.unshift({
+    const rootNode: ProjectNode = {
       path: path.relative(entryDir, this.entryPoint),
       absPath: this.entryPoint,
       title: entryTitle,
-      children: [],
-    });
+      children: this.scanNodes(this.entryPoint, processedPaths),
+    };
 
-    return nodes;
+    return [rootNode];
   }
 
   private scanNodes(currentPath: string, processedPaths: Set<string>): ProjectNode[] {

@@ -45,7 +45,7 @@ export function getExpandedContent(
   content: string,
   options?: BuildOptions,
   extraVariables?: Record<string, unknown>
-): { content: string; variables: Record<string, unknown> } {
+): { content: string; variables: Record<string, unknown>; includedFiles: string[] } {
   const initialVariables: Record<string, unknown> = {
     ...options?.projectMetadata,
     ...options?.variables,
@@ -64,6 +64,7 @@ export function getExpandedContent(
   return {
     content: expandedContent,
     variables: evaluator.getAllVariables(),
+    includedFiles: Array.from(sourceEvaluator.getIncludedFiles()),
   };
 }
 
@@ -157,13 +158,13 @@ export function extractAllAssets(
   filePath?: string
 ): { zltLinks: string[]; otherAssets: string[] } {
   // Expansion is needed to find assets inside includes/layouts
-  const { content: expandedContent } = getExpandedContent(content, { projectMetadata, filePath });
+  const { content: expandedContent, includedFiles } = getExpandedContent(content, { projectMetadata, filePath });
   const lexer = new Lexer(expandedContent);
   const tokens = lexer.tokenize();
   const parser = new Parser(tokens, filePath);
   const ast = parser.parse();
 
-  const zltLinks: string[] = [];
+  const zltLinks: string[] = [...includedFiles];
   const otherAssets: string[] = [];
 
   const bubblingFileExists = (dir: string, fileName: string): boolean => {
@@ -294,7 +295,7 @@ export function extractZltLinks(content: string, projectMetadata?: Record<string
 
 export async function getLinkedFiles(inputPath: string, projectMetadata?: Record<string, unknown>): Promise<string[]> {
   const content = await readFile(inputPath, 'utf-8');
-  const { zltLinks } = extractAllAssets(content, projectMetadata);
+  const { zltLinks } = extractAllAssets(content, projectMetadata, inputPath);
 
   return zltLinks;
 }

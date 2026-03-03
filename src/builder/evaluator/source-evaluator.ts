@@ -13,6 +13,7 @@ export class SourceEvaluator {
   private isLayoutProcessing: boolean;
   private allowLayout: boolean;
   private readonly MAX_INCLUDE_DEPTH = 10;
+  private includedFiles: Set<string>;
 
   constructor(
     evaluator: ExpressionEvaluator,
@@ -20,7 +21,8 @@ export class SourceEvaluator {
     includeStack: string[] = [],
     contentToInject?: string,
     isLayoutProcessing: boolean = false,
-    allowLayout: boolean = false
+    allowLayout: boolean = false,
+    includedFiles: Set<string> = new Set()
   ) {
     this.evaluator = evaluator;
     this.contentProcessor = new ContentProcessor(evaluator);
@@ -29,6 +31,11 @@ export class SourceEvaluator {
     this.contentToInject = contentToInject;
     this.isLayoutProcessing = isLayoutProcessing;
     this.allowLayout = allowLayout;
+    this.includedFiles = includedFiles;
+  }
+
+  public getIncludedFiles(): Set<string> {
+    return this.includedFiles;
   }
 
   evaluate(source: string, allowRootLayout = this.allowLayout): string {
@@ -186,6 +193,8 @@ export class SourceEvaluator {
       return `${metadata}:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
     }
 
+    this.includedFiles.add(targetPath);
+
     try {
       const layoutContent = fs.readFileSync(targetPath, 'utf8');
 
@@ -195,7 +204,8 @@ export class SourceEvaluator {
         currentIncludeStack,
         contentToInject,
         true,
-        false
+        false,
+        this.includedFiles
       );
       const expandedLayout = layoutEvaluator.evaluate(layoutContent);
 
@@ -291,6 +301,8 @@ export class SourceEvaluator {
       return `:::error Included file not found: ${includePath}:::`;
     }
 
+    this.includedFiles.add(targetPath);
+
     if (currentIncludeStack.includes(targetPath)) {
       return `:::error Circular inclusion detected: ${includePath}:::`;
     }
@@ -303,7 +315,8 @@ export class SourceEvaluator {
         currentIncludeStack,
         undefined,
         false,
-        false
+        false,
+        this.includedFiles
       );
 
       return childEvaluator.evaluate(content);

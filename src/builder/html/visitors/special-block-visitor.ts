@@ -275,9 +275,9 @@ export class SpecialBlockVisitor {
       return '<div class="zolt-filetree-error">Project graph not available. Please specify an entry point.</div>';
     }
 
-    const from = parseInt(node.attributes?.from || '0', 10) || 0;
-    const to = parseInt(node.attributes?.to || '99', 10) || 99;
-    const depth = parseInt(node.attributes?.depth || '99', 10) || 99;
+    const from = node.attributes?.from !== undefined ? parseInt(node.attributes.from, 10) : 0;
+    const to = node.attributes?.to !== undefined ? parseInt(node.attributes.to, 10) : 99;
+    const depth = node.attributes?.depth !== undefined ? parseInt(node.attributes.depth, 10) : 99;
     const numbered =
       node.attributes?.numbered === 'true' ||
       (node.attributes && Object.hasOwn(node.attributes, 'numbered') && node.attributes.numbered === '') ||
@@ -431,7 +431,7 @@ export class SpecialBlockVisitor {
       }
     }
 
-    if (node.children.length > 0 && currentDepth < to && currentDepth + 1 < maxDepth) {
+    if (node.children.length > 0 && currentDepth < to && currentDepth < maxDepth) {
       const childrenHtmlParts = [];
       for (const child of node.children) {
         childrenHtmlParts.push(

@@ -29,8 +29,8 @@ describe('ProjectGraphBuilder', () => {
     expect(graph).not.toBeNull();
     // Use basename if title metadata is missing
     expect(graph![0].title).toBe('index');
-    expect(graph![0].children.length).toBe(0); // Current implementation puts siblings instead of children
-    expect(graph!.some((n) => n.title === 'page1')).toBe(true);
+    expect(graph![0].children.length).toBe(1);
+    expect(graph![0].children[0].title).toBe('page1');
   });
 
   test('should extract title from metadata', () => {
