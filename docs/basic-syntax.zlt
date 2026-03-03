@@ -11,15 +11,15 @@ This guide covers the fundamental text formatting and typography features in Zol
 
 Zolt supports several inline text formatting options:
 
-| Symbol             | Rendered               | Description                                                     |
-|--------------------|------------------------|-----------------------------------------------------------------|
-| `**bold**`         | **bold**               | Bold text                                                       |
-| `//text//`         | //italic//             | Italic text                                                     |
-| `underline`        | <u>underline</u>       | Native underline                                                |
-| `~~strikethrough~~`| ~~strikethrough~~      | Strikethrough text                                              |
-| `^{superscript}`   | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}}   |
-| `_{subscript}`     | this is _{subscript}   | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}}     |
-| `==highlight==`    | ==highlight==          | Native highlight                                                |
+| Symbol              | Rendered               | Description                                                   |
+|---------------------|------------------------|---------------------------------------------------------------|
+| `**bold**`          | **bold**               | Bold text                                                     |
+| `//text//`          | //italic//             | Italic text                                                   |
+| `underline`         | <u>underline</u>       | Native underline                                              |
+| `~~strikethrough~~` | ~~strikethrough~~      | Strikethrough text                                            |
+| `^{superscript}`    | this is ^{superscript} | Superscript \n Supports nesting : `2^{3^{4}}` gives 2^{3^{4}} |
+| `_{subscript}`      | this is _{subscript}   | Subscript \n Supports nesting : `2_{3_{4}}` gives 2_{3_{4}}   |
+| `==highlight==`     | ==highlight==          | Native highlight                                              |
 
 ## Inline Styles
 
@@ -51,15 +51,15 @@ This is ||bold and blue||{fontWeight=bold color=blue}.
 
 ### Common Attributes
 
-| Attribute      | Description      | Example                       |
-|----------------|------------------|-------------------------------|
-| `color`        | Text color       | `{color=red}`                 |
-| `background`   | Background color | `{background=yellow}`         |
-| `fontWeight`   | Font weight      | `{fontWeight=bold}`           |
-| `fontSize`     | Font size        | `{fontSize=1.5em}`            |
-| `fontStyle`    | Font style       | `{fontStyle=italic}`          |
-| `border`       | Border           | `{border="1px solid black"}`  |
-| `borderRadius` | Border radius    | `{borderRadius=10px}`         |
+| Attribute      | Description      | Example                      |
+|----------------|------------------|------------------------------|
+| `color`        | Text color       | `{color=red}`                |
+| `background`   | Background color | `{background=yellow}`        |
+| `fontWeight`   | Font weight      | `{fontWeight=bold}`          |
+| `fontSize`     | Font size        | `{fontSize=1.5em}`           |
+| `fontStyle`    | Font style       | `{fontStyle=italic}`         |
+| `border`       | Border           | `{border="1px solid black"}` |
+| `borderRadius` | Border radius    | `{borderRadius=10px}`        |
 
 ### Practical Examples
 
@@ -85,14 +85,14 @@ Display literal special characters using the backslash `\` character.
 
 ### Common Escapes
 
-| Syntax         | Result                |
-|----------------|-----------------------|
-| `\[text]`      | [text]                |
-| `\{text}`      | {text}                |
-| `\|\|text\|\|` | \|\|text\|\|          |
-| `\-`           | - (not a list item)   |
-| `\.`           | . (not a list)        |
-| `\\`           | \ (literal backslash) |
+| Syntax                                            | Result                |     |       |     |     |
+|---------------------------------------------------|-----------------------|-----|-------|-----|-----|
+| `\[text]`                                         | [text]                |     |       |     |     |
+| `\{text}`                                         | {text}                |     |       |     |     |
+| `\        | \                     | text\ | \ | ` | \                     | \   | text\ | \   |     |
+| `\-`                                              | - (not a list item)   |     |       |     |     |
+| `\.`                                              | . (not a list)        |     |       |     |     |
+| `\\`                                              | \ (literal backslash) |     |       |     |     |
 
 ### Examples
 
@@ -158,6 +158,64 @@ in the output.
 After
 :::
 
+## Universal Attribute System
+
+Zolt features a unique attribute system that allows you to apply styles and properties to almost **any element** in your document. Attributes are defined in curly braces `{}` immediately following the element.
+
+### Supported Elements
+
+| Element       | Example                             |
+|:--------------|:------------------------------------|
+| **Paragraph** | `This is a paragraph. {color=blue}` |
+| **List**      | `- Item {fontWeight=bold}`          |
+| **Citation**  | `> Important quote. {color=gray}`   |
+| **Heading**   | `## Title {#custom-id}`             |
+| **Image**     | `![alt](img.jpg) {width=200}`       |
+| **Rule**      | `--- {color=red}`                   |
+
+### Common Attributes
+
+| Attribute    | Description       | Example               |
+|:-------------|:------------------|:----------------------|
+| `id`         | Unique identifier | `{#my-id}`            |
+| `color`      | Text color        | `{color=red}`         |
+| `background` | Background color  | `{background=yellow}` |
+| `fontWeight` | Font weight       | `{fontWeight=bold}`   |
+| `fontSize`   | Font size         | `{fontSize=1.5em}`    |
+| `fontStyle`  | Font style        | `{fontStyle=italic}`  |
+| `width`      | Element width     | `{width=50%}`         |
+| `align`      | Alignment         | `{align=center}`      |
+
+## File Inclusions
+
+You can split your documentation into multiple files and include them using the `{{include}}` directive. This is perfect for reusable headers, footers, or shared configuration.
+
+> **Tip**: If you want to define a consistent global structure (like sidebars and navigation) for all your pages, check out [Layouts & Templates](metadata.zlt#layouts--templates).
+
+### Syntax
+
+```zolt
+{{include path/to/file.zlt}}
+```
+
+The content of the specified file is inserted exactly at the location of the `{{include}}` directive.
+
+### Examples
+
+```zolt
+{{include header.zlt}}
+
+# Main Content
+
+{{include footer.zlt}}
+```
+
+### Features
+
+1. **Relative Paths**: Use relative paths (e.g., `../shared/header.zlt`).
+2. **Variable Inheritance**: Included files have access to all variables defined in the parent file.
+3. **Recursion Protection**: Zolt prevents infinite loops and limits inclusion depth for safety.
+
 ## Horizontal Rules
 
 Create visual separators between sections.
@@ -180,7 +238,9 @@ ___
 ___
 :::
 
-### With Attributes
+### Customization
+
+Customize rules with attributes like `color`, `style`, `width`, and `align`.
 
 ```zolt
 --- {color=red style=dashed}
@@ -255,12 +315,12 @@ $numbered = true
 
 $numbered = false
 
-| Attribute     | Description                                                                 |
-|---------------|-----------------------------------------------------------------------------|
-| `id`          | Set a custom HTML ID for the heading (e.g. `{#my-id}`)                      |
-| `numbered`    | Enable numbered for this specific heading, or set a style (`roman-upper`)  |
-| `noCount`     | Exclude this heading from automatic numbered. It won't increment counters. |
-| `noToc`       | Hide this heading from the Table of Contents (`[[toc]]`).                   |
+| Attribute  | Description                                                                |
+|------------|----------------------------------------------------------------------------|
+| `id`       | Set a custom HTML ID for the heading (e.g. `{#my-id}`)                     |
+| `numbered` | Enable numbered for this specific heading, or set a style (`roman-upper`)  |
+| `noCount`  | Exclude this heading from automatic numbered. It won't increment counters. |
+| `noToc`    | Hide this heading from the Table of Contents (`[[toc]]`).                  |
 
 ### Automatic Numbering
 
@@ -272,15 +332,9 @@ numbered: true
 ---
 ```
 
-You can also specify a style directly:
+#### Mixed Styles
 
-```zolt
----
-numbered: "roman-upper"
----
-```
-
-Or even a **mixed style** for each level using a comma-separated list:
+You can specify a **mixed style** for each level using a comma-separated list:
 
 ```zolt
 ---
@@ -289,58 +343,6 @@ numbered: "decimal, alpha-lower, roman-upper"
 ```
 
 In this case, the first level headings will be `1`, the second level `1.a`, the third level `1.a.I`, etc. If there are more levels than styles, the last style in the list is used for all remaining levels.
-
-#### Selective Numbering
-
-You can toggle numbered mid-document by changing the `$numbered` variable:
-
-```zolt
-# Unnumbered Section
-
-$numbered = true
-
-## Numbered Subsection
-
-$numbered = "alpha-lower"
-
-## Subsection with different style
-
-$numbered = "decimal, alpha-lower, roman-upper"
-
-## Subsections with different style for each (decimal.alpha-lower)
-
-### Sub-Subsections with decimal.alpha.ROMAN
-
-#### Sub-Sub-Subsections with decimal.alpha.ROMAN.ROMAN
-
-$numbered = false
-
-## Another Unnumbered Section
-```
-
-:::info [Result]
-# Unnumbered Section {noToc}
-
-$numbered = true
-
-## Numbered Subsection {noToc}
-
-$numbered = "alpha-lower"
-
-## Subsection with different style {noToc}
-
-$numbered = "decimal, alpha-lower, roman-upper"
-
-## Subsections with different style for each (decimal.alpha-lower) {noToc}
-
-### Sub-Subsections with decimal.alpha.ROMAN {noToc}
-
-#### Sub-Sub-Subsections with decimal.alpha.ROMAN.ROMAN {noToc}
-
-$numbered = false
-
-## Another Unnumbered Section {noToc}
-:::
 
 #### Numbering Rules
 

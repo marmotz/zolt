@@ -382,6 +382,46 @@ Important sidebar information.
 :::
 :::
 
+## Sidebars
+
+Create a sidebar for navigation, metadata, or extra content. Sidebars are typically used in layouts (`_layout.zlt`) to provide a consistent interface across multiple pages.
+
+### Basic Syntax
+
+```zolt
+:::sidebar
+:::sidebar-header
+# Site Title
+:::
+
+:::sidebar-content
+[[filetree]]
+:::
+
+:::sidebar-footer
+© 2026 Author
+:::
+:::
+```
+
+### Attributes
+
+| Attribute | Description                            | Default |
+|:----------|:---------------------------------------|:--------|
+| `side`    | Side of the screen (`left` or `right`) | `left`  |
+
+```zolt {title="Right Sidebar"}
+:::sidebar {side=right}
+...
+:::
+```
+
+### Sidebar Components
+
+*   **`:::sidebar-header`**: Top section. Includes a built-in mobile toggle button and close button.
+*   **`:::sidebar-content`**: Main scrollable area for links or navigation.
+*   **`:::sidebar-footer`**: Bottom section for copyright or secondary links.
+
 ## Best Practices
 
 1. **Use appropriate types** for callouts (warning vs error)

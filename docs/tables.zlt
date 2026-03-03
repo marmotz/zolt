@@ -24,7 +24,7 @@ You can create a table simply by using pipes `|` and separators. This is the fas
 
 :::info [Result]
 | Column 1 | Column 2 | Column 3 |
-| :------- | :------- | :------- |
+|:---------|:---------|:---------|
 | Data 1   | Data 2   | Data 3   |
 | Data 4   | Data 5   | Data 6   |
 :::
@@ -45,7 +45,7 @@ Wrapping your table in `[[table]]` and `[[/table]]` is useful when you need to a
 :::info [Result]
 [[table id=my-table]]
 | Column 1 | Column 2 | Column 3 |
-| :------- | :------- | :------- |
+|:---------|:---------|:---------|
 | Data 1   | Data 2   | Data 3   |
 | Data 4   | Data 5   | Data 6   |
 [[/table]]
@@ -63,10 +63,10 @@ Mark header cells with `[h]`. Unlike standard Markdown which only supports heade
 ```
 
 :::info [Result]
-| Name      | Age     | City     |
-| :-------- | :------ | :------- |
-| [h] Alice | 30      | New York |
-| [h] Bob   | 25      | London   |
+| Name      | Age | City     |
+|:----------|:----|:---------|
+| [h] Alice | 30  | New York |
+| [h] Bob   | 25  | London   |
 :::
 
 ## Cell Alignment
@@ -89,9 +89,9 @@ Control alignment with colon position in the separator row:
 ```
 
 :::info [Result]
-| Left     | Center   | Right    |
-| :------- | :------: | -------: |
-| Data     | Data     | Data     |
+| Left | Center | Right |
+|:-----|:------:|------:|
+| Data | Data   | Data  |
 :::
 
 ## Cell Merging
@@ -106,10 +106,10 @@ Control alignment with colon position in the separator row:
 ```
 
 :::info [Result]
-| Header                  | Header      | Header      |
-| :---------------------- | :---------- | ----------- |
-| [colspan=2] Merged Cell | Simple cell |             |
-| Cell 1                  | Cell 2      | Cell 3      |
+| Header                  | Header      | Header |
+|:------------------------|:------------|--------|
+| [colspan=2] Merged Cell | Simple cell |        |
+| Cell 1                  | Cell 2      | Cell 3 |
 :::
 
 ### Vertical Merge (rowspan)
@@ -123,11 +123,11 @@ Control alignment with colon position in the separator row:
 ```
 
 :::info [Result]
-| Header              | Header |
-| :------------------ | :----- |
-| [rowspan=2] Merged  | Row 1  |
-|                       Row 2  |
-| Normal              | Row 3  |
+| Header             | Header |
+|:-------------------|:-------|
+| [rowspan=2] Merged | Row 1  |
+| Row 2              |        |
+| Normal             | Row 3  |
 :::
 
 ## Complex Example
@@ -145,12 +145,12 @@ Control alignment with colon position in the separator row:
 
 :::info [Result]
 [[table id=sales]]
-| Category                | Q1     | Q2     | Q3     | Q4     |
-| :---------------------- | :----: | :----: | :----: | :----: |
-| [rowspan=2] Electronics | $50K   | $60K   | $70K   | $80K   |
-|                           45%    | 50%    | 55%    | 60%    |
-| Clothing                | $30K   | $35K   | $40K   | $45K   |
-| [h] Total               | $80K   | $95K   | $110K  | $125K  |
+| Category                | Q1   | Q2   | Q3    | Q4    |
+|:------------------------|:----:|:----:|:-----:|:-----:|
+| [rowspan=2] Electronics | $50K | $60K | $70K  | $80K  |
+| 45%                     | 50%  | 55%  | 60%   |       |
+| Clothing                | $30K | $35K | $40K  | $45K  |
+| [h] Total               | $80K | $95K | $110K | $125K |
 [[/table]]
 :::
 

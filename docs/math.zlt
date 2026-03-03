@@ -89,7 +89,7 @@ $$
 ### Operations
 
 | Symbol      | LaTeX         | Example       |
-| ----------- | ------------- | ------------- |
+|-------------|---------------|---------------|
 | Fraction    | `\frac{a}{b}` | $\frac{a}{b}$ |
 | Square root | `\sqrt{x}`    | $\sqrt{x}$    |
 | nth root    | `\sqrt[n]{x}` | $\sqrt[n]{x}$ |
@@ -99,7 +99,7 @@ $$
 ### Greek Letters
 
 | Lowercase  | LaTeX      | Uppercase  | LaTeX      |
-| ---------- | ---------- | ---------- | ---------- |
+|------------|------------|------------|------------|
 | $\alpha$   | `\alpha`   | $\Alpha$   | `\Alpha`   |
 | $\beta$    | `\beta`    | $\Beta$    | `\Beta`    |
 | $\gamma$   | `\gamma`   | $\Gamma$   | `\Gamma`   |
@@ -116,7 +116,7 @@ $$
 ### Relations
 
 | Symbol | LaTeX     |
-| ------ | --------- |
+|--------|-----------|
 | ≠      | `\neq`    |
 | ≤      | `\leq`    |
 | ≥      | `\geq`    |
@@ -131,7 +131,7 @@ $$
 ### Calculus
 
 | Symbol | LaTeX      |
-| ------ | ---------- |
+|--------|------------|
 | ∫      | `\int`     |
 | ∮      | `\oint`    |
 | ∂      | `\partial` |
@@ -144,7 +144,7 @@ $$
 ### Trigonometry
 
 | Function | Identity                                     | LaTeX                                        |
-| :------- | :------------------------------------------- | :------------------------------------------- |
+|:---------|:---------------------------------------------|:---------------------------------------------|
 | Sine     | $\sin^2\theta + \cos^2\theta = 1$            | `\sin^2\theta + \cos^2\theta = 1`            |
 | Tangent  | $\tan\theta = \frac{\sin\theta}{\cos\theta}$ | `\tan\theta = \frac{\sin\theta}{\cos\theta}` |
 

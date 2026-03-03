@@ -9,17 +9,17 @@ This page provides a quick reference for all Zolt syntax patterns.
 
 ## Text Formatting & Layout
 
-| Zolt Syntax          | Result                 |
-|----------------------|------------------------|
-| `**bold**`           | **bold**               |
-| `//italic//`         | *italic*               |
-| `__underline__`      | <u>underline</u>       |
-| `~~strikethrough~~`  | ~~strikethrough~~      |
-| `^{superscript}`     | <sup>superscript</sup> |
-| `_{subscript}`       | <sub>subscript</sub>   |
-| `==highlight==`      | <mark>highlight</mark> |
-| `%% comment %%`      | (Hidden comment)       |
-| `---`, `***`, `___`  | Horizontal Rule        |
+| Zolt Syntax         | Result                 |
+|---------------------|------------------------|
+| `**bold**`          | **bold**               |
+| `//italic//`        | *italic*               |
+| `__underline__`     | <u>underline</u>       |
+| `~~strikethrough~~` | ~~strikethrough~~      |
+| `^{superscript}`    | <sup>superscript</sup> |
+| `_{subscript}`      | <sub>subscript</sub>   |
+| `==highlight==`     | <mark>highlight</mark> |
+| `%% comment %%`     | (Hidden comment)       |
+| `---`, `***`, `___` | Horizontal Rule        |
 
 ## Headings & Structure
 
@@ -34,14 +34,14 @@ This page provides a quick reference for all Zolt syntax patterns.
 
 ## Lists
 
-| Type       | Syntax          | Description            |
-|------------|-----------------|------------------------|
-| Bullet     | `- Item`        | Standard bullet        |
-| Numbered   | `1. Item`       | Auto-incrementing      |
-| Task       | `[ ] Task`      | `[x]` for completed    |
-| Definition | `: Term`        | followed by definition |
-| Plain      | `+ Item`        | No visual marker       |
-| Nested     | `  - Sub-item`  | 2 spaces or 1 tab      |
+| Type       | Syntax         | Description            |
+|------------|----------------|------------------------|
+| Bullet     | `- Item`       | Standard bullet        |
+| Numbered   | `1. Item`      | Auto-incrementing      |
+| Task       | `[ ] Task`     | `[x]` for completed    |
+| Definition | `: Term`       | followed by definition |
+| Plain      | `+ Item`       | No visual marker       |
+| Nested     | `  - Sub-item` | 2 spaces or 1 tab      |
 
 ## Links & Media
 
@@ -52,12 +52,12 @@ This page provides a quick reference for all Zolt syntax patterns.
 - **Anchor**: `[Jump](#heading-id)`
 
 ### Media Prefixes
-| Prefix | Type  | Syntax                 |
-|--------|-------|------------------------|
-| `!`    | Image | `![alt](image.jpg)`    |
-| `!!`   | Video | `!![alt](video.mp4)`   |
-| `??`   | Audio | `??[alt](audio.mp3)`   |
-| `&&`   | File  | `&&[alt](file.pdf)`    |
+| Prefix | Type  | Syntax               |
+|--------|-------|----------------------|
+| `!`    | Image | `![alt](image.jpg)`  |
+| `!!`   | Video | `!![alt](video.mp4)` |
+| `??`   | Audio | `??[alt](audio.mp3)` |
+| `&&`   | File  | `&&[alt](file.pdf)`  |
 
 ## Code
 
@@ -86,20 +86,20 @@ code block
 
 ## Semantic Blocks (:::)
 
-| Type           | Syntax / Example                                              |
-|----------------|---------------------------------------------------------------|
-| **Callouts**   | `:::info`, `:::warning`, `:::error`, `:::success`, `:::note`  |
-| **Accordions** | `:::details [Title]`                                          |
-| **Tabs**       | `:::tabs` containing `:::tab [Title]`                         |
-| **Columns**    | `:::columns` containing `:::column`                           |
-| **Comment**    | `:::comment`                                                  |
+| Type           | Syntax / Example                                             |
+|----------------|--------------------------------------------------------------|
+| **Callouts**   | `:::info`, `:::warning`, `:::error`, `:::success`, `:::note` |
+| **Accordions** | `:::details [Title]`                                         |
+| **Tabs**       | `:::tabs` containing `:::tab [Title]`                        |
+| **Columns**    | `:::columns` containing `:::column`                          |
+| **Comment**    | `:::comment`                                                 |
 
 ## Citations & Indentation
 
-| Type        | Syntax | Description            |
-|-------------|--------|------------------------|
-| Citation    | `> text`| Semantic blockquote    |
-| Indentation | `& text`| Visual nesting (`&&`, `&&&`) |
+| Type        | Syntax   | Description                  |
+|-------------|----------|------------------------------|
+| Citation    | `> text` | Semantic blockquote          |
+| Indentation | `& text` | Visual nesting (`&&`, `&&&`) |
 
 ## Math & Diagrams
 
@@ -126,13 +126,13 @@ Key: Value
 
 ## Variables & Data
 
-| Type       | Syntax                                |
-|------------|---------------------------------------|
-| **Define** | `$var = "value"`                      |
-| **Global** | `$$globalVar = "value"`               |
-| **Usage**  | `{$var}`                              |
-| **Array**  | `$arr = [1, 2]` -> `{$arr[0]}`         |
-| **Object** | `$obj = {p: "v"}` -> `{$obj.p}`       |
+| Type       | Syntax                          |
+|------------|---------------------------------|
+| **Define** | `$var = "value"`                |
+| **Global** | `$$globalVar = "value"`         |
+| **Usage**  | `{$var}`                        |
+| **Array**  | `$arr = [1, 2]` -> `{$arr[0]}`  |
+| **Object** | `$obj = {p: "v"}` -> `{$obj.p}` |
 
 ## Expressions & Logic
 
@@ -162,12 +162,12 @@ Key: Value
 ### Namespaces
 Available built-in functions:
 
-| Namespace | Functions |
-|-----------|-----------|
-| **Math**  | `floor(n)`, `ceil(n)`, `round(n)`, `abs(n)`, `pow(b,e)`, `sqrt(n)`, `min(...n)`, `max(...n)` |
-| **String**| `upper(s)`, `lower(s)`, `length(s)`, `trim(s)`, `replace(s,f,r)`, `split(s,sep)`, `join(l,sep)` |
-| **List**  | `length(l)`, `count(l)`, `first(l)`, `last(l)`, `sum(l)`, `avg(l)`, `min(l)`, `max(l)` |
-| **Date**  | `buildTime()`, `format(d,f)`, `parse(s,f?)`, `calc(d,dur)`, `diff(d1,d2,u?)`, `timestamp(d?)` |
+| Namespace  | Functions                                                                                       |
+|------------|-------------------------------------------------------------------------------------------------|
+| **Math**   | `floor(n)`, `ceil(n)`, `round(n)`, `abs(n)`, `pow(b,e)`, `sqrt(n)`, `min(...n)`, `max(...n)`    |
+| **String** | `upper(s)`, `lower(s)`, `length(s)`, `trim(s)`, `replace(s,f,r)`, `split(s,sep)`, `join(l,sep)` |
+| **List**   | `length(l)`, `count(l)`, `first(l)`, `last(l)`, `sum(l)`, `avg(l)`, `min(l)`, `max(l)`          |
+| **Date**   | `buildTime()`, `format(d,f)`, `parse(s,f?)`, `calc(d,dur)`, `diff(d1,d2,u?)`, `timestamp(d?)`   |
 
 Example: `{{ Math.round($n) }}`, `{{ String.upper($name) }}`
 
@@ -180,11 +180,11 @@ Example: `{{ Math.round($n) }}`, `{{ String.upper($name) }}`
 
 ## Navigation & Tools
 
-| Component        | Syntax             | Description                |
-|------------------|--------------------|----------------------------|
-| Table of Contents| `[[toc]]`          | Page-level TOC             |
-| File Tree        | `[[filetree]]`     | Project-wide navigation    |
-| Nav Links        | `[[filetree-nav]]` | Prev/Next page links       |
+| Component         | Syntax             | Description             |
+|-------------------|--------------------|-------------------------|
+| Table of Contents | `[[toc]]`          | Page-level TOC          |
+| File Tree         | `[[filetree]]`     | Project-wide navigation |
+| Nav Links         | `[[filetree-nav]]` | Prev/Next page links    |
 
 ## Footnotes & Abbreviations
 
@@ -193,8 +193,8 @@ Example: `{{ Math.round($n) }}`, `{{ String.upper($name) }}`
 
 ## Escape Characters
 
-| Syntax | Result | Syntax | Result |
-|--------|--------|--------|--------|
-| `\[`   | [      | `\*`   | *      |
-| `\{`   | {      | `\\`   | \      |
-| `\|`   | \|     | `\$`   | $      |
+| Syntax     | Result | Syntax | Result |     |
+|------------|--------|--------|--------|-----|
+| `\[`       | [      | `\*`   | *      |     |
+| `\{`       | {      | `\\`   | \      |     |
+| `\     | ` | \      |        | `\$`   | $   |

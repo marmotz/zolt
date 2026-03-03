@@ -170,11 +170,18 @@ Zolt uses unique prefixes for each media type:
 !![Loop Video](kitten.mp4){autoplay loop muted}
 :::
 
-| Attribute  | Description          |
-|------------|----------------------|
-| `autoplay` | Start automatically  |
-| `loop`     | Repeat when finished |
-| `muted`    | Start muted          |
+### Video Attributes
+
+| Attribute  | Description          | Example                   |
+|------------|----------------------|---------------------------|
+| `autoplay` | Start automatically  | `!![Vid](...) {autoplay}` |
+| `loop`     | Repeat when finished | `!![Vid](...) {loop}`     |
+| `muted`    | Start muted          | `!![Vid](...) {muted}`    |
+
+Example of a background video:
+```zolt
+!![Background](video.mp4){autoplay loop muted width=100%}
+```
 
 ## Audio
 

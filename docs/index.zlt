@@ -13,16 +13,16 @@ It combines the simplicity of Markdown with advanced features for professional d
 
 Zolt comes with powerful features:
 
-| Feature            | Syntax                     | Description                    |
-|--------------------|----------------------------|--------------------------------|
-| **Text Formatting** | `**bold**`, `//italic//`   | Enhanced inline formatting     |
-| **Attributes**      | `{color=red}`              | Apply styles to any element    |
-| **Variables**       | `$var = "value"`           | Reusable content values        |
-| **Calculations**    | `{{ 10 + 5 }}`             | Mathematical expressions       |
-| **Tables**          | `[[table]]...[[/table]]`   | Advanced grid tables           |
-| **Charts**          | `:::chart`                 | Built-in data visualization    |
-| **Blocks**          | `:::info`, `:::tabs`       | Semantic containers            |
-| **Navigation**      | `[[filetree-nav]]`         | Automatic Prev/Next links      |
+| Feature             | Syntax                   | Description                 |
+|---------------------|--------------------------|-----------------------------|
+| **Text Formatting** | `**bold**`, `//italic//` | Enhanced inline formatting  |
+| **Attributes**      | `{color=red}`            | Apply styles to any element |
+| **Variables**       | `$var = "value"`         | Reusable content values     |
+| **Calculations**    | `{{ 10 + 5 }}`           | Mathematical expressions    |
+| **Tables**          | `[[table]]...[[/table]]` | Advanced grid tables        |
+| **Charts**          | `:::chart`               | Built-in data visualization |
+| **Blocks**          | `:::info`, `:::tabs`     | Semantic containers         |
+| **Navigation**      | `[[filetree-nav]]`       | Automatic Prev/Next links   |
 
 ## Getting Started
 

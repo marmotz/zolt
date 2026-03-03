@@ -58,11 +58,11 @@ def hello():
 
 ### Available Attributes
 
-| Attribute  | Description          | Example             |
-|------------|----------------------|---------------------|
-| `title`    | Display title        | `{title="main.py"}` |
-| `highlight`| Highlight lines      | `{highlight=1,3-5}` |
-| `start`    | Starting line number | `{start=10}`        |
+| Attribute   | Description          | Example             |
+|-------------|----------------------|---------------------|
+| `title`     | Display title        | `{title="main.py"}` |
+| `highlight` | Highlight lines      | `{highlight=1,3-5}` |
+| `start`     | Starting line number | `{start=10}`        |
 ### Example with Highlighting
 
 ````zolt

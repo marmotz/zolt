@@ -50,20 +50,20 @@ By {$author}
 
 ## Supported Fields
 
-| Field         | Type         | Description                                                    |
-|---------------|--------------|----------------------------------------------------------------|
-| `title`       | string       | Document title                                                 |
-| `author`      | string       | Author name                                                    |
-| `date`        | date         | Creation date                                                  |
-| `version`     | string/number| Document version                                               |
-| `tags`        | array        | List of tags                                                   |
-| `description` | string       | Short description                                              |
-| `keywords`    | array/string | SEO keywords                                                   |
-| `lang`        | string       | Language code                                                  |
-| `theme`       | string       | Theme name (`default`, `professional`, `technical`, `playful`) |
-| `colorScheme` | string       | `auto`, `light`, or `dark`                                     |
-| `layout`      | string       | Path to a layout file (e.g., `_layout.zlt`)                    |
-| `toc`         | boolean      | Auto-generate TOC                                              |
+| Field         | Type          | Description                                                    |
+|---------------|---------------|----------------------------------------------------------------|
+| `title`       | string        | Document title                                                 |
+| `author`      | string        | Author name                                                    |
+| `date`        | date          | Creation date                                                  |
+| `version`     | string/number | Document version                                               |
+| `tags`        | array         | List of tags                                                   |
+| `description` | string        | Short description                                              |
+| `keywords`    | array/string  | SEO keywords                                                   |
+| `lang`        | string        | Language code                                                  |
+| `theme`       | string        | Theme name (`default`, `professional`, `technical`, `playful`) |
+| `colorScheme` | string        | `auto`, `light`, or `dark`                                     |
+| `layout`      | string        | Path to a layout file (e.g., `_layout.zlt`)                    |
+| `toc`         | boolean       | Auto-generate TOC                                              |
 
 ## Layouts & Templates
 
@@ -132,19 +132,19 @@ Generate a navigation tree based on your project structure:
 [[filetree]]
 ```
 
-The file tree automatically detects links between your files to build a visual hierarchy.
+The file tree automatically detects links between your files to build a visual hierarchy based on your project's entry point and dependencies.
 
-| Attribute      | Description                         | Default |
-|----------------|-------------------------------------|---------|
-| `depth`        | Maximum depth                       | 99      |
-| `from`         | Starting depth level                | 0       |
-| `to`           | Ending depth level                  | 99      |
-| `numbered`     | Enable numbered for the file tree  | false   |
-| `toc`          | Show TOC for the active page        | false   |
-| `tocFrom`      | TOC starting heading level          | 1       |
-| `tocTo`        | TOC ending heading level            | 6       |
-| `tocDepth`     | TOC maximum depth                   | 3       |
-| `tocNumbered`  | Enable numbered for TOC            | false   |
+| Attribute     | Description                               | Default |
+|:--------------|:------------------------------------------|:--------|
+| `from`        | Starting depth (0 = root)                 | `0`     |
+| `to`          | Maximum depth for files                   | `99`    |
+| `depth`       | Maximum depth for sub-trees               | `99`    |
+| `numbered`    | Enable numbering for the list             | `false` |
+| `toc`         | Show headings (TOC) under the active file | `false` |
+| `tocFrom`     | Starting heading level for TOC            | `1`     |
+| `tocTo`       | Ending heading level for TOC              | `6`     |
+| `tocDepth`    | Maximum nesting depth for TOC             | `3`     |
+| `tocNumbered` | Enable numbering for the inline TOC       | `false` |
 
 
 ```zolt {title="Example with custom depth"}
@@ -163,9 +163,14 @@ Automatically generate "Previous" and "Next" links based on your project structu
 [[filetree-nav]]
 ```
 
-The navigation links are determined by the order of files in your `[[filetree]]`. This is perfect for multi-page documentation or tutorials.
+The `[[filetree-nav]]` block creates navigation links based on the flattened order of your project graph. Zolt automatically deduces the correct links by:
 
-> **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page.
+1.  **Scanning the Entry Point**: It analyzes the entry point file to build a project-wide dependency graph.
+2.  **Mapping Dependencies**: It tracks all linked and included files recursively.
+3.  **Flattening the Graph**: It converts the hierarchical tree into a linear sequence of pages.
+4.  **Context-Aware Links**: It identifies the current file's position in this sequence to provide the correct "Previous" and "Next" destinations.
+
+> **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page in your project.
 
 ## Built-in Themes
 
@@ -173,7 +178,7 @@ Zolt includes several built-in themes that automatically adapt to your color pre
 
 | 🎨 **Default**      | [Auto](themes/default-auto.zlt)      | [Light](themes/default-light.zlt)      | [Dark](themes/default-dark.zlt)      |
 | 👔 **Professional** | [Auto](themes/professional-auto.zlt) | [Light](themes/professional-light.zlt) | [Dark](themes/professional-dark.zlt) |
-| 💻 **Technical**    | [Auto](themes/technical-auto.zlt)    | [Light](themes/technical-light.zlt)    | [Dark](themes/technical-dark.zlt)   |
+| 💻 **Technical**    | [Auto](themes/technical-auto.zlt)    | [Light](themes/technical-light.zlt)    | [Dark](themes/technical-dark.zlt)    |
 | 🚀 **Playful**      | [Auto](themes/playful-auto.zlt)      | [Light](themes/playful-light.zlt)      | [Dark](themes/playful-dark.zlt)      |
 
 

@@ -208,11 +208,12 @@ The `:::chart` block can accept attributes to control the global layout.
 :::
 ```
 
-| Attribute | Description                             |
-| --------- | --------------------------------------- |
-| `width`   | Container width                         |
-| `height`  | Container height                        |
-| `layout`  | Layout: `horizontal` or `vertical`      |
+| Attribute | Description                                 |
+|-----------|---------------------------------------------|
+| `width`   | Container width                             |
+| `height`  | Container height                            |
+| `layout`  | Layout: `horizontal` or `vertical`          |
+| `stacked` | Stacked layout for bar/area charts (`true`) |
 
 ### Chart-Specific Attributes
 
@@ -223,12 +224,12 @@ Each chart type (`chart-line`, `chart-bar`, etc.) accepts its own attributes.
 :::
 ```
 
-| Attribute     | Description                                     |
-| ------------- | ----------------------------------------------- |
-| `title`       | Chart title                                     |
-| `colorScheme` | Color palette (`cool`, `warm`, `pastel`)       |
-| `legend`      | Show legend                                     |
-| `grid`        | Show grid                                       |
+| Attribute     | Description                              |
+|---------------|------------------------------------------|
+| `title`       | Chart title                              |
+| `colorScheme` | Color palette (`cool`, `warm`, `pastel`) |
+| `legend`      | Show legend                              |
+| `grid`        | Show grid                                |
 
 ## Multiple Charts
 

@@ -26,11 +26,11 @@ Les abréviations comme HTML{abbr="HyperText Markup Language"} affichent des inf
 2. Numérotation séquentielle
 
 ### Tableaux de données
-| Composant | Description | Performance |
-| :--- | :--- | :--- |
+| Composant   | Description         | Performance  |
+|:------------|:--------------------|:-------------|
 | Moteur Core | Écrit en TypeScript | Ultra Rapide |
-| Parseur | Descente récursive | Fiable |
-| Thèmes | Variables CSS | Flexible |
+| Parseur     | Descente récursive  | Fiable       |
+| Thèmes      | Variables CSS       | Flexible     |
 
 ## Composants Structurels
 

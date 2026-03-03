@@ -21,6 +21,12 @@ Expand the current block system (`:::info`, `:::tabs`, etc.) to allow users to d
 - Define custom rendering logic for specific block types.
 - Support for third-party block plugins.
 
+### 🏗️ Block-level Layouts
+We are planning a new `:::layout [path]` block that bridges the gap between file-level layouts and inclusions.
+- Apply a layout to a specific section of a page rather than the entire document.
+- The content inside the `:::layout` block is injected into the `:::content:::` marker of the target layout file.
+- Perfect for complex nested structures or modular page designs.
+
 ### 📄 PDF & Docx Builds
 Provide native support for exporting Zolt documents directly to professional formats:
 - High-quality PDF generation with customizable layouts.

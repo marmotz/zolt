@@ -79,54 +79,54 @@ $products = [
 :::
 :::
 
-## Loop Variables
+### Loop Variables
 
-Access loop metadata:
+Access loop metadata to customize rendering based on the element's position:
 
-| Variable             | Description             |
-|----------------------|-------------------------|
-| `{$foreach.index}`   | Current index (0-based) |
-| `{$foreach.index1}`  | Current index (1-based) |
-| `{$foreach.first}`   | `true` if first element |
-| `{$foreach.last}`    | `true` if last element  |
-| `{$foreach.even}`    | `true` if index is even |
-| `{$foreach.odd}`     | `true` if index is odd  |
+| Variable            | Description             |
+|---------------------|-------------------------|
+| `{$foreach.index}`  | Current index (0-based) |
+| `{$foreach.index1}` | Current index (1-based) |
+| `{$foreach.first}`  | `true` if first element |
+| `{$foreach.last}`   | `true` if last element  |
+| `{$foreach.even}`   | `true` if index is even |
+| `{$foreach.odd}`    | `true` if index is odd  |
 
-### Examples
+### Concrete Examples
+
+#### Alternating Row Styles
 
 ```zolt
-$products = [
-  {name: "Laptop", price: 999},
-  {name: "Mouse", price: 29},
-  {name: "Keyboard", price: 79}
-]
+$rows = ["Row A", "Row B", "Row C", "Row D"]
 
-:::foreach {$products as $product}
-:::if {$foreach.first}
-- Featured: {$product.name}
-:::elseif {$foreach.last}
-- Last Item: {$product.name}
-:::else
-- {$product.name}
-:::
+:::foreach {$rows as $row}
++ {$row} {background={{ $foreach.even ? "lightblue" : "lightgreen" }}}
 :::
 ```
 
 :::info [Result]
-$products = [
-  {name: "Laptop", price: 999},
-  {name: "Mouse", price: 29},
-  {name: "Keyboard", price: 79}
-]
+$rows = ["Row A", "Row B", "Row C", "Row D"]
 
-:::foreach {$products as $product}
-:::if {$foreach.first}
-- Featured: {$product.name}
-:::elseif {$foreach.last}
-- Last Item: {$product.name}
-:::else
-- {$product.name}
+:::foreach {$rows as $row}
++ {$row} {background={{ $foreach.even ? "lightblue" : "lightgreen" }}}
 :::
+:::
+
+#### Comma-Separated List
+
+```zolt
+$tags = ["Tech", "Zolt", "Web"]
+
+:::foreach {$tags as $tag}
+{$tag}{{ $foreach.last ? "" : ", " }}
+:::
+```
+
+:::info [Result]
+$tags = ["Tech", "Zolt", "Web"]
+
+:::foreach {$tags as $tag}
+{$tag}{{ $foreach.last ? "" : ", " }}
 :::
 :::
 
@@ -241,11 +241,11 @@ Zolt supports standard operators for complex conditions and expressions.
 
 ### Logical Operators
 
-| Operator | Alias | Description | Example                          |
-|----------|-------|-------------|----------------------------------|
-| `!`      | -     | NOT         | `{!$enabled}`                    |
-| `&&`     | `and` | AND         | `{$count > 0 && $count < 10}`    |
-| `||`     | `or`  | OR          | `{$isAdmin || $isEditor}`        |
+| Operator             | Alias | Description | Example                       |
+|----------------------|-------|-------------|-------------------------------|
+| `!`                  | -     | NOT         | `{!$enabled}`                 |
+| `&&`                 | `and` | AND         | `{$count > 0 && $count < 10}` |
+| `        |       | ` | `or`  | OR          | `{$isAdmin |  | $isEditor}`   |
 
 #### Examples
 

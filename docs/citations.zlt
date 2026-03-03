@@ -71,9 +71,9 @@ L'indentation peut être cumulée pour créer des hiérarchies complexes :
 
 ## Comparaison : Citations vs Indentation
 
-| Fonctionnalité | Symbole | Cas d'usage                                                         |
-|----------------|---------|---------------------------------------------------------------------|
-| Citation       | `>`     | Citations, témoignages, références sémantiques                      |
+| Fonctionnalité | Symbole | Cas d'usage                                                          |
+|----------------|---------|----------------------------------------------------------------------|
+| Citation       | `>`     | Citations, témoignages, références sémantiques                       |
 | Indentation    | `&`     | Notes structurées, poésie, hiérarchie visuelle, sorties de terminaux |
 
 ## Combinaison avec d'autres éléments

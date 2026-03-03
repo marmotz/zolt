@@ -49,16 +49,16 @@ Zolt features a robust expression engine for performing calculations and manipul
 
 The `Math` namespace provides common mathematical constants and functions.
 
-| Function         | Arguments              | Return   | Description                                               |
-| :--------------- | :--------------------- | :------- | :-------------------------------------------------------- |
-| `Math.floor(n)`  | `n: number`            | `number` | Returns the largest integer less than or equal to `n`.    |
+| Function         | Arguments              | Return   | Description                                                |
+|:-----------------|:-----------------------|:---------|:-----------------------------------------------------------|
+| `Math.floor(n)`  | `n: number`            | `number` | Returns the largest integer less than or equal to `n`.     |
 | `Math.ceil(n)`   | `n: number`            | `number` | Returns the smallest integer greater than or equal to `n`. |
-| `Math.round(n)`  | `n: number`            | `number` | Returns the value of `n` rounded to the nearest integer.  |
-| `Math.abs(n)`    | `n: number`            | `number` | Returns the absolute value of `n`.                        |
-| `Math.pow(b, e)` | `b: number, e: number` | `number` | Returns the base `b` to the exponent `e` power.           |
-| `Math.sqrt(n)`   | `n: number`            | `number` | Returns the square root of `n`.                           |
-| `Math.min(...n)` | `...n: number`         | `number` | Returns the smallest of zero or more numbers.             |
-| `Math.max(...n)` | `...n: number`         | `number` | Returns the largest of zero or more numbers.              |
+| `Math.round(n)`  | `n: number`            | `number` | Returns the value of `n` rounded to the nearest integer.   |
+| `Math.abs(n)`    | `n: number`            | `number` | Returns the absolute value of `n`.                         |
+| `Math.pow(b, e)` | `b: number, e: number` | `number` | Returns the base `b` to the exponent `e` power.            |
+| `Math.sqrt(n)`   | `n: number`            | `number` | Returns the square root of `n`.                            |
+| `Math.min(...n)` | `...n: number`         | `number` | Returns the smallest of zero or more numbers.              |
+| `Math.max(...n)` | `...n: number`         | `number` | Returns the largest of zero or more numbers.               |
 
 #### Examples
 
@@ -88,16 +88,16 @@ The `Math` namespace provides common mathematical constants and functions.
 
 The `List` namespace provides functions for manipulating arrays.
 
-| Function         | Arguments  | Return   | Description                                                        |
-| :--------------- | :--------- | :------- | :----------------------------------------------------------------- |
-| `List.length(l)` | `l: array` | `number` | Returns the number of elements in the list.                        |
-| `List.count(l)`  | `l: array` | `number` | Alias of `List.length`.                                            |
-| `List.first(l)`  | `l: array` | `any`    | Returns the first element of the list.                             |
-| `List.last(l)`   | `l: array` | `any`    | Returns the last element of the list.                              |
-| `List.sum(l)`    | `l: array` | `number` | Returns the sum of all numeric elements in the list.               |
-| `List.avg(l)`    | `l: array` | `number` | Returns the average value of numeric elements in the list.         |
-| `List.min(l)`    | `l: array` | `number` | Returns the smallest numeric value in the list.                    |
-| `List.max(l)`    | `l: array` | `number` | Returns the largest numeric value in the list.                     |
+| Function         | Arguments  | Return   | Description                                                |
+|:-----------------|:-----------|:---------|:-----------------------------------------------------------|
+| `List.length(l)` | `l: array` | `number` | Returns the number of elements in the list.                |
+| `List.count(l)`  | `l: array` | `number` | Alias of `List.length`.                                    |
+| `List.first(l)`  | `l: array` | `any`    | Returns the first element of the list.                     |
+| `List.last(l)`   | `l: array` | `any`    | Returns the last element of the list.                      |
+| `List.sum(l)`    | `l: array` | `number` | Returns the sum of all numeric elements in the list.       |
+| `List.avg(l)`    | `l: array` | `number` | Returns the average value of numeric elements in the list. |
+| `List.min(l)`    | `l: array` | `number` | Returns the smallest numeric value in the list.            |
+| `List.max(l)`    | `l: array` | `number` | Returns the largest numeric value in the list.             |
 
 #### Examples
 
@@ -126,14 +126,14 @@ $numbers = [10, 20, 30, 40, 50]
 The `String` namespace provides functions for string manipulation.
 
 | Function                  | Arguments                         | Return   | Description                                                       |
-| :------------------------ | :-------------------------------- | :------- | :---------------------------------------------------------------- |
-| `String.upper(s)`         | `s: string`                       | `string` | Returns the string converted to uppercase.                         |
-| `String.lower(s)`         | `s: string`                       | `string` | Returns the string converted to lowercase.                         |
-| `String.length(s)`        | `s: string`                       | `number` | Returns the number of characters in the string.                    |
-| `String.trim(s)`          | `s: string`                       | `string` | Returns the string with whitespace removed from both ends.         |
-| `String.replace(s, f, r)` | `s: string, f: string, r: string` | `string` | Replaces all occurrences of `f` with `r` in `s`.                   |
-| `String.split(s, sep)`    | `s: string, sep: string`          | `array`  | Splits the string into an array of strings by separator.           |
-| `String.join(l, sep)`     | `l: array, sep: string`           | `string` | Joins all elements of an array into a string using the separator.  |
+|:--------------------------|:----------------------------------|:---------|:------------------------------------------------------------------|
+| `String.upper(s)`         | `s: string`                       | `string` | Returns the string converted to uppercase.                        |
+| `String.lower(s)`         | `s: string`                       | `string` | Returns the string converted to lowercase.                        |
+| `String.length(s)`        | `s: string`                       | `number` | Returns the number of characters in the string.                   |
+| `String.trim(s)`          | `s: string`                       | `string` | Returns the string with whitespace removed from both ends.        |
+| `String.replace(s, f, r)` | `s: string, f: string, r: string` | `string` | Replaces all occurrences of `f` with `r` in `s`.                  |
+| `String.split(s, sep)`    | `s: string, sep: string`          | `array`  | Splits the string into an array of strings by separator.          |
+| `String.join(l, sep)`     | `l: array, sep: string`           | `string` | Joins all elements of an array into a string using the separator. |
 
 #### Examples
 
@@ -158,7 +158,7 @@ The `String` namespace provides functions for string manipulation.
 The `Date` namespace provides functions for date and time operations.
 
 | Function                | Arguments                          | Return   | Description                                                     |
-| :---------------------- | :--------------------------------- | :------- | :---------------------------------------------------------------|
+|:------------------------|:-----------------------------------|:---------|:----------------------------------------------------------------|
 | `Date.buildTime()`      | None                               | `number` | Returns the generation timestamp in milliseconds.               |
 | `Date.format(d, f)`     | `d: timestamp/date/str, f: string` | `string` | Formats a date according to the provided format string.         |
 | `Date.parse(s, f?)`     | `s: string, f: string?`            | `date`   | Parses a string into a Date object (optionally using a format). |
@@ -167,12 +167,38 @@ The `Date` namespace provides functions for date and time operations.
 | `Date.timestamp(d?)`    | `d: date?`                         | `number` | Returns the Unix timestamp (seconds) for a date or now.         |
 | `Date.msTimestamp(d?)`  | `d: date?`                         | `number` | Returns the timestamp (milliseconds) for a date or now.         |
 
+#### Date Localization
+
+Zolt automatically localizes month and day names based on your language settings.
+
+To change the localization, set the `$lang` or `$locale` variable in your document:
+
+```zolt
+$date = "2026-03-03"
+
+$lang = "en"
+Today is: {{ Date.format($date, "dddd D mmmm YYYY") }}
+
+$lang = "fr"
+Aujourd'hui, nous sommes le {{ Date.format($date, "dddd D mmmm YYYY") }}
+```
+
+:::info [Result]
+$date = "2026-03-03"
+
+$lang = "en"
+Today is: {{ Date.format($date, "dddd D mmmm YYYY") }}
+
+$lang = "fr"
+Aujourd'hui, nous sommes le {{ Date.format($date, "dddd D mmmm YYYY") }}
+:::
+
 #### Format Tokens
 
 Available format tokens:
 
 | Token  | Description                 | Example                                     |
-| :----- | :-------------------------- | :------------------------------------------ |
+|:-------|:----------------------------|:--------------------------------------------|
 | `D`    | Day (1-2 digits)            | {{ Date.format(Date.buildTime(), 'D') }}    |
 | `DD`   | Day (2 digits)              | {{ Date.format(Date.buildTime(), 'DD') }}   |
 | `ddd`  | Day name (short)            | {{ Date.format(Date.buildTime(), 'ddd') }}  |

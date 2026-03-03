@@ -27,6 +27,26 @@ $enabled = true
 Variables defined in this block are ready to use.
 :::
 
+## Multiline Definitions
+
+Complex variables like arrays or objects can be defined over multiple lines for better readability.
+
+### Syntax
+
+```zolt
+$items = [
+  "Apple",
+  "Banana",
+  "Cherry"
+]
+
+$config = {
+  theme: "dark",
+  show_toc: true,
+  max_depth: 3
+}
+```
+
 ## Using Variables
 
 Reference variables anywhere in your text with `{$variable}`:
@@ -135,8 +155,8 @@ $items = [
   {name: "Gadget", qty: 3}
 ]
 
-| Item | Qty |
-| :--- |---: |
+| Item         | Qty         |
+|:-------------|------------:|
 :::foreach {$items as $item}
 | {$item.name} | {$item.qty} |
 :::
