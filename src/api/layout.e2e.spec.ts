@@ -54,7 +54,7 @@ This is my content.`;
     const content = `---
 layout: test-layout.zlt
 ---
-:::include test-include.zlt`;
+:::include test-include.zlt :::`;
 
     try {
       const html = await buildString(content, { filePath: docPath });
@@ -104,7 +104,7 @@ Content here`;
     const includePath = path.resolve(process.cwd(), 'test-include-with-layout.zlt');
     fs.writeFileSync(includePath, `---\nlayout: test-layout-2.zlt\n---\nIncluded with layout`);
 
-    const content = `# Main Doc\n:::include test-include-with-layout.zlt`;
+    const content = `# Main Doc\n:::include test-include-with-layout.zlt :::`;
 
     try {
       const html = await buildString(content, { filePath: docPath });

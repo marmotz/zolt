@@ -197,6 +197,9 @@ export class ContentProcessor {
       if (match.startsWith('`')) {
         return match;
       }
+      if (expression.trim().startsWith('include ')) {
+        return match;
+      }
       try {
         const value = this.evaluator.evaluate(expression);
 

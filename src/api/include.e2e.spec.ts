@@ -20,7 +20,7 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, '# Included Content\n\nThis is from the included file.');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = 'Main Title\n\n:::include included.zlt';
+    const mainContent = 'Main Title\n\n:::include included.zlt :::';
 
     const html = await buildString(mainContent, { filePath: mainFile });
 
@@ -34,10 +34,10 @@ describe('Include E2E', () => {
     fs.writeFileSync(file3, 'Final Content');
 
     const file2 = path.join(tempDir, 'file2.zlt');
-    fs.writeFileSync(file2, ':::include file3.zlt');
+    fs.writeFileSync(file2, ':::include file3.zlt :::');
 
     const file1 = path.join(tempDir, 'file1.zlt');
-    const content1 = 'Start\n\n:::include file2.zlt';
+    const content1 = 'Start\n\n:::include file2.zlt :::';
 
     const html = await buildString(content1, { filePath: file1 });
 
@@ -49,10 +49,10 @@ describe('Include E2E', () => {
     const fileA = path.join(tempDir, 'fileA.zlt');
     const fileB = path.join(tempDir, 'fileB.zlt');
 
-    fs.writeFileSync(fileA, ':::include fileB.zlt');
-    fs.writeFileSync(fileB, ':::include fileA.zlt');
+    fs.writeFileSync(fileA, ':::include fileB.zlt :::');
+    fs.writeFileSync(fileB, ':::include fileA.zlt :::');
 
-    const html = await buildString(':::include fileA.zlt', { filePath: path.join(tempDir, 'main.zlt') });
+    const html = await buildString(':::include fileA.zlt :::', { filePath: path.join(tempDir, 'main.zlt') });
     expect(html).toContain('Circular inclusion detected');
   });
 
@@ -61,7 +61,7 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, 'Hello {$name}!');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '$name = "Zolt"\n\n:::include vars.zlt';
+    const mainContent = '$name = "Zolt"\n\n:::include vars.zlt :::';
 
     const html = await buildString(mainContent, { filePath: mainFile });
 
@@ -73,7 +73,7 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, '## Section from Include');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '[[toc]]\n\n# Main Title\n\n:::include content.zlt';
+    const mainContent = '[[toc]]\n\n# Main Title\n\n:::include content.zlt :::';
 
     const html = await buildString(mainContent, { filePath: mainFile });
 
@@ -87,7 +87,7 @@ describe('Include E2E', () => {
     fs.writeFileSync(includedFile, ':::tabs\n:::tab [Tab 1]\nContent 1\n:::tab [Tab 2]\nContent 2\n:::\n');
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = '# Test\n\n:::include blocks.zlt';
+    const mainContent = '# Test\n\n:::include blocks.zlt :::';
 
     const html = await buildString(mainContent, { filePath: mainFile });
 
@@ -108,7 +108,7 @@ describe('Include E2E', () => {
 $items = ["itemA.zlt", "itemB.zlt"]
 :::foreach {$items as $file}
 ### File: {$file}
-:::include {$file}
+:::include {$file} :::
 :::
 `;
     // Note: Variable expansion in :::include is supported because SourceEvaluator

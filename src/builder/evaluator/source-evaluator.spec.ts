@@ -219,7 +219,7 @@ By {$author} ({$count})`;
     const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
 
     const input = `Main
-:::include included.zlt
+:::include included.zlt :::
 End`;
 
     const result = sourceEvaluator.evaluate(input);
@@ -233,12 +233,12 @@ End`;
     fs.writeFileSync(fileB, 'Content B');
 
     const fileA = path.join(tempDir, 'fileA.zlt');
-    fs.writeFileSync(fileA, ':::include fileB.zlt');
+    fs.writeFileSync(fileA, ':::include fileB.zlt :::');
 
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
 
-    const result = sourceEvaluator.evaluate(':::include fileA.zlt');
+    const result = sourceEvaluator.evaluate(':::include fileA.zlt :::');
     expect(result).toContain('Content B');
   });
 
@@ -246,26 +246,26 @@ End`;
     const fileA = path.join(tempDir, 'fileA.zlt');
     const fileB = path.join(tempDir, 'fileB.zlt');
 
-    fs.writeFileSync(fileA, ':::include fileB.zlt');
-    fs.writeFileSync(fileB, ':::include fileA.zlt');
+    fs.writeFileSync(fileA, ':::include fileB.zlt :::');
+    fs.writeFileSync(fileB, ':::include fileA.zlt :::');
 
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
 
-    const result = sourceEvaluator.evaluate(':::include fileA.zlt');
+    const result = sourceEvaluator.evaluate(':::include fileA.zlt :::');
     expect(result).toContain('Circular inclusion detected');
   });
 
   test('should handle max inclusion depth', () => {
     // Create a chain of inclusions
     for (let i = 0; i < 12; i++) {
-      fs.writeFileSync(path.join(tempDir, `file${i}.zlt`), `:::include file${i + 1}.zlt`);
+      fs.writeFileSync(path.join(tempDir, `file${i}.zlt`), `:::include file${i + 1}.zlt :::`);
     }
 
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
 
-    const result = sourceEvaluator.evaluate(':::include file0.zlt');
+    const result = sourceEvaluator.evaluate(':::include file0.zlt :::');
     expect(result).toContain('Max inclusion depth reached');
   });
 
@@ -352,7 +352,7 @@ Content`;
     const evaluator = new ExpressionEvaluator();
     const sourceEvaluator = new SourceEvaluator(evaluator, path.join(subDir, 'main.zlt'));
 
-    const result = sourceEvaluator.evaluate(':::include _template.zlt');
+    const result = sourceEvaluator.evaluate(':::include _template.zlt :::');
     expect(result).toContain('Template Content');
   });
 
@@ -376,5 +376,39 @@ Content`;
     const result = sourceEvaluator.evaluate(layout);
 
     expect(result).toBe('Use `$$` prefix');
+  });
+
+  test('should handle block-level layout injection', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+
+    const layoutPath = path.join(tempDir, 'block-layout.zlt');
+    fs.writeFileSync(layoutPath, 'Block Header\n:::content:::\nBlock Footer');
+
+    const source = `:::layout block-layout.zlt\nInner content\n:::`;
+    const result = sourceEvaluator.evaluate(source);
+
+    expect(result).toContain('Block Header');
+    expect(result).toContain('Inner content');
+    expect(result).toContain('Block Footer');
+  });
+  test('should handle inline {{include}} properly within a line', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator, path.join(tempDir, 'main.zlt'));
+    const includedPath = path.join(tempDir, 'inline-part.zlt');
+    fs.writeFileSync(includedPath, 'beautiful');
+
+    const source = 'This is a {{include inline-part.zlt}} day.';
+    const result = sourceEvaluator.evaluate(source);
+
+    expect(result).toBe('This is a beautiful day.');
+  });
+  test('should require closing ::: for block include', () => {
+    const evaluator = new ExpressionEvaluator();
+    const sourceEvaluator = new SourceEvaluator(evaluator);
+    const source = ':::include file.zlt';
+    const result = sourceEvaluator.evaluate(source);
+
+    expect(result).toContain(':::error Invalid include syntax: :::include file.zlt (expected :::include path :::):::');
   });
 });

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealeased]
+
+### Added
+
+- Implemented block-level layouts (`:::layout [path]`) with robust testing and documentation.
+- Added support for inline includes (`{{include path}}`) anywhere within a line.
+
+### Fixed
+
+- Removce extra spaces were introduced after `InlineStyle` elements (e.g., `</span> olt` instead of `</span>olt`).
+
 ## [0.2.0] - 2026-03-03
 
 ### Added

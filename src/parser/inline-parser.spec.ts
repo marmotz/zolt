@@ -487,4 +487,14 @@ describe('InlineParser', () => {
       expect(Object.hasOwn(attrs!, 'noToc')).toBe(true);
     });
   });
+
+  describe('Custom Styles', () => {
+    test('should not add a trailing space after inline style block', () => {
+      const result = parser.parse('||**Z**||{color=cyan}olt');
+      expect(result).toHaveLength(2); // The style block, then 'olt'
+      expect(result[0].type).toBe('InlineStyle');
+      expect(result[1].type).toBe('Text');
+      expect((result[1] as any).content).toBe('olt');
+    });
+  });
 });

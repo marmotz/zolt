@@ -176,6 +176,7 @@ Example: `{{ Math.round($n) }}`, `{{ String.upper($name) }}`
 - **File Header**: YAML between `---` at top of file.
 - **Project**: `zolt.yaml` in root.
 - **Layout**: `layout: "_layout.zlt"` in metadata.
+- **Block Layout**: `:::layout [path]` (injects inner content into layout).
 - **Injection**: `:::content:::` in layout file.
 
 ## Navigation & Tools

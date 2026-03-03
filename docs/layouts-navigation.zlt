@@ -1,0 +1,189 @@
+---
+title: "Layouts, Includes & Navigation"
+description: "How to structure your documentation with layouts, includes, and navigation components"
+---
+
+# Layouts, Includes & Navigation
+
+Zolt provides powerful tools to reuse content and structure your documentation efficiently.
+
+## Layouts & Templates
+
+Layouts allow you to wrap your content in a common structure (headers, footers, sidebars).
+
+### Defining a Layout
+
+A layout is a standard Zolt file that uses the `:::content:::` marker to indicate where the main document content should be injected. You can use existing structural blocks like `:::sidebar` to organize your layout.
+
+**Example `_layout.zlt`:**
+
+```zolt
+:::sidebar
+:::sidebar-header
+# {$siteName}
+:::
+
+:::sidebar-content
+[[filetree]]
+:::
+:::
+
+# {$title}
+
+:::content:::
+
+---
+© 2026 {$author}
+```
+
+### Using a Layout
+
+Set the `layout` property in your metadata:
+
+```yaml
+---
+title: "My Page"
+layout: "_layout.zlt"
+---
+```
+
+### Block-level Layouts
+
+You can also apply a layout to a specific section of a page rather than the entire document using the `:::layout [path]` block. The content inside the block is injected into the `:::content:::` marker of the target layout file. This is perfect for complex nested structures or modular page designs.
+
+```zolt {title=_card-layout.zlt}
+Before content
+
+:::content:::
+
+After content
+```
+
+```zolt
+:::layout _card-layout.zlt
+$variables = 'variables here'
+This is the inner content that will be injected into the card.
+You can use **style** and __{{ $variables }}__!
+:::
+```
+
+:::info [Result]
+:::layout _card-layout.zlt
+$variables = 'variables here'
+This is the inner content that will be injected into the card.
+You can use **style** and __{{ $variables }}__!
+:::
+:::
+
+Alternatively, you can use brackets around the path:
+
+```zolt
+:::layout [_card-layout.zlt]
+Content here.
+:::
+```
+
+## Inclusions
+
+You can easily include the content of another Zolt file directly into your current document. This is useful for sharing common snippets, warnings, or repeating sections across multiple pages.
+
+### Block Include
+
+To include a file as a block, use the `:::include` syntax:
+
+```zolt {title=_zolt-name.zlt}
+||**Z**||{color=cyan}olt
+```
+
+```zolt
+:::include _zolt-name.zlt :::
+```
+
+:::info [Result]
+:::include _zolt-name.zlt :::
+:::
+
+### Inline Include
+
+To include a file within a paragraph or inline context, use the `{{include ...}}` syntax:
+
+```zolt {title=_zolt-name.zlt}
+||**Z**||{color=cyan}olt
+```
+
+```zolt
+Welcome on {{ include _zolt-name.zlt }} documentation !
+```
+
+:::info [Result]
+Welcome on {{ include _zolt-name.zlt }} documentation !
+:::
+
+Included files have access to the variables defined in the parent document. Zolt automatically prevents infinite recursion by detecting circular inclusions.
+
+## Navigation & Structure
+
+Zolt provides built-in components to help users navigate your content.
+
+### Table of Contents (TOC)
+
+Generate a TOC for the current page:
+
+```zolt
+[[toc]]
+```
+
+| Attribute  | Description         | Default |
+|------------|---------------------|---------|
+| `depth`    | Maximum depth (1-6) | 3       |
+| `from`     | Start level         | 1       |
+| `to`       | End level           | 6       |
+| `numbered` | Include numbers     | false   |
+
+### File Tree
+
+Generate a navigation tree based on your project structure:
+
+```zolt
+[[filetree]]
+```
+
+The file tree automatically detects links between your files to build a visual hierarchy based on your project's entry point and dependencies.
+
+| Attribute     | Description                               | Default |
+|:--------------|:------------------------------------------|:--------|
+| `from`        | Starting depth (0 = root)                 | `0`     |
+| `to`          | Maximum depth for files                   | `99`    |
+| `depth`       | Maximum depth for sub-trees               | `99`    |
+| `numbered`    | Enable numbering for the list             | `false` |
+| `toc`         | Show headings (TOC) under the active file | `false` |
+| `tocFrom`     | Starting heading level for TOC            | `1`     |
+| `tocTo`       | Ending heading level for TOC              | `6`     |
+| `tocDepth`    | Maximum nesting depth for TOC             | `3`     |
+| `tocNumbered` | Enable numbering for the inline TOC       | `false` |
+
+
+```zolt {title="Example with custom depth"}
+[[filetree {depth=2}]]
+```
+
+```zolt {title="Example with advanced TOC settings"}
+[[filetree {toc tocFrom=2 tocNumbered}]]
+```
+
+### Navigation Links
+
+Automatically generate "Previous" and "Next" links based on your project structure:
+
+```zolt
+[[filetree-nav]]
+```
+
+The `[[filetree-nav]]` block creates navigation links based on the flattened order of your project graph. Zolt automatically deduces the correct links by:
+
+1.  **Scanning the Entry Point**: It analyzes the entry point file to build a project-wide dependency graph.
+2.  **Mapping Dependencies**: It tracks all linked and included files recursively.
+3.  **Flattening the Graph**: It converts the hierarchical tree into a linear sequence of pages.
+4.  **Context-Aware Links**: It identifies the current file's position in this sequence to provide the correct "Previous" and "Next" destinations.
+
+> **Tip**: Place `[[filetree-nav]]` in your layout file (e.g., `_layout.zlt`) after `:::content:::` to automatically add navigation to every page in your project.

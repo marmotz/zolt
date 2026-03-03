@@ -15,8 +15,8 @@ describe('API: Footnotes', () => {
     const content = 'Ref 1[^reuse], Ref 2[^reuse]\n\n[^reuse]: Shared note';
     const html = await buildString(content);
 
-    expect(html).toContain('Ref 1 <sup><a href="#fn-reuse" id="fnref-reuse">[1]</a></sup> ,');
-    expect(html).toContain('Ref 2 <sup><a href="#fn-reuse" id="fnref-reuse-1">[1]</a></sup>');
+    expect(html).toContain('Ref 1<sup><a href="#fn-reuse" id="fnref-reuse">[1]</a></sup>,');
+    expect(html).toContain('Ref 2<sup><a href="#fn-reuse" id="fnref-reuse-1">[1]</a></sup>');
     expect(html).toContain('href="#fnref-reuse"');
     expect(html).toContain('href="#fnref-reuse-1"');
   });

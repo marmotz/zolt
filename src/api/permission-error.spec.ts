@@ -25,7 +25,7 @@ describe('Include Permission Errors', () => {
     fs.chmodSync(includedFile, 0);
 
     const mainFile = path.join(tempDir, 'main.zlt');
-    const mainContent = ':::include secret.zlt';
+    const mainContent = ':::include secret.zlt :::';
 
     const html = await buildString(mainContent, { filePath: mainFile });
 

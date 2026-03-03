@@ -124,7 +124,7 @@ describe('API: Abbreviations', () => {
         '*[API]: Application Programming Interface\n\nThe API, REST, and JSON are related.'
       );
 
-      expect(html).toContain('<abbr title="Application Programming Interface">API</abbr> ,');
+      expect(html).toContain('<abbr title="Application Programming Interface">API</abbr>,');
     });
   });
 });

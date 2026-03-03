@@ -49,6 +49,7 @@ Zolt comes with powerful features:
 - [Calculations & Functions](calculations.zlt) — Expressions, math, and string functions
 - [Loops & Conditionals](loops-conditionals.zlt) — Loops, conditionals, and logical expressions
 - [Metadata](metadata.zlt) — File metadata, themes, and configuration
+- [Layouts & Navigation](layouts-navigation.zlt) — Layouts, inclusions, and navigation components
 
 ## Reference
 

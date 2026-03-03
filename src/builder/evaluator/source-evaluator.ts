@@ -115,6 +115,7 @@ export class SourceEvaluator {
 
       let processedLine = line;
       if (this.contentToInject !== undefined && processedLine.includes(':::content:::')) {
+        processedLine = this.contentProcessor.processContent(processedLine);
         processedLine = processedLine.replace(/:::content:::/g, () => this.contentToInject!);
         result.push(processedLine);
         i++;
@@ -137,24 +138,46 @@ export class SourceEvaluator {
         // Discard standalone branching block
         const { nextIndex } = this.collectMultipartBlock(lines, i, ['elseif', 'else']);
         i = nextIndex;
+      } else if (trimmedProcessed.startsWith(':::layout')) {
+        const { branches, nextIndex } = this.collectMultipartBlock(lines, i, []);
+        const layoutBranch = branches[0];
+        let rawPath = layoutBranch.keyword.substring(6).trim();
+        if (rawPath.startsWith('[') && rawPath.endsWith(']')) {
+          rawPath = rawPath.substring(1, rawPath.length - 1).trim();
+        }
+        const layoutPath = this.contentProcessor.processContent(rawPath);
+        const innerContent = layoutBranch.content.join('\n');
+        const expandedInner = this.evaluate(innerContent, false);
+        const expanded = this.evaluateBlockLayout(layoutPath, expandedInner);
+        result.push(expanded);
+        i = nextIndex;
       } else if (trimmedProcessed.startsWith(':::include')) {
-        const rawPath = trimmedProcessed.substring(10).trim();
-        const includePath = this.contentProcessor.processContent(rawPath);
-        const expanded = this.evaluateInclude(includePath);
-        result.push(expanded);
-        i++;
-      } else if (trimmedProcessed.startsWith('{{include') && trimmedProcessed.endsWith('}}')) {
-        const rawPath = trimmedProcessed.substring(9, trimmedProcessed.length - 2).trim();
-        const includePath = this.contentProcessor.processContent(rawPath);
-        const expanded = this.evaluateInclude(includePath);
-        result.push(expanded);
+        const includeMatch = trimmedProcessed.match(/^:::include\s+(.+?)\s*:::$/);
+        if (includeMatch) {
+          const rawPath = includeMatch[1];
+          const includePath = this.contentProcessor.processContent(rawPath);
+          const expanded = this.evaluateInclude(includePath);
+          result.push(expanded);
+        } else {
+          result.push(`:::error Invalid include syntax: ${trimmedProcessed} (expected :::include path :::):::`);
+        }
         i++;
       } else if (trimmedProcessed.startsWith(':::comment')) {
         const { nextIndex } = this.collectMultipartBlock(lines, i, []);
         i = nextIndex;
       } else {
+        // Handle inline {{include path}} anywhere in the line
+        let lineWithIncludes = processedLine;
+        const inlineIncludeRegex = /\{\{\s*include\s+([^}]+)}}/g;
+        if (inlineIncludeRegex.test(lineWithIncludes)) {
+          lineWithIncludes = lineWithIncludes.replace(inlineIncludeRegex, (_match, rawPath) => {
+            const includePath = this.contentProcessor.processContent(rawPath.trim());
+            return this.evaluateInclude(includePath);
+          });
+        }
+
         // Variable definitions or normal content
-        const processed = this.contentProcessor.processContent(processedLine);
+        const processed = this.contentProcessor.processContent(lineWithIncludes);
         result.push(processed);
         i++;
       }
@@ -239,6 +262,56 @@ export class SourceEvaluator {
     }
   }
 
+  private evaluateBlockLayout(layoutPath: string, contentToInject: string): string {
+    const currentIncludeStack = [...this.includeStack];
+
+    if (this.filePath !== 'unknown') {
+      const absoluteFilePath = path.resolve(this.filePath);
+      if (!currentIncludeStack.includes(absoluteFilePath)) {
+        currentIncludeStack.push(absoluteFilePath);
+      }
+    }
+
+    const currentDir = this.filePath !== 'unknown' ? path.dirname(this.filePath) : process.cwd();
+    const targetPath = this.findLayout(currentDir, layoutPath);
+
+    if (!targetPath) {
+      return `:::error Layout file not found: ${layoutPath}:::\n${contentToInject}`;
+    }
+
+    this.includedFiles.add(targetPath);
+
+    try {
+      const layoutContent = fs.readFileSync(targetPath, 'utf8');
+
+      const childScope = this.evaluator.createChildScope();
+      const layoutEvaluator = new SourceEvaluator(
+        childScope,
+        targetPath,
+        currentIncludeStack,
+        contentToInject,
+        true,
+        false,
+        this.includedFiles
+      );
+      const expandedLayout = layoutEvaluator.evaluate(layoutContent);
+
+      let layoutBody = expandedLayout;
+
+      if (expandedLayout.startsWith('---')) {
+        const secondDashIndex = expandedLayout.indexOf('---', 3);
+        if (secondDashIndex !== -1) {
+          const endOfSecondDash = expandedLayout.indexOf('\n', secondDashIndex);
+          layoutBody = expandedLayout.substring(endOfSecondDash !== -1 ? endOfSecondDash + 1 : secondDashIndex + 3);
+        }
+      }
+
+      return layoutBody;
+    } catch (err: any) {
+      return `:::error Failed to process layout block: ${layoutPath} (${err.message}):::\n${contentToInject}`;
+    }
+  }
+
   private findLayout(startDir: string, layoutPath: string): string | null {
     let currentDir = startDir;
 
@@ -271,7 +344,8 @@ export class SourceEvaluator {
       // If we are processing a layout, we don't want to override variables
       // already set by the document or project metadata.
       if (this.isLayoutProcessing) {
-        if (this.evaluator.getVariable(key) === undefined) {
+        const existingValue = this.evaluator.getVariable(key);
+        if (existingValue === undefined || existingValue === null) {
           this.evaluator.setVariable(key, value as Value);
         }
       } else {

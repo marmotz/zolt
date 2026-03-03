@@ -190,7 +190,7 @@ Zolt features a unique attribute system that allows you to apply styles and prop
 
 You can split your documentation into multiple files and include them using the `{{include}}` directive. This is perfect for reusable headers, footers, or shared configuration.
 
-> **Tip**: If you want to define a consistent global structure (like sidebars and navigation) for all your pages, check out [Layouts & Templates](metadata.zlt#layouts--templates).
+> **Tip**: If you want to define a consistent global structure (like sidebars and navigation) for all your pages, check out [Layouts & Templates](layouts-navigation.zlt#layouts--templates).
 
 ### Syntax
 

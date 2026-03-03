@@ -147,7 +147,7 @@ export class BlockVisitor {
     }
 
     const attrs = this.renderAllAttributes(node.attributes);
-    const childrenHtml = await this.joinChildren(node.children);
+    const childrenHtml = await this.joinInlineChildren(node.children);
     const trimmed = childrenHtml.replace(/\s+/g, ' ').trim();
     if (!trimmed) {
       return '';
