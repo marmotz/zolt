@@ -12,6 +12,7 @@ export class PDFBuilder implements Builder {
   private blockVisitor: BlockVisitor;
   private tableVisitor: TableVisitor;
   private specialBlockVisitor: SpecialBlockVisitor;
+  private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: any }> = new Map();
 
   constructor(private assetResolver?: (path: string) => string) {
     const visitNodeBound = this.visitNode.bind(this);
@@ -35,14 +36,38 @@ export class PDFBuilder implements Builder {
   }
 
   public async buildToDefinition(node: ASTNode): Promise<TDocumentDefinitions> {
+    this.footnoteDefinitions.clear();
     const content: Content[] = [];
 
     if (node.type === 'Document') {
       for (const child of (node as DocumentNode).children) {
-        content.push(await this.visitNode(child));
+        const visited = await this.visitNode(child);
+        if (visited && !this.isEmptyText(visited)) {
+          content.push(visited);
+        }
       }
     } else {
       content.push(await this.visitNode(node));
+    }
+
+    // Ajouter les notes de bas de page à la fin
+    if (this.footnoteDefinitions.size > 0) {
+      content.push({ text: '', margin: [0, 20, 0, 0] });
+      content.push({ canvas: [{ type: 'line', x1: 0, y1: 0, x2: 100, y2: 0, lineWidth: 1 }] });
+
+      const footnotes: Content[] = [];
+      for (const [id, def] of this.footnoteDefinitions.entries()) {
+        const footnoteContent = await Promise.all(def.children.map((c) => this.visitNode(c)));
+        footnotes.push({
+          columns: [
+            { text: `[${id}] `, width: 'auto', id: `fn-${id}` },
+            { stack: footnoteContent, width: '*' },
+          ],
+          margin: [0, 5, 0, 5],
+          fontSize: 9,
+        });
+      }
+      content.push({ stack: footnotes });
     }
 
     return {
@@ -52,6 +77,16 @@ export class PDFBuilder implements Builder {
         fontSize: 11,
       },
     };
+  }
+
+  private isEmptyText(content: Content): boolean {
+    return (
+      typeof content === 'object' &&
+      'text' in content &&
+      content.text === '' &&
+      !('id' in content) &&
+      !('pageBreak' in content)
+    );
   }
 
   private async visitNode(node: ASTNode): Promise<Content> {
@@ -91,6 +126,12 @@ export class PDFBuilder implements Builder {
         return await this.inlineVisitor.visitFile(node as any);
       case 'Footnote':
         return await this.inlineVisitor.visitFootnote(node as any);
+      case 'FootnoteDefinition':
+        this.footnoteDefinitions.set((node as any).id, {
+          children: (node as any).children,
+          attributes: (node as any).attributes,
+        });
+        return { text: '' };
       case 'Abbreviation':
         return this.inlineVisitor.visitAbbreviation(node as any);
       case 'CommentInline':

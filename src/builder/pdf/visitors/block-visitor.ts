@@ -59,10 +59,15 @@ export class BlockVisitor {
     let listContent: Content;
     if (node.kind === 'numbered') {
       listContent = { ol: children } as Content;
-    } else if (node.kind === 'definition') {
+    } else if (node.kind === 'definition' || node.kind === 'plain') {
       listContent = { stack: children } as Content;
     } else {
+      // bullet or task
       listContent = { ul: children } as Content;
+    }
+
+    if (node.kind === 'task') {
+      (listContent as any).listType = 'none';
     }
 
     return applyAttributes(listContent, node);
@@ -72,7 +77,17 @@ export class BlockVisitor {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
     let listItem: Content;
-    if (children.length > 1) {
+    if (node.checked !== undefined) {
+      // C'est une tâche
+      const checkbox = node.checked ? '☑ ' : '☐ ';
+      listItem = {
+        columns: [
+          { text: checkbox, width: 'auto' },
+          { stack: children, width: '*' },
+        ],
+        columnGap: 5,
+      };
+    } else if (children.length > 1) {
       listItem = { stack: children };
     } else if (children.length === 1) {
       listItem = children[0];

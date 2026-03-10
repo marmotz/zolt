@@ -52,29 +52,29 @@ Légende :
 | Titre Niveau 4                 | `####`                |     [x]      |     [x]     | build.e2e.spec.ts            |
 | Titre Niveau 5                 | `#####`               |     [x]      |     [x]     | build.e2e.spec.ts            |
 | Titre Niveau 6                 | `######`              |     [x]      |     [x]     | build.e2e.spec.ts            |
-| Bloc de citation               | `>`                   |     [x]      |     [ ]     | blockquotes.e2e.spec.ts      |
-| Liste à puces (tiret)          | `-`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste à puces (astérisque)     | `*`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste à puces (plus)           | `+`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste numérotée (chiffre)      | `1.`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste numérotées (lettre min)  | `a.`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste numérotées (romain min)  | `i.`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste numérotées (romain maj)  | `I.`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste numérotées (lettre maj)  | `A.`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste de tâches (vide)         | `- [ ]`               |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste de tâches (cochée)       | `- [x]`               |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Liste de définition            | `terme : description` |     [x]      |     [ ]     | definition-lists.e2e.spec.ts |
-| Liste simple                   | `.. item`             |     [x]      |     [ ]     | plain-list.e2e.spec.ts       |
-| Bloc de code                   | ` ```lang ... ``` `   |     [x]      |     [ ]     | code-blocks.e2e.spec.ts      |
-| Règle horizontale (tiret)      | `---`                 |     [x]      |     [ ]     | separators.e2e.spec.ts       |
-| Règle horizontale (astérisque) | `***`                 |     [x]      |     [ ]     | separators.e2e.spec.ts       |
-| Règle horizontale (underscore) | `___`                 |     [x]      |     [ ]     | separators.e2e.spec.ts       |
-| Tableaux                       | `\| col \| col \|`    |     [x]      |     [ ]     | tables.e2e.spec.ts           |
-| Indentation                    | (espaces/tabs)        |     [x]      |     [ ]     | indentation.e2e.spec.ts      |
-| Footnote Def                   | `[^id]: definition`   |     [x]      |     [ ]     | footnotes.e2e.spec.ts        |
-| Abbréviation Def               | `*[abbr]: definition` |     [x]      |     [ ]     | abbreviations.e2e.spec.ts    |
-| Link Reference Def             | `[ref]: url`          |     [x]      |     [ ]     | links.e2e.spec.ts            |
-| Math Block                     | `$$ ... $$`           |     [x]      |     [ ]     | math.e2e.spec.ts             |
+| Bloc de citation               | `>`                   |     [x]      |     [x]     | blockquotes.e2e.spec.ts      |
+| Liste à puces (tiret)          | `-`                   |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste à puces (astérisque)     | `*`                   |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste à puces (plus)           | `+`                   |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste numérotée (chiffre)      | `1.`                  |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste numérotées (lettre min)  | `a.`                  |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste numérotées (romain min)  | `i.`                  |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste numérotées (romain maj)  | `I.`                  |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste numérotées (lettre maj)  | `A.`                  |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste de tâches (vide)         | `- [ ]`               |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste de tâches (cochée)       | `- [x]`               |     [x]      |     [x]     | build.e2e.spec.ts            |
+| Liste de définition            | `terme : description` |     [x]      |     [x]     | definition-lists.e2e.spec.ts |
+| Liste simple                   | `.. item`             |     [x]      |     [x]     | plain-list.e2e.spec.ts       |
+| Bloc de code                   | ` ```lang ... ``` `   |     [x]      |     [x]     | code-blocks.e2e.spec.ts      |
+| Règle horizontale (tiret)      | `---`                 |     [x]      |     [x]     | separators.e2e.spec.ts       |
+| Règle horizontale (astérisque) | `***`                 |     [x]      |     [x]     | separators.e2e.spec.ts       |
+| Règle horizontale (underscore) | `___`                 |     [x]      |     [x]     | separators.e2e.spec.ts       |
+| Tableaux                       | `\| col \| col \|`    |     [x]      |     [x]     | tables.e2e.spec.ts           |
+| Indentation                    | (espaces/tabs)        |     [x]      |     [x]     | indentation.e2e.spec.ts      |
+| Footnote Def                   | `[^id]: definition`   |     [x]      |     [x]     | footnotes.e2e.spec.ts        |
+| Abbréviation Def               | `*[abbr]: definition` |     [x]      |     [x]     | abbreviations.e2e.spec.ts    |
+| Link Reference Def             | `[ref]: url`          |     [x]      |     [x]     | links.e2e.spec.ts            |
+| Math Block                     | `$$ ... $$`           |     [x]      |     [x]     | math.e2e.spec.ts             |
 
 ## 3. Blocs Spéciaux (Triple Colon `:::`)
 

@@ -61,6 +61,72 @@ describe('PDFBuilder - BlockVisitor', () => {
     expect(content[0].ul[0].text).toBe('I');
   });
 
+  test('should build task lists with checkboxes', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'List',
+          kind: 'task',
+          children: [
+            { type: 'ListItem', checked: true, children: [{ type: 'Text', content: 'Done' } as TextNode] } as any,
+            { type: 'ListItem', checked: false, children: [{ type: 'Text', content: 'Todo' } as TextNode] } as any,
+          ],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].ul).toBeDefined();
+    // Les items de tâches utilisent des colonnes pour la checkbox
+    expect(content[0].ul[0].columns[0].text).toBe('☑ ');
+    expect(content[0].ul[1].columns[0].text).toBe('☐ ');
+  });
+
+  test('should build plain lists', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'List',
+          kind: 'plain',
+          children: [{ type: 'ListItem', children: [{ type: 'Text', content: 'Item' } as TextNode] } as any],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].stack).toBeDefined();
+    expect(content[0].stack[0].text).toBe('Item');
+  });
+
+  test('should build definition lists', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'List',
+          kind: 'definition',
+          children: [
+            { type: 'DefinitionTerm', children: [{ type: 'Text', content: 'Term' } as TextNode] } as any,
+            { type: 'DefinitionDescription', children: [{ type: 'Text', content: 'Desc' } as TextNode] } as any,
+          ],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].stack).toBeDefined();
+    expect(content[0].stack[0].bold).toBe(true);
+    expect(content[0].stack[1].margin[0]).toBe(15);
+  });
+
   test('should build code blocks', async () => {
     const ast: DocumentNode = {
       type: 'Document',
