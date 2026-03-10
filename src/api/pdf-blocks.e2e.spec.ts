@@ -41,6 +41,23 @@ Indented
 $$
 E=mc^2
 $$
+
+:::tabs
+:::tab [Tab 1]
+Content 1
+:::
+:::tab [Tab 2]
+Content 2
+:::
+:::
+
+:::sidebar
+Should be ignored
+:::
+
+:::details Title
+Hidden details
+:::
     `;
 
     const result = await buildString(input, options);
@@ -64,5 +81,12 @@ $$
     expect(flatContent).toContain('Val 1');
     expect(flatContent).toContain('Footnote definition');
     expect(flatContent).toContain('E=mc^2');
+
+    // New blocks
+    expect(flatContent).toContain('Tab 1');
+    expect(flatContent).toContain('Content 1');
+    expect(flatContent).toContain('Tab 2');
+    expect(flatContent).not.toContain('Should be ignored');
+    expect(flatContent).toContain('Hidden details');
   });
 });

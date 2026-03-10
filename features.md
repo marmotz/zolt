@@ -80,15 +80,15 @@ Légende :
 
 | Feature          | Syntaxe               | HTML Builder | PDF Builder | Test E2E                        |
 |:-----------------|:----------------------|:------------:|:-----------:|:--------------------------------|
-| Alert Info       | `:::info`             |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Alert Warning    | `:::warning`          |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Alert Error      | `:::error`            |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Alert Success    | `:::success`          |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Alert Note       | `:::note`             |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Tabs             | `:::tabs`             |     [x]      |     [ ]     | tabs.e2e.spec.ts                |
-| Sidebar          | `:::sidebar`          |     [x]      |     [ ]     | sidebar.e2e.spec.ts             |
-| Details          | `:::details`          |     [x]      |     [ ]     | triple-colon-blocks.e2e.spec.ts |
-| Columns          | `:::columns`          |     [x]      |     [ ]     | columns.e2e.spec.ts             |
+| Alert Info       | `:::info`             |     [x]      |     [x]     | triple-colon-blocks.e2e.spec.ts |
+| Alert Warning    | `:::warning`          |     [x]      |     [x]     | triple-colon-blocks.e2e.spec.ts |
+| Alert Error      | `:::error`            |     [x]      |     [x]     | triple-colon-blocks.e2e.spec.ts |
+| Alert Success    | `:::success`          |     [x]      |     [x]     | triple-colon-blocks.e2e.spec.ts |
+| Alert Note       | `:::note`             |     [x]      |     [x]     | triple-colon-blocks.e2e.spec.ts |
+| Tabs             | `:::tabs`             |     [x]      |     [x]     | pdf-blocks.e2e.spec.ts          |
+| Sidebar          | `:::sidebar`          |     [x]      |     [x]     | pdf-blocks.e2e.spec.ts          |
+| Details          | `:::details`          |     [x]      |     [x]     | pdf-blocks.e2e.spec.ts          |
+| Columns          | `:::columns`          |     [x]      |     [x]     | columns.e2e.spec.ts             |
 | Mermaid          | `:::mermaid`          |     [x]*     |     [ ]     | -                               |
 | Chart (Bar)      | `:::chart-bar`        |     [x]      |     [ ]     | charts.e2e.spec.ts              |
 | Chart (Line)     | `:::chart-line`       |     [x]      |     [ ]     | charts.e2e.spec.ts              |

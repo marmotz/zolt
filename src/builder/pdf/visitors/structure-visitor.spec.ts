@@ -76,4 +76,77 @@ describe('PDFBuilder - Structure Visitors (Table & SpecialBlocks)', () => {
     expect(content[0].columns).toBeDefined();
     expect(content[0].columns.length).toBe(2);
   });
+
+  test('should build tabs sequentially', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'TripleColonBlock',
+          blockType: 'tabs',
+          children: [
+            {
+              type: 'TripleColonBlock',
+              blockType: 'tab',
+              title: 'Tab 1',
+              children: [{ type: 'Paragraph', children: [{ type: 'Text', content: 'Content 1' } as TextNode] } as any],
+            } as any,
+            {
+              type: 'TripleColonBlock',
+              blockType: 'tab',
+              title: 'Tab 2',
+              children: [{ type: 'Paragraph', children: [{ type: 'Text', content: 'Content 2' } as TextNode] } as any],
+            } as any,
+          ],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].stack).toBeDefined();
+    expect(content[0].stack.length).toBe(4); // Titre 1, Content 1, Titre 2, Content 2
+    expect(content[0].stack[0].text).toBe('Tab 1');
+  });
+
+  test('should ignore sidebar', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'TripleColonBlock',
+          blockType: 'sidebar',
+          children: [{ type: 'Paragraph', children: [] } as any],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    // Le visiteur retourne { text: '' } pour la sidebar, qui est ensuite filtré par isEmptyText dans builder.ts
+    // Si PDFBuilder.buildToDefinition filtre bien, content devrait être vide
+    expect(content.length).toBe(0);
+  });
+
+  test('should build details block', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'TripleColonBlock',
+          blockType: 'details',
+          title: 'More Info',
+          children: [{ type: 'Paragraph', children: [{ type: 'Text', content: 'Details' } as TextNode] } as any],
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].table).toBeDefined();
+    expect(content[0].table.body[0][0].stack[0].text).toBe('More Info');
+  });
 });
