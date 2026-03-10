@@ -298,6 +298,10 @@ export interface IndentationNode {
   attributes?: Attributes;
 }
 
+export interface PageBreakNode {
+  type: 'PageBreak';
+}
+
 export interface DocumentNode {
   type: 'Document';
   children: ASTNode[];
@@ -352,6 +356,7 @@ export type ASTNode =
   | TableCellNode
   | DoubleBracketBlockNode
   | IndentationNode
+  | PageBreakNode
   | DocumentNode
   | IfNode
   | ForeachNode

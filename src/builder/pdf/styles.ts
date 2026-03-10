@@ -56,6 +56,12 @@ export const defaultPDFStyles: StyleDictionary = {
     fontSize: 10,
     background: '#f4f4f4',
   },
+  codeBlock: {
+    font: 'Courier',
+    fontSize: 10,
+    background: '#f4f4f4',
+    margin: [0, 5, 0, 5],
+  },
   blockquote: {
     margin: [15, 5, 0, 5],
     color: '#666666',

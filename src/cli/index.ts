@@ -7,7 +7,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import pc from 'picocolors';
 import { version } from '../../package.json';
-import { buildFile, getAssetFiles, getLinkedFiles, lint } from '../api';
+import { buildFile, buildFilesToPdf, getAssetFiles, getLinkedFiles, lint } from '../api';
 import { FileMetadataUtils } from '../utils/file-metadata';
 
 const PROJECT_FILENAMES = ['zolt.yaml', 'zolt.yml'];
@@ -56,6 +56,88 @@ export async function loadProjectMetadata(baseInputDir: string): Promise<Record<
   }
 
   return data;
+}
+
+export function findBubblingFile(startDir: string, fileName: string): string | null {
+  let currentDir = startDir;
+  while (true) {
+    const fullPath = resolve(currentDir, fileName);
+    if (existsSync(fullPath)) {
+      return fullPath;
+    }
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+
+  return null;
+}
+
+export async function discoverFilesAndAssetsRec(
+  inputFile: string,
+  baseInputDir: string,
+  outputDir: string,
+  projectMetadata: Record<string, any>,
+  visited: Set<string>,
+  orderedFiles: string[],
+  assetsToCopy: Map<string, string>
+): Promise<void> {
+  const absoluteInput = resolve(inputFile);
+  if (visited.has(absoluteInput)) {
+    return;
+  }
+  visited.add(absoluteInput);
+  orderedFiles.push(absoluteInput);
+
+  const inputDir = dirname(absoluteInput);
+
+  // Collect assets
+  const assets = await getAssetFiles(absoluteInput, projectMetadata);
+  for (const asset of assets) {
+    const fullAssetPath = resolve(inputDir, asset);
+    const assetPathRelativeToBase = relative(baseInputDir, fullAssetPath);
+
+    let destAssetPath: string;
+    if (assetPathRelativeToBase.startsWith('..')) {
+      const oneLevelUp = dirname(baseInputDir);
+      const pathFromOneLevelUp = relative(oneLevelUp, fullAssetPath);
+      destAssetPath = resolve(outputDir, pathFromOneLevelUp);
+    } else {
+      destAssetPath = resolve(outputDir, assetPathRelativeToBase);
+    }
+    assetsToCopy.set(fullAssetPath, destAssetPath);
+  }
+
+  // Handle linked .zlt files
+  const linkedFiles = await getLinkedFiles(absoluteInput, projectMetadata);
+  for (const linkedFile of linkedFiles) {
+    let fullLinkedPath: string;
+    if (linkedFile.startsWith('_layout') || linkedFile.startsWith('_template')) {
+      const bubbledPath = findBubblingFile(inputDir, linkedFile);
+      fullLinkedPath = bubbledPath || resolve(inputDir, linkedFile);
+    } else {
+      fullLinkedPath = resolve(inputDir, linkedFile);
+    }
+
+    try {
+      const linkedStat = await stat(fullLinkedPath);
+      if (linkedStat.isFile()) {
+        await discoverFilesAndAssetsRec(
+          fullLinkedPath,
+          baseInputDir,
+          outputDir,
+          projectMetadata,
+          visited,
+          orderedFiles,
+          assetsToCopy
+        );
+      }
+    } catch {
+      // Linked file not found, ignore during discovery
+    }
+  }
 }
 
 export async function buildFileWithDeps(
@@ -136,23 +218,6 @@ export async function buildFileWithDeps(
 
   // Handle linked .zlt files recursively
   const linkedFiles = await getLinkedFiles(absoluteInput, projectMetadata);
-
-  const findBubblingFile = (startDir: string, fileName: string): string | null => {
-    let currentDir = startDir;
-    while (true) {
-      const fullPath = resolve(currentDir, fileName);
-      if (existsSync(fullPath)) {
-        return fullPath;
-      }
-      const parentDir = dirname(currentDir);
-      if (parentDir === currentDir) {
-        break;
-      }
-      currentDir = parentDir;
-    }
-
-    return null;
-  };
 
   for (const linkedFile of linkedFiles) {
     let fullLinkedPath: string;
@@ -353,7 +418,48 @@ export async function performBuild(
   const projectMetadata = await loadProjectMetadata(baseInputDir);
   const entryPoint = files.length > 0 ? resolve(files[0]) : undefined;
 
-  if (files.length === 1) {
+  if (type === 'pdf') {
+    let pdfOutputFile: string;
+    if (output) {
+      if (output.endsWith('.pdf')) {
+        pdfOutputFile = resolve(output);
+      } else {
+        // Output is a directory, use the first input file name
+        pdfOutputFile = join(resolve(output), basename(files[0]).replace(/\.zlt$/, '.pdf'));
+      }
+    } else {
+      pdfOutputFile = files[0].replace(/\.zlt$/, '.pdf');
+    }
+
+    outputDir = dirname(pdfOutputFile);
+    await mkdir(outputDir, { recursive: true });
+
+    const orderedFiles: string[] = [];
+    const pdfVisited = new Set<string>();
+
+    for (const inputFile of files) {
+      await discoverFilesAndAssetsRec(
+        inputFile,
+        baseInputDir,
+        outputDir,
+        projectMetadata,
+        pdfVisited,
+        orderedFiles,
+        assetsToCopy
+      );
+    }
+
+    for (const f of orderedFiles) {
+      allTouchedFiles.add(f);
+    }
+
+    const assetResolver = (originalAssetPath: string): string => {
+      return originalAssetPath;
+    };
+
+    await buildFilesToPdf(orderedFiles, pdfOutputFile, { type, assetResolver, projectMetadata, entryPoint });
+    console.log(`${pc.green('Built:')} ${pdfOutputFile}`);
+  } else if (files.length === 1) {
     const inputFile = files[0];
     let outputFile = output;
 
@@ -398,8 +504,7 @@ export async function performBuild(
         }
       }
     } else {
-      const extension = type === 'pdf' ? '.pdf' : '.html';
-      outputFile = inputFile.replace(/\.zlt$/, extension);
+      outputFile = inputFile.replace(/\.zlt$/, '.html');
     }
 
     if (!outputDir) {
@@ -757,7 +862,7 @@ export async function handleBuild(args: string[]) {
     if (type === 'pdf') {
       console.error(`${pc.red('Error:')} Server mode is only available for HTML output.`);
       console.error('PDF generation does not support live preview via a web server.');
-      if (import.meta.main || process.argv[1].endsWith('src/cli.ts')) {
+      if (import.meta.main) {
         process.exit(1);
       }
       throw new Error('Server mode only available for HTML');

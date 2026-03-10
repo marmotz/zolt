@@ -7,6 +7,7 @@ import { HTMLBuilder, type InitialVariables } from '../builder/html/builder';
 import { PDFBuilder } from '../builder/pdf/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
+import type { ASTNode, DocumentNode } from '../parser/types';
 import { ProjectGraphBuilder, type ProjectNode } from '../utils/project-graph';
 
 export interface BuildOptions {
@@ -127,9 +128,13 @@ export async function buildString(content: string, options?: BuildOptions): Prom
 
   // Phase 4: Building
   if (options?.type === 'pdf') {
-    const builder = new PDFBuilder();
+    const builder = new PDFBuilder(options?.assetResolver);
 
     return builder.buildDocument(ast);
+  }
+
+  if (options?.type && options.type !== 'html') {
+    throw new Error(`Unsupported output type: ${options.type}`);
   }
 
   const builder = new HTMLBuilder(
@@ -148,6 +153,7 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
 
   if (options?.type === 'pdf') {
     // For PDF, result is the JSON definition for pdfmake
+    // biome-ignore lint/suspicious/noExplicitAny: PdfPrinter is a dynamic import
     const PdfPrinter = (await import('pdfmake')).default as any;
     const printer = new PdfPrinter({
       Courier: {
@@ -175,6 +181,64 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
   }
 
   await writeFile(outputPath, result, 'utf-8');
+}
+
+export async function buildFilesToPdf(inputPaths: string[], outputPath: string, options?: BuildOptions): Promise<void> {
+  const allNodes: ASTNode[] = [];
+
+  for (let i = 0; i < inputPaths.length; i++) {
+    const inputPath = inputPaths[i];
+    const content = await readFile(inputPath, 'utf-8');
+
+    // Phase 1: Expansion
+    const { content: expandedContent } = getExpandedContent(content, { ...options, filePath: inputPath });
+
+    // Phase 2: Lexing & Parsing
+    const lexer = new Lexer(expandedContent);
+    const tokens = lexer.tokenize();
+    const parser = new Parser(tokens, inputPath, options?.globalAbbreviations);
+    const ast = parser.parse();
+
+    allNodes.push(...ast.children);
+
+    // Add page break between files, but not after the last one
+    if (i < inputPaths.length - 1) {
+      allNodes.push({ type: 'PageBreak' });
+    }
+  }
+
+  const finalAst: DocumentNode = {
+    type: 'Document',
+    children: allNodes,
+    sourceFile: outputPath,
+  };
+
+  const builder = new PDFBuilder(options?.assetResolver);
+  const docDef = await builder.buildToDefinition(finalAst);
+  docDef.defaultStyle = {
+    font: 'Courier',
+  };
+
+  // biome-ignore lint/suspicious/noExplicitAny: PdfPrinter is a dynamic import
+  const PdfPrinter = (await import('pdfmake')).default as any;
+  const printer = new PdfPrinter({
+    Courier: {
+      normal: 'Courier',
+      bold: 'Courier-Bold',
+      italics: 'Courier-Oblique',
+      bolditalics: 'Courier-BoldOblique',
+    },
+  });
+
+  const pdfDoc = printer.createPdfKitDocument(docDef);
+
+  return new Promise((resolve, reject) => {
+    const stream = fs.createWriteStream(outputPath);
+    pdfDoc.pipe(stream);
+    pdfDoc.end();
+    stream.on('finish', resolve);
+    stream.on('error', reject);
+  });
 }
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {

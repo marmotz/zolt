@@ -1,12 +1,28 @@
 import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
-import type { ASTNode, DocumentNode, HeadingNode, ParagraphNode, TextNode } from '../../parser/types';
+import type { ASTNode, DocumentNode } from '../../parser/types';
 import type { Builder } from '../builder';
 import { defaultPDFStyles } from './styles';
+import { BlockVisitor } from './visitors/block-visitor';
+import { InlineVisitor } from './visitors/inline-visitor';
+import { SpecialBlockVisitor } from './visitors/special-block-visitor';
+import { TableVisitor } from './visitors/table-visitor';
 
 export class PDFBuilder implements Builder {
+  private inlineVisitor: InlineVisitor;
+  private blockVisitor: BlockVisitor;
+  private tableVisitor: TableVisitor;
+  private specialBlockVisitor: SpecialBlockVisitor;
+
+  constructor(private assetResolver?: (path: string) => string) {
+    const visitNodeBound = this.visitNode.bind(this);
+
+    this.inlineVisitor = new InlineVisitor(visitNodeBound, this.assetResolver);
+    this.blockVisitor = new BlockVisitor(visitNodeBound);
+    this.tableVisitor = new TableVisitor(visitNodeBound);
+    this.specialBlockVisitor = new SpecialBlockVisitor(visitNodeBound);
+  }
+
   async build(node: ASTNode): Promise<string> {
-    // PDFBuilder ne retourne pas directement une string mais génère un buffer.
-    // Cette méthode pourra être utilisée pour des exports intermédiaires ou de debug.
     const doc = await this.buildToDefinition(node);
 
     return JSON.stringify(doc);
@@ -18,9 +34,6 @@ export class PDFBuilder implements Builder {
     return JSON.stringify(docDef);
   }
 
-  /**
-   * Transforme un DocumentNode Zolt en définition pdfmake.
-   */
   public async buildToDefinition(node: ASTNode): Promise<TDocumentDefinitions> {
     const content: Content[] = [];
 
@@ -44,56 +57,72 @@ export class PDFBuilder implements Builder {
   private async visitNode(node: ASTNode): Promise<Content> {
     switch (node.type) {
       case 'Text':
-        return this.visitText(node as TextNode);
+        return this.inlineVisitor.visitText(node as any);
+      case 'Anchor':
+        return this.inlineVisitor.visitAnchor(node as any);
       case 'Paragraph':
-        return await this.visitParagraph(node as ParagraphNode);
+        return await this.blockVisitor.visitParagraph(node as any);
       case 'Heading':
-        return await this.visitHeading(node as HeadingNode);
+        return await this.blockVisitor.visitHeading(node as any);
       case 'Bold':
       case 'Italic':
       case 'Underline':
       case 'Strikethrough':
-        return await this.visitInlineStyle(node as any);
+        return await this.inlineVisitor.visitInlineStyle(node as any);
+      case 'Superscript':
+        return await this.inlineVisitor.visitSuperscript(node as any);
+      case 'Subscript':
+        return await this.inlineVisitor.visitSubscript(node as any);
+      case 'Highlight':
+        return await this.inlineVisitor.visitHighlight(node as any);
+      case 'Code':
+        return this.inlineVisitor.visitCode(node as any);
+      case 'Link':
+        return await this.inlineVisitor.visitLink(node as any);
+      case 'Image':
+        return await this.inlineVisitor.visitImage(node as any);
+      case 'Video':
+        return await this.inlineVisitor.visitVideo(node as any);
+      case 'Audio':
+        return await this.inlineVisitor.visitAudio(node as any);
+      case 'Embed':
+        return await this.inlineVisitor.visitEmbed(node as any);
+      case 'File':
+        return await this.inlineVisitor.visitFile(node as any);
+      case 'Footnote':
+        return await this.inlineVisitor.visitFootnote(node as any);
+      case 'Abbreviation':
+        return this.inlineVisitor.visitAbbreviation(node as any);
+      case 'CommentInline':
+        return this.inlineVisitor.visitCommentInline(node as any);
+      case 'Math':
+        return this.inlineVisitor.visitMath(node as any);
+      case 'Blockquote':
+        return await this.blockVisitor.visitBlockquote(node as any);
+      case 'List':
+        return await this.blockVisitor.visitList(node as any);
+      case 'ListItem':
+        return await this.blockVisitor.visitListItem(node as any);
+      case 'DefinitionTerm':
+        return await this.blockVisitor.visitDefinitionTerm(node as any);
+      case 'DefinitionDescription':
+        return await this.blockVisitor.visitDefinitionDescription(node as any);
+      case 'Table':
+        return await this.tableVisitor.visitTable(node as any);
+      case 'Indentation':
+        return await this.blockVisitor.visitIndentation(node as any);
+      case 'TripleColonBlock':
+        return await this.specialBlockVisitor.visitTripleColonBlock(node as any);
+      case 'CodeBlock':
+        return this.blockVisitor.visitCodeBlock(node as any);
+      case 'HorizontalRule':
+        return this.blockVisitor.visitHorizontalRule(node as any);
+      case 'LineBreak':
+        return this.blockVisitor.visitLineBreak();
+      case 'PageBreak':
+        return this.blockVisitor.visitPageBreak();
       default:
-        // Fallback pour les nœuds non encore supportés
         return { text: `[Unsupported node: ${node.type}]`, color: 'red' };
     }
-  }
-
-  private visitText(node: TextNode): Content {
-    return { text: node.content };
-  }
-
-  private async visitParagraph(node: ParagraphNode): Promise<Content> {
-    const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
-
-    return {
-      text: children,
-      style: 'paragraph',
-    };
-  }
-
-  private async visitHeading(node: HeadingNode): Promise<Content> {
-    const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
-
-    return {
-      text: children,
-      style: `header${node.level}`,
-    };
-  }
-
-  private async visitInlineStyle(node: any): Promise<Content> {
-    const children = await Promise.all(node.children.map((child: ASTNode) => this.visitNode(child)));
-    const styleMap: Record<string, string> = {
-      Bold: 'bold',
-      Italic: 'italic',
-      Underline: 'underline',
-      Strikethrough: 'strikethrough',
-    };
-
-    return {
-      text: children,
-      style: styleMap[node.type] || '',
-    };
   }
 }

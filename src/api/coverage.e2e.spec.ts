@@ -124,10 +124,10 @@ layout: f-layout.zlt
 
     it('should throw error for unsupported output type', async () => {
       try {
-        await buildString('', { type: 'pdf' as any });
+        await buildString('', { type: 'epub' as any });
         expect(false).toBe(true); // Should not reach here
       } catch (e: any) {
-        expect(e.message).toBe('Unsupported output type: pdf');
+        expect(e.message).toBe('Unsupported output type: epub');
       }
     });
 

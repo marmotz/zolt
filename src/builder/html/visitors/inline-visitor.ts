@@ -259,7 +259,7 @@ export class InlineVisitor {
     delete (nodeAttrs as any).controls;
     const attrs = this.renderAllAttributes(nodeAttrs);
 
-    return `<video src="${resolvedSrc}" controls${attrs}>${alt}</video>`;
+    return `<video src="${resolvedSrc}" controls${attrs}>${alt || 'Your browser does not support the video element.'}</video>`;
   }
 
   visitAudio(node: AudioNode): string {
@@ -273,7 +273,7 @@ export class InlineVisitor {
     const isRemote = src.startsWith('http://') || src.startsWith('https://');
     const resolvedSrc = !isRemote && this.assetResolver ? this.assetResolver(src) : src;
 
-    return `<audio src="${resolvedSrc}" controls${attrs}>${alt}</audio>`;
+    return `<audio src="${resolvedSrc}" controls${attrs}>${alt || 'Your browser does not support the audio element.'}</audio>`;
   }
 
   visitEmbed(node: EmbedNode): string {

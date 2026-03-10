@@ -59,10 +59,10 @@ export class InlineParser {
       // Handle escaped characters
       if (remaining[0] === '\\' && remaining.length > 1) {
         const nextChar = remaining[1];
-        if (nextChar === 'n') {
+        if (nextChar === 'n' || nextChar === ' ') {
           nodes.push({ type: 'LineBreak' });
           remaining = remaining.slice(2);
-          lastChar = '\n';
+          lastChar = nextChar === 'n' ? '\n' : ' ';
           continue;
         }
         const lastNode = nodes[nodes.length - 1];
