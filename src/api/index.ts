@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import { ExpressionEvaluator, type Value } from '../builder/evaluator/expression-evaluator';
 import { SourceEvaluator } from '../builder/evaluator/source-evaluator';
 import { HTMLBuilder, type InitialVariables } from '../builder/html/builder';
+import { PDFBuilder } from '../builder/pdf/builder';
 import { Lexer } from '../lexer/lexer';
 import { Parser } from '../parser/parser';
 import { ProjectGraphBuilder, type ProjectNode } from '../utils/project-graph';
@@ -124,26 +125,56 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     projectGraph = result ? result : undefined;
   }
 
-  // Phase 4: HTML Building
-  let builder: HTMLBuilder;
-  if (options?.type === 'html' || !options?.type) {
-    builder = new HTMLBuilder(
-      mergedVariables as InitialVariables,
-      options?.assetResolver,
-      projectGraph,
-      options?.filePath
-    );
-  } else {
-    throw new Error(`Unsupported output type: ${options.type}`);
+  // Phase 4: Building
+  if (options?.type === 'pdf') {
+    const builder = new PDFBuilder();
+
+    return builder.buildDocument(ast);
   }
+
+  const builder = new HTMLBuilder(
+    mergedVariables as InitialVariables,
+    options?.assetResolver,
+    projectGraph,
+    options?.filePath
+  );
 
   return builder.buildDocument(ast);
 }
 
 export async function buildFile(inputPath: string, outputPath: string, options?: BuildOptions): Promise<void> {
   const content = await readFile(inputPath, 'utf-8');
-  const html = await buildString(content, { ...options, filePath: inputPath });
-  await writeFile(outputPath, html, 'utf-8');
+  const result = await buildString(content, { ...options, filePath: inputPath });
+
+  if (options?.type === 'pdf') {
+    // For PDF, result is the JSON definition for pdfmake
+    const PdfPrinter = (await import('pdfmake')).default as any;
+    const printer = new PdfPrinter({
+      Courier: {
+        normal: 'Courier',
+        bold: 'Courier-Bold',
+        italics: 'Courier-Oblique',
+        bolditalics: 'Courier-BoldOblique',
+      },
+    });
+
+    const docDefinition = JSON.parse(result);
+    docDefinition.defaultStyle = {
+      font: 'Courier',
+    };
+
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+    return new Promise((resolve, reject) => {
+      const stream = fs.createWriteStream(outputPath);
+      pdfDoc.pipe(stream);
+      pdfDoc.end();
+      stream.on('finish', resolve);
+      stream.on('error', reject);
+    });
+  }
+
+  await writeFile(outputPath, result, 'utf-8');
 }
 
 export async function buildFileToString(filePath: string, options?: BuildOptions): Promise<string> {

@@ -43,8 +43,10 @@
     "build:bin:macos-arm64": "mkdir -p dist/bin && rm -f dist/bin/zolt-macos-arm64 && bun build src/cli.ts --outfile dist/bin/zolt-macos-arm64 --target bun-aarch64-macos --compile",
     "build:bin:windows": "mkdir -p dist/bin && rm -f dist/bin/zolt-windows-x64.exe && bun build src/cli.ts --outfile dist/bin/zolt-windows-x64.exe --target bun-x64-windows --compile",
     "build:cli": "mkdir -p dist/cli && rm -f dist/cli/zolt && bun build src/cli.ts --outfile dist/cli/zolt --target node && chmod +x dist/cli/zolt",
-    "build:docs": "rm -rf dist/docs && mkdir -p dist/docs && bun dev build docs/index.zlt -o dist/docs",
-    "build:docs:watch": "bun build:docs -w -s",
+    "build:docs:html": "rm -rf dist/docs/html && mkdir -p dist/docs/html && bun dev build docs/index.zlt -t html -o dist/docs/html",
+    "build:docs:html:watch": "bun build:docs:html -w -s",
+    "build:docs:pdf": "rm -rf dist/docs/pdf && mkdir -p dist/docs/pdf && bun dev build docs/index.zlt -t pdf -o dist/docs/pdf",
+    "build:docs:pdf:watch": "bun build:docs:pdf -w",
     "build:examples": "rm -rf dist/examples && mkdir -p dist/examples && bun dev build examples/index.zlt -o dist/examples",
     "dev": "bun run src/cli.ts",
     "test": "bun test",
@@ -78,7 +80,9 @@
     "LICENSE"
   ],
   "dependencies": {
+    "@types/pdfmake": "^0.3.2",
     "katex": "^0.16.33",
+    "pdfmake": "0.2.15",
     "picocolors": "^1.1.1",
     "shiki": "^3.23.0",
     "yaml": "^2.8.2"

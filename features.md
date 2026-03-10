@@ -13,12 +13,13 @@ Légende :
 
 | Feature               | Syntaxe                   | HTML Builder | PDF Builder | Test E2E                       |
 |:----------------------|:--------------------------|:------------:|:-----------:|:-------------------------------|
-| Texte brut            | `texte`                   |     [x]      |     [ ]     | build.e2e.spec.ts              |
-| Gras                  | `**texte**`               |     [x]      |     [ ]     | attributes.e2e.spec.ts         |
-| Italique              | `//texte//`               |     [x]      |     [ ]     | attributes.e2e.spec.ts         |
-| Souligné              | `__texte__`               |     [x]      |     [ ]     | attributes.e2e.spec.ts         |
-| Barré                 | `~~texte~~`               |     [x]*     |     [ ]     | -                              |
-| Code en ligne         | `` `code` ``              |     [x]      |     [ ]     | attributes.e2e.spec.ts         |
+| Texte brut | `texte` | [x] | [x] | build.e2e.spec.ts |
+| Gras | `**texte**` | [x] | [x] | attributes.e2e.spec.ts |
+| Italique | `//texte//` | [x] | [x] | attributes.e2e.spec.ts |
+| Souligné | `__texte__` | [x] | [x] | attributes.e2e.spec.ts |
+| Barré | `~~texte~~` | [x]* | [x] | - |
+| Code en ligne | `` `code` `` | [x] | [ ] | attributes.e2e.spec.ts |
+
 | Exposant              | `^{texte}`                |     [x]      |     [ ]     | build.e2e.spec.ts              |
 | Indice                | `_{texte}`                |     [x]      |     [ ]     | build.e2e.spec.ts              |
 | Surlignage            | `==texte==`               |     [x]*     |     [ ]     | -                              |
@@ -45,13 +46,14 @@ Légende :
 
 | Feature                        | Syntaxe               | HTML Builder | PDF Builder | Test E2E                     |
 |:-------------------------------|:----------------------|:------------:|:-----------:|:-----------------------------|
-| Paragraphe                     | (texte multi-ligne)   |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 1                 | `#`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 2                 | `##`                  |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 3                 | `###`                 |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 4                 | `####`                |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 5                 | `#####`               |     [x]      |     [ ]     | build.e2e.spec.ts            |
-| Titre Niveau 6                 | `######`              |     [x]      |     [ ]     | build.e2e.spec.ts            |
+| Paragraphe | (texte multi-ligne) | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 1 | `#` | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 2 | `##` | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 3 | `###` | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 4 | `####` | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 5 | `#####` | [x] | [x] | build.e2e.spec.ts |
+| Titre Niveau 6 | `######` | [x] | [x] | build.e2e.spec.ts |
+
 | Bloc de citation               | `>`                   |     [x]      |     [ ]     | blockquotes.e2e.spec.ts      |
 | Liste à puces (tiret)          | `-`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |
 | Liste à puces (astérisque)     | `*`                   |     [x]      |     [ ]     | build.e2e.spec.ts            |

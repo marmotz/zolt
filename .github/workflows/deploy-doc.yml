@@ -35,7 +35,7 @@ jobs:
         run: bun install
 
       - name: Build examples
-        run: bun run build:docs
+        run: bun run build:docs:html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -86,7 +86,8 @@ export async function buildFileWithDeps(
       ? absoluteInput.slice(baseInputDir.length).replace(/^[/\\]+/, '')
       : basename(absoluteInput);
 
-    const baseName = relativePath.replace(/\.zlt$/, '.html');
+    const extension = type === 'pdf' ? '.pdf' : '.html';
+    const baseName = relativePath.replace(/\.zlt$/, extension);
     outputFile = join(outputDir, baseName);
   }
 
@@ -397,7 +398,8 @@ export async function performBuild(
         }
       }
     } else {
-      outputFile = inputFile.replace(/\.zlt$/, '.html');
+      const extension = type === 'pdf' ? '.pdf' : '.html';
+      outputFile = inputFile.replace(/\.zlt$/, extension);
     }
 
     if (!outputDir) {
@@ -752,9 +754,10 @@ export async function handleBuild(args: string[]) {
   }
 
   if (server) {
-    if (type !== 'html') {
-      console.error(`${pc.red('Error:')} Server mode is only available for HTML output`);
-      if (import.meta.main) {
+    if (type === 'pdf') {
+      console.error(`${pc.red('Error:')} Server mode is only available for HTML output.`);
+      console.error('PDF generation does not support live preview via a web server.');
+      if (import.meta.main || process.argv[1].endsWith('src/cli.ts')) {
         process.exit(1);
       }
       throw new Error('Server mode only available for HTML');
