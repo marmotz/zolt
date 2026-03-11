@@ -416,6 +416,7 @@ export async function performBuild(
   }
 
   const projectMetadata = await loadProjectMetadata(baseInputDir);
+  projectMetadata.baseDir = baseInputDir;
   const entryPoint = files.length > 0 ? resolve(files[0]) : undefined;
 
   if (type === 'pdf') {

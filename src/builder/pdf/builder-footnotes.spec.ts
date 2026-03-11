@@ -26,7 +26,7 @@ describe('PDFBuilder - Footnotes', () => {
     const content = docDef.content as any[];
 
     // Le premier paragraphe contient la référence
-    expect(content[0].text[1].linkToDestination).toBe('fn-1');
+    expect(content[0].text[1].linkToDestination).toBe('fn_1');
 
     // Le dernier élément est la stack de footnotes
     const lastElement = content[content.length - 1];

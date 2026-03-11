@@ -127,10 +127,10 @@ Légende :
 
 ## 7. Attributs (`{...}`)
 
-| Feature              | Syntaxe                    | HTML Builder | PDF Builder | Test E2E               |
-|:---------------------|:---------------------------|:------------:|:-----------:|:-----------------------|
-| Identifiant          | `{#id}`                    |     [x]      |     [ ]     | attributes.e2e.spec.ts |
-| Classe CSS           | `{.class}`                 |     [x]      |     [ ]     | attributes.e2e.spec.ts |
-| Style Inline         | `{color=red}`              |     [x]      |     [ ]     | attributes.e2e.spec.ts |
-| Attributs génériques | `{attr=value}`             |     [x]      |     [ ]     | attributes.e2e.spec.ts |
-| Rendu sur bloc       | `{#id}` sur ligne suivante |     [x]      |     [ ]     | attributes.e2e.spec.ts |
+| Feature              | Syntaxe                    | HTML Builder | PDF Builder | Test E2E                   |
+|:---------------------|:---------------------------|:------------:|:-----------:|:---------------------------|
+| Identifiant          | `{#id}`                    |     [x]      |     [x]     | pdf-attributes.e2e.spec.ts |
+| Classe CSS           | `{.class}`                 |     [x]      |     [x]     | pdf-attributes.e2e.spec.ts |
+| Style Inline         | `{color=red}`              |     [x]      |     [x]     | pdf-attributes.e2e.spec.ts |
+| Attributs génériques | `{attr=value}`             |     [x]      |     [x]     | pdf-attributes.e2e.spec.ts |
+| Rendu sur bloc       | `{#id}` sur ligne suivante |     [x]      |     [x]     | pdf-attributes.e2e.spec.ts |

@@ -106,46 +106,58 @@ export class BlockVisitor {
   async visitDefinitionTerm(node: DefinitionTermNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      text: children,
-      bold: true,
-      margin: [0, 5, 0, 0],
-    };
+    return applyAttributes(
+      {
+        text: children,
+        bold: true,
+        margin: [0, 5, 0, 0],
+      },
+      node
+    );
   }
 
   async visitDefinitionDescription(node: DefinitionDescriptionNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      stack: children,
-      margin: [15, 0, 0, 5],
-    };
+    return applyAttributes(
+      {
+        stack: children,
+        margin: [15, 0, 0, 5],
+      },
+      node
+    );
   }
 
   async visitIndentation(node: IndentationNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      stack: children,
-      margin: [node.level * 20, 0, 0, 0],
-    };
+    return applyAttributes(
+      {
+        stack: children,
+        margin: [node.level * 20, 0, 0, 0],
+      },
+      node
+    );
   }
 
-  visitHorizontalRule(_node: HorizontalRuleNode): Content {
-    return {
-      canvas: [
-        {
-          type: 'line',
-          x1: 0,
-          y1: 5,
-          x2: 515,
-          y2: 5,
-          lineWidth: 1,
-          lineColor: '#cccccc',
-        },
-      ],
-      margin: [0, 10, 0, 10],
-    };
+  visitHorizontalRule(node: HorizontalRuleNode): Content {
+    return applyAttributes(
+      {
+        canvas: [
+          {
+            type: 'line',
+            x1: 0,
+            y1: 5,
+            x2: 515,
+            y2: 5,
+            lineWidth: 1,
+            lineColor: '#cccccc',
+          },
+        ],
+        margin: [0, 10, 0, 10],
+      },
+      node
+    );
   }
 
   visitLineBreak(): Content {
@@ -157,22 +169,25 @@ export class BlockVisitor {
   }
 
   visitCodeBlock(node: CodeBlockNode): Content {
-    return {
-      table: {
-        widths: ['*'],
-        body: [
-          [
-            {
-              text: node.content,
-              style: 'code',
-              margin: [5, 5, 5, 5],
-            },
+    return applyAttributes(
+      {
+        table: {
+          widths: ['*'],
+          body: [
+            [
+              {
+                text: node.content,
+                style: 'code',
+                margin: [5, 5, 5, 5],
+              },
+            ],
           ],
-        ],
+        },
+        layout: 'noBorders',
+        fillColor: '#f4f4f4',
+        margin: [0, 5, 0, 10],
       },
-      layout: 'noBorders',
-      fillColor: '#f4f4f4',
-      margin: [0, 5, 0, 10],
-    };
+      node
+    );
   }
 }

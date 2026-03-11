@@ -133,7 +133,7 @@ export async function buildString(content: string, options?: BuildOptions): Prom
 
   // Phase 4: Building
   if (options?.type === 'pdf') {
-    const builder = new PDFBuilder(options?.assetResolver, evaluator);
+    const builder = new PDFBuilder(options?.assetResolver, evaluator, options?.projectMetadata?.baseDir as string);
 
     return builder.buildDocument(ast);
   }
@@ -195,6 +195,10 @@ export async function buildFilesToPdf(inputPaths: string[], outputPath: string, 
     ...options?.variables,
   };
 
+  const baseDir =
+    (options?.projectMetadata?.baseDir as string) ||
+    (inputPaths.length > 0 ? path.dirname(inputPaths[0]) : process.cwd());
+
   for (let i = 0; i < inputPaths.length; i++) {
     const inputPath = inputPaths[i];
     const content = await readFile(inputPath, 'utf-8');
@@ -216,7 +220,18 @@ export async function buildFilesToPdf(inputPaths: string[], outputPath: string, 
       Object.assign(allVariables, ast.fileMetadata.data);
     }
 
-    allNodes.push(...ast.children);
+    // Wrap the file content into a DocumentNode to preserve context
+    const relativePath = path.relative(baseDir, inputPath);
+    const fileAnchorId = `file:${relativePath}`.replace(/[:.#/\\ ]/g, '_');
+
+    const fileNodes: ASTNode[] = [{ type: 'Anchor', id: fileAnchorId }, ...ast.children];
+
+    allNodes.push({
+      type: 'Document',
+      children: fileNodes,
+      sourceFile: inputPath,
+      fileMetadata: ast.fileMetadata,
+    } as DocumentNode);
 
     // Add page break between files, but not after the last one
     if (i < inputPaths.length - 1) {
@@ -235,7 +250,7 @@ export async function buildFilesToPdf(inputPaths: string[], outputPath: string, 
     evaluator.setVariable(key, value as Value);
   }
 
-  const builder = new PDFBuilder(options?.assetResolver, evaluator);
+  const builder = new PDFBuilder(options?.assetResolver, evaluator, baseDir as string);
   const docDef = await builder.buildToDefinition(finalAst);
   docDef.defaultStyle = {
     font: 'Courier',

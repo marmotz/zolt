@@ -17,14 +17,45 @@ export class PDFBuilder implements Builder {
 
   constructor(
     private assetResolver?: (path: string) => string,
-    private evaluator?: ExpressionEvaluator
+    private evaluator?: ExpressionEvaluator,
+    private baseDir?: string,
+    private sourceFile?: string
   ) {
     const visitNodeBound = this.visitNode.bind(this);
 
-    this.inlineVisitor = new InlineVisitor(visitNodeBound, this.assetResolver, this.evaluator);
+    this.inlineVisitor = new InlineVisitor(
+      visitNodeBound,
+      this.assetResolver,
+      this.evaluator,
+      this.baseDir,
+      this.sourceFile
+    );
     this.blockVisitor = new BlockVisitor(visitNodeBound);
     this.tableVisitor = new TableVisitor(visitNodeBound);
     this.specialBlockVisitor = new SpecialBlockVisitor(visitNodeBound);
+  }
+
+  /**
+   * Nettoie un ID pour pdfmake
+   */
+  private cleanId(id: string): string {
+    return id.replace(/[:.#/\\ ]/g, '_');
+  }
+
+  /**
+   * Définit le fichier source actuel pour la résolution des liens relatifs.
+   */
+  public setSourceFile(filePath: string): void {
+    this.sourceFile = filePath;
+    const visitNodeBound = this.visitNode.bind(this);
+    // On réinstancie le visiteur avec le nouveau sourceFile
+    this.inlineVisitor = new InlineVisitor(
+      visitNodeBound,
+      this.assetResolver,
+      this.evaluator,
+      this.baseDir,
+      this.sourceFile
+    );
   }
 
   async build(node: ASTNode): Promise<string> {
@@ -41,19 +72,14 @@ export class PDFBuilder implements Builder {
 
   public async buildToDefinition(node: ASTNode): Promise<TDocumentDefinitions> {
     this.footnoteDefinitions.clear();
+    this.specialBlockVisitor.reset();
     const content: Content[] = [];
 
-    let documentNode: DocumentNode | undefined;
-    if (node.type === 'Document') {
-      documentNode = node as DocumentNode;
-      for (const child of documentNode.children) {
-        const visited = await this.visitNode(child);
-        if (visited && !this.isEmptyText(visited)) {
-          content.push(visited);
-        }
-      }
-    } else {
-      content.push(await this.visitNode(node));
+    const visited = await this.visitNode(node);
+    if (Array.isArray(visited)) {
+      content.push(...visited.filter((v) => !this.isEmptyText(v)));
+    } else if (visited && !this.isEmptyText(visited)) {
+      content.push(visited);
     }
 
     // Ajouter les notes de bas de page à la fin
@@ -64,10 +90,13 @@ export class PDFBuilder implements Builder {
       const footnotes: Content[] = [];
       for (const [id, def] of this.footnoteDefinitions.entries()) {
         const footnoteContent = await Promise.all(def.children.map((c) => this.visitNode(c)));
+        // footnoteContent peut être un tableau de tableaux si on a des DocumentNode imbriqués
+        const flatFootnoteContent = footnoteContent.flat();
+
         footnotes.push({
           columns: [
-            { text: `[${id}] `, width: 'auto', id: `fn-${id}` },
-            { stack: footnoteContent, width: '*' },
+            { text: `[${id}] `, width: 'auto', id: `fn_${this.cleanId(id)}` },
+            { stack: flatFootnoteContent as any, width: '*' },
           ],
           margin: [0, 5, 0, 5],
           fontSize: 9,
@@ -78,8 +107,8 @@ export class PDFBuilder implements Builder {
 
     // Extraction des métadonnées
     const metadata = this.evaluator?.getAllVariables() || {};
-    if (documentNode?.fileMetadata) {
-      Object.assign(metadata, documentNode.fileMetadata.data);
+    if (node.type === 'Document' && (node as DocumentNode).fileMetadata) {
+      Object.assign(metadata, (node as DocumentNode).fileMetadata!.data);
     }
 
     const title = (metadata.title as string) || (metadata.projectTitle as string) || 'Zolt Document';
@@ -107,6 +136,7 @@ export class PDFBuilder implements Builder {
   private isEmptyText(content: Content): boolean {
     return (
       typeof content === 'object' &&
+      content !== null &&
       'text' in content &&
       content.text === '' &&
       !('id' in content) &&
@@ -116,6 +146,19 @@ export class PDFBuilder implements Builder {
 
   private async visitNode(node: ASTNode): Promise<Content> {
     switch (node.type) {
+      case 'Document': {
+        const doc = node as DocumentNode;
+        const oldSourceFile = this.sourceFile;
+        if (doc.sourceFile) {
+          this.setSourceFile(doc.sourceFile);
+        }
+        const children = await Promise.all(doc.children.map((child) => this.visitNode(child)));
+        if (doc.sourceFile) {
+          this.setSourceFile(oldSourceFile || '');
+        }
+        // Pour un Document, on renvoie le tableau de ses enfants mis à plat
+        return children.flat() as any;
+      }
       case 'Text':
         return this.inlineVisitor.visitText(node as any);
       case 'Anchor':
@@ -163,6 +206,10 @@ export class PDFBuilder implements Builder {
         return this.inlineVisitor.visitCommentInline(node as any);
       case 'Math':
         return this.inlineVisitor.visitMath(node as any);
+      case 'Variable':
+        return this.inlineVisitor.visitVariable(node as any);
+      case 'Expression':
+        return this.inlineVisitor.visitExpression(node as any);
       case 'Blockquote':
         return await this.blockVisitor.visitBlockquote(node as any);
       case 'List':
@@ -192,7 +239,6 @@ export class PDFBuilder implements Builder {
       case 'PageBreak':
         return this.blockVisitor.visitPageBreak();
       case 'FileMetadata':
-        // Ignoré ici car déjà traité dans buildToDefinition pour les métadonnées globales
         return { text: '' };
       default:
         return { text: `[Unsupported node: ${node.type}]`, color: 'red' };

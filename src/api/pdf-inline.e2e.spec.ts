@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildString } from '../index';
+import { buildString } from './index';
 
 describe('PDF Build - Section 1 Inline Syntax', () => {
   const options = { type: 'pdf' as const };
@@ -44,7 +44,7 @@ Line\\ break
     expect(flatContent).toContain('a.mp3');
     expect(flatContent).toContain('e.html');
     expect(flatContent).toContain('f.pdf');
-    expect(flatContent).toContain('fn-1');
+    expect(flatContent).toContain('fn_1');
     expect(flatContent).not.toContain('Secret');
     expect(flatContent).toContain('E=mc^2');
   });

@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { Content } from 'pdfmake/interfaces';
 import type {
   AbbreviationNode,
@@ -29,101 +30,176 @@ export class InlineVisitor {
   constructor(
     private visitNode: (node: ASTNode) => Promise<Content>,
     private assetResolver?: (path: string) => string,
-    private evaluator?: ExpressionEvaluator
+    private evaluator?: ExpressionEvaluator,
+    private baseDir?: string,
+    private sourceFile?: string
   ) {}
+
+  /**
+   * Nettoie un ID pour pdfmake (évite les caractères spéciaux qui pourraient bloquer les liens)
+   */
+  private cleanId(id: string): string {
+    return id.replace(/[:.#/\\ ]/g, '_');
+  }
 
   visitText(node: TextNode): Content {
     return { text: this.evaluateString(node.content) };
   }
 
   visitAnchor(node: AnchorNode): Content {
-    return { text: '', id: node.id };
+    // pdfmake a parfois du mal avec les textes vides pour les IDs
+    // On utilise un zero-width space (\u200B) pour assurer la présence de l'élément
+    return applyAttributes({ text: '\u200B', id: this.cleanId(node.id) }, node);
   }
 
   visitCode(node: CodeNode): Content {
-    return { text: this.evaluateString(node.content), style: 'code' };
+    return applyAttributes({ text: this.evaluateString(node.content), style: 'code' }, node);
   }
 
   async visitLink(node: LinkNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
     const href = this.evaluateString(node.href);
 
-    return {
-      text: children,
-      link: href,
-      color: 'blue',
-      decoration: 'underline',
-    };
+    // Transformation des liens internes Zolt
+    if (href.endsWith('.zlt') || href.includes('.zlt#') || href.startsWith('#')) {
+      const [rawPath, rawAnchor] = href.startsWith('#') ? ['', href.substring(1)] : href.split('#');
+
+      // Nettoyage de l'ancre si elle contient des attributs {...}
+      const anchor = rawAnchor ? rawAnchor.replace(/\{[^}]*}$/, '').trim() : '';
+      const filePath = rawPath;
+
+      // Si c'est un lien relatif, on essaie de le résoudre
+      let absolutePath = filePath;
+      if (filePath && !path.isAbsolute(filePath) && this.sourceFile) {
+        absolutePath = path.resolve(path.dirname(this.sourceFile), filePath);
+      } else if (!filePath && this.sourceFile) {
+        absolutePath = this.sourceFile;
+      }
+
+      if (this.baseDir && absolutePath) {
+        const relativePath = path.relative(this.baseDir, absolutePath);
+        const destination = anchor ? anchor : `file:${relativePath}`;
+
+        return applyAttributes(
+          {
+            text: children,
+            linkToDestination: this.cleanId(destination),
+            color: 'blue',
+            decoration: 'underline',
+          },
+          node
+        );
+      } else if (anchor) {
+        // Lien interne pur (ex: #mon-ancre)
+        return applyAttributes(
+          {
+            text: children,
+            linkToDestination: this.cleanId(anchor),
+            color: 'blue',
+            decoration: 'underline',
+          },
+          node
+        );
+      }
+    }
+
+    return applyAttributes(
+      {
+        text: children,
+        link: href,
+        color: 'blue',
+        decoration: 'underline',
+      },
+      node
+    );
   }
 
   async visitImage(node: ImageNode): Promise<Content> {
     const src = this.assetResolver ? this.assetResolver(this.evaluateString(node.src)) : this.evaluateString(node.src);
 
+    let content: any;
     try {
       if (src.startsWith('http')) {
-        return {
+        content = {
           image: src,
           width: 500,
         };
+      } else {
+        const imageBuffer = fs.readFileSync(src);
+        const extension = src.split('.').pop()?.toLowerCase() || 'png';
+        const base64Data = imageBuffer.toString('base64');
+        const dataUrl = `data:image/${extension};base64,${base64Data}`;
+
+        content = {
+          image: dataUrl,
+          width: 500,
+        };
       }
-
-      const imageBuffer = fs.readFileSync(src);
-      const extension = src.split('.').pop()?.toLowerCase() || 'png';
-      const base64Data = imageBuffer.toString('base64');
-      const dataUrl = `data:image/${extension};base64,${base64Data}`;
-
-      return {
-        image: dataUrl,
-        width: 500,
-      };
     } catch {
-      return { text: `[Image not found: ${src}]`, color: 'red' };
+      content = { text: `[Image not found: ${src}]`, color: 'red' };
     }
+
+    return applyAttributes(content, node);
   }
 
   async visitVideo(node: VideoNode): Promise<Content> {
-    return {
-      text: `[Video: ${this.evaluateString(node.alt || node.src)}]`,
-      link: this.evaluateString(node.src),
-      color: 'blue',
-      decoration: 'underline',
-    };
+    return applyAttributes(
+      {
+        text: `[Video: ${this.evaluateString(node.alt || node.src)}]`,
+        link: this.evaluateString(node.src),
+        color: 'blue',
+        decoration: 'underline',
+      },
+      node
+    );
   }
 
   async visitAudio(node: AudioNode): Promise<Content> {
-    return {
-      text: `[Audio: ${this.evaluateString(node.alt || node.src)}]`,
-      link: this.evaluateString(node.src),
-      color: 'blue',
-      decoration: 'underline',
-    };
+    return applyAttributes(
+      {
+        text: `[Audio: ${this.evaluateString(node.alt || node.src)}]`,
+        link: this.evaluateString(node.src),
+        color: 'blue',
+        decoration: 'underline',
+      },
+      node
+    );
   }
 
   async visitEmbed(node: EmbedNode): Promise<Content> {
-    return {
-      text: `[Embed: ${this.evaluateString(node.title || node.src)}]`,
-      link: this.evaluateString(node.src),
-      color: 'blue',
-      decoration: 'underline',
-    };
+    return applyAttributes(
+      {
+        text: `[Embed: ${this.evaluateString(node.title || node.src)}]`,
+        link: this.evaluateString(node.src),
+        color: 'blue',
+        decoration: 'underline',
+      },
+      node
+    );
   }
 
   async visitFile(node: FileNode): Promise<Content> {
-    return {
-      text: `[File: ${this.evaluateString(node.title || node.src)}]`,
-      link: this.evaluateString(node.src),
-      color: 'blue',
-      decoration: 'underline',
-    };
+    return applyAttributes(
+      {
+        text: `[File: ${this.evaluateString(node.title || node.src)}]`,
+        link: this.evaluateString(node.src),
+        color: 'blue',
+        decoration: 'underline',
+      },
+      node
+    );
   }
 
   async visitFootnote(node: FootnoteNode): Promise<Content> {
-    return {
-      text: `[${node.id}]`,
-      linkToDestination: `fn-${node.id}`,
-      color: 'blue',
-      sup: true,
-    };
+    return applyAttributes(
+      {
+        text: `[${node.id}]`,
+        linkToDestination: `fn_${this.cleanId(node.id)}`,
+        color: 'blue',
+        sup: true,
+      },
+      node
+    );
   }
 
   visitVariable(node: VariableNode): Content {
@@ -159,7 +235,7 @@ export class InlineVisitor {
   }
 
   visitAbbreviation(node: AbbreviationNode): Content {
-    return { text: node.abbreviation };
+    return applyAttributes({ text: node.abbreviation }, node);
   }
 
   visitCommentInline(_node: CommentInlineNode): Content {
@@ -167,34 +243,43 @@ export class InlineVisitor {
   }
 
   visitMath(node: MathNode): Content {
-    return { text: node.content, italics: true, color: '#444444' };
+    return applyAttributes({ text: node.content, italics: true, color: '#444444' }, node);
   }
 
   async visitSuperscript(node: SuperscriptNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      text: children,
-      sup: true,
-    };
+    return applyAttributes(
+      {
+        text: children,
+        sup: true,
+      },
+      node
+    );
   }
 
   async visitSubscript(node: SubscriptNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      text: children,
-      sub: true,
-    };
+    return applyAttributes(
+      {
+        text: children,
+        sub: true,
+      },
+      node
+    );
   }
 
   async visitHighlight(node: HighlightNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
-    return {
-      text: children,
-      background: 'yellow',
-    };
+    return applyAttributes(
+      {
+        text: children,
+        background: 'yellow',
+      },
+      node
+    );
   }
 
   async visitInlineStyle(node: any): Promise<Content> {

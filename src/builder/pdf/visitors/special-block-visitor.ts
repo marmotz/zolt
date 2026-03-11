@@ -3,7 +3,16 @@ import type { ASTNode, DoubleBracketBlockNode, TripleColonBlockNode } from '../.
 import { applyAttributes } from '../utils/attribute-applier';
 
 export class SpecialBlockVisitor {
+  private hasToc = false;
+
   constructor(private visitNode: (node: ASTNode) => Promise<Content>) {}
+
+  /**
+   * Réinitialise l'état du visiteur (appelé au début d'un nouveau document).
+   */
+  public reset(): void {
+    this.hasToc = false;
+  }
 
   async visitTripleColonBlock(node: TripleColonBlockNode): Promise<Content> {
     let blockContent: Content;
@@ -114,6 +123,10 @@ export class SpecialBlockVisitor {
 
     switch (node.blockType) {
       case 'toc':
+        if (this.hasToc) {
+          return { text: '' };
+        }
+        this.hasToc = true;
         blockContent = {
           toc: {
             title: { text: node.attributes?.title || 'Table of Contents', style: 'header2' },

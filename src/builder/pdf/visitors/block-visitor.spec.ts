@@ -170,4 +170,39 @@ describe('PDFBuilder - BlockVisitor', () => {
     const content = docDef.content as any[];
     expect(content[0].id).toBe('my-id');
   });
+
+  test('should handle nested Document nodes and context switching', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: '/base/doc1.zlt',
+      children: [
+        {
+          type: 'Link',
+          href: 'doc2.zlt',
+          children: [{ type: 'Text', content: 'Link to 2' } as TextNode],
+        } as any,
+        {
+          type: 'Document',
+          sourceFile: '/base/doc2.zlt',
+          children: [
+            {
+              type: 'Link',
+              href: 'doc1.zlt',
+              children: [{ type: 'Text', content: 'Link to 1' } as TextNode],
+            } as any,
+          ],
+        } as any,
+      ],
+    };
+
+    const builderWithContext = new PDFBuilder(undefined, undefined, '/base', '/base/doc1.zlt');
+    const docDef = await builderWithContext.buildToDefinition(ast);
+    const content = docDef.content as any[];
+
+    // First link in doc1.zlt should point to doc2.zlt (as an anchor)
+    expect(content[0].linkToDestination).toBe('file_doc2_zlt');
+
+    // Second link in nested doc2.zlt should point back to doc1.zlt
+    expect(content[1].linkToDestination).toBe('file_doc1_zlt');
+  });
 });

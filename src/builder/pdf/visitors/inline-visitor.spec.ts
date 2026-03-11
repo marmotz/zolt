@@ -153,7 +153,7 @@ describe('PDFBuilder - InlineVisitor', () => {
 
     const docDef = await builder.buildToDefinition(ast);
     const content = docDef.content as any[];
-    expect(content[0].linkToDestination).toBe('fn-1');
+    expect(content[0].linkToDestination).toBe('fn_1');
     expect(content[1].text).toBe('Z');
   });
 
@@ -172,5 +172,38 @@ describe('PDFBuilder - InlineVisitor', () => {
     expect(content[0].text).toBe('E=mc^2');
     // Le commentaire vide est filtré par PDFBuilder.buildToDefinition
     expect(content.length).toBe(1);
+  });
+
+  test('should build internal links', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'Link',
+          href: 'other.zlt#section',
+          children: [{ type: 'Text', content: 'Link' } as TextNode],
+        } as any,
+      ],
+    };
+
+    // Need to set baseDir and sourceFile for internal link transformation
+    const builderWithContext = new PDFBuilder(undefined, undefined, '/base', '/base/test.zlt');
+    const docDef = await builderWithContext.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].linkToDestination).toBe('section');
+  });
+
+  test('should build anchors', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [{ type: 'Anchor', id: 'my:anchor.id' } as any],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].id).toBe('my_anchor_id');
+    expect(content[0].text).toBe('\u200B');
   });
 });
