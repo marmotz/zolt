@@ -126,9 +126,14 @@ export async function buildString(content: string, options?: BuildOptions): Prom
     projectGraph = result ? result : undefined;
   }
 
+  const evaluator = new ExpressionEvaluator();
+  for (const [key, value] of Object.entries(mergedVariables)) {
+    evaluator.setVariable(key, value as Value);
+  }
+
   // Phase 4: Building
   if (options?.type === 'pdf') {
-    const builder = new PDFBuilder(options?.assetResolver);
+    const builder = new PDFBuilder(options?.assetResolver, evaluator);
 
     return builder.buildDocument(ast);
   }
@@ -185,19 +190,31 @@ export async function buildFile(inputPath: string, outputPath: string, options?:
 
 export async function buildFilesToPdf(inputPaths: string[], outputPath: string, options?: BuildOptions): Promise<void> {
   const allNodes: ASTNode[] = [];
+  const allVariables: Record<string, unknown> = {
+    ...options?.projectMetadata,
+    ...options?.variables,
+  };
 
   for (let i = 0; i < inputPaths.length; i++) {
     const inputPath = inputPaths[i];
     const content = await readFile(inputPath, 'utf-8');
 
     // Phase 1: Expansion
-    const { content: expandedContent } = getExpandedContent(content, { ...options, filePath: inputPath });
+    const { content: expandedContent, variables: expandedVariables } = getExpandedContent(content, {
+      ...options,
+      filePath: inputPath,
+    });
+    Object.assign(allVariables, expandedVariables);
 
     // Phase 2: Lexing & Parsing
     const lexer = new Lexer(expandedContent);
     const tokens = lexer.tokenize();
     const parser = new Parser(tokens, inputPath, options?.globalAbbreviations);
     const ast = parser.parse();
+
+    if (ast.fileMetadata) {
+      Object.assign(allVariables, ast.fileMetadata.data);
+    }
 
     allNodes.push(...ast.children);
 
@@ -213,7 +230,12 @@ export async function buildFilesToPdf(inputPaths: string[], outputPath: string, 
     sourceFile: outputPath,
   };
 
-  const builder = new PDFBuilder(options?.assetResolver);
+  const evaluator = new ExpressionEvaluator();
+  for (const [key, value] of Object.entries(allVariables)) {
+    evaluator.setVariable(key, value as Value);
+  }
+
+  const builder = new PDFBuilder(options?.assetResolver, evaluator);
   const docDef = await builder.buildToDefinition(finalAst);
   docDef.defaultStyle = {
     font: 'Courier',

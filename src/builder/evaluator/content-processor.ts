@@ -1,3 +1,4 @@
+import { formatValue } from '../../utils/value-formatter';
 import type { ExpressionEvaluator, Value } from './expression-evaluator';
 
 export class ContentProcessor {
@@ -203,7 +204,7 @@ export class ContentProcessor {
       try {
         const value = this.evaluator.evaluate(expression);
 
-        return this.formatValue(value);
+        return formatValue(value);
       } catch {
         return match;
       }
@@ -223,36 +224,11 @@ export class ContentProcessor {
           return match;
         }
 
-        return this.formatValue(value);
+        return formatValue(value);
       } catch {
         return match;
       }
     });
-  }
-
-  private formatValue(value: Value): string {
-    if (value === null || value === undefined) {
-      return '';
-    }
-    if (typeof value === 'boolean') {
-      return value ? 'true' : 'false';
-    }
-    if (typeof value === 'number') {
-      if (Number.isInteger(value)) {
-        return value.toString();
-      }
-      const formatted = value.toFixed(10);
-
-      return parseFloat(formatted).toString();
-    }
-    if (Array.isArray(value)) {
-      return JSON.stringify(value);
-    }
-    if (typeof value === 'object') {
-      return JSON.stringify(value);
-    }
-
-    return String(value);
   }
 
   evaluateCondition(condition: string): boolean {
@@ -284,7 +260,7 @@ export class ContentProcessor {
       try {
         const value = this.evaluator.evaluate(expr);
 
-        return this.formatValue(value);
+        return formatValue(value);
       } catch {
         return 'false';
       }
@@ -294,7 +270,7 @@ export class ContentProcessor {
       try {
         const value = this.evaluator.evaluate(`$${varPath}`);
 
-        return this.formatValue(value);
+        return formatValue(value);
       } catch {
         return 'null';
       }

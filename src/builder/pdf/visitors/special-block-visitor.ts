@@ -1,5 +1,5 @@
 import type { Content } from 'pdfmake/interfaces';
-import type { ASTNode, TripleColonBlockNode } from '../../../parser/types';
+import type { ASTNode, DoubleBracketBlockNode, TripleColonBlockNode } from '../../../parser/types';
 import { applyAttributes } from '../utils/attribute-applier';
 
 export class SpecialBlockVisitor {
@@ -104,6 +104,32 @@ export class SpecialBlockVisitor {
           margin: [0, 10, 0, 10],
         };
       }
+    }
+
+    return applyAttributes(blockContent, node);
+  }
+
+  async visitDoubleBracketBlock(node: DoubleBracketBlockNode): Promise<Content> {
+    let blockContent: Content;
+
+    switch (node.blockType) {
+      case 'toc':
+        blockContent = {
+          toc: {
+            title: { text: node.attributes?.title || 'Table of Contents', style: 'header2' },
+          },
+          margin: [0, 10, 0, 20],
+        };
+        break;
+
+      case 'filetree':
+      case 'filetree-nav':
+        // On ignore totalement le filetree comme demandé
+        return { text: '' };
+
+      default:
+        // Pour les autres types, on ignore ou on affiche le contenu brut
+        return { text: '' };
     }
 
     return applyAttributes(blockContent, node);

@@ -99,11 +99,11 @@ Légende :
 
 ## 4. Blocs Dynamiques (Double Bracket `[[...]]`)
 
-| Feature           | Syntaxe            | HTML Builder | PDF Builder | Test E2E                 |
-|:------------------|:-------------------|:------------:|:-----------:|:-------------------------|
-| Table of Contents | `[[toc]]`          |     [x]      |     [ ]     | toc.e2e.spec.ts          |
-| File Tree         | `[[filetree]]`     |     [x]      |     [ ]     | filetree.e2e.spec.ts     |
-| File Tree Nav     | `[[filetree-nav]]` |     [x]      |     [ ]     | filetree-nav.e2e.spec.ts |
+| Feature           | Syntaxe            | HTML Builder | PDF Builder | Test E2E                |
+|:------------------|:-------------------|:------------:|:-----------:|:------------------------|
+| Table of Contents | `[[toc]]`          |     [x]      |     [x]     | pdf-dynamic.e2e.spec.ts |
+| File Tree         | `[[filetree]]`     |     [x]      |     [x]     | pdf-dynamic.e2e.spec.ts |
+| File Tree Nav     | `[[filetree-nav]]` |     [x]      |     [x]     | pdf-dynamic.e2e.spec.ts |
 
 ## 5. Logique et Calculs
 

@@ -1,3 +1,7 @@
+import { formatValue } from '../../../utils/value-formatter';
+
+export { formatValue };
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -44,31 +48,6 @@ export function toAlpha(num: number): string {
   }
 
   return alpha || 'A';
-}
-
-export function formatValue(value: any): string {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  if (typeof value === 'boolean') {
-    return value ? 'true' : 'false';
-  }
-  if (typeof value === 'number') {
-    if (Number.isInteger(value)) {
-      return value.toString();
-    }
-    const formatted = value.toFixed(10);
-
-    return parseFloat(formatted).toString();
-  }
-  if (Array.isArray(value)) {
-    return JSON.stringify(value);
-  }
-  if (typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-
-  return String(value);
 }
 
 export function transformHref(href: string): string {

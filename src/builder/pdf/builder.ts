@@ -1,6 +1,7 @@
 import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
 import type { ASTNode, DocumentNode } from '../../parser/types';
 import type { Builder } from '../builder';
+import type { ExpressionEvaluator } from '../evaluator/expression-evaluator';
 import { defaultPDFStyles } from './styles';
 import { BlockVisitor } from './visitors/block-visitor';
 import { InlineVisitor } from './visitors/inline-visitor';
@@ -14,10 +15,13 @@ export class PDFBuilder implements Builder {
   private specialBlockVisitor: SpecialBlockVisitor;
   private footnoteDefinitions: Map<string, { children: ASTNode[]; attributes?: any }> = new Map();
 
-  constructor(private assetResolver?: (path: string) => string) {
+  constructor(
+    private assetResolver?: (path: string) => string,
+    private evaluator?: ExpressionEvaluator
+  ) {
     const visitNodeBound = this.visitNode.bind(this);
 
-    this.inlineVisitor = new InlineVisitor(visitNodeBound, this.assetResolver);
+    this.inlineVisitor = new InlineVisitor(visitNodeBound, this.assetResolver, this.evaluator);
     this.blockVisitor = new BlockVisitor(visitNodeBound);
     this.tableVisitor = new TableVisitor(visitNodeBound);
     this.specialBlockVisitor = new SpecialBlockVisitor(visitNodeBound);
@@ -154,6 +158,10 @@ export class PDFBuilder implements Builder {
         return await this.blockVisitor.visitIndentation(node as any);
       case 'TripleColonBlock':
         return await this.specialBlockVisitor.visitTripleColonBlock(node as any);
+      case 'VariableDefinition':
+        return { text: '' };
+      case 'DoubleBracketBlock':
+        return await this.specialBlockVisitor.visitDoubleBracketBlock(node as any);
       case 'CodeBlock':
         return this.blockVisitor.visitCodeBlock(node as any);
       case 'HorizontalRule':

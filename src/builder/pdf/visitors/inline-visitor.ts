@@ -8,6 +8,7 @@ import type {
   CodeNode,
   CommentInlineNode,
   EmbedNode,
+  ExpressionNode,
   FileNode,
   FootnoteNode,
   HighlightNode,
@@ -17,18 +18,22 @@ import type {
   SubscriptNode,
   SuperscriptNode,
   TextNode,
+  VariableNode,
   VideoNode,
 } from '../../../parser/types';
+import { formatValue } from '../../../utils/value-formatter';
+import type { ExpressionEvaluator } from '../../evaluator/expression-evaluator';
 import { applyAttributes } from '../utils/attribute-applier';
 
 export class InlineVisitor {
   constructor(
     private visitNode: (node: ASTNode) => Promise<Content>,
-    private assetResolver?: (path: string) => string
+    private assetResolver?: (path: string) => string,
+    private evaluator?: ExpressionEvaluator
   ) {}
 
   visitText(node: TextNode): Content {
-    return { text: node.content };
+    return { text: this.evaluateString(node.content) };
   }
 
   visitAnchor(node: AnchorNode): Content {
@@ -36,22 +41,23 @@ export class InlineVisitor {
   }
 
   visitCode(node: CodeNode): Content {
-    return { text: node.content, style: 'code' };
+    return { text: this.evaluateString(node.content), style: 'code' };
   }
 
   async visitLink(node: LinkNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
+    const href = this.evaluateString(node.href);
 
     return {
       text: children,
-      link: node.href,
+      link: href,
       color: 'blue',
       decoration: 'underline',
     };
   }
 
   async visitImage(node: ImageNode): Promise<Content> {
-    const src = this.assetResolver ? this.assetResolver(node.src) : node.src;
+    const src = this.assetResolver ? this.assetResolver(this.evaluateString(node.src)) : this.evaluateString(node.src);
 
     try {
       if (src.startsWith('http')) {
@@ -77,8 +83,8 @@ export class InlineVisitor {
 
   async visitVideo(node: VideoNode): Promise<Content> {
     return {
-      text: `[Video: ${node.alt || node.src}]`,
-      link: node.src,
+      text: `[Video: ${this.evaluateString(node.alt || node.src)}]`,
+      link: this.evaluateString(node.src),
       color: 'blue',
       decoration: 'underline',
     };
@@ -86,8 +92,8 @@ export class InlineVisitor {
 
   async visitAudio(node: AudioNode): Promise<Content> {
     return {
-      text: `[Audio: ${node.alt || node.src}]`,
-      link: node.src,
+      text: `[Audio: ${this.evaluateString(node.alt || node.src)}]`,
+      link: this.evaluateString(node.src),
       color: 'blue',
       decoration: 'underline',
     };
@@ -95,8 +101,8 @@ export class InlineVisitor {
 
   async visitEmbed(node: EmbedNode): Promise<Content> {
     return {
-      text: `[Embed: ${node.title || node.src}]`,
-      link: node.src,
+      text: `[Embed: ${this.evaluateString(node.title || node.src)}]`,
+      link: this.evaluateString(node.src),
       color: 'blue',
       decoration: 'underline',
     };
@@ -104,8 +110,8 @@ export class InlineVisitor {
 
   async visitFile(node: FileNode): Promise<Content> {
     return {
-      text: `[File: ${node.title || node.src}]`,
-      link: node.src,
+      text: `[File: ${this.evaluateString(node.title || node.src)}]`,
+      link: this.evaluateString(node.src),
       color: 'blue',
       decoration: 'underline',
     };
@@ -120,8 +126,39 @@ export class InlineVisitor {
     };
   }
 
+  visitVariable(node: VariableNode): Content {
+    if (!this.evaluator) {
+      return { text: `{$${node.name}}` };
+    }
+    try {
+      const value = this.evaluator.evaluate(`$${node.name}`);
+      if (value === null || value === undefined) {
+        return { text: `{$${node.name}}` };
+      }
+
+      return { text: formatValue(value) };
+    } catch {
+      return { text: `{$${node.name}}` };
+    }
+  }
+
+  visitExpression(node: ExpressionNode): Content {
+    if (!this.evaluator) {
+      return { text: `{{${node.expression}}}` };
+    }
+    try {
+      const value = this.evaluator.evaluate(node.expression);
+      if (value === null || value === undefined) {
+        return { text: `{{${node.expression}}}` };
+      }
+
+      return { text: formatValue(value) };
+    } catch {
+      return { text: `{{${node.expression}}}` };
+    }
+  }
+
   visitAbbreviation(node: AbbreviationNode): Content {
-    // pdfmake ne supporte pas nativement les tooltips, on affiche juste le texte
     return { text: node.abbreviation };
   }
 
@@ -130,7 +167,6 @@ export class InlineVisitor {
   }
 
   visitMath(node: MathNode): Content {
-    // Rendu basique pour l'instant
     return { text: node.content, italics: true, color: '#444444' };
   }
 
@@ -177,5 +213,21 @@ export class InlineVisitor {
       },
       node
     );
+  }
+
+  private evaluateString(text: string): string {
+    if (!this.evaluator) {
+      return text;
+    }
+
+    return text.replace(/\{\$([a-zA-Z_][a-zA-Z0-9_]*[^}]*)?}/g, (_, name) => {
+      try {
+        const val = this.evaluator!.evaluate(`$${name}`);
+
+        return formatValue(val);
+      } catch {
+        return `{$${name}}`;
+      }
+    });
   }
 }

@@ -170,6 +170,7 @@ describe('PDFBuilder - InlineVisitor', () => {
     const docDef = await builder.buildToDefinition(ast);
     const content = docDef.content as any[];
     expect(content[0].text).toBe('E=mc^2');
-    expect(content[1].text).toBe('');
+    // Le commentaire vide est filtré par PDFBuilder.buildToDefinition
+    expect(content.length).toBe(1);
   });
 });

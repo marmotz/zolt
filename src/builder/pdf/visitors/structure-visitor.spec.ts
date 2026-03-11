@@ -149,4 +149,41 @@ describe('PDFBuilder - Structure Visitors (Table & SpecialBlocks)', () => {
     expect(content[0].table).toBeDefined();
     expect(content[0].table.body[0][0].stack[0].text).toBe('More Info');
   });
+
+  test('should build TOC', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'DoubleBracketBlock',
+          blockType: 'toc',
+          attributes: { title: 'My TOC' },
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    expect(content[0].toc).toBeDefined();
+    expect(content[0].toc.title.text).toBe('My TOC');
+  });
+
+  test('should ignore filetree', async () => {
+    const ast: DocumentNode = {
+      type: 'Document',
+      sourceFile: 'test.zlt',
+      children: [
+        {
+          type: 'DoubleBracketBlock',
+          blockType: 'filetree',
+        } as any,
+      ],
+    };
+
+    const docDef = await builder.buildToDefinition(ast);
+    const content = docDef.content as any[];
+    // Le visiteur retourne { text: '' } pour le filetree
+    expect(content.length).toBe(0);
+  });
 });

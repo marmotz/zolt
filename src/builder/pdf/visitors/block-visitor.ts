@@ -32,11 +32,16 @@ export class BlockVisitor {
   async visitHeading(node: HeadingNode): Promise<Content> {
     const children = await Promise.all(node.children.map((child) => this.visitNode(child)));
 
+    // On ignore les titres qui ont l'attribut noToc
+    const tocItem = !(node.attributes && Object.hasOwn(node.attributes, 'noToc'));
+
     return applyAttributes(
       {
         text: children,
         style: `header${node.level}`,
-      },
+        tocItem,
+        tocLevel: node.level - 1,
+      } as any,
       node
     );
   }
