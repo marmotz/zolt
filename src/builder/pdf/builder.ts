@@ -43,8 +43,10 @@ export class PDFBuilder implements Builder {
     this.footnoteDefinitions.clear();
     const content: Content[] = [];
 
+    let documentNode: DocumentNode | undefined;
     if (node.type === 'Document') {
-      for (const child of (node as DocumentNode).children) {
+      documentNode = node as DocumentNode;
+      for (const child of documentNode.children) {
         const visited = await this.visitNode(child);
         if (visited && !this.isEmptyText(visited)) {
           content.push(visited);
@@ -74,7 +76,26 @@ export class PDFBuilder implements Builder {
       content.push({ stack: footnotes });
     }
 
+    // Extraction des métadonnées
+    const metadata = this.evaluator?.getAllVariables() || {};
+    if (documentNode?.fileMetadata) {
+      Object.assign(metadata, documentNode.fileMetadata.data);
+    }
+
+    const title = (metadata.title as string) || (metadata.projectTitle as string) || 'Zolt Document';
+    const author = (metadata.author as string) || '';
+    const subject = (metadata.description as string) || (metadata.subject as string) || '';
+    const keywords = (metadata.keywords as string) || '';
+
     return {
+      info: {
+        title,
+        author,
+        subject,
+        keywords,
+        creator: 'Zolt',
+        producer: 'Zolt PDF Builder',
+      },
       content,
       styles: defaultPDFStyles,
       defaultStyle: {
@@ -170,6 +191,9 @@ export class PDFBuilder implements Builder {
         return this.blockVisitor.visitLineBreak();
       case 'PageBreak':
         return this.blockVisitor.visitPageBreak();
+      case 'FileMetadata':
+        // Ignoré ici car déjà traité dans buildToDefinition pour les métadonnées globales
+        return { text: '' };
       default:
         return { text: `[Unsupported node: ${node.type}]`, color: 'red' };
     }

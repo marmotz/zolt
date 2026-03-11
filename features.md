@@ -109,21 +109,21 @@ Légende :
 
 | Feature                | Syntaxe         | HTML Builder | PDF Builder | Test E2E                       |
 |:-----------------------|:----------------|:------------:|:-----------:|:-------------------------------|
-| Conditionnelle         | `:::if`         |     [x]      |     [ ]     | calculations.e2e.spec.ts       |
-| Boucle                 | `:::foreach`    |     [x]      |     [ ]     | calculations.e2e.spec.ts       |
-| Définition Var locale  | `$var = value`  |     [x]      |     [ ]     | resource-variables.e2e.spec.ts |
-| Définition Var globale | `$$var = value` |     [x]      |     [ ]     | resource-variables.e2e.spec.ts |
+| Conditionnelle         | `:::if`         |     [x]      |     [x]     | calculations.e2e.spec.ts       |
+| Boucle                 | `:::foreach`    |     [x]      |     [x]     | calculations.e2e.spec.ts       |
+| Définition Var locale  | `$var = value`  |     [x]      |     [x]     | resource-variables.e2e.spec.ts |
+| Définition Var globale | `$$var = value` |     [x]      |     [x]     | resource-variables.e2e.spec.ts |
 
 ## 6. Métadonnées et Configuration
 
-| Feature          | Localisation    | HTML Builder | PDF Builder | Test E2E                             |
-|:-----------------|:----------------|:------------:|:-----------:|:-------------------------------------|
-| Frontmatter YAML | Haut de fichier |     [x]      |     [ ]     | file-metadata-evaluation.e2e.spec.ts |
-| Titre            | `title:`        |     [x]      |     [ ]     | file-metadata-evaluation.e2e.spec.ts |
-| Auteur           | `author:`       |     [x]      |     [ ]     | file-metadata-evaluation.e2e.spec.ts |
-| Thème            | `theme:`        |     [x]      |     [ ]     | themes.e2e.spec.ts                   |
-| Mise en page     | `layout:`       |     [x]      |     [ ]     | layout.e2e.spec.ts                   |
-| Sidebar config   | `sidebar:`      |     [x]      |     [ ]     | sidebar-layout.e2e.spec.ts           |
+| Feature          | Localisation    | HTML Builder | PDF Builder | Test E2E                 |
+|:-----------------|:----------------|:------------:|:-----------:|:-------------------------|
+| Frontmatter YAML | Haut de fichier |     [x]      |     [x]     | pdf-metadata.e2e.spec.ts |
+| Titre            | `title:`        |     [x]      |     [x]     | pdf-metadata.e2e.spec.ts |
+| Auteur           | `author:`       |     [x]      |     [x]     | pdf-metadata.e2e.spec.ts |
+| Thème            | `theme:`        |     [x]      |     [ ]     | themes.e2e.spec.ts       |
+| Mise en page     | `layout:`       |     [x]      |     [x]     | pdf-metadata.e2e.spec.ts |
+| Sidebar config   | `sidebar:`      |     [x]      |     [x]     | pdf-metadata.e2e.spec.ts |
 
 ## 7. Attributs (`{...}`)
 
